@@ -4,10 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.http.api.request;
+package org.mule.extension.http.internal.request;
 
 import static java.lang.Integer.MAX_VALUE;
-import org.mule.extension.http.api.HttpConnector;
+import org.mule.extension.http.internal.request.validator.HttpMetadataResolver;
+import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
+import org.mule.extension.http.internal.HttpConnector;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
@@ -16,7 +18,6 @@ import org.mule.extension.http.api.request.client.HttpClient;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.request.validator.SuccessStatusCodeValidator;
-import org.mule.extension.http.internal.request.HttpRequester;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;

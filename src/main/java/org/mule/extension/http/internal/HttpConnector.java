@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.http.api;
+package org.mule.extension.http.internal;
 
-import org.mule.extension.http.api.listener.HttpListenerConfig;
-import org.mule.extension.http.api.request.HttpRequesterConfig;
+import org.mule.extension.http.internal.listener.server.HttpListenerConfig;
+import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
 import org.mule.extension.http.api.request.authentication.BasicAuthentication;
 import org.mule.extension.http.api.request.authentication.DigestAuthentication;
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
@@ -18,7 +18,7 @@ import org.mule.extension.http.api.request.proxy.ProxyConfig;
 import org.mule.extension.http.api.request.validator.FailureStatusCodeValidator;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.request.validator.SuccessStatusCodeValidator;
-import org.mule.extension.http.internal.listener.HttpListenerConnectionManager;
+import org.mule.extension.http.api.server.HttpListenerConnectionManager;
 import org.mule.module.socket.api.SocketsExtension;
 import org.mule.module.socket.api.socket.tcp.TcpClientSocketProperties;
 import org.mule.module.socket.api.socket.tcp.TcpServerSocketProperties;

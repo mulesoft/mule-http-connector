@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.http.api.listener;
+package org.mule.extension.http.internal.listener;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
@@ -13,8 +13,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpStreamingType;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
-import org.mule.extension.http.internal.listener.HttpRequestToMuleMessage;
-import org.mule.extension.http.internal.listener.MuleEventToHttpResponse;
+import org.mule.extension.http.internal.listener.server.HttpListenerConfig;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.api.message.MuleMessage;
