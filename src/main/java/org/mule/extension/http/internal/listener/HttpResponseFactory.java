@@ -9,6 +9,7 @@ package org.mule.extension.http.internal.listener;
 
 import static org.mule.extension.http.api.HttpStreamingType.ALWAYS;
 import static org.mule.extension.http.api.HttpStreamingType.AUTO;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.getReasonPhraseForStatusCode;
@@ -18,13 +19,15 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Names.TRANSFER_ENCODI
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
 import org.mule.extension.http.api.HttpStreamingType;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.message.MultiPartPayload;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.model.ParameterMap;
 import org.mule.runtime.core.util.IOUtils;
@@ -55,7 +58,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-public class MuleEventToHttpResponse {
+public class HttpResponseFactory implements Startable {
 
   public static final String MULTIPART = "multipart";
   private Logger logger = LoggerFactory.getLogger(getClass());
@@ -63,46 +66,50 @@ public class MuleEventToHttpResponse {
   private HttpStreamingType responseStreaming = AUTO;
   private MuleContext muleContext;
   private boolean multipartEntityWithNoMultipartContentyTypeWarned;
-  private boolean mapPayloadButNoUrlEncodedContentyTypeWarned;
+  private boolean mapPayloadButNoUrlEncodedContentTypeWarned;
+  private Transformer objectToByteArray;
 
-  public MuleEventToHttpResponse(HttpStreamingType responseStreaming, MuleContext muleContext) {
+  public HttpResponseFactory(HttpStreamingType responseStreaming, MuleContext muleContext) {
     this.responseStreaming = responseStreaming;
     this.muleContext = muleContext;
+  }
+
+  @Override
+  public void start() throws MuleException {
+    objectToByteArray = muleContext.getRegistry().lookupTransformer(OBJECT, BYTE_ARRAY);
   }
 
   /**
    * Creates an {@HttpResponse}.
    *
-   * @param event The {@link Event} that should be used to set the {@link HttpResponse} content.
-   * @param responseBuilder The {@link HttpResponseBuilder} that should be modified if necessary and used to build the
-   *        {@link HttpResponse}.
-   * @param listenerResponseBuilder The generic {@HttpListenerResponseBuilder} configured for this listener.
+   * @param responseBuilder          The {@link HttpResponseBuilder} that should be modified if necessary and used to build the
+   *                                 {@link HttpResponse}.
+   * @param listenerResponseBuilder  The generic {@HttpListenerResponseBuilder} configured for this listener.
    * @param supportsTransferEncoding boolean that determines whether the HTTP protocol of the response supports streaming.
    * @return an {@HttpResponse} configured based on the parameters.
    * @throws MessagingException if the response creation fails.
    */
-  public HttpResponse create(Event event, HttpResponseBuilder responseBuilder,
-                             HttpListenerResponseBuilder listenerResponseBuilder, boolean supportsTransferEncoding)
+  public HttpResponse create(HttpResponseBuilder responseBuilder,
+                             HttpListenerResponseBuilder listenerResponseBuilder,
+                             boolean supportsTransferEncoding)
       throws MessagingException {
-    Map<String, String> headers = listenerResponseBuilder.getHeaders(event);
+
+    Map<String, String> headers = listenerResponseBuilder.getHeaders();
 
     final HttpResponseHeaderBuilder httpResponseHeaderBuilder = new HttpResponseHeaderBuilder();
 
-    for (String name : headers.keySet()) {
+    headers.forEach((key, value) -> {
       // For now, only support single headers
-      if (TRANSFER_ENCODING.equals(name) && !supportsTransferEncoding) {
-        logger
-            .debug("Client HTTP version is lower than 1.1 so the unsupported 'Transfer-Encoding' header has been removed and 'Content-Length' will be sent instead.");
+      if (TRANSFER_ENCODING.equals(key) && !supportsTransferEncoding) {
+        logger.debug(
+                     "Client HTTP version is lower than 1.1 so the unsupported 'Transfer-Encoding' header has been removed and 'Content-Length' will be sent instead.");
       } else {
-        httpResponseHeaderBuilder.addHeader(name, headers.get(name));
+        httpResponseHeaderBuilder.addHeader(key, value);
       }
-    }
+    });
 
-    if (httpResponseHeaderBuilder.getContentType() == null) {
-      DataType dataType = event.getMessage().getPayload().getDataType();
-      if (!MediaType.ANY.matches(dataType.getMediaType())) {
-        httpResponseHeaderBuilder.addHeader(CONTENT_TYPE, dataType.getMediaType().toString());
-      }
+    if (httpResponseHeaderBuilder.getContentType() == null && !MediaType.ANY.matches(listenerResponseBuilder.getMediaType())) {
+      httpResponseHeaderBuilder.addHeader(CONTENT_TYPE, listenerResponseBuilder.getMediaType().toString());
     }
 
     final String configuredContentType = httpResponseHeaderBuilder.getContentType();
@@ -110,7 +117,7 @@ public class MuleEventToHttpResponse {
     final String existingContentLength = httpResponseHeaderBuilder.getContentLength();
 
     HttpEntity httpEntity;
-    final Object payload = event.getMessage().getPayload().getValue();
+    final Object payload = listenerResponseBuilder.getBody();
 
     if (payload == null) {
       setupContentLengthEncoding(httpResponseHeaderBuilder, 0);
@@ -121,7 +128,7 @@ public class MuleEventToHttpResponse {
       } else if (!configuredContentType.startsWith(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())) {
         warnMapPayloadButNoUrlEncodedContentType(httpResponseHeaderBuilder.getContentType());
       }
-      httpEntity = createUrlEncodedEntity(event, (Map) payload);
+      httpEntity = createUrlEncodedEntity(listenerResponseBuilder.getMediaType(), (Map) payload);
       if (responseStreaming == ALWAYS && supportsTransferEncoding) {
         setupChunkedEncoding(httpResponseHeaderBuilder);
       } else {
@@ -138,7 +145,7 @@ public class MuleEventToHttpResponse {
       } else if (!configuredContentType.startsWith(MULTIPART)) {
         warnNoMultipartContentTypeButMultipartEntity(httpResponseHeaderBuilder.getContentType());
       }
-      httpEntity = createMultipartEntity(event, httpResponseHeaderBuilder.getContentType(), (MultiPartPayload) payload);
+      httpEntity = createMultipartEntity(httpResponseHeaderBuilder.getContentType(), (MultiPartPayload) payload);
       resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding,
                       (ByteArrayHttpEntity) httpEntity);
     } else if (payload instanceof InputStream) {
@@ -154,7 +161,7 @@ public class MuleEventToHttpResponse {
       }
     } else {
       try {
-        ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(event.getMessageAsBytes(muleContext));
+        ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity((byte[]) objectToByteArray.transform(payload));
         resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding,
                         byteArrayHttpEntity);
         httpEntity = byteArrayHttpEntity;
@@ -171,11 +178,11 @@ public class MuleEventToHttpResponse {
       }
     }
 
-    Integer statusCode = listenerResponseBuilder.getStatusCode(event);
+    Integer statusCode = listenerResponseBuilder.getStatusCode();
     if (statusCode != null) {
       responseBuilder.setStatusCode(statusCode);
     }
-    String reasonPhrase = resolveReasonPhrase(listenerResponseBuilder.getReasonPhrase(event), statusCode);
+    String reasonPhrase = resolveReasonPhrase(listenerResponseBuilder.getReasonPhrase(), statusCode);
     if (reasonPhrase != null) {
       responseBuilder.setReasonPhrase(reasonPhrase);
     }
@@ -224,12 +231,12 @@ public class MuleEventToHttpResponse {
     return String.format("%s; boundary=%s", HttpHeaders.Values.MULTIPART_FORM_DATA, UUID.getUUID());
   }
 
-  private HttpEntity createUrlEncodedEntity(Event event, Map payload) {
+  private HttpEntity createUrlEncodedEntity(MediaType mediaType, Map payload) {
     final Map mapPayload = payload;
     HttpEntity entity = new EmptyHttpEntity();
     if (!mapPayload.isEmpty()) {
       String encodedBody;
-      final Charset encoding = event.getMessage().getPayload().getDataType().getMediaType().getCharset().get();
+      final Charset encoding = mediaType.getCharset().get();
       if (mapPayload instanceof ParameterMap) {
         encodedBody = HttpParser.encodeString(encoding, ((ParameterMap) mapPayload).toListValuesMap());
       } else {
@@ -241,11 +248,11 @@ public class MuleEventToHttpResponse {
   }
 
   private void warnMapPayloadButNoUrlEncodedContentType(String contentType) {
-    if (!mapPayloadButNoUrlEncodedContentyTypeWarned) {
+    if (!mapPayloadButNoUrlEncodedContentTypeWarned) {
       logger.warn(String.format(
                                 "Payload is a Map which will be used to generate an url encoded http body but Contenty-Type specified is %s and not %s.",
                                 contentType, HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED));
-      mapPayloadButNoUrlEncodedContentyTypeWarned = true;
+      mapPayloadButNoUrlEncodedContentTypeWarned = true;
     }
   }
 
@@ -258,7 +265,7 @@ public class MuleEventToHttpResponse {
     }
   }
 
-  private HttpEntity createMultipartEntity(Event event, String contentType, MultiPartPayload partPayload)
+  private HttpEntity createMultipartEntity(String contentType, MultiPartPayload partPayload)
       throws MessagingException {
     if (logger.isDebugEnabled()) {
       logger.debug("Message contains attachments. Ignoring payload and trying to generate multipart response.");
@@ -266,12 +273,11 @@ public class MuleEventToHttpResponse {
 
     final MultipartHttpEntity multipartEntity;
     try {
-      Transformer objectToByteArray = muleContext.getRegistry().lookupTransformer(OBJECT, BYTE_ARRAY);
+
       multipartEntity = new MultipartHttpEntity(HttpPartDataSource.createFrom(partPayload, objectToByteArray));
       return new ByteArrayHttpEntity(HttpMultipartEncoder.createMultipartContent(multipartEntity, contentType));
     } catch (Exception e) {
-      throw new MessagingException(I18nMessageFactory.createStaticMessage("Error creating multipart HTTP entity."),
-                                   event.getMessage(), muleContext, e);
+      throw new MuleRuntimeException(createStaticMessage("Error creating multipart HTTP entity."), e);
     }
   }
 

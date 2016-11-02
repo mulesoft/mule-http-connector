@@ -11,12 +11,12 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.module.http.internal.HttpParser.decodeUrlEncodedBody;
 import static org.mule.runtime.module.http.internal.multipart.HttpPartDataSource.multiPartPayloadForAttachments;
 import static org.mule.runtime.module.http.internal.util.HttpToMuleMessage.getMediaType;
-
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.http.api.HttpHeaders;
 import org.mule.runtime.module.http.internal.domain.EmptyHttpEntity;
 import org.mule.runtime.module.http.internal.domain.HttpEntity;
@@ -29,20 +29,17 @@ import org.mule.runtime.module.http.internal.listener.ListenerPath;
 
 import java.io.IOException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Component that transforms an HTTP request to a proper {@link Message}.
  *
  * @since 4.0
  */
-public class HttpRequestToMuleMessage {
+public class HttpRequestToResult {
 
-  private static Logger logger = LoggerFactory.getLogger(HttpRequestToMuleMessage.class);
-
-  public static Message transform(final HttpRequestContext requestContext, final MuleContext muleContext,
-                                  Boolean parseRequest, ListenerPath listenerPath)
+  public static Result<Object, HttpRequestAttributes> transform(final HttpRequestContext requestContext,
+                                                                final MuleContext muleContext,
+                                                                Boolean parseRequest,
+                                                                ListenerPath listenerPath)
       throws HttpRequestParsingException {
     final HttpRequest request = requestContext.getRequest();
 
@@ -84,7 +81,8 @@ public class HttpRequestToMuleMessage {
 
     HttpRequestAttributes attributes =
         new HttpRequestAttributesBuilder().setRequestContext(requestContext).setListenerPath(listenerPath).build();
-    return Message.builder().payload(payload).mediaType(mediaType).attributes(attributes).build();
+
+    return Result.<Object, HttpRequestAttributes>builder().output(payload).mediaType(mediaType).attributes(attributes).build();
   }
 
 }
