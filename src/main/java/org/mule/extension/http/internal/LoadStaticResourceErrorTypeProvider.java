@@ -17,7 +17,7 @@ import java.util.Set;
 /**
  * Errors that can be thrown in the {@link HttpOperations#loadStaticResource(StaticResourceLoader)} operation.
  *
- * @since 4.0
+ * @since 1.0
  */
 public class LoadStaticResourceErrorTypeProvider implements ErrorTypeProvider {
 

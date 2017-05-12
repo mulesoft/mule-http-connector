@@ -15,7 +15,7 @@ import org.mule.service.http.api.client.HttpRequestAuthentication;
 /**
  * Configures NTLM authentication for the requests.
  *
- * @since 4.0
+ * @since 1.0
  */
 public class NtlmAuthentication extends UsernamePasswordAuthentication {
 

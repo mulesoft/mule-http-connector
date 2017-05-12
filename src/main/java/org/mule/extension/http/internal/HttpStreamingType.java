@@ -9,7 +9,7 @@ package org.mule.extension.http.internal;
 /**
  * Streaming mode for HTTP. Streaming in HTTP implies using Transfer-Encoding: chunked
  *
- * @since 4.0
+ * @since 1.0
  */
 public enum HttpStreamingType {
   /**

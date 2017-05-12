@@ -57,7 +57,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Component that generates {@link HttpRequest HttpRequests}.
  *
- * @since 4.0
+ * @since 1.0
  */
 public class HttpRequestFactory {
 

@@ -46,7 +46,7 @@ import javax.inject.Inject;
 /**
  * Connection provider for a {@link HttpListener}, handles the creation of {@link HttpServer} instances.
  *
- * @since 4.0
+ * @since 1.0
  */
 @Alias("listener")
 public class HttpListenerProvider implements CachedConnectionProvider<HttpServer>, Lifecycle {

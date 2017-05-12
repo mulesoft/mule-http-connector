@@ -11,7 +11,7 @@ import org.mule.service.http.api.domain.ParameterMap;
 /**
  * Common parts of all http request attributes.
  *
- * @since 4.0
+ * @since 1.0
  */
 public class BaseHttpRequestAttributes extends HttpAttributes {
 

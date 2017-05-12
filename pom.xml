@@ -4,20 +4,27 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.mule.extensions</groupId>
-        <artifactId>mule-extensions</artifactId>
+        <artifactId>mule-core-modules-parent</artifactId>
         <version>4.0.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.mule.modules</groupId>
-    <artifactId>mule-module-http-ext</artifactId>
+    <groupId>org.mule.connectors</groupId>
+    <artifactId>mule-http-connector</artifactId>
     <packaging>mule-extension</packaging>
+    <version>1.0.0-SNAPSHOT</version>
 
     <name>Mule HTTP Extension</name>
     <description>A Mule extension that provides HTTP server and client functionality</description>
 
     <properties>
-        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+        <commonsCodecVersion>1.9</commonsCodecVersion>
+        <fluentHcVersion>4.3.5</fluentHcVersion>
+        <javaxMailVersion>1.4.3</javaxMailVersion>
+        <jettyVersion>9.0.7.v20131107</jettyVersion>
+        <projectReactorVersion>3.0.7.RELEASE</projectReactorVersion>
+
+        <formatterConfigPath>formatter.xml</formatterConfigPath>
     </properties>
 
     <build>
@@ -37,60 +44,42 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-service-http-api</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.services</groupId>
             <artifactId>mule-service-http</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
             <classifier>mule-service</classifier>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-sockets</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
             <classifier>mule-plugin</classifier>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-core</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-tls</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
+            <version>${javaxMailVersion}</version>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
+            <version>${commonsCodecVersion}</version>
         </dependency>
         <dependency>
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-core</artifactId>
-        </dependency>
-
-        <!--TODO: MULE-10837-->
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-service</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.services</groupId>
-            <artifactId>mule-service-scheduler</artifactId>
-            <version>${project.version}</version>
-            <classifier>mule-service</classifier>
-            <scope>provided</scope>
+            <version>${projectReactorVersion}</version>
         </dependency>
 
         <!-- Tests -->
@@ -98,36 +87,72 @@
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-unit</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>fluent-hc</artifactId>
-            <version>4.3.5</version>
+            <version>${fluentHcVersion}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
+            <version>${jettyVersion}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlet</artifactId>
+            <version>${jettyVersion}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-extensions-support</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
     </dependencies>
 
+    <distributionManagement>
+        <repository>
+            <id>mule-releases</id>
+            <name>Mule Release Repository</name>
+            <url>https://repository-master.mulesoft.org/nexus/content/repositories/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>mule-snapshots</id>
+            <name>Mule Snapshot Repository</name>
+            <url>https://repository-master.mulesoft.org/nexus/content/repositories/snapshots</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <repositories>
+        <repository>
+            <id>mule</id>
+            <name>Mule Repository</name>
+            <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
+        </repository>
+        <repository>
+            <id>spring-snapshot</id>
+            <name>Spring Snapshot Repository</name>
+            <url>http://repo.spring.io/snapshot/</url>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>mule-plugin</id>
+            <name>Mule Repository</name>
+            <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
+        </pluginRepository>
+    </pluginRepositories>
 </project>

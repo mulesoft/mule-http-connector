@@ -21,7 +21,7 @@ import org.mule.service.http.api.HttpConstants;
 /**
  * Groups parameters related to a requester connection
  *
- * @since 4.0
+ * @since 1.0
  */
 public final class RequestConnectionParams {
 

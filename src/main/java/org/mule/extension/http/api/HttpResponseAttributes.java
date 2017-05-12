@@ -11,7 +11,7 @@ import org.mule.service.http.api.domain.ParameterMap;
 /**
  * Representation of an HTTP response message attributes.
  *
- * @since 4.0
+ * @since 1.0
  */
 public class HttpResponseAttributes extends HttpAttributes {
 

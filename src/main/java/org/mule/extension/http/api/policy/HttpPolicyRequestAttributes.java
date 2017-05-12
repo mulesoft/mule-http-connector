@@ -15,7 +15,7 @@ import java.util.Map;
  * {@link BaseHttpRequestAttributes} subclass that allows modification of request attributes and
  * creation through the expression language.
  *
- * @since 4.0
+ * @since 1.0
  */
 public class HttpPolicyRequestAttributes extends BaseHttpRequestAttributes {
 

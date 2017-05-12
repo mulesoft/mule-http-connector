@@ -18,7 +18,7 @@ import org.mule.service.http.api.domain.message.request.HttpRequestBuilder;
 /**
  * Base class for user/pass based implementations.
  *
- * @since 4.0
+ * @since 1.0
  */
 public abstract class UsernamePasswordAuthentication implements HttpAuthentication {
 

@@ -13,7 +13,7 @@ import java.security.cert.Certificate;
 /**
  * Representation of an HTTP request message attributes.
  *
- * @since 4.0
+ * @since 1.0
  */
 public class HttpRequestAttributes extends BaseHttpRequestAttributes {
 

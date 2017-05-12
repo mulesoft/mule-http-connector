@@ -35,7 +35,7 @@ import javax.inject.Inject;
 /**
  * Configuration element for a HTTP requests.
  *
- * @since 4.0
+ * @since 1.0
  */
 @Configuration(name = "request-config")
 @ConnectionProviders(HttpRequesterProvider.class)

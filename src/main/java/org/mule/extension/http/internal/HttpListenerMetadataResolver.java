@@ -20,7 +20,7 @@ import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 /**
  * Dummy {@link OutputTypeResolver} implementation for the {@link HttpListener} which always returns an {@link AnyType}
  *
- * @since 4.0
+ * @since 1.0
  */
 public class HttpListenerMetadataResolver implements OutputTypeResolver<Object> {
 

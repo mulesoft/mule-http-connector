@@ -9,7 +9,7 @@ package org.mule.extension.http.internal;
 /**
  * Constants of the HTTP Connector.
  *
- * @since 4.0
+ * @since 1.0
  */
 public interface HttpConnectorConstants {
 

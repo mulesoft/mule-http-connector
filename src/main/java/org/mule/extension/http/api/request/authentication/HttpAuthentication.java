@@ -14,7 +14,7 @@ import org.mule.service.http.api.domain.message.request.HttpRequestBuilder;
 /**
  * An object that authenticates an HTTP request.
  *
- * @since 4.0
+ * @since 1.0
  */
 public interface HttpAuthentication {
 

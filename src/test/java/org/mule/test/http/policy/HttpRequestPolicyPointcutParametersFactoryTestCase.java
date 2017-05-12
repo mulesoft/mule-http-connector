@@ -12,7 +12,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mule.extension.http.api.policy.HttpRequestPolicyPointcutParametersFactory.PATH_PARAMETER_NAME;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
 import org.mule.extension.http.api.policy.HttpRequestPolicyPointcutParameters;
 import org.mule.extension.http.api.policy.HttpRequestPolicyPointcutParametersFactory;

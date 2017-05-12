@@ -92,7 +92,7 @@ import org.slf4j.Logger;
 /**
  * Represents a listener for HTTP requests.
  *
- * @since 4.0
+ * @since 1.0
  */
 @Alias("listener")
 @MetadataScope(outputResolver = HttpListenerMetadataResolver.class)

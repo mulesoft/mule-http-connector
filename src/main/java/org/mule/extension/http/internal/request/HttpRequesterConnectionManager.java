@@ -31,7 +31,7 @@ import javax.inject.Inject;
  * Manages {@link HttpClient HttpClients} across multiple configurations based on their name, meaning two configurations spawning
  * from the same prototype will receive the same {@link HttpClient}.
  *
- * @since 4.0
+ * @since 1.0
  */
 public class HttpRequesterConnectionManager implements Disposable {
 

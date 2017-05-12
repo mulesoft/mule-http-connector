@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Component that transforms an HTTP request to a proper {@link Result}.
  *
- * @since 4.0
+ * @since 1.0
  */
 public class HttpRequestToResult {
 

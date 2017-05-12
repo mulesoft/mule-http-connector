@@ -24,7 +24,7 @@ import org.mule.runtime.extension.api.security.AuthenticationHandler;
 /**
  * General HTTP operations that do not required any specific configuration or connection.
  *
- * @since 4.0
+ * @since 1.0
  */
 public class HttpOperations {
 

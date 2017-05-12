@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * Component that specifies how to create a proper HTTP request.
  *
- * @since 4.0
+ * @since 1.0
  */
 public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
 

@@ -11,7 +11,7 @@ import org.mule.service.http.api.server.async.HttpResponseReadyCallback;
 /**
  * Holds temporary state necessary to emit an http response
  *
- * @since 4.0
+ * @since 1.0
  */
 public class HttpResponseContext {
 

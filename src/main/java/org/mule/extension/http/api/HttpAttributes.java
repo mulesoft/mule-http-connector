@@ -12,7 +12,7 @@ import org.mule.service.http.api.domain.ParameterMap;
 /**
  * Base representation of HTTP message attributes.
  *
- * @since 4.0
+ * @since 1.0
  */
 public abstract class HttpAttributes extends BaseAttributes {
 

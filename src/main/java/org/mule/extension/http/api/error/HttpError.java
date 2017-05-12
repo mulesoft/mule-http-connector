@@ -18,7 +18,7 @@ import java.util.Optional;
 /**
  * Represents an error that can happen in an HTTP operation.
  *
- * @since 4.0
+ * @since 1.0
  */
 public enum HttpError implements ErrorTypeDefinition<HttpError> {
 

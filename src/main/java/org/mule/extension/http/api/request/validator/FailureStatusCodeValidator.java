@@ -14,7 +14,7 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
  * Response validator that allows specifying which status codes should be treated as failures. Responses with such status codes
  * will cause the component to throw an exception.
  *
- * @since 4.0
+ * @since 1.0
  */
 public class FailureStatusCodeValidator extends RangeStatusCodeValidator {
 

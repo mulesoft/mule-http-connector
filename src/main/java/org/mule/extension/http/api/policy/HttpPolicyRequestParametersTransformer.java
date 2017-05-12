@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * Implementation that does transformation from http:request operation parameters to {@link Message} and vice versa.
  *
- * @since 4.0
+ * @since 1.0
  */
 public class HttpPolicyRequestParametersTransformer implements OperationPolicyParametersTransformer {
 

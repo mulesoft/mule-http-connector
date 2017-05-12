@@ -7,8 +7,8 @@
 package org.mule.test.http;
 
 import static org.mule.runtime.api.component.location.Location.builder;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.METADATA;
+import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.METADATA;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasItems;

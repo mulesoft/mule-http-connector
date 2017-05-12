@@ -13,7 +13,7 @@ import static org.mule.extension.http.internal.request.RequestConnectionParams.D
 import static org.mule.runtime.core.internal.connection.ConnectionProviderWrapper.unwrapProviderWrapper;
 import static org.mule.service.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.service.http.api.HttpConstants.Protocols.HTTPS;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationInstanceFromRegistry;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.core.Is.is;

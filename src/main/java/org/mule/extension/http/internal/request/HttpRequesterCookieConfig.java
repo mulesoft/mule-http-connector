@@ -11,7 +11,7 @@ import java.net.CookieManager;
 /**
  * Provides access to the HTTP requester configuration relative to cookies.
  *
- * @since 4.0
+ * @since 1.0
  */
 public interface HttpRequesterCookieConfig {
 

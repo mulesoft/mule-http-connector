@@ -13,7 +13,7 @@ import org.mule.runtime.extension.api.exception.ModuleException;
 /**
  * Exception thrown when there is a problem parsing an HTTP message.
  *
- * @since 4.0
+ * @since 1.0
  */
 public class HttpMessageParsingException extends ModuleException {
 

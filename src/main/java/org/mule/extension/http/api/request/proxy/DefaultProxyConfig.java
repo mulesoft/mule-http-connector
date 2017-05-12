@@ -16,7 +16,7 @@ import org.mule.service.http.api.client.proxy.ProxyConfig;
 /**
  * Basic HTTP Proxy configuration based on host and port, and optionally a username and password for proxy authentication.
  *
- * @since 4.0
+ * @since 1.0
  */
 @Alias("proxy")
 @XmlHints(allowTopLevelDefinition = true)

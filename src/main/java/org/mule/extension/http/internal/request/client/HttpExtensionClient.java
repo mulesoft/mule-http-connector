@@ -23,7 +23,7 @@ import org.mule.service.http.api.domain.message.request.HttpRequest;
  * Composition of an {@link HttpClient} with URI and authentication parameters that allow falling back to connection default
  * values for them.
  *
- * @since 4.0
+ * @since 1.0
  */
 public class HttpExtensionClient implements Startable, Stoppable {
 

@@ -15,7 +15,7 @@ import org.mule.service.http.api.client.proxy.NtlmProxyConfig;
 /**
  * A Proxy configuration for NTLM authentication proxies.
  *
- * @since 4.0
+ * @since 1.0
  */
 @Alias("ntlm-proxy")
 @XmlHints(allowTopLevelDefinition = true)

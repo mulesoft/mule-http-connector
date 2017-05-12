@@ -13,7 +13,7 @@ import org.mule.runtime.extension.api.exception.ModuleException;
 /**
  * Thrown when a static file is requested but not found, associated with a 404 status code.
  *
- * @since 4.0
+ * @since 1.0
  */
 public class ResourceNotFoundException extends ModuleException {
 

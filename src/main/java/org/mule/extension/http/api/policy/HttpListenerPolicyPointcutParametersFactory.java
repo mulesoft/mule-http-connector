@@ -20,7 +20,7 @@ import org.mule.runtime.policy.api.SourcePolicyPointcutParametersFactory;
 /**
  * HTTP request operation policy pointcut parameters factory.
  * 
- * @since 4.0
+ * @since 1.0
  */
 public class HttpListenerPolicyPointcutParametersFactory implements SourcePolicyPointcutParametersFactory {
 

@@ -12,7 +12,7 @@ import org.mule.service.http.api.HttpConstants.Protocols;
 /**
  * Default implementation of {@link UriParameters}.
  *
- * @since 4.0
+ * @since 1.0
  */
 public class DefaultUriParameters implements UriParameters {
 

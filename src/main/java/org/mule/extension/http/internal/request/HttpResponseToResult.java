@@ -70,7 +70,7 @@ import reactor.core.publisher.Mono;
 /**
  * Component that transforms an HTTP response to a proper {@link Result}.
  *
- * @since 4.0
+ * @since 1.0
  */
 public class HttpResponseToResult {
 

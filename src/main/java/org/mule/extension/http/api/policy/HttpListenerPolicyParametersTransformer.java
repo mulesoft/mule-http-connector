@@ -25,7 +25,7 @@ import java.util.Map;
  * Implementation that does transformation from http:listener response and failure response parameters to {@link Message} and vice
  * versa.
  *
- * @since 4.0
+ * @since 1.0
  */
 public class HttpListenerPolicyParametersTransformer implements SourcePolicyParametersTransformer {
 

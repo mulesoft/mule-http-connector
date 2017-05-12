@@ -13,7 +13,7 @@ import org.mule.runtime.policy.api.PolicyPointcutParameters;
 /**
  * Specific implementation of {@link PolicyPointcutParameters} for http:request operation.
  * 
- * @since 4.0
+ * @since 1.0
  */
 public class HttpRequestPolicyPointcutParameters extends HttpPolicyPointcutParameters {
 

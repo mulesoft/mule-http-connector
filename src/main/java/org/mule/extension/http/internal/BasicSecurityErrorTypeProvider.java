@@ -22,7 +22,7 @@ import java.util.Set;
  * Errors that can be thrown in the {@link HttpOperations#basicSecurityFilter(HttpBasicAuthenticationFilter, AuthenticationHandler)}
  * operation.
  *
- * @since 4.0
+ * @since 1.0
  */
 public class BasicSecurityErrorTypeProvider implements ErrorTypeProvider {
 

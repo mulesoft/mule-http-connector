@@ -31,7 +31,7 @@ import java.util.Map;
 /**
  * Handles all metadata related operations for HTTP requests.
  *
- * @since 4.0
+ * @since 1.0
  */
 public class HttpRequestMetadataResolver implements OutputTypeResolver<HttpMetadataKey> {
 

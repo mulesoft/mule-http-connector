@@ -16,7 +16,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 /**
  * Group which contains additional request parameters
  *
- * @since 4.0
+ * @since 1.0
  */
 public final class OtherRequestSettings {
 

@@ -23,7 +23,7 @@ import java.util.Set;
  * ResponseValidationSettings, HttpRequesterRequestBuilder, OutputSettings, HttpExtensionClient, HttpRequesterConfig,
  * CompletionCallback)} operation.
  *
- * @since 4.0
+ * @since 1.0
  */
 public class RequestErrorTypeProvider implements ErrorTypeProvider {
 

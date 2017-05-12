@@ -26,7 +26,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 /**
  * Configuration element for a {@link HttpListener}.
  *
- * @since 4.0
+ * @since 1.0
  */
 @Configuration(name = "listener-config")
 @ConnectionProviders(HttpListenerProvider.class)

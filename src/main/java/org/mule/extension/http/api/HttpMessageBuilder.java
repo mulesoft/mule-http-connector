@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * Base component to create HTTP messages.
  *
- * @since 4.0
+ * @since 1.0
  */
 public abstract class HttpMessageBuilder {
 

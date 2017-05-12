@@ -11,7 +11,7 @@ import org.mule.service.http.api.HttpConstants.Protocols;
 /**
  * Represents the default URI parameters an {@HttpClient} will receive in {@HttpRequest}s.
  *
- * @since 4.0
+ * @since 1.0
  */
 public interface UriParameters {
 

@@ -12,7 +12,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 /**
  * Base status code validator that can be extended to create custom validations.
  *
- * @since 4.0
+ * @since 1.0
  */
 public abstract class RangeStatusCodeValidator implements ResponseValidator {
 

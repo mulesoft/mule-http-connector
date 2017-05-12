@@ -7,7 +7,7 @@
 package org.mule.test.http.internal.request;
 
 import static org.mule.tck.junit4.matcher.IsEmptyOptional.empty;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;

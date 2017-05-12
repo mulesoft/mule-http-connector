@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * HTTP request operation policy pointcut parameters factory.
  *
- * @since 4.0
+ * @since 1.0
  */
 public class HttpRequestPolicyPointcutParametersFactory implements OperationPolicyPointcutParametersFactory {
 

@@ -17,7 +17,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
 /**
  * Groups parameters which configure how a request is done
  *
- * @since 4.0
+ * @since 1.0
  */
 public final class RequestSettings {
 

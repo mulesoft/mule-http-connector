@@ -20,7 +20,7 @@ import java.util.Optional;
 /**
  * Signals that an error occurred while validating a {@link Message}
  *
- * @since 4.0
+ * @since 1.0
  */
 public class ResponseValidatorException extends ModuleException implements ErrorMessageAwareException {
 

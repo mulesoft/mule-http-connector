@@ -9,7 +9,7 @@ package org.mule.test.http;
 import static org.mule.extension.http.internal.HttpStreamingType.AUTO;
 import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
 import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_LENGTH;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;

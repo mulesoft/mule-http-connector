@@ -17,7 +17,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 /**
  * Groups parameters which control how the operation output is generated
  *
- * @since 4.0
+ * @since 1.0
  */
 public final class OutputSettings {
 

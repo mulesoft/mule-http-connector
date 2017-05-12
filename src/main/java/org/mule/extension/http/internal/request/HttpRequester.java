@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Component capable of performing an HTTP request given a request.
  *
- * @since 4.0
+ * @since 1.0
  */
 public class HttpRequester {
 

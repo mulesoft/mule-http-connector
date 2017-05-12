@@ -16,7 +16,7 @@ import java.util.Map;
  * the expression language to modify the response parameters of the http:listener
  * using policies.
  *
- * @since 4.0
+ * @since 1.0
  */
 public class HttpPolicyResponseAttributes implements Attributes {
 

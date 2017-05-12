@@ -17,7 +17,7 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 /**
  * Configuration for the API that is being consumed based on a RAML file.
  *
- * @since 4.0
+ * @since 1.0
  */
 @Extensible
 public class RamlApiConfiguration {

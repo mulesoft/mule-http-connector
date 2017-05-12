@@ -37,7 +37,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Filter for basic authentication over an HTTP request.
  *
- * @since 4.0
+ * @since 1.0
  */
 public class HttpBasicAuthenticationFilter {
 

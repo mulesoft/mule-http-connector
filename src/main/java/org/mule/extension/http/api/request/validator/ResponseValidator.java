@@ -12,7 +12,7 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 /**
  * Configures error handling of the response.
  *
- * @since 4.0
+ * @since 1.0
  */
 public interface ResponseValidator {
 

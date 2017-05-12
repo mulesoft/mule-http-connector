@@ -9,7 +9,7 @@ package org.mule.extension.http.internal.request;
 /**
  * Defines if the request should contain a body or not.
  *
- * @since 4.0
+ * @since 1.0
  */
 public enum HttpSendBodyMode {
   /**

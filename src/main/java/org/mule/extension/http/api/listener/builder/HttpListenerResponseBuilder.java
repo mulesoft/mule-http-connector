@@ -13,7 +13,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 /**
  * Base class for a {@link HttpMessageBuilder} which returns responses
  *
- * @since 4.0
+ * @since 1.0
  */
 public abstract class HttpListenerResponseBuilder extends HttpMessageBuilder {
 

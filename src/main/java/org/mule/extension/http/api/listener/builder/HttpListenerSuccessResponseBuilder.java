@@ -17,7 +17,7 @@ import java.util.Map;
 /**
  * Implementation of {@link HttpListenerResponseBuilder} which returns success responses
  *
- * @since 4.0
+ * @since 1.0
  */
 public class HttpListenerSuccessResponseBuilder extends HttpListenerResponseBuilder {
 

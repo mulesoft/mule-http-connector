@@ -54,7 +54,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Connection provider for a HTTP request, handles the creation of {@link HttpExtensionClient} instances.
  *
- * @since 4.0
+ * @since 1.0
  */
 @Alias("request")
 public class HttpRequesterProvider implements CachedConnectionProvider<HttpExtensionClient>, Initialisable, Disposable {
