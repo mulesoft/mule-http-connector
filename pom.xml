@@ -23,6 +23,7 @@
         <javaxMailVersion>1.4.3</javaxMailVersion>
         <jettyVersion>9.0.7.v20131107</jettyVersion>
         <projectReactorVersion>3.0.7.RELEASE</projectReactorVersion>
+        <socketsConnectorVersion>1.0.0-SNAPSHOT</socketsConnectorVersion>
 
         <formatterConfigPath>formatter.xml</formatterConfigPath>
     </properties>
@@ -55,9 +56,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-sockets</artifactId>
-            <version>${mule.version}</version>
+            <groupId>org.mule.connectors</groupId>
+            <artifactId>mule-sockets-connector</artifactId>
+            <version>${socketsConnectorVersion}</version>
             <classifier>mule-plugin</classifier>
         </dependency>
         <dependency>
