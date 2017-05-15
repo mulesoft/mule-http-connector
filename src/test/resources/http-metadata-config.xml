@@ -19,11 +19,11 @@
         <echo-component/>
     </flow>
 
-    <flow name="anyExplicit">
+    <flow name="any">
         <http:request path="/" config-ref="reqConfig" outputType="ANY"/>
     </flow>
 
-    <flow name="anyImplicit">
+    <flow name="streamImplicit">
         <http:request path="/" config-ref="reqConfig"/>
     </flow>
 
