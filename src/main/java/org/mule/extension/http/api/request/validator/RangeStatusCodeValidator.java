@@ -6,8 +6,12 @@
  */
 package org.mule.extension.http.api.request.validator;
 
-import static java.lang.String.format;
+import static org.mule.extension.http.api.error.HttpError.getErrorByCode;
+import org.mule.extension.http.api.error.HttpError;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
+
+import java.util.Optional;
 
 /**
  * Base status code validator that can be extended to create custom validations.
@@ -54,8 +58,17 @@ public abstract class RangeStatusCodeValidator implements ResponseValidator {
     this.values = values;
   }
 
-  protected String getExceptionMessage(int status) {
-    return format("Response code %d mapped as failure", status);
+  protected String getExceptionMessage(int status, HttpRequest request) {
+    StringBuilder stringBuilder = new StringBuilder();
+    stringBuilder.append("Response code ").append(status).append(" mapped as failure");
+    Optional<HttpError> httpError = getErrorByCode(status);
+    if (httpError.isPresent()) {
+      stringBuilder.append(": ");
+      stringBuilder.append(httpError.get().getErrorMessage(request));
+    }
+    stringBuilder.append(".");
+
+    return stringBuilder.toString();
   }
 
 }

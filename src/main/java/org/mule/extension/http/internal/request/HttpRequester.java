@@ -111,7 +111,7 @@ public class HttpRequester {
                   scheduler.submit(() -> consumePayload(result));
                   doRequest(client, requestBuilder, false, muleContext, callback);
                 } else {
-                  responseValidator.validate(result);
+                  responseValidator.validate(result, httpRequest);
                   callback.success(result);
                 }
               } catch (MuleException e) {

@@ -7,13 +7,15 @@
 package org.mule.extension.http.api.error;
 
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.extension.api.error.MuleErrors.ANY;
+import static org.mule.extension.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.getStatusByCode;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.service.http.api.HttpConstants.HttpStatus;
+import org.mule.service.http.api.domain.message.request.HttpRequest;
 
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * Represents an error that can happen in an HTTP operation.
@@ -32,7 +34,7 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
 
   CONNECTIVITY(MuleErrors.CONNECTIVITY),
 
-  RESPONSE_VALIDATION(ANY),
+  RESPONSE_VALIDATION,
 
   BAD_REQUEST(RESPONSE_VALIDATION),
 
@@ -40,13 +42,14 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
 
   FORBIDDEN(RESPONSE_VALIDATION),
 
-  NOT_FOUND(RESPONSE_VALIDATION),
+  NOT_FOUND(RESPONSE_VALIDATION, request -> "resource " + request.getPath() + " not found"),
 
-  METHOD_NOT_ALLOWED(RESPONSE_VALIDATION),
+  METHOD_NOT_ALLOWED(RESPONSE_VALIDATION, request -> "method " + request.getMethod() + " not allowed"),
 
   NOT_ACCEPTABLE(RESPONSE_VALIDATION),
 
-  UNSUPPORTED_MEDIA_TYPE(RESPONSE_VALIDATION),
+  UNSUPPORTED_MEDIA_TYPE(RESPONSE_VALIDATION,
+      request -> "media type " + request.getHeaderValueIgnoreCase(CONTENT_TYPE) + " not supported"),
 
   TOO_MANY_REQUESTS(RESPONSE_VALIDATION),
 
@@ -56,10 +59,20 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
 
   private ErrorTypeDefinition<?> parentErrorType;
 
-  HttpError() {}
+  private Function<HttpRequest, String> errorMessageFunction;
+
+  HttpError() {
+    errorMessageFunction = httpRequest -> this.name().replace("_", " ").toLowerCase();
+  }
 
   HttpError(ErrorTypeDefinition<?> parentErrorType) {
+    this();
     this.parentErrorType = parentErrorType;
+  }
+
+  HttpError(ErrorTypeDefinition<?> parentErrorType, Function<HttpRequest, String> errorMessageFunction) {
+    this.parentErrorType = parentErrorType;
+    this.errorMessageFunction = errorMessageFunction;
   }
 
   @Override
@@ -102,6 +115,16 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
       }
     }
     return ofNullable(result);
+  }
+
+  /**
+   * Returns the custom error message for this {@link HttpError} based on the {@link HttpRequest} that triggered it.
+   *
+   * @param request the {@link HttpRequest} that caused the error
+   * @return the custom error message associated to the error
+   */
+  public String getErrorMessage(HttpRequest request) {
+    return errorMessageFunction.apply(request);
   }
 
 }
