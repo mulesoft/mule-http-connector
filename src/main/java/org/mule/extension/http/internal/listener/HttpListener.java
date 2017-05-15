@@ -226,7 +226,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
     startIfNeeded(responseFactory);
 
     validatePath();
-    this.parseRequest = config.resolveParseRequest(configurationOverrides.getParseRequest());
+    this.parseRequest = configurationOverrides.getParseRequest();
     interpretedAttributes = HttpListenerResponseAttributes.class;
 
     try {

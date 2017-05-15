@@ -7,9 +7,8 @@
 package org.mule.extension.http.internal.request;
 
 import static org.mule.extension.http.internal.HttpConnectorConstants.CONFIGURATION_OVERRIDES;
-
 import org.mule.extension.http.internal.HttpStreamingType;
-import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
@@ -24,15 +23,15 @@ public final class ConfigurationOverrides {
    * Specifies whether to follow redirects or not.
    */
   @Parameter
-  @Optional
+  @ConfigOverride
   @Placement(tab = CONFIGURATION_OVERRIDES, order = 3)
-  private Boolean followRedirects;
+  private boolean followRedirects;
 
   /**
    * Defines if the request should contain a body or not.
    */
   @Parameter
-  @Optional
+  @ConfigOverride
   @Placement(tab = CONFIGURATION_OVERRIDES, order = 4)
   private HttpSendBodyMode sendBodyMode;
 
@@ -40,7 +39,7 @@ public final class ConfigurationOverrides {
    * Defines if the request should be sent using streaming or not.
    */
   @Parameter
-  @Optional
+  @ConfigOverride
   @Placement(tab = CONFIGURATION_OVERRIDES, order = 5)
   private HttpStreamingType requestStreamingMode;
 
@@ -48,19 +47,19 @@ public final class ConfigurationOverrides {
    * Defines if the HTTP response should be parsed or it's raw contents should be propagated instead.
    */
   @Parameter
-  @Optional
+  @ConfigOverride
   @Placement(tab = CONFIGURATION_OVERRIDES, order = 6)
-  private Boolean parseResponse;
+  private boolean parseResponse;
 
   /**
    * Maximum time that the request element will block the execution of the flow waiting for the HTTP response.
    */
   @Parameter
-  @Optional
+  @ConfigOverride
   @Placement(tab = CONFIGURATION_OVERRIDES, order = 7)
   private Integer responseTimeout;
 
-  public Boolean getFollowRedirects() {
+  public boolean getFollowRedirects() {
     return followRedirects;
   }
 
@@ -72,7 +71,7 @@ public final class ConfigurationOverrides {
     return requestStreamingMode;
   }
 
-  public Boolean getParseResponse() {
+  public boolean getParseResponse() {
     return parseResponse;
   }
 

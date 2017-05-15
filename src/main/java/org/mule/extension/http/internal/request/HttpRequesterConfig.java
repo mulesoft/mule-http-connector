@@ -12,7 +12,6 @@ import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST_SE
 import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE_SETTINGS;
 import static org.mule.extension.http.internal.HttpConnectorConstants.URL_CONFIGURATION;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
-
 import org.mule.extension.http.api.request.RamlApiConfiguration;
 import org.mule.extension.http.internal.HttpStreamingType;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -22,7 +21,6 @@ import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
-import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -43,20 +41,16 @@ import javax.inject.Inject;
 public class HttpRequesterConfig implements Initialisable, HttpRequesterCookieConfig {
 
   @ParameterGroup(name = URL_CONFIGURATION)
-  @NullSafe
   private RequestUrlConfiguration urlConfiguration;
 
   @ParameterGroup(name = REQUEST_SETTINGS)
-  @NullSafe
   private RequestSettings requestSettings;
 
   @ParameterGroup(name = RESPONSE_SETTINGS)
   @Placement(tab = RESPONSE_SETTINGS)
-  @NullSafe
   private ResponseSettings responseSettings;
 
   @ParameterGroup(name = OTHER_SETTINGS)
-  @NullSafe
   private OtherRequestSettings otherSettings;
 
   /**
@@ -83,11 +77,11 @@ public class HttpRequesterConfig implements Initialisable, HttpRequesterCookieCo
     return urlConfiguration.getBasePath();
   }
 
-  public Boolean getFollowRedirects() {
+  public boolean getFollowRedirects() {
     return requestSettings.getFollowRedirects();
   }
 
-  public Boolean getParseResponse() {
+  public boolean getParseResponse() {
     return responseSettings.getParseResponse();
   }
 

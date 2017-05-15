@@ -12,14 +12,12 @@ import static org.mule.extension.http.internal.HttpConnectorConstants.CONFIGURAT
 import static org.mule.extension.http.internal.HttpConnectorConstants.OTHER_SETTINGS;
 import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST_SETTINGS;
 import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.encodeSpaces;
-
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.request.validator.SuccessStatusCodeValidator;
 import org.mule.extension.http.internal.HttpRequestMetadataResolver;
-import org.mule.extension.http.internal.HttpStreamingType;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -30,10 +28,10 @@ import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -93,22 +91,23 @@ public class HttpRequestOperations implements Initialisable, Disposable {
         resolvedUri = resolvedBuilder.replaceUriParams(uriSettings.getUrl());
       }
 
-      Boolean resolvedFollowRedirects =
-          resolveIfNecessary(overrides.getFollowRedirects(), config.getFollowRedirects());
-      HttpStreamingType resolvedStreamingMode =
-          resolveIfNecessary(overrides.getRequestStreamingMode(), config.getRequestStreamingMode());
-      HttpSendBodyMode resolvedSendBody = resolveIfNecessary(overrides.getSendBodyMode(), config.getSendBodyMode());
-      Boolean resolvedParseResponse = resolveIfNecessary(overrides.getParseResponse(), config.getParseResponse());
-      Integer resolvedTimeout = resolveResponseTimeout(config, overrides.getResponseTimeout());
+      Integer resolvedTimeout = resolveResponseTimeout(overrides.getResponseTimeout());
       ResponseValidator responseValidator = responseValidationSettings.getResponseValidator();
       responseValidator = responseValidator != null ? responseValidator : new SuccessStatusCodeValidator("0..399");
 
 
       HttpRequester requester =
-          new HttpRequester.Builder().setUri(resolvedUri).setMethod(method).setFollowRedirects(resolvedFollowRedirects)
-              .setRequestStreamingMode(resolvedStreamingMode).setSendBodyMode(resolvedSendBody)
-              .setAuthentication(client.getDefaultAuthentication()).setParseResponse(resolvedParseResponse)
-              .setResponseTimeout(resolvedTimeout).setResponseValidator(responseValidator).setConfig(config)
+          new HttpRequester.Builder()
+              .setConfig(config)
+              .setUri(resolvedUri)
+              .setMethod(method)
+              .setFollowRedirects(overrides.getFollowRedirects())
+              .setRequestStreamingMode(overrides.getRequestStreamingMode())
+              .setSendBodyMode(overrides.getSendBodyMode())
+              .setAuthentication(client.getDefaultAuthentication())
+              .setParseResponse(overrides.getParseResponse())
+              .setResponseTimeout(resolvedTimeout)
+              .setResponseValidator(responseValidator)
               .setTransformationService(muleContext.getTransformationService()).setScheduler(scheduler)
               .build();
 
@@ -118,20 +117,12 @@ public class HttpRequestOperations implements Initialisable, Disposable {
     }
   }
 
-  private <T> T resolveIfNecessary(T value, T configValue) {
-    return value != null ? value : configValue;
-  }
-
   private String resolveUri(HttpConstants.Protocols scheme, String host, Integer port, String path) {
     // Encode spaces to generate a valid HTTP request.
     return format("%s://%s:%s%s", scheme.getScheme(), host, port, encodeSpaces(path));
   }
 
-  private int resolveResponseTimeout(HttpRequesterConfig config, Integer responseTimeout) {
-    if (responseTimeout == null && config.getResponseTimeout() != null) {
-      responseTimeout = config.getResponseTimeout();
-    }
-
+  private int resolveResponseTimeout(Integer responseTimeout) {
     if (muleContext.getConfiguration().isDisableTimeouts()) {
       return WAIT_FOR_EVER;
     } else {

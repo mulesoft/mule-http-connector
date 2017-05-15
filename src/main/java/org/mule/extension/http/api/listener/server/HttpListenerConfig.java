@@ -50,7 +50,7 @@ public class HttpListenerConfig implements Initialisable {
   @Optional(defaultValue = "true")
   @Expression(NOT_SUPPORTED)
   @Placement(tab = ADVANCED_TAB)
-  private Boolean parseRequest;
+  private boolean parseRequest;
 
   @Override
   public void initialise() throws InitialisationException {
@@ -62,15 +62,15 @@ public class HttpListenerConfig implements Initialisable {
     return new ListenerPath(basePath, listenerPath);
   }
 
-  public Boolean resolveParseRequest(Boolean listenerParseRequest) {
-    return listenerParseRequest != null ? listenerParseRequest : parseRequest;
-  }
-
   public String sanitizePathWithStartSlash(String path) {
     if (path == null) {
       return null;
     }
     return path.startsWith("/") ? path : "/" + path;
+  }
+
+  public boolean getParseRequest() {
+    return parseRequest;
   }
 
 }
