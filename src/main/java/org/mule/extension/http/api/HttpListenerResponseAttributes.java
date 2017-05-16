@@ -9,8 +9,7 @@ package org.mule.extension.http.api;
 import org.mule.service.http.api.domain.ParameterMap;
 
 /**
- * HTTP listener specific {@link HttpResponseAttributes}. Unless interpretation of request errors is enabled, only this kind of
- * attributes will be considered within an error message.
+ * HTTP listener specific {@link HttpResponseAttributes}. Only this kind of attributes will be considered within an error message.
  *
  * @since 1.0
  */

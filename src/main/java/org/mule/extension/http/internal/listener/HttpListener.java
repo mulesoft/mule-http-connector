@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
 import static org.mule.extension.http.api.HttpHeaders.Names.CONTENT_LENGTH;
-import static org.mule.extension.http.api.error.HttpError.RESPONSE_VALIDATION;
+import static org.mule.extension.http.api.error.HttpError.NOT_FOUND;
 import static org.mule.extension.http.internal.HttpConnectorConstants.CONFIGURATION_OVERRIDES;
 import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE_SETTINGS;
 import static org.mule.extension.http.internal.listener.HttpRequestToResult.transform;
@@ -25,13 +25,12 @@ import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.mule.service.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import static org.mule.service.http.api.HttpConstants.Protocols.HTTP;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.extension.http.api.error.HttpError;
 import org.mule.extension.http.api.error.HttpMessageParsingException;
 import org.mule.extension.http.api.listener.builder.HttpListenerErrorResponseBuilder;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
@@ -40,6 +39,7 @@ import org.mule.extension.http.api.listener.server.HttpListenerConfig;
 import org.mule.extension.http.internal.HttpListenerMetadataResolver;
 import org.mule.extension.http.internal.HttpStreamingType;
 import org.mule.extension.http.internal.listener.server.ModuleRequestHandler;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -178,10 +178,10 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
       showInDsl = true) HttpListenerErrorResponseBuilder errorResponse,
                       SourceCallbackContext callbackContext,
                       Error error) {
-    final HttpResponseBuilder failureResponseBuilder = createFailureResponseBuilder(error, errorResponse);
+    final HttpResponseBuilder failureResponseBuilder = createFailureResponseBuilder(error);
 
     if (errorResponse.getBody() == null || errorResponse.getBody().getValue() == null) {
-      errorResponse.setBody(new TypedValue<>(error.getCause().getMessage(), STRING));
+      errorResponse.setBody(new TypedValue<>(error.getDescription(), STRING));
     }
 
     HttpResponseContext context = callbackContext.<HttpResponseContext>getVariable(RESPONSE_CONTEXT)
@@ -199,7 +199,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
     responseCallback.responseReady(response, getResponseFailureCallback(responseCallback));
   }
 
-  private HttpResponseBuilder createFailureResponseBuilder(Error error, HttpListenerResponseBuilder errorResponse) {
+  private HttpResponseBuilder createFailureResponseBuilder(Error error) {
     final HttpResponseBuilder failureResponseBuilder;
     if (hasCustomResponse(ofNullable(error))) {
       Message errorMessage = error.getErrorMessage();
@@ -208,9 +208,6 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
           .setStatusCode(attributes.getStatusCode())
           .setReasonPhrase(attributes.getReasonPhrase());
       attributes.getHeaders().forEach(failureResponseBuilder::addHeader);
-      if (errorResponse.getBody() == null || errorResponse.getBody().getValue() == null) {
-        errorResponse.setBody(errorMessage.getPayload());
-      }
     } else if (error != null) {
       failureResponseBuilder = createDefaultFailureResponseBuilder(error);
     } else {
@@ -230,11 +227,8 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
 
     validatePath();
     this.parseRequest = config.resolveParseRequest(configurationOverrides.getParseRequest());
-    if (config.resolveInterpretRequestErrors(configurationOverrides.getInterpretRequestErrors())) {
-      interpretedAttributes = HttpResponseAttributes.class;
-    } else {
-      interpretedAttributes = HttpListenerResponseAttributes.class;
-    }
+    interpretedAttributes = HttpListenerResponseAttributes.class;
+
     try {
       if (allowedMethods != null) {
         requestHandlerManager =
@@ -253,9 +247,12 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
   private List<ErrorTypeMatcher> createErrorMatcherList(ErrorTypeRepository errorTypeRepository) {
     List<ErrorTypeMatcher> matchers = new LinkedList<>();
     matchers.add(new SingleErrorTypeMatcher(errorTypeRepository.lookupErrorType(SECURITY).get()));
-    matchers.add(new SingleErrorTypeMatcher(errorTypeRepository.lookupErrorType(builder()
-        .withNamespace(HTTP_NAMESPACE.toUpperCase())
-        .withName(RESPONSE_VALIDATION.name())
+    ComponentIdentifier.Builder httpErrorBuilder = builder().withNamespace(HTTP_NAMESPACE.toUpperCase());
+    matchers.add(new SingleErrorTypeMatcher(errorTypeRepository.lookupErrorType(httpErrorBuilder
+        .withName(NOT_FOUND.name())
+        .build()).get()));
+    matchers.add(new SingleErrorTypeMatcher(errorTypeRepository.lookupErrorType(httpErrorBuilder
+        .withName(UNAUTHORIZED.name())
         .build()).get()));
     return matchers;
   }
@@ -333,21 +330,6 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
   }
 
   private HttpResponseBuilder createDefaultFailureResponseBuilder(Error error) {
-    if (knownErrors.match(error.getErrorType())) {
-      HttpError httpError = null;
-      try {
-        httpError = HttpError.valueOf(error.getErrorType().getIdentifier());
-      } catch (Throwable t) {
-        // Do nothing
-      }
-      if (httpError != null) {
-        java.util.Optional<HttpStatus> status = HttpError.getHttpStatus(httpError);
-        if (status.isPresent()) {
-          return HttpResponse.builder().setStatusCode(status.get().getStatusCode())
-              .setReasonPhrase(status.get().getReasonPhrase());
-        }
-      }
-    }
     // Default to the HTTP transport exception mapping for compatibility
     Throwable throwable = error.getCause();
     String exceptionStatusCode = getTransportErrorMapping(HTTP.getScheme(), throwable.getClass(), muleContext);
