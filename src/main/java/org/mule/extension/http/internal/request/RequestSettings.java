@@ -27,7 +27,7 @@ public final class RequestSettings {
   @Parameter
   @Optional(defaultValue = "true")
   @Placement(tab = ADVANCED_TAB, order = 1)
-  private Boolean followRedirects;
+  private boolean followRedirects;
 
   /**
    * Defines if the request should contain a body or not. If AUTO, it will depend on the method (GET, HEAD and OPTIONS will not
@@ -50,7 +50,7 @@ public final class RequestSettings {
       + "the behavior will depend on the type of the payload (it will stream only for InputStream).")
   private HttpStreamingType requestStreamingMode;
 
-  public Boolean getFollowRedirects() {
+  public boolean getFollowRedirects() {
     return followRedirects;
   }
 

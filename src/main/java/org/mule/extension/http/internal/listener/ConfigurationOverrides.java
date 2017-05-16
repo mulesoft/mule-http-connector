@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.internal.listener;
 
-import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 public class ConfigurationOverrides {
@@ -17,10 +17,10 @@ public class ConfigurationOverrides {
    * always contain the raw contents of the HTTP request.
    */
   @Parameter
-  @Optional
-  private Boolean parseRequest;
+  @ConfigOverride
+  private boolean parseRequest;
 
-  public Boolean getParseRequest() {
+  public boolean getParseRequest() {
     return parseRequest;
   }
 

@@ -89,7 +89,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
     @Optional(defaultValue = "true")
     @Expression(NOT_SUPPORTED)
     @Placement(tab = ADVANCED, order = 1)
-    private Boolean usePersistentConnections;
+    private boolean usePersistentConnections;
 
     /**
      * The number of milliseconds that a connection can remain idle before it is closed. The value of this attribute is only used
@@ -113,7 +113,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
       return port;
     }
 
-    public Boolean getUsePersistentConnections() {
+    public boolean getUsePersistentConnections() {
       return usePersistentConnections;
     }
 

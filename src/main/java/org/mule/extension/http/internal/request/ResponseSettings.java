@@ -28,7 +28,7 @@ public final class ResponseSettings {
   @Optional(defaultValue = "true")
   @Placement(tab = ADVANCED_TAB, order = 1)
   @Summary("Indicates if the HTTP response should be parsed, or directly receive the raw content")
-  private Boolean parseResponse;
+  private boolean parseResponse;
 
   /**
    * Maximum time that the request element will block the execution of the flow waiting for the HTTP response. If this value is
@@ -39,7 +39,7 @@ public final class ResponseSettings {
   @Placement(tab = ADVANCED_TAB, order = 2)
   private Integer responseTimeout;
 
-  public Boolean getParseResponse() {
+  public boolean getParseResponse() {
     return parseResponse;
   }
 

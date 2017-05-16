@@ -66,7 +66,7 @@ public final class RequestConnectionParams {
   @Optional(defaultValue = "true")
   @Expression(NOT_SUPPORTED)
   @Placement(tab = ADVANCED_TAB, order = 1)
-  private Boolean usePersistentConnections;
+  private boolean usePersistentConnections;
 
   /**
    * The maximum number of outbound connections that will be kept open at the same time. By default the number of connections is
@@ -116,7 +116,7 @@ public final class RequestConnectionParams {
     return port;
   }
 
-  public Boolean getUsePersistentConnections() {
+  public boolean getUsePersistentConnections() {
     return usePersistentConnections;
   }
 
@@ -148,7 +148,7 @@ public final class RequestConnectionParams {
     this.port = port;
   }
 
-  public void setUsePersistentConnections(Boolean usePersistentConnections) {
+  public void setUsePersistentConnections(boolean usePersistentConnections) {
     this.usePersistentConnections = usePersistentConnections;
   }
 
