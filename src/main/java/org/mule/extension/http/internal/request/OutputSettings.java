@@ -22,7 +22,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 public final class OutputSettings {
 
   @Parameter
-  @Optional(defaultValue = "ANY")
+  @Optional(defaultValue = "STREAM")
   @MetadataKeyId
   @Placement(tab = ADVANCED_TAB)
   private HttpMetadataKey outputType;

@@ -71,12 +71,12 @@ public class HttpMetadataResolverTestCase extends AbstractHttpTestCase {
 
   @Test
   public void resolvesAny() {
-    verifyAny(getMetadata("anyExplicit"));
+    verifyAny(getMetadata("any"));
   }
 
   @Test
   public void resolveDefault() {
-    verifyAny(getMetadata("anyImplicit"));
+    verifyType("streamImplicit", BinaryType.class, InputStream.class);
   }
 
   @Test
