@@ -37,11 +37,11 @@ public class HttpOperations {
     try {
       filter.authenticate(authenticationHandler);
     } catch (UnauthorisedException e) {
-      throw new ModuleException(e, UNAUTHORIZED);
+      throw new ModuleException(UNAUTHORIZED, e);
     } catch (SecurityException e) {
-      throw new ModuleException(e, FORBIDDEN);
+      throw new ModuleException(FORBIDDEN, e);
     } catch (SecurityProviderNotFoundException | UnknownAuthenticationTypeException e) {
-      throw new ModuleException(e, SECURITY);
+      throw new ModuleException(SECURITY, e);
     }
   }
 

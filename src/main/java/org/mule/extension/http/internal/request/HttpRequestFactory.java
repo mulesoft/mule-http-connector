@@ -128,14 +128,14 @@ public class HttpRequestFactory {
     try {
       builder.setEntity(createRequestEntity(builder, this.method, muleContext, requestBuilder.getBody().getValue(), mediaType));
     } catch (TransformerException e) {
-      throw new ModuleException(e, TRANSFORMATION);
+      throw new ModuleException(TRANSFORMATION, e);
     }
 
     if (authentication != null) {
       try {
         authentication.authenticate(builder);
       } catch (MuleException e) {
-        throw new ModuleException(e, SECURITY);
+        throw new ModuleException(SECURITY, e);
       }
     }
 
