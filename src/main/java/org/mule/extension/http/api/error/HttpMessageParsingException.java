@@ -20,7 +20,7 @@ public class HttpMessageParsingException extends ModuleException {
   private static final long serialVersionUID = 2516645632512321036L;
 
   public HttpMessageParsingException(I18nMessage message, Throwable throwable) {
-    super(throwable, PARSING, message);
+    super(message, PARSING, throwable);
   }
 
 }

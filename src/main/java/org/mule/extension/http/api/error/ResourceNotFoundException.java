@@ -27,7 +27,7 @@ public class ResourceNotFoundException extends ModuleException implements ErrorM
   public <T extends Enum<T>> ResourceNotFoundException(Exception exception,
                                                        ErrorTypeDefinition<T> errorTypeDefinition,
                                                        I18nMessage message) {
-    super(exception, errorTypeDefinition, message);
+    super(message, errorTypeDefinition, exception);
   }
 
   @Override
