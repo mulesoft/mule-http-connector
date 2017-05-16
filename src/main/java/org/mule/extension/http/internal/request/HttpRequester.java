@@ -127,7 +127,7 @@ public class HttpRequester {
         checkIfRemotelyClosed(exception, client.getDefaultUriParameters());
         logger.error(getErrorMessage(httpRequest));
         HttpError error = exception instanceof TimeoutException ? TIMEOUT : CONNECTIVITY;
-        callback.error(new ModuleException(exception, error));
+        callback.error(new ModuleException(error, exception));
       }
 
     };
