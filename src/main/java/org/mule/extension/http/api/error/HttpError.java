@@ -42,9 +42,9 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
 
   FORBIDDEN(RESPONSE_VALIDATION),
 
-  NOT_FOUND(RESPONSE_VALIDATION, request -> "resource " + request.getPath() + " not found"),
+  NOT_FOUND(RESPONSE_VALIDATION),
 
-  METHOD_NOT_ALLOWED(RESPONSE_VALIDATION, request -> "method " + request.getMethod() + " not allowed"),
+  METHOD_NOT_ALLOWED(RESPONSE_VALIDATION),
 
   NOT_ACCEPTABLE(RESPONSE_VALIDATION),
 

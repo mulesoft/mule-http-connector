@@ -58,13 +58,23 @@ public abstract class RangeStatusCodeValidator implements ResponseValidator {
     this.values = values;
   }
 
+  /**
+   * Builds the exception message for a rejected status code based on the {@link HttpRequest} that triggered it. The message will
+   * follow the following pattern: "HTTP GET on resource http://host:port/path failed", adding a custom message for known errors
+   * and the received status code for all errors.
+   *
+   * @param status the status code received as a response
+   * @param request the {@link HttpRequest} that resulted in the failure response
+   * @return the message to be used on exceptions
+   */
   protected String getExceptionMessage(int status, HttpRequest request) {
     StringBuilder stringBuilder = new StringBuilder();
-    stringBuilder.append("Response code ").append(status).append(" mapped as failure");
+    stringBuilder.append("HTTP ").append(request.getMethod()).append(" on resource ").append(request.getUri()).append(" failed");
     Optional<HttpError> httpError = getErrorByCode(status);
     if (httpError.isPresent()) {
-      stringBuilder.append(": ");
-      stringBuilder.append(httpError.get().getErrorMessage(request));
+      stringBuilder.append(": ").append(httpError.get().getErrorMessage(request)).append(" (").append(status).append(")");
+    } else {
+      stringBuilder.append(" with status code ").append(status);
     }
     stringBuilder.append(".");
 
