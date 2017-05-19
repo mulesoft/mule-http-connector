@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.internal.request;
 
-import static org.mule.service.http.api.HttpConstants.Protocols.HTTPS;
+import static org.mule.service.http.api.HttpConstants.Protocol.HTTPS;
 import static org.mule.extension.http.api.error.HttpError.CONNECTIVITY;
 import static org.mule.extension.http.api.error.HttpError.TIMEOUT;
 import static reactor.core.publisher.Mono.from;

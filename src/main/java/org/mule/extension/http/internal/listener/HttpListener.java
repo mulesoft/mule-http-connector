@@ -26,7 +26,7 @@ import static org.mule.runtime.extension.api.annotation.param.display.Placement.
 import static org.mule.service.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.service.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
-import static org.mule.service.http.api.HttpConstants.Protocols.HTTP;
+import static org.mule.service.http.api.HttpConstants.Protocol.HTTP;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.extension.http.api.HttpRequestAttributes;

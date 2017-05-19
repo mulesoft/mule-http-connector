@@ -14,8 +14,8 @@ import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.ADVANCED;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.SECURITY_TAB;
-import static org.mule.service.http.api.HttpConstants.Protocols.HTTP;
-import static org.mule.service.http.api.HttpConstants.Protocols.HTTPS;
+import static org.mule.service.http.api.HttpConstants.Protocol.HTTP;
+import static org.mule.service.http.api.HttpConstants.Protocol.HTTPS;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -62,7 +62,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
     @Optional(defaultValue = "HTTP")
     @Expression(NOT_SUPPORTED)
     @Placement(order = 1)
-    private HttpConstants.Protocols protocol;
+    private HttpConstants.Protocol protocol;
 
     /**
      * Host where the requests will be sent.
@@ -101,7 +101,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
     @Placement(tab = ADVANCED, order = 2)
     private Integer connectionIdleTimeout;
 
-    public HttpConstants.Protocols getProtocol() {
+    public HttpConstants.Protocol getProtocol() {
       return protocol;
     }
 

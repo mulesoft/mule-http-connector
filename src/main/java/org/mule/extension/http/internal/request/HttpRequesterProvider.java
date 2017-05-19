@@ -15,8 +15,8 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.SECURITY_TAB;
-import static org.mule.service.http.api.HttpConstants.Protocols.HTTP;
-import static org.mule.service.http.api.HttpConstants.Protocols.HTTPS;
+import static org.mule.service.http.api.HttpConstants.Protocol.HTTP;
+import static org.mule.service.http.api.HttpConstants.Protocol.HTTPS;
 
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.http.api.request.client.UriParameters;
@@ -113,7 +113,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
 
   @Override
   public void initialise() throws InitialisationException {
-    final HttpConstants.Protocols protocol = connectionParams.getProtocol();
+    final HttpConstants.Protocol protocol = connectionParams.getProtocol();
 
     if (connectionParams.getPort() == null) {
       connectionParams.setPort(protocol.getDefaultPort());
