@@ -39,7 +39,7 @@ public final class RequestConnectionParams {
   @Expression(NOT_SUPPORTED)
   @Summary("Protocol to use for communication. Valid values are HTTP and HTTPS")
   @Placement(order = 1)
-  private HttpConstants.Protocols protocol;
+  private HttpConstants.Protocol protocol;
 
   /**
    * Host where the requests will be sent.
@@ -104,7 +104,7 @@ public final class RequestConnectionParams {
   @Placement(tab = ADVANCED_TAB, order = 5)
   private TcpClientSocketProperties clientSocketProperties;
 
-  public HttpConstants.Protocols getProtocol() {
+  public HttpConstants.Protocol getProtocol() {
     return protocol;
   }
 
@@ -136,7 +136,7 @@ public final class RequestConnectionParams {
     return clientSocketProperties;
   }
 
-  public void setProtocol(HttpConstants.Protocols protocol) {
+  public void setProtocol(HttpConstants.Protocol protocol) {
     this.protocol = protocol;
   }
 

@@ -11,7 +11,6 @@ public interface AllureConstants {
   interface HttpFeature {
 
     String HTTP_EXTENSION = "HTTP Extension";
-    String HTTP_SERVICE = "HTTP Service";
 
     interface HttpStory {
 

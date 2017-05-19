@@ -7,7 +7,7 @@
 package org.mule.extension.http.internal.request.client;
 
 import org.mule.extension.http.api.request.client.UriParameters;
-import org.mule.service.http.api.HttpConstants.Protocols;
+import org.mule.service.http.api.HttpConstants.Protocol;
 
 /**
  * Default implementation of {@link UriParameters}.
@@ -16,19 +16,19 @@ import org.mule.service.http.api.HttpConstants.Protocols;
  */
 public class DefaultUriParameters implements UriParameters {
 
-  private final Protocols scheme;
+  private final Protocol scheme;
   private final String host;
   private final Integer port;
 
 
-  public DefaultUriParameters(Protocols protocol, String host, Integer port) {
+  public DefaultUriParameters(Protocol protocol, String host, Integer port) {
     this.scheme = protocol;
     this.host = host;
     this.port = port;
   }
 
   @Override
-  public Protocols getScheme() {
+  public Protocol getScheme() {
     return scheme;
   }
 
