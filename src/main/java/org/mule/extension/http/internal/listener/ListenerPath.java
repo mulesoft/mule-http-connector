@@ -15,7 +15,7 @@ public class ListenerPath {
 
   public ListenerPath(String basePath, String listenerPath) {
     this.basePath = basePath;
-    this.resolvedPath = basePath == null ? listenerPath : basePath + listenerPath;
+    this.resolvedPath = basePath == null ? listenerPath : pathWithoutEndSlash(basePath) + listenerPath;
   }
 
   public String getResolvedPath() {
@@ -24,5 +24,13 @@ public class ListenerPath {
 
   public String getRelativePath(String requestPath) {
     return basePath == null ? requestPath : requestPath.replace(basePath, StringUtils.EMPTY);
+  }
+
+  private String pathWithoutEndSlash(String path) {
+    if (path.endsWith("/")) {
+      return path.substring(0, path.length()-1);
+    } else {
+      return path;
+    }
   }
 }
