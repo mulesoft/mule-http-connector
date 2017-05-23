@@ -15,8 +15,8 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.SECURITY_TAB;
-import static org.mule.service.http.api.HttpConstants.Protocol.HTTP;
-import static org.mule.service.http.api.HttpConstants.Protocol.HTTPS;
+import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTP;
+import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
 
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.http.api.request.client.UriParameters;
@@ -41,10 +41,10 @@ import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
-import org.mule.service.http.api.HttpConstants;
-import org.mule.service.http.api.client.HttpClient;
-import org.mule.service.http.api.client.HttpClientConfiguration;
-import org.mule.service.http.api.client.proxy.ProxyConfig;
+import org.mule.runtime.http.api.HttpConstants;
+import org.mule.runtime.http.api.client.HttpClient;
+import org.mule.runtime.http.api.client.HttpClientConfiguration;
+import org.mule.runtime.http.api.client.proxy.ProxyConfig;
 
 import javax.inject.Inject;
 
@@ -186,8 +186,8 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
     return new HttpExtensionClient(httpClient, uriParameters, authentication);
   }
 
-  private org.mule.service.http.api.tcp.TcpClientSocketProperties buildTcpProperties(TcpClientSocketProperties socketProperties) {
-    return org.mule.service.http.api.tcp.TcpClientSocketProperties.builder()
+  private org.mule.runtime.http.api.tcp.TcpClientSocketProperties buildTcpProperties(TcpClientSocketProperties socketProperties) {
+    return org.mule.runtime.http.api.tcp.TcpClientSocketProperties.builder()
         .setSendBufferSize(socketProperties.getSendBufferSize())
         .setSendBufferSize(socketProperties.getSendBufferSize())
         .setClientTimeout(socketProperties.getClientTimeout())

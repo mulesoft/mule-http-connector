@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.api;
 
-import org.mule.service.http.api.domain.ParameterMap;
+import org.mule.runtime.http.api.domain.ParameterMap;
 
 /**
  * Common parts of all http request attributes.

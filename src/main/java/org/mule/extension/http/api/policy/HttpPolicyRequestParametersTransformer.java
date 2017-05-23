@@ -14,7 +14,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
-import org.mule.service.http.api.domain.ParameterMap;
+import org.mule.runtime.http.api.domain.ParameterMap;
 
 import com.google.common.collect.ImmutableMap;
 

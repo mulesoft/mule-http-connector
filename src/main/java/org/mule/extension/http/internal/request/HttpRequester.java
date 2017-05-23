@@ -6,9 +6,9 @@
  */
 package org.mule.extension.http.internal.request;
 
-import static org.mule.service.http.api.HttpConstants.Protocol.HTTPS;
 import static org.mule.extension.http.api.error.HttpError.CONNECTIVITY;
 import static org.mule.extension.http.api.error.HttpError.TIMEOUT;
+import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
 import static reactor.core.publisher.Mono.from;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
@@ -33,10 +33,10 @@ import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
-import org.mule.service.http.api.client.HttpRequestAuthentication;
-import org.mule.service.http.api.client.async.ResponseHandler;
-import org.mule.service.http.api.domain.message.request.HttpRequest;
-import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.runtime.http.api.client.HttpRequestAuthentication;
+import org.mule.runtime.http.api.client.async.ResponseHandler;
+import org.mule.runtime.http.api.domain.message.request.HttpRequest;
+import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 
 import java.io.InputStream;
 import java.util.concurrent.TimeoutException;

@@ -6,15 +6,15 @@
  */
 package org.mule.extension.http.internal.listener;
 
-import static org.mule.service.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.internal.HttpStreamingType;
 import org.mule.runtime.core.api.TransformationService;
-import org.mule.service.http.api.domain.message.response.HttpResponse;
-import org.mule.service.http.api.domain.message.response.HttpResponseBuilder;
-import org.mule.service.http.api.server.async.HttpResponseReadyCallback;
-import org.mule.service.http.api.server.async.ResponseStatusCallback;
+import org.mule.runtime.http.api.domain.message.response.HttpResponse;
+import org.mule.runtime.http.api.domain.message.response.HttpResponseBuilder;
+import org.mule.runtime.http.api.server.async.HttpResponseReadyCallback;
+import org.mule.runtime.http.api.server.async.ResponseStatusCallback;
 
 public class HttpListenerResponseSender {
 

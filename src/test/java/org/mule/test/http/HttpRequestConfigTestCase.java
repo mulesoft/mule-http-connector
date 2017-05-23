@@ -11,8 +11,8 @@ import static org.mule.extension.http.internal.request.RequestConnectionParams.D
 import static org.mule.extension.http.internal.request.RequestConnectionParams.DEFAULT_MAX_CONNECTIONS;
 import static org.mule.extension.http.internal.request.RequestConnectionParams.DEFAULT_RESPONSE_BUFFER_SIZE;
 import static org.mule.runtime.core.internal.connection.ConnectionProviderWrapper.unwrapProviderWrapper;
-import static org.mule.service.http.api.HttpConstants.Protocol.HTTP;
-import static org.mule.service.http.api.HttpConstants.Protocol.HTTPS;
+import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTP;
+import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationInstanceFromRegistry;
 import static org.hamcrest.CoreMatchers.notNullValue;

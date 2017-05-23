@@ -33,7 +33,7 @@ import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
-import org.mule.service.http.api.client.proxy.ProxyConfig;
+import org.mule.runtime.http.api.client.proxy.ProxyConfig;
 
 /**
  * HTTP connector used to handle and perform HTTP requests.
