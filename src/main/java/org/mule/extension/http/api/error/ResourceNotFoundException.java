@@ -6,14 +6,15 @@
  */
 package org.mule.extension.http.api.error;
 
-import static org.mule.service.http.api.HttpConstants.HttpStatus.NOT_FOUND;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.NOT_FOUND;
+
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.runtime.api.exception.ErrorMessageAwareException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.exception.ModuleException;
-import org.mule.service.http.api.domain.ParameterMap;
+import org.mule.runtime.http.api.domain.ParameterMap;
 
 /**
  * Thrown when a static file is requested but not found, associated with a 404 status code.

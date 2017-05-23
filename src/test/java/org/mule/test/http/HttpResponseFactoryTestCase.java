@@ -8,7 +8,7 @@ package org.mule.test.http;
 
 import static org.mule.extension.http.internal.HttpStreamingType.AUTO;
 import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
-import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.Matchers.is;
@@ -20,7 +20,7 @@ import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.internal.listener.HttpResponseFactory;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.TransformationService;
-import org.mule.service.http.api.domain.message.response.HttpResponse;
+import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.ByteArrayInputStream;

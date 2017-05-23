@@ -7,7 +7,7 @@
 package org.mule.extension.http.internal.request.client;
 
 import org.mule.extension.http.api.request.client.UriParameters;
-import org.mule.service.http.api.HttpConstants.Protocol;
+import org.mule.runtime.http.api.HttpConstants.Protocol;
 
 /**
  * Default implementation of {@link UriParameters}.

@@ -10,7 +10,7 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
-import org.mule.service.http.api.client.proxy.NtlmProxyConfig;
+import org.mule.runtime.http.api.client.proxy.NtlmProxyConfig;
 
 /**
  * A Proxy configuration for NTLM authentication proxies.

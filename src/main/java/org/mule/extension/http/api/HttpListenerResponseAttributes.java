@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.api;
 
-import org.mule.service.http.api.domain.ParameterMap;
+import org.mule.runtime.http.api.domain.ParameterMap;
 
 /**
  * HTTP listener specific {@link HttpResponseAttributes}. Only this kind of attributes will be considered within an error message.

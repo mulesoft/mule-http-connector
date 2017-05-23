@@ -14,10 +14,10 @@ import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.service.http.api.client.HttpClient;
-import org.mule.service.http.api.client.HttpRequestAuthentication;
-import org.mule.service.http.api.client.async.ResponseHandler;
-import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.runtime.http.api.client.HttpClient;
+import org.mule.runtime.http.api.client.HttpRequestAuthentication;
+import org.mule.runtime.http.api.client.async.ResponseHandler;
+import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 
 /**
  * Composition of an {@link HttpClient} with URI and authentication parameters that allow falling back to connection default

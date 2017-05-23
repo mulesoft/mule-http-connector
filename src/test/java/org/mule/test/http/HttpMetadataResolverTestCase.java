@@ -32,7 +32,7 @@ import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.service.http.api.domain.ParameterMap;
+import org.mule.runtime.http.api.domain.ParameterMap;
 import org.mule.tck.junit4.matcher.MetadataKeyMatcher;
 import org.mule.tck.junit4.rule.DynamicPort;
 

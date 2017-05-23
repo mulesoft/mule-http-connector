@@ -11,7 +11,8 @@ import static java.lang.String.format;
 import static org.mule.extension.http.internal.HttpConnectorConstants.CONFIGURATION_OVERRIDES;
 import static org.mule.extension.http.internal.HttpConnectorConstants.OTHER_SETTINGS;
 import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST_SETTINGS;
-import static org.mule.service.http.api.utils.HttpEncoderDecoderUtils.encodeSpaces;
+import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.encodeSpaces;
+
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.api.request.client.UriParameters;
@@ -36,7 +37,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
-import org.mule.service.http.api.HttpConstants;
+import org.mule.runtime.http.api.HttpConstants;
 
 import javax.inject.Inject;
 

@@ -9,7 +9,7 @@ package org.mule.extension.http.api.request.validator;
 import static org.mule.extension.http.api.error.HttpError.getErrorByCode;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 
 /**
  * Response validator that allows specifying which status codes should be treated as failures. Responses with such status codes

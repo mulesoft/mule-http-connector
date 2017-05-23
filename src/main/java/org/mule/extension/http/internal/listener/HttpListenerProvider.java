@@ -14,8 +14,9 @@ import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.ADVANCED;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.SECURITY_TAB;
-import static org.mule.service.http.api.HttpConstants.Protocol.HTTP;
-import static org.mule.service.http.api.HttpConstants.Protocol.HTTPS;
+import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTP;
+import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
+
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -33,11 +34,11 @@ import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
-import org.mule.service.http.api.HttpConstants;
-import org.mule.service.http.api.HttpService;
-import org.mule.service.http.api.server.HttpServer;
-import org.mule.service.http.api.server.HttpServerConfiguration;
-import org.mule.service.http.api.server.ServerAddress;
+import org.mule.runtime.http.api.HttpConstants;
+import org.mule.runtime.http.api.HttpService;
+import org.mule.runtime.http.api.server.HttpServer;
+import org.mule.runtime.http.api.server.HttpServerConfiguration;
+import org.mule.runtime.http.api.server.ServerAddress;
 
 import java.io.IOException;
 

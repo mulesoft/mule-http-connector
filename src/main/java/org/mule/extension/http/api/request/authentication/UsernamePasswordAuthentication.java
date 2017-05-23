@@ -11,9 +11,9 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.service.http.api.client.HttpAuthenticationType;
-import org.mule.service.http.api.client.HttpRequestAuthentication;
-import org.mule.service.http.api.domain.message.request.HttpRequestBuilder;
+import org.mule.runtime.http.api.client.HttpAuthenticationType;
+import org.mule.runtime.http.api.client.HttpRequestAuthentication;
+import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
 
 /**
  * Base class for user/pass based implementations.

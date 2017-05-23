@@ -9,7 +9,7 @@ package org.mule.extension.http.api.request.validator;
 import static org.mule.extension.http.api.error.HttpError.getErrorByCode;
 import org.mule.extension.http.api.error.HttpError;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 
 import java.util.Optional;
 

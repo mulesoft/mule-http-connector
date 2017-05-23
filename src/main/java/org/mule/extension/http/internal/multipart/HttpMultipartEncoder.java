@@ -9,8 +9,8 @@ package org.mule.extension.http.internal.multipart;
 import static java.lang.Math.toIntExact;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
-import static org.mule.service.http.api.HttpHeaders.Names.CONTENT_TYPE;
+import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
+import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.MultiPartPayload;
@@ -19,8 +19,8 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.service.http.api.domain.entity.multipart.HttpPart;
-import org.mule.service.http.api.domain.entity.multipart.MultipartHttpEntity;
+import org.mule.runtime.http.api.domain.entity.multipart.HttpPart;
+import org.mule.runtime.http.api.domain.entity.multipart.MultipartHttpEntity;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

@@ -20,10 +20,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.extension.http.internal.request.HttpRequesterConnectionManager;
-import org.mule.service.http.api.HttpService;
-import org.mule.service.http.api.client.HttpClient;
-import org.mule.service.http.api.client.HttpClientConfiguration;
-import org.mule.service.http.api.client.HttpClientFactory;
+import org.mule.runtime.http.api.HttpService;
+import org.mule.runtime.http.api.client.HttpClient;
+import org.mule.runtime.http.api.client.HttpClientConfiguration;
+import org.mule.runtime.http.api.client.HttpClientFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;

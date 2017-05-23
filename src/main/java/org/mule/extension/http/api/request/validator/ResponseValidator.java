@@ -8,7 +8,7 @@ package org.mule.extension.http.api.request.validator;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.service.http.api.domain.message.request.HttpRequest;
+import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 
 /**
  * Configures error handling of the response.
