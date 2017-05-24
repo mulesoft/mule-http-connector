@@ -28,19 +28,6 @@
         <formatterConfigPath>formatter.xml</formatterConfigPath>
     </properties>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <!--TODO: https://www.mulesoft.org/jira/browse/MULE-9776 remove this when http is packages as zip plugin -->
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
     <dependencies>
         <dependency>
             <groupId>org.mule.runtime</groupId>
