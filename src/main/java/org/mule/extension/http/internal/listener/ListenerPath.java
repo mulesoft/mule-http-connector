@@ -28,7 +28,7 @@ public class ListenerPath {
 
   private String pathWithoutEndSlash(String path) {
     if (path.endsWith("/")) {
-      return path.substring(0, path.length()-1);
+      return path.substring(0, path.length() - 1);
     } else {
       return path;
     }
