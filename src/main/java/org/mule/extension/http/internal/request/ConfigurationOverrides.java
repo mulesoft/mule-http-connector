@@ -6,7 +6,8 @@
  */
 package org.mule.extension.http.internal.request;
 
-import static org.mule.extension.http.internal.HttpConnectorConstants.CONFIGURATION_OVERRIDES;
+import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST;
+import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE;
 import org.mule.extension.http.internal.HttpStreamingType;
 import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -24,7 +25,7 @@ public final class ConfigurationOverrides {
    */
   @Parameter
   @ConfigOverride
-  @Placement(tab = CONFIGURATION_OVERRIDES, order = 3)
+  @Placement(tab = REQUEST, order = 1)
   private boolean followRedirects;
 
   /**
@@ -32,7 +33,7 @@ public final class ConfigurationOverrides {
    */
   @Parameter
   @ConfigOverride
-  @Placement(tab = CONFIGURATION_OVERRIDES, order = 4)
+  @Placement(tab = REQUEST, order = 2)
   private HttpSendBodyMode sendBodyMode;
 
   /**
@@ -40,7 +41,7 @@ public final class ConfigurationOverrides {
    */
   @Parameter
   @ConfigOverride
-  @Placement(tab = CONFIGURATION_OVERRIDES, order = 5)
+  @Placement(tab = REQUEST, order = 3)
   private HttpStreamingType requestStreamingMode;
 
   /**
@@ -48,7 +49,7 @@ public final class ConfigurationOverrides {
    */
   @Parameter
   @ConfigOverride
-  @Placement(tab = CONFIGURATION_OVERRIDES, order = 6)
+  @Placement(tab = RESPONSE, order = 1)
   private boolean parseResponse;
 
   /**
@@ -56,7 +57,7 @@ public final class ConfigurationOverrides {
    */
   @Parameter
   @ConfigOverride
-  @Placement(tab = CONFIGURATION_OVERRIDES, order = 7)
+  @Placement(tab = RESPONSE, order = 2)
   private Integer responseTimeout;
 
   public boolean getFollowRedirects() {

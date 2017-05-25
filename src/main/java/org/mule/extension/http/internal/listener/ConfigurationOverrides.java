@@ -6,8 +6,11 @@
  */
 package org.mule.extension.http.internal.listener;
 
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
+
 import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 public class ConfigurationOverrides {
 
@@ -18,6 +21,7 @@ public class ConfigurationOverrides {
    */
   @Parameter
   @ConfigOverride
+  @Placement(tab = ADVANCED_TAB)
   private boolean parseRequest;
 
   public boolean getParseRequest() {

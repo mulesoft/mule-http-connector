@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.internal.request;
 
-import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE_SETTINGS;
+import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -24,7 +24,7 @@ public final class ResponseValidationSettings {
    */
   @Parameter
   @Optional
-  @Placement(tab = RESPONSE_SETTINGS)
+  @Placement(tab = RESPONSE)
   private ResponseValidator responseValidator;
 
   public ResponseValidator getResponseValidator() {

@@ -7,8 +7,6 @@
 package org.mule.extension.http.api.listener.builder;
 
 import org.mule.extension.http.api.HttpMessageBuilder;
-import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 /**
  * Base class for a {@link HttpMessageBuilder} which returns responses
@@ -17,34 +15,12 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
  */
 public abstract class HttpListenerResponseBuilder extends HttpMessageBuilder {
 
-  /**
-   * HTTP status code the response should have.
-   */
-  @Parameter
-  @Optional
-  private Integer statusCode;
+  public abstract Integer getStatusCode();
 
-  /**
-   * HTTP reason phrase the response should have.
-   */
-  @Parameter
-  @Optional
-  private String reasonPhrase;
+  public abstract String getReasonPhrase();
 
-  public Integer getStatusCode() {
-    return statusCode;
-  }
+  public abstract void setStatusCode(Integer statusCode);
 
-  public String getReasonPhrase() {
-    return reasonPhrase;
-  }
-
-  public void setStatusCode(Integer statusCode) {
-    this.statusCode = statusCode;
-  }
-
-  public void setReasonPhrase(String reasonPhrase) {
-    this.reasonPhrase = reasonPhrase;
-  }
+  public abstract void setReasonPhrase(String reasonPhrase);
 
 }

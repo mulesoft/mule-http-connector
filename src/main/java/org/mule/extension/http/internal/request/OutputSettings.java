@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.internal.request;
 
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
+import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE;
 
 import org.mule.extension.http.internal.HttpMetadataKey;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
@@ -24,7 +24,7 @@ public final class OutputSettings {
   @Parameter
   @Optional(defaultValue = "STREAM")
   @MetadataKeyId
-  @Placement(tab = ADVANCED_TAB)
+  @Placement(tab = RESPONSE)
   private HttpMetadataKey outputType;
 
   public HttpMetadataKey getOutputType() {
