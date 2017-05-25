@@ -175,6 +175,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
           .setMaxConnections(connectionParams.getMaxConnections())
           .setUsePersistentConnections(connectionParams.getUsePersistentConnections())
           .setConnectionIdleTimeout(connectionParams.getConnectionIdleTimeout())
+          .setStreaming(connectionParams.getStreamResponse())
           .setResponseBufferSize(connectionParams.getResponseBufferSize())
           .setName(name)
           .build();
