@@ -9,6 +9,7 @@ package org.mule.extension.http.internal.request;
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.String.format;
 import static org.mule.extension.http.internal.HttpConnectorConstants.CONNECTOR_OVERRIDES;
+import static org.mule.extension.http.internal.HttpConnectorConstants.OUTPUT;
 import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST;
 import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE;
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.encodeSpaces;
@@ -74,7 +75,7 @@ public class HttpRequestOperations implements Initialisable, Disposable {
                       @ParameterGroup(name = CONNECTOR_OVERRIDES) ConfigurationOverrides overrides,
                       @ParameterGroup(name = REQUEST) HttpRequesterRequestBuilder requestBuilder,
                       @ParameterGroup(name = RESPONSE) ResponseValidationSettings responseValidationSettings,
-                      @ParameterGroup(name = "Output") OutputSettings outputSettings,
+                      @ParameterGroup(name = OUTPUT) OutputSettings outputSettings,
                       @Connection HttpExtensionClient client,
                       @Config HttpRequesterConfig config,
                       CompletionCallback<Object, HttpResponseAttributes> callback) {

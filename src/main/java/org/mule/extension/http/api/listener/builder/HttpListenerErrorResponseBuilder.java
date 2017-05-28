@@ -30,7 +30,7 @@ public class HttpListenerErrorResponseBuilder extends HttpListenerResponseBuilde
   @Parameter
   @Optional(defaultValue = "#[error.description]")
   @Content
-  @Placement(tab = RESPONSES, order = 5)
+  @Placement(tab = RESPONSES, order = 1)
   private TypedValue<Object> body;
 
   /**
@@ -39,7 +39,7 @@ public class HttpListenerErrorResponseBuilder extends HttpListenerResponseBuilde
   @Parameter
   @Optional
   @Content
-  @Placement(tab = RESPONSES, order = 6)
+  @Placement(tab = RESPONSES, order = 2)
   protected Map<String, String> headers = new HashMap<>();
 
   /**
@@ -47,7 +47,7 @@ public class HttpListenerErrorResponseBuilder extends HttpListenerResponseBuilde
    */
   @Parameter
   @Optional
-  @Placement(tab = RESPONSES, order = 7)
+  @Placement(tab = RESPONSES, order = 3)
   private Integer statusCode;
 
   /**
@@ -55,7 +55,7 @@ public class HttpListenerErrorResponseBuilder extends HttpListenerResponseBuilde
    */
   @Parameter
   @Optional
-  @Placement(tab = RESPONSES, order = 8)
+  @Placement(tab = RESPONSES, order = 4)
   private String reasonPhrase;
 
   public Integer getStatusCode() {

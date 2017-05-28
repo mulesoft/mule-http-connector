@@ -47,6 +47,9 @@ public final class RequestSettings {
       + "the behavior will depend on the type of the payload (it will stream only for InputStream).")
   private HttpStreamingType requestStreamingMode;
 
+  /**       
+   * If true, cookies received in HTTP responses will be stored, and sent in subsequent HTTP requests.        
+   */
   @Parameter
   @Optional(defaultValue = "true")
   @Expression(NOT_SUPPORTED)
