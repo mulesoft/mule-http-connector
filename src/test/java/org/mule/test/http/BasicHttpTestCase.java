@@ -6,6 +6,7 @@
  */
 package org.mule.test.http;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
@@ -131,18 +132,25 @@ public class BasicHttpTestCase extends AbstractHttpTestCase {
 
   @Test
   public void receivesRequest() throws Exception {
-    CloseableHttpClient httpClient = HttpClients.createDefault();
     HttpGet getRequest = new HttpGet(String.format("http://localhost:%s/test?query=param", serverPort.getValue()));
     getRequest.addHeader("Y-Custom", "value-custom");
-    try {
-      CloseableHttpResponse response = httpClient.execute(getRequest);
-      try {
+    try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+      try (CloseableHttpResponse response = httpClient.execute(getRequest)) {
         assertThat(IOUtils.toString(response.getEntity().getContent()), is("HEY"));
-      } finally {
-        response.close();
       }
-    } finally {
-      httpClient.close();
+    }
+  }
+
+  @Test
+  public void invalidError() throws Exception {
+    HttpGet getRequest = new HttpGet(String.format("http://localhost:%s/invalid?query=param", serverPort.getValue()));
+    getRequest.addHeader("Y-Custom", "value-custom");
+    try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+      try (CloseableHttpResponse response = httpClient.execute(getRequest)) {
+        assertThat(response.getStatusLine().getStatusCode(), is(500));
+        assertThat(response.getStatusLine().getReasonPhrase(), is("Server Error"));
+        assertThat(IOUtils.toString(response.getEntity().getContent()), is(containsString("ExpressionRuntimeException")));
+      }
     }
   }
 
