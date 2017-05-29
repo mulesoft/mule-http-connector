@@ -11,8 +11,7 @@ import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
 import static org.mule.extension.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.extension.http.api.error.HttpError.NOT_FOUND;
-import static org.mule.extension.http.internal.HttpConnectorConstants.CONFIGURATION_OVERRIDES;
-import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE_SETTINGS;
+import static org.mule.extension.http.internal.HttpConnectorConstants.CONNECTOR_OVERRIDES;
 import static org.mule.extension.http.internal.listener.HttpRequestToResult.transform;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -28,6 +27,7 @@ import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTP;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
@@ -103,10 +103,8 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
   public static final String HTTP_NAMESPACE = "http";
   private static final Logger LOGGER = getLogger(HttpListener.class);
   private static final String SERVER_PROBLEM = "Server encountered a problem";
-  private static final String ERROR_RESPONSE_SETTINGS = "Error Response Settings";
   private static final String RESPONSE_CONTEXT = "responseContext";
   private static final String RESPONSE_CONTEXT_NOT_FOUND = "Response Context is not present. Could not send response.";
-
 
   @Inject
   private MuleContext muleContext;
@@ -129,7 +127,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
    */
   @Parameter
   @Optional
-  @Placement(order = 2)
+  @Placement(tab = Placement.ADVANCED_TAB)
   @Summary("Comma separated list of methods. Leave empty to allow all.")
   @Example("GET, POST")
   private String allowedMethods;
@@ -139,7 +137,8 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
    * and inbound attachments with each part). If this property is set to false, no parsing will be done, and the payload will
    * always contain the raw contents of the HTTP request.
    */
-  @ParameterGroup(name = CONFIGURATION_OVERRIDES)
+  @Placement(tab = Placement.ADVANCED_TAB)
+  @ParameterGroup(name = CONNECTOR_OVERRIDES)
   private ConfigurationOverrides configurationOverrides;
 
   /**
@@ -162,7 +161,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
 
   // TODO: MULE-10900 figure out a way to have a shared group between callbacks and possibly regular params
   @OnSuccess
-  public void onSuccess(@Placement(tab = RESPONSE_SETTINGS) @ParameterGroup(name = "Response",
+  public void onSuccess(@ParameterGroup(name = "Successful Responses",
       showInDsl = true) HttpListenerSuccessResponseBuilder response,
                         SourceCallbackContext callbackContext)
       throws Exception {
@@ -174,7 +173,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
 
   // TODO: MULE-10900 figure out a way to have a shared group between callbacks and possibly regular params
   @OnError
-  public void onError(@Placement(tab = ERROR_RESPONSE_SETTINGS) @ParameterGroup(name = "Error Response",
+  public void onError(@ParameterGroup(name = "Error Responses",
       showInDsl = true) HttpListenerErrorResponseBuilder errorResponse,
                       SourceCallbackContext callbackContext,
                       Error error) {

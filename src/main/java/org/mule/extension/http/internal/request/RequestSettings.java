@@ -6,12 +6,12 @@
  */
 package org.mule.extension.http.internal.request;
 
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 
 import org.mule.extension.http.internal.HttpStreamingType;
+import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 /**
@@ -26,7 +26,6 @@ public final class RequestSettings {
    */
   @Parameter
   @Optional(defaultValue = "true")
-  @Placement(tab = ADVANCED_TAB, order = 1)
   private boolean followRedirects;
 
   /**
@@ -35,7 +34,6 @@ public final class RequestSettings {
    */
   @Parameter
   @Optional(defaultValue = "AUTO")
-  @Placement(tab = ADVANCED_TAB, order = 2)
   private HttpSendBodyMode sendBodyMode;
 
   /**
@@ -45,10 +43,17 @@ public final class RequestSettings {
    */
   @Parameter
   @Optional(defaultValue = "AUTO")
-  @Placement(tab = ADVANCED_TAB, order = 3)
   @Summary("Defines if the request should be sent using streaming or not. If this attribute is not present, "
       + "the behavior will depend on the type of the payload (it will stream only for InputStream).")
   private HttpStreamingType requestStreamingMode;
+
+  /**       
+   * If true, cookies received in HTTP responses will be stored, and sent in subsequent HTTP requests.        
+   */
+  @Parameter
+  @Optional(defaultValue = "true")
+  @Expression(NOT_SUPPORTED)
+  private boolean enableCookies;
 
   public boolean getFollowRedirects() {
     return followRedirects;
@@ -60,5 +65,9 @@ public final class RequestSettings {
 
   public HttpStreamingType getRequestStreamingMode() {
     return requestStreamingMode;
+  }
+
+  public boolean isEnableCookies() {
+    return enableCookies;
   }
 }

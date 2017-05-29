@@ -14,12 +14,12 @@ package org.mule.extension.http.internal;
 public interface HttpConnectorConstants {
 
   String URL_CONFIGURATION = "URL Configuration";
-  String RESPONSE_SETTINGS = "Response Settings";
-  String REQUEST_SETTINGS = "Request Settings";
-  String CONFIGURATION_OVERRIDES = "Configuration Overrides";
-  String API_SPECIFICATION = "API Specification";
+  String RESPONSE = "Response";
+  String REQUEST = "Request";
+  String RESPONSES = "Responses";
+  String CONNECTOR_OVERRIDES = "Connector Overrides";
   String TLS_CONFIGURATION = "TLS Configuration";
-  String OTHER_SETTINGS = "Other Settings";
+  String OUTPUT = "Output";
   String AUTHENTICATION = "Authentication";
 
 }

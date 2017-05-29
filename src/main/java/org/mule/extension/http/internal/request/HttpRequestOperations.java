@@ -8,9 +8,10 @@ package org.mule.extension.http.internal.request;
 
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.String.format;
-import static org.mule.extension.http.internal.HttpConnectorConstants.CONFIGURATION_OVERRIDES;
-import static org.mule.extension.http.internal.HttpConnectorConstants.OTHER_SETTINGS;
-import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST_SETTINGS;
+import static org.mule.extension.http.internal.HttpConnectorConstants.CONNECTOR_OVERRIDES;
+import static org.mule.extension.http.internal.HttpConnectorConstants.OUTPUT;
+import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST;
+import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE;
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.encodeSpaces;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
@@ -69,13 +70,12 @@ public class HttpRequestOperations implements Initialisable, Disposable {
   @OutputResolver(output = HttpRequestMetadataResolver.class)
   @Throws(RequestErrorTypeProvider.class)
   @Streaming
-  public void request(@Placement(order = 1) @ParameterGroup(name = "URI Settings") UriSettings uriSettings,
-                      @Placement(order = 2) @Optional(defaultValue = "GET") String method,
-                      @ParameterGroup(name = CONFIGURATION_OVERRIDES) ConfigurationOverrides overrides,
-                      @Placement(order = 3) @ParameterGroup(name = REQUEST_SETTINGS) HttpRequesterRequestBuilder requestBuilder,
-                      @Placement(order = 4) @ParameterGroup(
-                          name = "Response Validation Settings") ResponseValidationSettings responseValidationSettings,
-                      @ParameterGroup(name = OTHER_SETTINGS) OutputSettings outputSettings,
+  public void request(@ParameterGroup(name = "URI Settings") UriSettings uriSettings,
+                      @Placement(order = 3) @Optional(defaultValue = "GET") String method,
+                      @ParameterGroup(name = CONNECTOR_OVERRIDES) ConfigurationOverrides overrides,
+                      @ParameterGroup(name = REQUEST) HttpRequesterRequestBuilder requestBuilder,
+                      @ParameterGroup(name = RESPONSE) ResponseValidationSettings responseValidationSettings,
+                      @ParameterGroup(name = OUTPUT) OutputSettings outputSettings,
                       @Connection HttpExtensionClient client,
                       @Config HttpRequesterConfig config,
                       CompletionCallback<Object, HttpResponseAttributes> callback) {

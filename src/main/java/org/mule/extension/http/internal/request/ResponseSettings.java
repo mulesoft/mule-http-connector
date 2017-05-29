@@ -6,10 +6,8 @@
  */
 package org.mule.extension.http.internal.request;
 
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 /**
@@ -26,7 +24,6 @@ public final class ResponseSettings {
    */
   @Parameter
   @Optional(defaultValue = "true")
-  @Placement(tab = ADVANCED_TAB, order = 1)
   @Summary("Indicates if the HTTP response should be parsed, or directly receive the raw content")
   private boolean parseResponse;
 
@@ -36,7 +33,6 @@ public final class ResponseSettings {
    */
   @Parameter
   @Optional
-  @Placement(tab = ADVANCED_TAB, order = 2)
   private Integer responseTimeout;
 
   public boolean getParseResponse() {

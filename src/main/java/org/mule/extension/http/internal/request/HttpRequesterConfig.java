@@ -6,10 +6,6 @@
  */
 package org.mule.extension.http.internal.request;
 
-import static org.mule.extension.http.internal.HttpConnectorConstants.API_SPECIFICATION;
-import static org.mule.extension.http.internal.HttpConnectorConstants.OTHER_SETTINGS;
-import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST_SETTINGS;
-import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE_SETTINGS;
 import static org.mule.extension.http.internal.HttpConnectorConstants.URL_CONFIGURATION;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import org.mule.extension.http.api.request.RamlApiConfiguration;
@@ -41,17 +37,16 @@ import javax.inject.Inject;
 public class HttpRequesterConfig implements Initialisable, HttpRequesterCookieConfig {
 
   @ParameterGroup(name = URL_CONFIGURATION)
+  @Placement(order = 1)
   private RequestUrlConfiguration urlConfiguration;
 
-  @ParameterGroup(name = REQUEST_SETTINGS)
+  @ParameterGroup(name = "Request Settings")
+  @Placement(order = 2)
   private RequestSettings requestSettings;
 
-  @ParameterGroup(name = RESPONSE_SETTINGS)
-  @Placement(tab = RESPONSE_SETTINGS)
+  @ParameterGroup(name = "Response Settings")
+  @Placement(order = 3)
   private ResponseSettings responseSettings;
-
-  @ParameterGroup(name = OTHER_SETTINGS)
-  private OtherRequestSettings otherSettings;
 
   /**
    * Specifies a RAML configuration file for the I that is being consumed.
@@ -59,7 +54,7 @@ public class HttpRequesterConfig implements Initialisable, HttpRequesterCookieCo
   @Parameter
   @Optional
   @Expression(NOT_SUPPORTED)
-  @Placement(tab = API_SPECIFICATION)
+  @Placement(order = 4)
   private RamlApiConfiguration apiConfiguration;
 
   @Inject
@@ -68,7 +63,7 @@ public class HttpRequesterConfig implements Initialisable, HttpRequesterCookieCo
 
   @Override
   public void initialise() throws InitialisationException {
-    if (otherSettings.isEnableCookies()) {
+    if (requestSettings.isEnableCookies()) {
       cookieManager = new CookieManager();
     }
   }
@@ -99,7 +94,7 @@ public class HttpRequesterConfig implements Initialisable, HttpRequesterCookieCo
 
   @Override
   public boolean isEnableCookies() {
-    return otherSettings.isEnableCookies();
+    return requestSettings.isEnableCookies();
   }
 
   public RamlApiConfiguration getApiConfiguration() {
