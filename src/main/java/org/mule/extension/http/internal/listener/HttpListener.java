@@ -12,6 +12,7 @@ import static java.util.Optional.ofNullable;
 import static org.mule.extension.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.extension.http.api.error.HttpError.NOT_FOUND;
 import static org.mule.extension.http.internal.HttpConnectorConstants.CONNECTOR_OVERRIDES;
+import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE;
 import static org.mule.extension.http.internal.listener.HttpRequestToResult.transform;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -161,7 +162,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
 
   // TODO: MULE-10900 figure out a way to have a shared group between callbacks and possibly regular params
   @OnSuccess
-  public void onSuccess(@ParameterGroup(name = "Successful Responses",
+  public void onSuccess(@ParameterGroup(name = RESPONSE,
       showInDsl = true) HttpListenerSuccessResponseBuilder response,
                         SourceCallbackContext callbackContext)
       throws Exception {
@@ -173,7 +174,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
 
   // TODO: MULE-10900 figure out a way to have a shared group between callbacks and possibly regular params
   @OnError
-  public void onError(@ParameterGroup(name = "Error Responses",
+  public void onError(@ParameterGroup(name = "Error Response",
       showInDsl = true) HttpListenerErrorResponseBuilder errorResponse,
                       SourceCallbackContext callbackContext,
                       Error error) {
