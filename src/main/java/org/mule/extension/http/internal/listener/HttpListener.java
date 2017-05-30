@@ -28,7 +28,6 @@ import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTP;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
@@ -52,10 +51,12 @@ import org.mule.runtime.core.exception.DisjunctiveErrorTypeMatcher;
 import org.mule.runtime.core.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.exception.SingleErrorTypeMatcher;
+import org.mule.runtime.extension.api.runtime.source.SourceResult;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
+import org.mule.runtime.extension.api.annotation.execution.OnTerminate;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -82,13 +83,13 @@ import org.mule.runtime.http.api.server.RequestHandlerManager;
 import org.mule.runtime.http.api.server.async.HttpResponseReadyCallback;
 import org.mule.runtime.http.api.server.async.ResponseStatusCallback;
 
+import org.slf4j.Logger;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.inject.Inject;
-
-import org.slf4j.Logger;
 
 /**
  * Represents a listener for HTTP requests.
@@ -106,6 +107,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
   private static final String SERVER_PROBLEM = "Server encountered a problem";
   private static final String RESPONSE_CONTEXT = "responseContext";
   private static final String RESPONSE_CONTEXT_NOT_FOUND = "Response Context is not present. Could not send response.";
+  private static final HttpListenerErrorResponseBuilder NULL_ERROR_RESPONSE = new HttpListenerErrorResponseBuilder();
 
   @Inject
   private MuleContext muleContext;
@@ -178,6 +180,19 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
       showInDsl = true) HttpListenerErrorResponseBuilder errorResponse,
                       SourceCallbackContext callbackContext,
                       Error error) {
+    sendErrorResponse(errorResponse, callbackContext, error);
+  }
+
+  @OnTerminate
+  public void onTerminate(SourceResult sourceResult) {
+    sourceResult
+        .getParameterGenerationError()
+        .ifPresent(error -> sendErrorResponse(NULL_ERROR_RESPONSE, sourceResult.getSourceCallbackContext(), error));
+  }
+
+  private void sendErrorResponse(HttpListenerErrorResponseBuilder errorResponse, SourceCallbackContext callbackContext,
+                                 Error error) {
+
     final HttpResponseBuilder failureResponseBuilder = createFailureResponseBuilder(error);
 
     if (errorResponse.getBody() == null || errorResponse.getBody().getValue() == null) {

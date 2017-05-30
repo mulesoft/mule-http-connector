@@ -40,4 +40,15 @@
         <set-payload value="HEY"/>
     </flow>
 
+    <flow name="serverWithInvalidErrorResponse">
+        <http:listener config-ref="lisConfig" path="/invalid">
+            <http:error-response>
+                <http:body>#[error.description ++]</http:body>
+                <http:headers>#[{'Name':'Value'}]</http:headers>
+            </http:error-response>
+        </http:listener>
+
+        <set-payload value="#[HEY ++]"/>
+    </flow>
+
 </mule>
