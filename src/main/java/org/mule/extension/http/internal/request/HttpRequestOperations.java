@@ -9,16 +9,15 @@ package org.mule.extension.http.internal.request;
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.String.format;
 import static org.mule.extension.http.internal.HttpConnectorConstants.CONNECTOR_OVERRIDES;
-import static org.mule.extension.http.internal.HttpConnectorConstants.OUTPUT;
 import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST;
 import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE;
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.encodeSpaces;
-
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.request.validator.SuccessStatusCodeValidator;
+import org.mule.extension.http.internal.HttpMetadataKey;
 import org.mule.extension.http.internal.HttpRequestMetadataResolver;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -29,6 +28,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.error.Throws;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -61,7 +61,7 @@ public class HttpRequestOperations implements Initialisable, Disposable {
    * @param overrides configuration overrides parameter group
    * @param responseValidationSettings response validation parameter group
    * @param requestBuilder configures the request
-   * @param outputSettings additional settings parameter group
+   * @param outputType the expected response type (STREAM, MULTIPART, FORM or ANY)
    * @param client the http connection
    * @param config the configuration for this operation. All parameters not configured will be taken from it.
    * @return an {@link Result} with {@link HttpResponseAttributes}
@@ -70,12 +70,13 @@ public class HttpRequestOperations implements Initialisable, Disposable {
   @OutputResolver(output = HttpRequestMetadataResolver.class)
   @Throws(RequestErrorTypeProvider.class)
   @Streaming
-  public void request(@ParameterGroup(name = "URI Settings") UriSettings uriSettings,
-                      @Placement(order = 3) @Optional(defaultValue = "GET") String method,
+  public void request(@Placement(order = 1) @ParameterGroup(name = "URI Settings") UriSettings uriSettings,
+                      @Placement(order = 2) @Optional(defaultValue = "GET") String method,
                       @ParameterGroup(name = CONNECTOR_OVERRIDES) ConfigurationOverrides overrides,
-                      @ParameterGroup(name = REQUEST) HttpRequesterRequestBuilder requestBuilder,
+                      @Placement(order = 3) @ParameterGroup(name = REQUEST) HttpRequesterRequestBuilder requestBuilder,
                       @ParameterGroup(name = RESPONSE) ResponseValidationSettings responseValidationSettings,
-                      @ParameterGroup(name = OUTPUT) OutputSettings outputSettings,
+                      @Placement(tab = RESPONSE,
+                          order = 1) @Optional(defaultValue = "STREAM") @MetadataKeyId HttpMetadataKey outputType,
                       @Connection HttpExtensionClient client,
                       @Config HttpRequesterConfig config,
                       CompletionCallback<Object, HttpResponseAttributes> callback) {

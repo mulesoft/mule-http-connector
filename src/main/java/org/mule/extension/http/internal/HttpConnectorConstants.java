@@ -19,7 +19,6 @@ public interface HttpConnectorConstants {
   String RESPONSES = "Responses";
   String CONNECTOR_OVERRIDES = "Connector Overrides";
   String TLS_CONFIGURATION = "TLS Configuration";
-  String OUTPUT = "Output";
   String AUTHENTICATION = "Authentication";
 
 }
