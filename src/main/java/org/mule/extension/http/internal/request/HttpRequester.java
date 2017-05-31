@@ -6,11 +6,11 @@
  */
 package org.mule.extension.http.internal.request;
 
+import static org.apache.commons.lang.StringUtils.containsIgnoreCase;
 import static org.mule.extension.http.api.error.HttpError.CONNECTIVITY;
 import static org.mule.extension.http.api.error.HttpError.TIMEOUT;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
 import static reactor.core.publisher.Mono.from;
-
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.error.HttpError;
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
@@ -29,7 +29,6 @@ import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.context.notification.NotificationHelper;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
@@ -161,7 +160,7 @@ public class HttpRequester {
 
   private void checkIfRemotelyClosed(Exception exception, UriParameters uriParameters) {
     if (HTTPS.getScheme().equals(uriParameters.getScheme())
-        && StringUtils.containsIgnoreCase(exception.getMessage(), REMOTELY_CLOSED)) {
+        && containsIgnoreCase(exception.getMessage(), REMOTELY_CLOSED)) {
       logger
           .error("Remote host closed connection. Possible SSL/TLS handshake issue. Check protocols, cipher suites and certificate set up. Use -Djavax.net.debug=handshake for further debugging.");
     }
