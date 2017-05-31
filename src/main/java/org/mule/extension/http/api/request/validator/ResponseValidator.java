@@ -22,8 +22,8 @@ public interface ResponseValidator {
    *
    * @param result the message to validate
    * @param request the request that cause the {@code result}
-   * @throws ResponseValidatorException if the message is not considered valid.
+   * @throws ResponseValidatorTypedException if the message is not considered valid.
    */
-  void validate(Result<Object, HttpResponseAttributes> result, HttpRequest request) throws ResponseValidatorException;
+  void validate(Result<Object, HttpResponseAttributes> result, HttpRequest request) throws ResponseValidatorTypedException;
 
 }

@@ -6,9 +6,8 @@
  */
 package org.mule.extension.http.internal;
 
-import static org.mule.extension.http.api.error.HttpError.FORBIDDEN;
-import static org.mule.extension.http.api.error.HttpError.SECURITY;
-import static org.mule.extension.http.api.error.HttpError.UNAUTHORIZED;
+import static org.mule.extension.http.api.error.HttpError.BASIC_AUTHENTICATION;
+import static org.mule.runtime.extension.api.error.MuleErrors.SERVER_SECURITY;
 import org.mule.extension.http.api.listener.HttpBasicAuthenticationFilter;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
@@ -19,8 +18,8 @@ import com.google.common.collect.ImmutableSet;
 import java.util.Set;
 
 /**
- * Errors that can be thrown in the {@link HttpOperations#basicSecurityFilter(HttpBasicAuthenticationFilter, AuthenticationHandler)}
- * operation.
+ * Errors that can be thrown in the
+ * {@link HttpOperations#basicSecurityFilter(HttpBasicAuthenticationFilter, AuthenticationHandler)} operation.
  *
  * @since 1.0
  */
@@ -29,9 +28,8 @@ public class BasicSecurityErrorTypeProvider implements ErrorTypeProvider {
   @Override
   public Set<ErrorTypeDefinition> getErrorTypes() {
     return ImmutableSet.<ErrorTypeDefinition>builder()
-        .add(SECURITY)
-        .add(FORBIDDEN)
-        .add(UNAUTHORIZED)
+        .add(SERVER_SECURITY)
+        .add(BASIC_AUTHENTICATION)
         .build();
   }
 }

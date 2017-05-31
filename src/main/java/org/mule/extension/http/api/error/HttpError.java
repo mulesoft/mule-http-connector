@@ -9,13 +9,15 @@ package org.mule.extension.http.api.error;
 import static java.util.Optional.ofNullable;
 import static org.mule.extension.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.getStatusByCode;
-
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.http.api.HttpConstants.HttpStatus;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 
+import com.google.common.collect.ImmutableSet;
+
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 
 /**
@@ -31,32 +33,36 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
 
   SECURITY(MuleErrors.SECURITY),
 
+  CLIENT_SECURITY(MuleErrors.CLIENT_SECURITY),
+
+  SERVER_SECURITY(MuleErrors.SERVER_SECURITY),
+
   TRANSFORMATION(MuleErrors.TRANSFORMATION),
 
   CONNECTIVITY(MuleErrors.CONNECTIVITY),
 
-  RESPONSE_VALIDATION,
+  BAD_REQUEST,
 
-  BAD_REQUEST(RESPONSE_VALIDATION),
+  BASIC_AUTHENTICATION(SERVER_SECURITY),
 
-  UNAUTHORIZED(RESPONSE_VALIDATION),
+  UNAUTHORIZED(CLIENT_SECURITY),
 
-  FORBIDDEN(RESPONSE_VALIDATION),
+  FORBIDDEN(CLIENT_SECURITY),
 
-  NOT_FOUND(RESPONSE_VALIDATION),
+  NOT_FOUND,
 
-  METHOD_NOT_ALLOWED(RESPONSE_VALIDATION),
+  METHOD_NOT_ALLOWED,
 
-  NOT_ACCEPTABLE(RESPONSE_VALIDATION),
+  NOT_ACCEPTABLE,
 
-  UNSUPPORTED_MEDIA_TYPE(RESPONSE_VALIDATION,
+  UNSUPPORTED_MEDIA_TYPE(
       request -> "media type " + request.getHeaderValueIgnoreCase(CONTENT_TYPE) + " not supported"),
 
-  TOO_MANY_REQUESTS(RESPONSE_VALIDATION),
+  TOO_MANY_REQUESTS,
 
-  INTERNAL_SERVER_ERROR(RESPONSE_VALIDATION),
+  INTERNAL_SERVER_ERROR,
 
-  SERVICE_UNAVAILABLE(RESPONSE_VALIDATION);
+  SERVICE_UNAVAILABLE;
 
   private ErrorTypeDefinition<?> parentErrorType;
 
@@ -69,6 +75,11 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
   HttpError(ErrorTypeDefinition<?> parentErrorType) {
     this();
     this.parentErrorType = parentErrorType;
+  }
+
+  HttpError(Function<HttpRequest, String> errorMessageFunction) {
+    this();
+    this.errorMessageFunction = errorMessageFunction;
   }
 
   HttpError(ErrorTypeDefinition<?> parentErrorType, Function<HttpRequest, String> errorMessageFunction) {
@@ -116,6 +127,14 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
       }
     }
     return ofNullable(result);
+  }
+
+  public static Set<ErrorTypeDefinition> getHttpRequestOperationErrors() {
+    return ImmutableSet.<ErrorTypeDefinition>builder()
+        .add(PARSING).add(TIMEOUT).add(SECURITY).add(CLIENT_SECURITY).add(CONNECTIVITY).add(BAD_REQUEST).add(FORBIDDEN)
+        .add(UNAUTHORIZED).add(METHOD_NOT_ALLOWED).add(TOO_MANY_REQUESTS)
+        .add(NOT_FOUND).add(UNSUPPORTED_MEDIA_TYPE).add(NOT_ACCEPTABLE).add(INTERNAL_SERVER_ERROR).add(SERVICE_UNAVAILABLE)
+        .build();
   }
 
   /**

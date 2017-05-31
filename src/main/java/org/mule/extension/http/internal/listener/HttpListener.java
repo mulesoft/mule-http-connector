@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
 import static org.mule.extension.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+import static org.mule.extension.http.api.error.HttpError.BASIC_AUTHENTICATION;
 import static org.mule.extension.http.api.error.HttpError.NOT_FOUND;
 import static org.mule.extension.http.internal.HttpConnectorConstants.CONNECTOR_OVERRIDES;
 import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE;
@@ -25,10 +26,8 @@ import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTP;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
@@ -252,7 +251,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
         .withName(NOT_FOUND.name())
         .build()).get()));
     matchers.add(new SingleErrorTypeMatcher(errorTypeRepository.lookupErrorType(httpErrorBuilder
-        .withName(UNAUTHORIZED.name())
+        .withName(BASIC_AUTHENTICATION.name())
         .build()).get()));
     return matchers;
   }

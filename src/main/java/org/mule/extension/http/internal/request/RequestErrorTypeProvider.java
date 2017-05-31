@@ -6,22 +6,19 @@
  */
 package org.mule.extension.http.internal.request;
 
-import org.mule.extension.http.api.error.HttpError;
+import static org.mule.extension.http.api.error.HttpError.getHttpRequestOperationErrors;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 
-import com.google.common.collect.ImmutableSet;
-
-import java.util.Arrays;
 import java.util.Set;
 
 /**
- * Errors that can be thrown in the {@link HttpRequestOperations#request(String, String, ConfigurationOverrides,
- * ResponseValidationSettings, HttpRequesterRequestBuilder, OutputSettings, HttpExtensionClient, HttpRequesterConfig,
- * CompletionCallback)} operation.
+ * Errors that can be thrown in the
+ * {@link HttpRequestOperations#request(String, String, ConfigurationOverrides, ResponseValidationSettings, HttpRequesterRequestBuilder, OutputSettings, HttpExtensionClient, HttpRequesterConfig, CompletionCallback)}
+ * operation.
  *
  * @since 1.0
  */
@@ -29,9 +26,7 @@ public class RequestErrorTypeProvider implements ErrorTypeProvider {
 
   @Override
   public Set<ErrorTypeDefinition> getErrorTypes() {
-    //TODO: MULE-11506 - Clean up once the error hierarchy is considered and only RESPONSE_VALIDATION necessary
-    ImmutableSet.Builder<ErrorTypeDefinition> setBuilder = ImmutableSet.builder();
-    Arrays.stream(HttpError.values()).forEach(setBuilder::add);
-    return setBuilder.build();
+    // TODO: MULE-11506 - Clean up once the error hierarchy is considered and only RESPONSE_VALIDATION necessary
+    return getHttpRequestOperationErrors();
   }
 }
