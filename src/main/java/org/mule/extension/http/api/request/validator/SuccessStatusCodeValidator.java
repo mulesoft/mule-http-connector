@@ -7,7 +7,6 @@
 package org.mule.extension.http.api.request.validator;
 
 
-import static org.mule.extension.http.api.error.HttpError.getErrorByCode;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
@@ -20,11 +19,6 @@ import org.mule.runtime.http.api.domain.message.request.HttpRequest;
  */
 public class SuccessStatusCodeValidator extends RangeStatusCodeValidator {
 
-  /**
-   * An status code validator that allows any status code.
-   */
-  public static SuccessStatusCodeValidator NULL_VALIDATOR = new SuccessStatusCodeValidator("0..599");
-
   public SuccessStatusCodeValidator() {}
 
   public SuccessStatusCodeValidator(String values) {
@@ -32,11 +26,11 @@ public class SuccessStatusCodeValidator extends RangeStatusCodeValidator {
   }
 
   @Override
-  public void validate(Result<Object, HttpResponseAttributes> result, HttpRequest request) throws ResponseValidatorException {
+  public void validate(Result<Object, HttpResponseAttributes> result, HttpRequest request) {
     int status = result.getAttributes().get().getStatusCode();
 
     if (!belongs(status)) {
-      throw new ResponseValidatorException(getExceptionMessage(status, request), getErrorByCode(status), result);
+      throwValidationException(result, request, status);
     }
   }
 

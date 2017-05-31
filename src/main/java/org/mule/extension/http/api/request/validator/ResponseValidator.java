@@ -22,8 +22,11 @@ public interface ResponseValidator {
    *
    * @param result the message to validate
    * @param request the request that cause the {@code result}
-   * @throws ResponseValidatorException if the message is not considered valid.
+   * @throws ResponseValidatorTypedException if the message is not considered valid and the response validator throws a
+   *         {@link org.mule.runtime.extension.api.exception.ModuleException}
+   * @throws ResponseValidatorException if the message is not considered valid and the response validator does not relates to an
+   *         specific error type.
    */
-  void validate(Result<Object, HttpResponseAttributes> result, HttpRequest request) throws ResponseValidatorException;
+  void validate(Result<Object, HttpResponseAttributes> result, HttpRequest request);
 
 }

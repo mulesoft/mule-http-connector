@@ -7,8 +7,10 @@
 package org.mule.extension.http.api.request.validator;
 
 import static org.mule.extension.http.api.error.HttpError.getErrorByCode;
+import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.error.HttpError;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 
 import java.util.Optional;
@@ -79,6 +81,24 @@ public abstract class RangeStatusCodeValidator implements ResponseValidator {
     stringBuilder.append(".");
 
     return stringBuilder.toString();
+  }
+
+  /**
+   * Creates the exception to be thrown if the validation didn't pass.
+   * 
+   * @param result the result of the request operation
+   * @param request the HTTP request sent
+   * @param status the HTTP response status code
+   * @return
+   * @throws ResponseValidatorTypedException
+   */
+  protected void throwValidationException(Result<Object, HttpResponseAttributes> result, HttpRequest request, int status) {
+    Optional<HttpError> error = getErrorByCode(status);
+    if (error.isPresent()) {
+      throw new ResponseValidatorTypedException(getExceptionMessage(status, request), error.get(), result);
+    } else {
+      throw new ResponseValidatorException(getExceptionMessage(status, request), result);
+    }
   }
 
 }

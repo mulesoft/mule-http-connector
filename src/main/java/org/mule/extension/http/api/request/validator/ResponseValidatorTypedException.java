@@ -6,12 +6,12 @@
  */
 package org.mule.extension.http.api.request.validator;
 
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import org.mule.extension.http.api.HttpResponseAttributes;
+import org.mule.extension.http.api.error.HttpError;
 import org.mule.runtime.api.exception.ErrorMessageAwareException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 /**
@@ -19,16 +19,16 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
  *
  * @since 1.0
  */
-public class ResponseValidatorException extends MuleRuntimeException implements ErrorMessageAwareException {
+public class ResponseValidatorTypedException extends ModuleException implements ErrorMessageAwareException {
 
   Message errorMessage;
 
-  public ResponseValidatorException(String message) {
-    super(createStaticMessage(message));
+  public ResponseValidatorTypedException(String message, HttpError error) {
+    super(message, error);
   }
 
-  public ResponseValidatorException(String message, Result<Object, HttpResponseAttributes> result) {
-    this(message);
+  public ResponseValidatorTypedException(String message, HttpError error, Result<Object, HttpResponseAttributes> result) {
+    this(message, error);
     this.errorMessage = Message.builder()
         .payload(result.getOutput())
         .attributes(result.getAttributes().get())
