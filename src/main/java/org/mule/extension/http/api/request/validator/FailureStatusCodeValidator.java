@@ -19,8 +19,7 @@ import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 public class FailureStatusCodeValidator extends RangeStatusCodeValidator {
 
   @Override
-  public void validate(Result<Object, HttpResponseAttributes> result, HttpRequest request)
-      throws ResponseValidatorTypedException {
+  public void validate(Result<Object, HttpResponseAttributes> result, HttpRequest request) {
     int status = result.getAttributes().get().getStatusCode();
 
     if (belongs(status)) {

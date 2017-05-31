@@ -19,11 +19,6 @@ import org.mule.runtime.http.api.domain.message.request.HttpRequest;
  */
 public class SuccessStatusCodeValidator extends RangeStatusCodeValidator {
 
-  /**
-   * An status code validator that allows any status code.
-   */
-  public static SuccessStatusCodeValidator NULL_VALIDATOR = new SuccessStatusCodeValidator("0..599");
-
   public SuccessStatusCodeValidator() {}
 
   public SuccessStatusCodeValidator(String values) {
@@ -31,8 +26,7 @@ public class SuccessStatusCodeValidator extends RangeStatusCodeValidator {
   }
 
   @Override
-  public void validate(Result<Object, HttpResponseAttributes> result, HttpRequest request)
-      throws ResponseValidatorException {
+  public void validate(Result<Object, HttpResponseAttributes> result, HttpRequest request) {
     int status = result.getAttributes().get().getStatusCode();
 
     if (!belongs(status)) {

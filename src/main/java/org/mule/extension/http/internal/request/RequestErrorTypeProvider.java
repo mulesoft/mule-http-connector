@@ -26,7 +26,6 @@ public class RequestErrorTypeProvider implements ErrorTypeProvider {
 
   @Override
   public Set<ErrorTypeDefinition> getErrorTypes() {
-    // TODO: MULE-11506 - Clean up once the error hierarchy is considered and only RESPONSE_VALIDATION necessary
     return getHttpRequestOperationErrors();
   }
 }
