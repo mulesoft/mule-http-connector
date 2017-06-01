@@ -15,7 +15,7 @@ import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.error.ResourceNotFoundException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
