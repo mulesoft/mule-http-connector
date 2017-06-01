@@ -8,14 +8,14 @@
 package org.mule.extension.http.internal;
 
 import static java.lang.String.format;
+import static org.apache.commons.lang.StringUtils.removeEnd;
 import static org.mule.extension.http.api.error.HttpError.NOT_FOUND;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.error.ResourceNotFoundException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -65,7 +65,7 @@ public class StaticResourceLoader {
       contextPath = ROOT_PATH;
     }
     if (contextPath.endsWith(ANY_PATH)) {
-      contextPath = StringUtils.removeEnd(contextPath, ANY_PATH);
+      contextPath = removeEnd(contextPath, ANY_PATH);
     }
 
     if (!ROOT_PATH.equals(contextPath)) {
