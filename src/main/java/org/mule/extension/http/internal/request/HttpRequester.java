@@ -26,9 +26,9 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.TransformationService;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.context.notification.NotificationHelper;
-import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
@@ -113,7 +113,7 @@ public class HttpRequester {
                   responseValidator.validate(result, httpRequest);
                   callback.success(result);
                 }
-              } catch (MuleException e) {
+              } catch (Exception e) {
                 callback.error(e);
               }
             })
