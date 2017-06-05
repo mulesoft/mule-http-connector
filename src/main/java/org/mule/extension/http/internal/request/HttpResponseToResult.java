@@ -11,6 +11,7 @@ import static java.lang.String.format;
 import static java.nio.charset.Charset.defaultCharset;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
@@ -24,7 +25,6 @@ import static reactor.core.publisher.Mono.defer;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
-
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.error.HttpMessageParsingException;
 import org.mule.extension.http.internal.request.builder.HttpResponseAttributesBuilder;
@@ -34,9 +34,9 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.message.PartAttributes;
-import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.runtime.http.api.domain.entity.multipart.HttpPart;
@@ -102,6 +102,7 @@ public class HttpResponseToResult {
     Mono<?> payload = just(responseInputStream);
     if (responseContentType != null && parseResponse) {
       if (responseContentType.startsWith(MULTI_PART_PREFIX)) {
+        responseContentType = APPLICATION_JAVA.toRfcString();
         // Given we need to read whole payload in this scenario, do this using IO scheduler for avoid deadlock
         payload = defer(() -> {
           try {
@@ -111,6 +112,7 @@ public class HttpResponseToResult {
           }
         }).subscribeOn(fromExecutorService(scheduler));
       } else if (responseContentType.startsWith(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())) {
+        responseContentType = APPLICATION_JAVA.toRfcString();
         // Given we need to read whole payload in this scenario, do this using IO scheduler for avoid deadlock
         payload = defer(() -> just(decodeUrlEncodedBody(IOUtils.toString(responseInputStream), encoding)))
             .subscribeOn(fromExecutorService(scheduler));

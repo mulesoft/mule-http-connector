@@ -12,12 +12,10 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.CaseInsensitiveMapWrapper;
 
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
 
 import java.util.Collection;
@@ -88,9 +86,9 @@ public class HttpResponseHeaderBuilder {
     addSimpleValue(CONTENT_TYPE, multipartFormData);
   }
 
-  public void setContentLenght(String calculatedContentLenght) {
+  public void setContentLength(String calculatedContentLength) {
     removeHeader(CONTENT_LENGTH);
-    addSimpleValue(CONTENT_LENGTH, calculatedContentLenght);
+    addSimpleValue(CONTENT_LENGTH, calculatedContentLength);
   }
 
   public Collection<String> getHeaderNames() {
