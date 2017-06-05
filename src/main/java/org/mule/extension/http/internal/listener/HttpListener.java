@@ -193,7 +193,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
   @OnTerminate
   public void onTerminate(SourceResult sourceResult) {
     sourceResult
-        .getParameterGenerationError()
+        .getInvocationError()
         .ifPresent(error -> sendErrorResponse(NULL_ERROR_RESPONSE,
                                               sourceResult.getSourceCallbackContext(),
                                               error,
