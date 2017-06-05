@@ -26,6 +26,7 @@
         <socketsConnectorVersion>1.0.0-SNAPSHOT</socketsConnectorVersion>
         <commonsLangVersion>2.4</commonsLangVersion>
         <commonsIoVersion>2.4</commonsIoVersion>
+        <guavaVersion>18.0</guavaVersion>
         <formatterConfigPath>formatter.xml</formatterConfigPath>
     </properties>
 
@@ -79,6 +80,11 @@
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-core</artifactId>
             <version>${projectReactorVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guavaVersion}</version>
         </dependency>
 
         <!-- Tests -->
