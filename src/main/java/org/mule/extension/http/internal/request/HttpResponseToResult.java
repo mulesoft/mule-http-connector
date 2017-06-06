@@ -95,14 +95,15 @@ public class HttpResponseToResult {
       responseContentType = mediaType.toRfcString();
     }
     final String finalResponseContentType = responseContentType;
+    MediaType responseMediaType = getMediaType(responseContentType, getDefaultEncoding(muleContext));
 
     InputStream responseInputStream = ((InputStreamHttpEntity) response.getEntity()).getInputStream();
-    Charset encoding = getMediaType(responseContentType, getDefaultEncoding(muleContext)).getCharset().get();
+    Charset encoding = responseMediaType.getCharset().get();
 
     Mono<?> payload = just(responseInputStream);
     if (responseContentType != null && parseResponse) {
       if (responseContentType.startsWith(MULTI_PART_PREFIX)) {
-        responseContentType = APPLICATION_JAVA.toRfcString();
+        responseMediaType = getJavaMediaType(encoding);
         // Given we need to read whole payload in this scenario, do this using IO scheduler for avoid deadlock
         payload = defer(() -> {
           try {
@@ -112,7 +113,7 @@ public class HttpResponseToResult {
           }
         }).subscribeOn(fromExecutorService(scheduler));
       } else if (responseContentType.startsWith(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())) {
-        responseContentType = APPLICATION_JAVA.toRfcString();
+        responseMediaType = getJavaMediaType(encoding);
         // Given we need to read whole payload in this scenario, do this using IO scheduler for avoid deadlock
         payload = defer(() -> just(decodeUrlEncodedBody(IOUtils.toString(responseInputStream), encoding)))
             .subscribeOn(fromExecutorService(scheduler));
@@ -131,11 +132,15 @@ public class HttpResponseToResult {
     if (isEmpty(responseContentType)) {
       builder.mediaType(mediaType);
     } else {
-      builder.mediaType(MediaType.parse(responseContentType));
+      builder.mediaType(responseMediaType);
     }
     builder.attributes(responseAttributes);
 
     return payload.map(p -> builder.output(p).build());
+  }
+
+  private MediaType getJavaMediaType(Charset encoding) {
+    return APPLICATION_JAVA.withCharset(encoding);
   }
 
   private static MultiPartPayload multiPartPayloadForAttachments(String responseContentType, InputStream responseInputStream)

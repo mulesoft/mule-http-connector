@@ -108,7 +108,7 @@ public class HttpRequestToResult {
   }
 
   private static MediaType getJavaMediaType(MediaType mediaType) {
-    return MediaType.create(APPLICATION_JAVA.getPrimaryType(), APPLICATION_JAVA.getSubType(), mediaType.getCharset().get());
+    return APPLICATION_JAVA.withCharset(mediaType.getCharset().get());
   }
 
   public static MultiPartPayload multiPartPayloadForAttachments(MultipartHttpEntity entity) throws IOException {
