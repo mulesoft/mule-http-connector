@@ -15,7 +15,7 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
-import static org.mule.runtime.core.util.UUID.getUUID;
+import static org.mule.runtime.core.api.util.UUID.getUUID;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.NO_CONTENT;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.getReasonPhraseForStatusCode;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
