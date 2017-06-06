@@ -14,6 +14,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
 import static org.mule.runtime.core.util.UUID.getUUID;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.NO_CONTENT;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.getReasonPhraseForStatusCode;
@@ -107,7 +108,7 @@ public class HttpResponseFactory {
 
     TypedValue<Object> body = listenerResponseBuilder.getBody();
     if (httpResponseHeaderBuilder.getContentType() == null && !ANY.matches(body.getDataType().getMediaType())) {
-      httpResponseHeaderBuilder.addHeader(CONTENT_TYPE, body.getDataType().getMediaType().toString());
+      httpResponseHeaderBuilder.addHeader(CONTENT_TYPE, body.getDataType().getMediaType().toRfcString());
     }
 
     final String configuredContentType = httpResponseHeaderBuilder.getContentType();
@@ -121,7 +122,8 @@ public class HttpResponseFactory {
       setupContentLengthEncoding(httpResponseHeaderBuilder, 0);
       httpEntity = new EmptyHttpEntity();
     } else if (payload instanceof Map) {
-      if (configuredContentType == null) {
+      if (configuredContentType == null || isJavaMimeType(configuredContentType)) {
+        httpResponseHeaderBuilder.removeHeader(CONTENT_TYPE);
         httpResponseHeaderBuilder.addContentType(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString());
       } else if (!configuredContentType.startsWith(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())) {
         warnMapPayloadButNoUrlEncodedContentType(httpResponseHeaderBuilder.getContentType());
@@ -138,7 +140,8 @@ public class HttpResponseFactory {
         }
       }
     } else if (payload instanceof MultiPartPayload) {
-      if (configuredContentType == null) {
+      if (configuredContentType == null || isJavaMimeType(configuredContentType)) {
+        httpResponseHeaderBuilder.removeHeader(CONTENT_TYPE);
         httpResponseHeaderBuilder.addContentType(createMultipartFormDataContentType());
       } else if (!configuredContentType.startsWith(MULTIPART)) {
         warnNoMultipartContentTypeButMultipartEntity(httpResponseHeaderBuilder.getContentType());
@@ -191,6 +194,10 @@ public class HttpResponseFactory {
     return responseBuilder.build();
   }
 
+  private boolean isJavaMimeType(String configuredContentType) {
+    return configuredContentType.startsWith(APPLICATION_JAVA.toRfcString());
+  }
+
   private byte[] getMessageAsBytes(Object payload) {
     try {
       return (byte[]) transformationService.transform(of(payload), BYTE_ARRAY).getPayload().getValue();
@@ -226,7 +233,7 @@ public class HttpResponseFactory {
       logger.debug("Content-Length encoding is being used so the 'Transfer-Encoding' header has been removed");
       httpResponseHeaderBuilder.removeHeader(TRANSFER_ENCODING);
     }
-    httpResponseHeaderBuilder.setContentLenght(String.valueOf(contentLength));
+    httpResponseHeaderBuilder.setContentLength(String.valueOf(contentLength));
   }
 
   private void setupChunkedEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder) {

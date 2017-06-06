@@ -10,6 +10,7 @@ import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
 import static java.nio.charset.Charset.defaultCharset;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
@@ -60,7 +61,7 @@ public class HttpRequestToResult {
       throws HttpMessageParsingException {
     final HttpRequest request = requestContext.getRequest();
 
-    final MediaType mediaType = getMediaType(request.getHeaderValueIgnoreCase(CONTENT_TYPE), encoding);
+    MediaType mediaType = getMediaType(request.getHeaderValueIgnoreCase(CONTENT_TYPE), encoding);
 
     Object payload = null;
     if (parseRequest) {
@@ -69,6 +70,7 @@ public class HttpRequestToResult {
         if (entity instanceof MultipartHttpEntity) {
           try {
             payload = multiPartPayloadForAttachments((MultipartHttpEntity) entity);
+            mediaType = getJavaMediaType(mediaType);
           } catch (IOException e) {
             throw new HttpMessageParsingException(createStaticMessage("Unable to process multipart request"), e);
           }
@@ -78,6 +80,7 @@ public class HttpRequestToResult {
               try {
                 payload = decodeUrlEncodedBody(IOUtils.toString(((InputStreamHttpEntity) entity).getInputStream()),
                                                mediaType.getCharset().get());
+                mediaType = getJavaMediaType(mediaType);
               } catch (IllegalArgumentException e) {
                 throw new HttpMessageParsingException(createStaticMessage("Cannot decode %s payload",
                                                                           APPLICATION_X_WWW_FORM_URLENCODED.getSubType()),
@@ -102,6 +105,10 @@ public class HttpRequestToResult {
         new HttpRequestAttributesBuilder().setRequestContext(requestContext).setListenerPath(listenerPath).build();
 
     return Result.<Object, HttpRequestAttributes>builder().output(payload).mediaType(mediaType).attributes(attributes).build();
+  }
+
+  private static MediaType getJavaMediaType(MediaType mediaType) {
+    return APPLICATION_JAVA.withCharset(mediaType.getCharset().get());
   }
 
   public static MultiPartPayload multiPartPayloadForAttachments(MultipartHttpEntity entity) throws IOException {
