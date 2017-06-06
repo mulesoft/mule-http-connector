@@ -108,7 +108,7 @@ public class HttpResponseFactory {
 
     TypedValue<Object> body = listenerResponseBuilder.getBody();
     if (httpResponseHeaderBuilder.getContentType() == null && !ANY.matches(body.getDataType().getMediaType())) {
-      httpResponseHeaderBuilder.addHeader(CONTENT_TYPE, body.getDataType().getMediaType().toString());
+      httpResponseHeaderBuilder.addHeader(CONTENT_TYPE, body.getDataType().getMediaType().toRfcString());
     }
 
     final String configuredContentType = httpResponseHeaderBuilder.getContentType();
