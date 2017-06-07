@@ -20,7 +20,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.extension.http.internal.request.HttpRequesterProvider;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.http.api.client.proxy.NtlmProxyConfig;
 import org.mule.runtime.http.api.client.proxy.ProxyConfig;
