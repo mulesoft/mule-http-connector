@@ -70,6 +70,7 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
+import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceResult;
 import org.mule.runtime.http.api.HttpConstants.HttpStatus;
 import org.mule.runtime.http.api.domain.HttpProtocol;
@@ -166,12 +167,13 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
   @OnSuccess
   public void onSuccess(@ParameterGroup(name = RESPONSE,
       showInDsl = true) HttpListenerSuccessResponseBuilder response,
-                        SourceCallbackContext callbackContext)
+                        SourceCallbackContext callbackContext,
+                        SourceCompletionCallback completionCallback)
       throws Exception {
 
     HttpResponseContext context = callbackContext.<HttpResponseContext>getVariable(RESPONSE_CONTEXT)
         .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(RESPONSE_CONTEXT_NOT_FOUND)));
-    responseSender.sendResponse(context, response);
+    responseSender.sendResponse(context, response, completionCallback);
   }
 
   // TODO: MULE-10900 figure out a way to have a shared group between callbacks and possibly regular params
@@ -179,19 +181,29 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
   public void onError(@ParameterGroup(name = "Error Response",
       showInDsl = true) HttpListenerErrorResponseBuilder errorResponse,
                       SourceCallbackContext callbackContext,
-                      Error error) {
-    sendErrorResponse(errorResponse, callbackContext, error);
+                      Error error,
+                      SourceCompletionCallback completionCallback) {
+    try {
+      sendErrorResponse(errorResponse, callbackContext, error, completionCallback);
+    } catch (Throwable t) {
+      completionCallback.error(t);
+    }
   }
 
   @OnTerminate
   public void onTerminate(SourceResult sourceResult) {
     sourceResult
         .getParameterGenerationError()
-        .ifPresent(error -> sendErrorResponse(NULL_ERROR_RESPONSE, sourceResult.getSourceCallbackContext(), error));
+        .ifPresent(error -> sendErrorResponse(NULL_ERROR_RESPONSE,
+                                              sourceResult.getSourceCallbackContext(),
+                                              error,
+                                              null));
   }
 
-  private void sendErrorResponse(HttpListenerErrorResponseBuilder errorResponse, SourceCallbackContext callbackContext,
-                                 Error error) {
+  private void sendErrorResponse(HttpListenerErrorResponseBuilder errorResponse,
+                                 SourceCallbackContext callbackContext,
+                                 Error error,
+                                 SourceCompletionCallback completionCallback) {
 
     final HttpResponseBuilder failureResponseBuilder = createFailureResponseBuilder(error);
 
@@ -211,7 +223,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
     }
 
     final HttpResponseReadyCallback responseCallback = context.getResponseCallback();
-    responseCallback.responseReady(response, getResponseFailureCallback(responseCallback));
+    responseCallback.responseReady(response, getResponseFailureCallback(responseCallback, completionCallback));
   }
 
   private HttpResponseBuilder createFailureResponseBuilder(Error error) {
@@ -364,13 +376,6 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
     // return muleEvent;
   }
 
-  protected HttpResponse buildResponse(HttpListenerResponseBuilder listenerResponseBuilder, boolean supportStreaming)
-      throws Exception {
-    HttpResponseBuilder responseBuilder = HttpResponse.builder();
-
-    return doBuildResponse(responseBuilder, listenerResponseBuilder, supportStreaming);
-  }
-
   protected HttpResponse doBuildResponse(HttpResponseBuilder responseBuilder,
                                          HttpListenerResponseBuilder listenerResponseBuilder,
                                          boolean supportsStreaming)
@@ -386,12 +391,16 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
     return errorResponse;
   }
 
-  private ResponseStatusCallback getResponseFailureCallback(HttpResponseReadyCallback responseReadyCallback) {
+  private ResponseStatusCallback getResponseFailureCallback(HttpResponseReadyCallback responseReadyCallback,
+                                                            SourceCompletionCallback completionCallback) {
     return new ResponseStatusCallback() {
 
       @Override
       public void responseSendFailure(Throwable throwable) {
         responseReadyCallback.responseReady(buildErrorResponse(), this);
+        if (completionCallback != null) {
+          completionCallback.error(throwable);
+        }
       }
 
       @Override
@@ -399,6 +408,9 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
         // TODO: MULE-9749 Figure out how to handle this. Maybe doing nothing is right since this will be executed later if
         // everything goes right.
         // responseCompletationCallback.responseSentSuccessfully();
+        if (completionCallback != null) {
+          completionCallback.success();
+        }
       }
     };
   }

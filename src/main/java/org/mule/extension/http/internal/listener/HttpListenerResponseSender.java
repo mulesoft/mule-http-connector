@@ -11,6 +11,7 @@ import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.internal.HttpStreamingType;
 import org.mule.runtime.core.api.TransformationService;
+import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.mule.runtime.http.api.domain.message.response.HttpResponseBuilder;
 import org.mule.runtime.http.api.server.async.HttpResponseReadyCallback;
@@ -28,10 +29,13 @@ public class HttpListenerResponseSender {
     this.responseFactory = new HttpResponseFactory(HttpStreamingType.NEVER, transformationService);
   }
 
-  public void sendResponse(HttpResponseContext context, HttpListenerResponseBuilder response) throws Exception {
+  public void sendResponse(HttpResponseContext context,
+                           HttpListenerResponseBuilder response,
+                           SourceCompletionCallback completionCallback)
+      throws Exception {
     HttpResponse httpResponse = buildResponse(response, context.isSupportStreaming());
     final HttpResponseReadyCallback responseCallback = context.getResponseCallback();
-    responseCallback.responseReady(httpResponse, getResponseFailureCallback(responseCallback));
+    responseCallback.responseReady(httpResponse, getResponseFailureCallback(responseCallback, completionCallback));
   }
 
   protected HttpResponse buildResponse(HttpListenerResponseBuilder listenerResponseBuilder, boolean supportStreaming)
@@ -48,12 +52,14 @@ public class HttpListenerResponseSender {
     return responseFactory.create(responseBuilder, listenerResponseBuilder, supportsStreaming);
   }
 
-  private ResponseStatusCallback getResponseFailureCallback(HttpResponseReadyCallback responseReadyCallback) {
+  private ResponseStatusCallback getResponseFailureCallback(HttpResponseReadyCallback responseReadyCallback,
+                                                            SourceCompletionCallback completionCallback) {
     return new ResponseStatusCallback() {
 
       @Override
       public void responseSendFailure(Throwable throwable) {
         responseReadyCallback.responseReady(buildErrorResponse(), this);
+        completionCallback.error(throwable);
       }
 
       @Override
@@ -61,6 +67,7 @@ public class HttpListenerResponseSender {
         // TODO: MULE-9749 Figure out how to handle this. Maybe doing nothing is right since this will be executed later if
         // everything goes right.
         // responseCompletationCallback.responseSentSuccessfully();
+        completionCallback.success();
       }
     };
   }
