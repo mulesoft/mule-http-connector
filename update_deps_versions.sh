@@ -23,7 +23,7 @@ updateParentVersion() {
   VERSION_TO="$1"
   POM_PROPERTY_PATH="$2"
 
-  echo "Updating version to $VERSION_TO..."
+  echo "Updating parent version to $VERSION_TO..."
   perl -0777 -i -pe "s/(<parent>.*<version)(.*)(\/version>.*<\/parent>)/\${1}>$VERSION_TO<\${3}/s" "$POM_PROPERTY_PATH"
 }
 
