@@ -58,8 +58,12 @@ public class HttpListenerResponseSender {
 
       @Override
       public void responseSendFailure(Throwable throwable) {
-        responseReadyCallback.responseReady(buildErrorResponse(), this);
-        completionCallback.error(throwable);
+        try {
+          responseReadyCallback.responseReady(buildErrorResponse(), this);
+          completionCallback.success();
+        } catch (Throwable t) {
+          completionCallback.error(t);
+        }
       }
 
       @Override
