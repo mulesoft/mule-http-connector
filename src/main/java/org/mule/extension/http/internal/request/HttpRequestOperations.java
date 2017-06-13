@@ -24,6 +24,7 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.extension.api.annotation.Streaming;
@@ -114,8 +115,8 @@ public class HttpRequestOperations implements Initialisable, Disposable {
               .build();
 
       requester.doRequest(client, resolvedBuilder, true, muleContext, callback);
-    } catch (Exception e) {
-      callback.error(e);
+    } catch (Throwable t) {
+      callback.error(t instanceof Exception ? (Exception) t : new DefaultMuleException(t));
     }
   }
 
