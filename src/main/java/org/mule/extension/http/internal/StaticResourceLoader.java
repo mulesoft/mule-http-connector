@@ -8,7 +8,7 @@
 package org.mule.extension.http.internal;
 
 import static java.lang.String.format;
-import static org.apache.commons.lang.StringUtils.removeEnd;
+import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.mule.extension.http.api.error.HttpError.NOT_FOUND;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.extension.http.api.HttpRequestAttributes;
