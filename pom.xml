@@ -24,7 +24,7 @@
         <jettyVersion>9.0.7.v20131107</jettyVersion>
         <projectReactorVersion>3.0.7.RELEASE</projectReactorVersion>
         <socketsConnectorVersion>1.0.0-SNAPSHOT</socketsConnectorVersion>
-        <commonsLangVersion>2.4</commonsLangVersion>
+        <commonsLangVersion>3.6</commonsLangVersion>
         <commonsIoVersion>2.4</commonsIoVersion>
         <guavaVersion>18.0</guavaVersion>
         <formatterConfigPath>formatter.xml</formatterConfigPath>
@@ -74,8 +74,8 @@
             <version>${commonsCodecVersion}</version>
         </dependency>
         <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
             <version>${commonsLangVersion}</version>             
         </dependency>
         <dependency>
