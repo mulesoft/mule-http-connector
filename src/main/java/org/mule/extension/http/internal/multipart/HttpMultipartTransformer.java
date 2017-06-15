@@ -7,6 +7,7 @@
 package org.mule.extension.http.internal.multipart;
 
 import static java.lang.Math.toIntExact;
+import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -43,7 +44,7 @@ public class HttpMultipartTransformer {
           return new HttpPart(name, data, contentType, size);
         }
       } catch (TransformerException e) {
-        throw new MuleRuntimeException(createStaticMessage(String.format("Could not create HTTP part %s", name), e));
+        throw new MuleRuntimeException(createStaticMessage(format("Could not create HTTP part \"%s\"", name), e));
       }
     }).collect(toList());
   }

@@ -284,7 +284,7 @@ public class HttpResponseFactory {
 
   private HttpEntity createMultipartEntity(MultiPartPayload partPayload) {
     if (logger.isDebugEnabled()) {
-      logger.debug("Payload is multipart.Trying to generate multipart response.");
+      logger.debug("Payload is multipart. Trying to generate multipart response.");
     }
 
     return new MultipartHttpEntity(createFrom(partPayload, objectToByteArray));
