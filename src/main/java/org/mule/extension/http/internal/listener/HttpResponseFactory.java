@@ -9,8 +9,6 @@ package org.mule.extension.http.internal.listener;
 
 import static java.lang.String.format;
 import static org.mule.extension.http.internal.multipart.HttpMultipartEncoder.createFrom;
-import static org.mule.extension.http.internal.multipart.HttpMultipartEncoder.createMultipartContent;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
@@ -25,7 +23,6 @@ import static org.mule.runtime.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FOR
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.runtime.http.api.HttpHeaders.Values.MULTIPART_FORM_DATA;
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.encodeString;
-
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.internal.HttpStreamingType;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -35,9 +32,9 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
-import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.http.api.domain.ParameterMap;
 import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.runtime.http.api.domain.entity.EmptyHttpEntity;
@@ -132,12 +129,7 @@ public class HttpResponseFactory {
       if (responseStreaming == HttpStreamingType.ALWAYS && supportsTransferEncoding) {
         setupChunkedEncoding(httpResponseHeaderBuilder);
       } else {
-        if (httpEntity instanceof EmptyHttpEntity) {
-          setupContentLengthEncoding(httpResponseHeaderBuilder, 0);
-        } else {
-          ByteArrayHttpEntity byteArrayHttpEntity = (ByteArrayHttpEntity) httpEntity;
-          setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getContent().length);
-        }
+        setupContentLengthEncoding(httpResponseHeaderBuilder, httpEntity.getBytes().length);
       }
     } else if (payload instanceof MultiPartPayload) {
       if (configuredContentType == null || isJavaMimeType(configuredContentType)) {
@@ -146,9 +138,13 @@ public class HttpResponseFactory {
       } else if (!configuredContentType.startsWith(MULTIPART)) {
         warnNoMultipartContentTypeButMultipartEntity(httpResponseHeaderBuilder.getContentType());
       }
-      httpEntity = createMultipartEntity(httpResponseHeaderBuilder.getContentType(), (MultiPartPayload) payload);
-      resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding,
-                      (ByteArrayHttpEntity) httpEntity);
+      httpEntity = createMultipartEntity((MultiPartPayload) payload);
+      if (responseStreaming == HttpStreamingType.ALWAYS || (responseStreaming == HttpStreamingType.AUTO &&
+          existingContentLength == null && CHUNKED.equals(existingTransferEncoding))) {
+        if (supportsTransferEncoding) {
+          setupChunkedEncoding(httpResponseHeaderBuilder);
+        }
+      }
     } else if (payload instanceof InputStream) {
       if (responseStreaming == HttpStreamingType.ALWAYS
           || (responseStreaming == HttpStreamingType.AUTO && existingContentLength == null)) {
@@ -158,7 +154,7 @@ public class HttpResponseFactory {
         httpEntity = new InputStreamHttpEntity((InputStream) payload);
       } else {
         ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(IOUtils.toByteArray(((InputStream) payload)));
-        setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getContent().length);
+        setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getBytes().length);
         httpEntity = byteArrayHttpEntity;
       }
     } else {
@@ -224,7 +220,7 @@ public class HttpResponseFactory {
         setupChunkedEncoding(httpResponseHeaderBuilder);
       }
     } else {
-      setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getContent().length);
+      setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getBytes().length);
     }
   }
 
@@ -285,19 +281,12 @@ public class HttpResponseFactory {
     }
   }
 
-  private HttpEntity createMultipartEntity(String contentType, MultiPartPayload partPayload)
+  private HttpEntity createMultipartEntity(MultiPartPayload partPayload)
       throws MessagingException {
     if (logger.isDebugEnabled()) {
-      logger.debug("Message contains attachments. Ignoring payload and trying to generate multipart response.");
+      logger.debug("Payload is multipart.Trying to generate multipart response.");
     }
 
-    final MultipartHttpEntity multipartEntity;
-    try {
-
-      multipartEntity = new MultipartHttpEntity(createFrom(partPayload, objectToByteArray));
-      return new ByteArrayHttpEntity(createMultipartContent(multipartEntity, contentType));
-    } catch (Exception e) {
-      throw new MuleRuntimeException(createStaticMessage("Error creating multipart HTTP entity."), e);
-    }
+    return new MultipartHttpEntity(createFrom(partPayload, objectToByteArray));
   }
 }

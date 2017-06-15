@@ -11,25 +11,22 @@ import static java.lang.String.format;
 import static java.nio.charset.Charset.defaultCharset;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.decodeUrlEncodedBody;
-
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.error.HttpMessageParsingException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.message.PartAttributes;
-import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.http.api.domain.entity.EmptyHttpEntity;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
-import org.mule.runtime.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.runtime.http.api.domain.entity.multipart.HttpPart;
-import org.mule.runtime.http.api.domain.entity.multipart.MultipartHttpEntity;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.request.HttpRequestContext;
 
@@ -63,41 +60,29 @@ public class HttpRequestToResult {
 
     MediaType mediaType = getMediaType(request.getHeaderValueIgnoreCase(CONTENT_TYPE), encoding);
 
-    Object payload = null;
+    final HttpEntity entity = request.getEntity();
+    Object payload = entity.getContent();
     if (parseRequest) {
-      final HttpEntity entity = request.getEntity();
-      if (entity != null && !(entity instanceof EmptyHttpEntity)) {
-        if (entity instanceof MultipartHttpEntity) {
-          try {
-            payload = multiPartPayloadForAttachments((MultipartHttpEntity) entity);
-            mediaType = getJavaMediaType(mediaType);
-          } catch (IOException e) {
-            throw new HttpMessageParsingException(createStaticMessage("Unable to process multipart request"), e);
-          }
-        } else {
-          if (mediaType != null) {
-            if (mediaType.matches(APPLICATION_X_WWW_FORM_URLENCODED)) {
-              try {
-                payload = decodeUrlEncodedBody(IOUtils.toString(((InputStreamHttpEntity) entity).getInputStream()),
-                                               mediaType.getCharset().get());
-                mediaType = getJavaMediaType(mediaType);
-              } catch (IllegalArgumentException e) {
-                throw new HttpMessageParsingException(createStaticMessage("Cannot decode %s payload",
-                                                                          APPLICATION_X_WWW_FORM_URLENCODED.getSubType()),
-                                                      e);
-              }
-            } else if (entity instanceof InputStreamHttpEntity) {
-              payload = ((InputStreamHttpEntity) entity).getInputStream();
+      if (entity.isComposed()) {
+        try {
+          payload = multiPartPayloadForAttachments(entity);
+          mediaType = getJavaMediaType(mediaType);
+        } catch (IOException e) {
+          throw new HttpMessageParsingException(createStaticMessage("Unable to process multipart request"), e);
+        }
+      } else {
+        if (mediaType != null) {
+          if (mediaType.matches(APPLICATION_X_WWW_FORM_URLENCODED)) {
+            try {
+              payload = decodeUrlEncodedBody(IOUtils.toString(entity.getContent()), mediaType.getCharset().get());
+              mediaType = getJavaMediaType(mediaType);
+            } catch (IllegalArgumentException e) {
+              throw new HttpMessageParsingException(createStaticMessage("Cannot decode %s payload",
+                                                                        APPLICATION_X_WWW_FORM_URLENCODED.getSubType()),
+                                                    e);
             }
-          } else if (entity instanceof InputStreamHttpEntity) {
-            payload = ((InputStreamHttpEntity) entity).getInputStream();
           }
         }
-      }
-    } else {
-      final InputStreamHttpEntity inputStreamEntity = request.getInputStreamEntity();
-      if (inputStreamEntity != null) {
-        payload = inputStreamEntity.getInputStream();
       }
     }
 
@@ -111,7 +96,8 @@ public class HttpRequestToResult {
     return APPLICATION_JAVA.withCharset(mediaType.getCharset().get());
   }
 
-  public static MultiPartPayload multiPartPayloadForAttachments(MultipartHttpEntity entity) throws IOException {
+  public static MultiPartPayload multiPartPayloadForAttachments(HttpEntity entity) throws IOException {
+    checkArgument(entity.isComposed(), "Only composed HTTP entities can provide parts.");
     return multiPartPayloadForAttachments(entity.getParts());
   }
 
