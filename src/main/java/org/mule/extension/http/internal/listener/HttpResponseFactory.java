@@ -44,6 +44,7 @@ import org.mule.runtime.http.api.domain.entity.multipart.MultipartHttpEntity;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.mule.runtime.http.api.domain.message.response.HttpResponseBuilder;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Collection;
@@ -87,7 +88,7 @@ public class HttpResponseFactory {
   public HttpResponse create(HttpResponseBuilder responseBuilder,
                              HttpListenerResponseBuilder listenerResponseBuilder,
                              boolean supportsTransferEncoding)
-      throws MessagingException {
+      throws IOException {
 
     Map<String, String> headers = listenerResponseBuilder.getHeaders();
 
@@ -281,8 +282,7 @@ public class HttpResponseFactory {
     }
   }
 
-  private HttpEntity createMultipartEntity(MultiPartPayload partPayload)
-      throws MessagingException {
+  private HttpEntity createMultipartEntity(MultiPartPayload partPayload) {
     if (logger.isDebugEnabled()) {
       logger.debug("Payload is multipart.Trying to generate multipart response.");
     }
