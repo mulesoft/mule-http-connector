@@ -44,7 +44,7 @@ public class HttpMultipartTransformer {
           return new HttpPart(name, data, contentType, size);
         }
       } catch (TransformerException e) {
-        throw new MuleRuntimeException(createStaticMessage(format("Could not create HTTP part \"%s\"", name), e));
+        throw new MuleRuntimeException(createStaticMessage(format("Could not create HTTP part '%s'", name), e));
       }
     }).collect(toList());
   }

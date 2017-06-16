@@ -8,12 +8,15 @@
 package org.mule.extension.http.internal.listener;
 
 import static java.lang.String.format;
+import static org.mule.extension.http.internal.HttpStreamingType.ALWAYS;
+import static org.mule.extension.http.internal.HttpStreamingType.AUTO;
 import static org.mule.extension.http.internal.multipart.HttpMultipartTransformer.createFrom;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
 import static org.mule.runtime.core.api.util.UUID.getUUID;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.NOT_MODIFIED;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.NO_CONTENT;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.getReasonPhraseForStatusCode;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
@@ -63,7 +66,7 @@ public class HttpResponseFactory {
   public static final String MULTIPART = "multipart";
   private Logger logger = LoggerFactory.getLogger(getClass());
 
-  private HttpStreamingType responseStreaming = HttpStreamingType.AUTO;
+  private HttpStreamingType responseStreaming = AUTO;
   private boolean multipartEntityWithNoMultipartContentyTypeWarned;
   private boolean mapPayloadButNoUrlEncodedContentTypeWarned;
   private TransformationService transformationService;
@@ -127,7 +130,7 @@ public class HttpResponseFactory {
         warnMapPayloadButNoUrlEncodedContentType(httpResponseHeaderBuilder.getContentType());
       }
       httpEntity = createUrlEncodedEntity(body.getDataType().getMediaType(), (Map) payload);
-      if (responseStreaming == HttpStreamingType.ALWAYS && supportsTransferEncoding) {
+      if (responseStreaming == ALWAYS && supportsTransferEncoding) {
         setupChunkedEncoding(httpResponseHeaderBuilder);
       } else {
         setupContentLengthEncoding(httpResponseHeaderBuilder, httpEntity.getBytes().length);
@@ -140,15 +143,15 @@ public class HttpResponseFactory {
         warnNoMultipartContentTypeButMultipartEntity(httpResponseHeaderBuilder.getContentType());
       }
       httpEntity = createMultipartEntity((MultiPartPayload) payload);
-      if (responseStreaming == HttpStreamingType.ALWAYS || (responseStreaming == HttpStreamingType.AUTO &&
+      if (responseStreaming == ALWAYS || (responseStreaming == AUTO &&
           existingContentLength == null && CHUNKED.equals(existingTransferEncoding))) {
         if (supportsTransferEncoding) {
           setupChunkedEncoding(httpResponseHeaderBuilder);
         }
       }
     } else if (payload instanceof InputStream) {
-      if (responseStreaming == HttpStreamingType.ALWAYS
-          || (responseStreaming == HttpStreamingType.AUTO && existingContentLength == null)) {
+      if (responseStreaming == ALWAYS
+          || (responseStreaming == AUTO && existingContentLength == null)) {
         if (supportsTransferEncoding) {
           setupChunkedEncoding(httpResponseHeaderBuilder);
         }
@@ -169,7 +172,7 @@ public class HttpResponseFactory {
     Integer statusCode = listenerResponseBuilder.getStatusCode();
     if (statusCode != null) {
       responseBuilder.setStatusCode(statusCode);
-      if (statusCode == NO_CONTENT.getStatusCode()) {
+      if (statusCode == NO_CONTENT.getStatusCode() || statusCode == NOT_MODIFIED.getStatusCode()) {
         httpEntity = new EmptyHttpEntity();
         httpResponseHeaderBuilder.removeHeader(TRANSFER_ENCODING);
       }
@@ -214,8 +217,8 @@ public class HttpResponseFactory {
   private void resolveEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder, String existingTransferEncoding,
                                String existingContentLength, boolean supportsTransferEncoding,
                                ByteArrayHttpEntity byteArrayHttpEntity) {
-    if (responseStreaming == HttpStreamingType.ALWAYS
-        || (responseStreaming == HttpStreamingType.AUTO && existingContentLength == null
+    if (responseStreaming == ALWAYS
+        || (responseStreaming == AUTO && existingContentLength == null
             && CHUNKED.equals(existingTransferEncoding))) {
       if (supportsTransferEncoding) {
         setupChunkedEncoding(httpResponseHeaderBuilder);
@@ -267,7 +270,7 @@ public class HttpResponseFactory {
   private void warnMapPayloadButNoUrlEncodedContentType(String contentType) {
     if (!mapPayloadButNoUrlEncodedContentTypeWarned) {
       logger
-          .warn(format("Payload is a Map which will be used to generate an url encoded http body but Contenty-Type specified is %s and not %s.",
+          .warn(format("Payload is a Map which will be used to generate an url encoded http body but Content-Type specified is %s and not %s.",
                        contentType, APPLICATION_X_WWW_FORM_URLENCODED));
       mapPayloadButNoUrlEncodedContentTypeWarned = true;
     }
