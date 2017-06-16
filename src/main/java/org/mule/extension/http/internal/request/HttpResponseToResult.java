@@ -15,7 +15,6 @@ import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
-import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.SET_COOKIE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.SET_COOKIE2;
@@ -38,29 +37,19 @@ import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.runtime.http.api.domain.entity.HttpEntity;
 import org.mule.runtime.http.api.domain.entity.multipart.HttpPart;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 
-import com.google.common.collect.Lists;
-
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import javax.mail.BodyPart;
-import javax.mail.Header;
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMultipart;
-import javax.mail.util.ByteArrayDataSource;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -94,20 +83,19 @@ public class HttpResponseToResult {
     if (isEmpty(responseContentType) && !ANY.matches(mediaType)) {
       responseContentType = mediaType.toRfcString();
     }
-    final String finalResponseContentType = responseContentType;
     MediaType responseMediaType = getMediaType(responseContentType, getDefaultEncoding(muleContext));
 
-    InputStream responseInputStream = ((InputStreamHttpEntity) response.getEntity()).getInputStream();
+    HttpEntity entity = response.getEntity();
     Charset encoding = responseMediaType.getCharset().get();
 
-    Mono<?> payload = just(responseInputStream);
+    Mono<?> payload = just(entity.getContent());
     if (responseContentType != null && parseResponse) {
-      if (responseContentType.startsWith(MULTI_PART_PREFIX)) {
+      if (entity.isComposed()) {
         responseMediaType = getJavaMediaType(encoding);
         // Given we need to read whole payload in this scenario, do this using IO scheduler for avoid deadlock
         payload = defer(() -> {
           try {
-            return just(multiPartPayloadForAttachments(finalResponseContentType, responseInputStream));
+            return just(multiPartPayloadForAttachments(entity.getParts()));
           } catch (IOException e) {
             return error(new HttpMessageParsingException(createStaticMessage("Unable to process multipart response"), e));
           }
@@ -115,7 +103,7 @@ public class HttpResponseToResult {
       } else if (responseContentType.startsWith(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())) {
         responseMediaType = getJavaMediaType(encoding);
         // Given we need to read whole payload in this scenario, do this using IO scheduler for avoid deadlock
-        payload = defer(() -> just(decodeUrlEncodedBody(IOUtils.toString(responseInputStream), encoding)))
+        payload = defer(() -> just(decodeUrlEncodedBody(IOUtils.toString(entity.getContent()), encoding)))
             .subscribeOn(fromExecutorService(scheduler));
       }
     }
@@ -143,11 +131,6 @@ public class HttpResponseToResult {
     return APPLICATION_JAVA.withCharset(encoding);
   }
 
-  private static MultiPartPayload multiPartPayloadForAttachments(String responseContentType, InputStream responseInputStream)
-      throws IOException {
-    return multiPartPayloadForAttachments(parseMultipartContent(responseInputStream, responseContentType));
-  }
-
   private static MultiPartPayload multiPartPayloadForAttachments(Collection<HttpPart> httpParts) throws IOException {
     List<org.mule.runtime.api.message.Message> parts = new ArrayList<>();
 
@@ -170,50 +153,6 @@ public class HttpResponseToResult {
     }
 
     return new DefaultMultiPartPayload(parts);
-  }
-
-  public static Collection<HttpPart> parseMultipartContent(InputStream content, String contentType) throws IOException {
-    MimeMultipart mimeMultipart = null;
-    List<HttpPart> parts = Lists.newArrayList();
-
-    try {
-      mimeMultipart = new MimeMultipart(new ByteArrayDataSource(content, contentType));
-    } catch (MessagingException e) {
-      throw new IOException(e);
-    }
-
-    try {
-      int partCount = mimeMultipart.getCount();
-
-      for (int i = 0; i < partCount; i++) {
-        BodyPart part = mimeMultipart.getBodyPart(i);
-
-        String filename = part.getFileName();
-        String partName = filename;
-        String[] contentDispositions = part.getHeader(CONTENT_DISPOSITION);
-        if (contentDispositions != null) {
-          String contentDisposition = contentDispositions[0];
-          if (contentDisposition.contains("name")) {
-            partName = contentDisposition.substring(contentDisposition.indexOf("name") + "name".length() + 2);
-            partName = partName.substring(0, partName.indexOf("\""));
-          }
-        }
-        HttpPart httpPart =
-            new HttpPart(partName, filename, IOUtils.toByteArray(part.getInputStream()), part.getContentType(), part.getSize());
-
-        Enumeration<Header> headers = part.getAllHeaders();
-
-        while (headers.hasMoreElements()) {
-          Header header = headers.nextElement();
-          httpPart.addHeader(header.getName(), header.getValue());
-        }
-        parts.add(httpPart);
-      }
-    } catch (MessagingException e) {
-      throw new IOException(e);
-    }
-
-    return parts;
   }
 
   private HttpResponseAttributes createAttributes(HttpResponse response) {

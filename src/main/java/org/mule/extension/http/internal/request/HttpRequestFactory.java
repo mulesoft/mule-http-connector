@@ -8,7 +8,7 @@ package org.mule.extension.http.internal.request;
 
 import static org.mule.extension.http.api.error.HttpError.SECURITY;
 import static org.mule.extension.http.api.error.HttpError.TRANSFORMATION;
-import static org.mule.extension.http.internal.multipart.HttpMultipartEncoder.createFrom;
+import static org.mule.extension.http.internal.multipart.HttpMultipartTransformer.createFrom;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
