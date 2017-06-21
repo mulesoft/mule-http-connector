@@ -16,7 +16,7 @@
     <flow name="server">
         <http:listener responseStreamingMode="AUTO" path="test" allowedMethods="GET" parseRequest="true"
                         config-ref="lisConfig"/>
-        <echo-component/>
+        <logger/>
     </flow>
 
     <flow name="any">
