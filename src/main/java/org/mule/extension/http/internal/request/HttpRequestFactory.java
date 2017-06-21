@@ -32,7 +32,7 @@ import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.extension.api.exception.ModuleException;
-import org.mule.runtime.http.api.domain.ParameterMap;
+import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.runtime.http.api.domain.entity.EmptyHttpEntity;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
@@ -143,10 +143,10 @@ public class HttpRequestFactory {
     return builder.build();
   }
 
-  private ParameterMap toParameterMap(Map<String, String> map) {
-    ParameterMap parameterMap = new ParameterMap();
-    map.forEach(parameterMap::put);
-    return parameterMap;
+  private MultiMap<String, String> toParameterMap(Map<String, String> map) {
+    MultiMap<String, String> multiMap = new MultiMap<>();
+    map.forEach(multiMap::put);
+    return multiMap;
   }
 
   private HttpEntity createRequestEntity(HttpRequestBuilder requestBuilder, String resolvedMethod,

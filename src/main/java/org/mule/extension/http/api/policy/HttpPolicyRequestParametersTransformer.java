@@ -14,7 +14,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
-import org.mule.runtime.http.api.domain.ParameterMap;
+import org.mule.runtime.api.util.MultiMap;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -38,9 +38,9 @@ public class HttpPolicyRequestParametersTransformer implements OperationPolicyPa
     String path = (String) parameters.get("path");
     TypedValue<Object> body = requestBuilder.getBody();
     return Message.builder().payload(body.getValue())
-        .attributes(new HttpPolicyRequestAttributes(new ParameterMap(requestBuilder.getHeaders()),
-                                                    new ParameterMap(requestBuilder.getQueryParams()),
-                                                    new ParameterMap(requestBuilder.getQueryParams()), path))
+        .attributes(new HttpPolicyRequestAttributes(new MultiMap<>(requestBuilder.getHeaders()),
+                                                    new MultiMap<>(requestBuilder.getQueryParams()),
+                                                    new MultiMap<>(requestBuilder.getQueryParams()), path))
         .mediaType(body.getDataType().getMediaType())
         .build();
   }

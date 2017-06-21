@@ -7,7 +7,7 @@
 package org.mule.extension.http.api;
 
 import org.mule.runtime.core.api.message.BaseAttributes;
-import org.mule.runtime.http.api.domain.ParameterMap;
+import org.mule.runtime.api.util.MultiMap;
 
 /**
  * Base representation of HTTP message attributes.
@@ -19,13 +19,13 @@ public abstract class HttpAttributes extends BaseAttributes {
   /**
    * Map of HTTP headers in the message. Former properties.
    */
-  protected ParameterMap headers;
+  protected MultiMap<String, String> headers;
 
-  public HttpAttributes(ParameterMap headers) {
-    this.headers = headers.toImmutableParameterMap();
+  public HttpAttributes(MultiMap<String, String> headers) {
+    this.headers = headers.toImmutableMultiMap();
   }
 
-  public ParameterMap getHeaders() {
+  public MultiMap<String, String> getHeaders() {
     return headers;
   }
 }

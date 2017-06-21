@@ -14,7 +14,7 @@ import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.exception.ModuleException;
-import org.mule.runtime.http.api.domain.ParameterMap;
+import org.mule.runtime.api.util.MultiMap;
 
 /**
  * Thrown when a static file is requested but not found, associated with a 404 status code.
@@ -36,7 +36,7 @@ public class ResourceNotFoundException extends ModuleException implements ErrorM
     return Message.builder()
         .payload(null)
         .attributes(new HttpListenerResponseAttributes(NOT_FOUND.getStatusCode(), NOT_FOUND.getReasonPhrase(),
-                                                       new ParameterMap()))
+                                                       new MultiMap<>()))
         .build();
   }
 

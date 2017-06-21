@@ -15,7 +15,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
-import org.mule.runtime.http.api.domain.ParameterMap;
+import org.mule.runtime.api.util.MultiMap;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -41,7 +41,7 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
   }
 
   private Message responseParametersToMessage(HttpListenerResponseBuilder responseBuilder, int defaultStatusCode) {
-    ParameterMap headers = new ParameterMap(responseBuilder.getHeaders());
+    MultiMap<String, String> headers = new MultiMap<>(responseBuilder.getHeaders());
     Message.Builder messageBuilder;
     Message.PayloadBuilder builder = Message.builder();
     TypedValue<Object> body = responseBuilder.getBody();

@@ -7,7 +7,7 @@
 package org.mule.extension.http.api.policy;
 
 import org.mule.extension.http.api.BaseHttpRequestAttributes;
-import org.mule.runtime.http.api.domain.ParameterMap;
+import org.mule.runtime.api.util.MultiMap;
 
 import java.util.Map;
 
@@ -19,24 +19,27 @@ import java.util.Map;
  */
 public class HttpPolicyRequestAttributes extends BaseHttpRequestAttributes {
 
-  public HttpPolicyRequestAttributes(ParameterMap headers, ParameterMap queryParams, ParameterMap uriParams, String requestPath) {
+  private static final long serialVersionUID = 7856582596752161400L;
+
+  public HttpPolicyRequestAttributes(MultiMap<String, String> headers, MultiMap<String, String> queryParams,
+                                     MultiMap<String, String> uriParams, String requestPath) {
     super(headers, queryParams, uriParams, requestPath);
   }
 
   public HttpPolicyRequestAttributes() {
-    super(new ParameterMap(), new ParameterMap(), new ParameterMap(), "");
+    super(new MultiMap<>(), new MultiMap<>(), new MultiMap<>(), "");
   }
 
   public void setHeaders(Map<String, String> headers) {
-    this.headers = new ParameterMap(headers);
+    this.headers = new MultiMap<>(headers);
   }
 
   public void setQueryParams(Map<String, String> queryParams) {
-    this.queryParams = new ParameterMap(queryParams);
+    this.queryParams = new MultiMap<>(queryParams);
   }
 
   public void setUriParams(Map<String, String> uriParams) {
-    this.uriParams = new ParameterMap(uriParams);
+    this.uriParams = new MultiMap<>(uriParams);
   }
 
 }

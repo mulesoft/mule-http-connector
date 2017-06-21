@@ -22,7 +22,7 @@ import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.http.api.domain.ParameterMap;
+import org.mule.runtime.api.util.MultiMap;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -45,7 +45,7 @@ public class HttpRequestMetadataResolver implements OutputTypeResolver<HttpMetad
     types.put(STREAM, streamType);
     MetadataType multiPartType = TYPE_LOADER.load(MultiPartPayload.class);
     types.put(MULTIPART, multiPartType);
-    MetadataType formPart = TYPE_LOADER.load(ParameterMap.class);
+    MetadataType formPart = TYPE_LOADER.load(MultiMap.class);
     types.put(FORM, formPart);
     //Create default union type
     UnionTypeBuilder builder = new BaseTypeBuilder(JAVA).unionType();

@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.api;
 
-import org.mule.runtime.http.api.domain.ParameterMap;
+import org.mule.runtime.api.util.MultiMap;
 
 /**
  * Common parts of all http request attributes.
@@ -18,18 +18,19 @@ public class BaseHttpRequestAttributes extends HttpAttributes {
   /**
    * Query parameters map built from the parsed string. Former 'http.query.params'.
    */
-  protected ParameterMap queryParams;
+  protected MultiMap<String, String> queryParams;
   /**
    * URI parameters extracted from the request path. Former 'http.uri.params'.
    */
-  protected ParameterMap uriParams;
+  protected MultiMap<String, String> uriParams;
 
   /**
    * Full path requested. Former 'http.request.path'.
    */
   protected String requestPath;
 
-  public BaseHttpRequestAttributes(ParameterMap headers, ParameterMap queryParams, ParameterMap uriParams, String requestPath) {
+  public BaseHttpRequestAttributes(MultiMap<String, String> headers, MultiMap<String, String> queryParams,
+                                   MultiMap<String, String> uriParams, String requestPath) {
     super(headers);
     this.queryParams = queryParams;
     this.uriParams = uriParams;
@@ -40,11 +41,11 @@ public class BaseHttpRequestAttributes extends HttpAttributes {
     return requestPath;
   }
 
-  public ParameterMap getQueryParams() {
+  public MultiMap<String, String> getQueryParams() {
     return queryParams;
   }
 
-  public ParameterMap getUriParams() {
+  public MultiMap<String, String> getUriParams() {
     return uriParams;
   }
 

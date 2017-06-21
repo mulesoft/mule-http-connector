@@ -27,7 +27,7 @@ import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
-import org.mule.runtime.http.api.domain.ParameterMap;
+import org.mule.runtime.api.util.MultiMap;
 
 import java.util.List;
 
@@ -122,7 +122,7 @@ public class HttpBasicAuthenticationFilter {
     if (realm != null) {
       realmHeader += "\"" + realm + "\"";
     }
-    ParameterMap headers = new ParameterMap();
+    MultiMap<String, String> headers = new MultiMap<>();
     headers.put(WWW_AUTHENTICATE, realmHeader);
     return Message.builder().nullPayload().attributes(new HttpListenerResponseAttributes(UNAUTHORIZED.getStatusCode(),
                                                                                          UNAUTHORIZED.getReasonPhrase(),
