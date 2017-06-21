@@ -15,7 +15,7 @@ import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.message.PartAttributes;
+import org.mule.runtime.core.api.message.PartAttributes;
 import org.mule.runtime.http.api.domain.entity.multipart.HttpPart;
 
 import java.util.Collection;
