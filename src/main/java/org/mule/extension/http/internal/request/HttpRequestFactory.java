@@ -100,8 +100,8 @@ public class HttpRequestFactory {
 
     builder.setUri(this.uri);
     builder.setMethod(this.method);
-    builder.setHeaders(toParameterMap(requestBuilder.getHeaders()));
-    builder.setQueryParams(toParameterMap(requestBuilder.getQueryParams()));
+    builder.setHeaders(toMultiMap(requestBuilder.getHeaders()));
+    builder.setQueryParams(toMultiMap(requestBuilder.getQueryParams()));
 
     MediaType mediaType = requestBuilder.getBody().getDataType().getMediaType();
     if (!builder.getHeaderValue(CONTENT_TYPE).isPresent()) {
@@ -143,7 +143,7 @@ public class HttpRequestFactory {
     return builder.build();
   }
 
-  private MultiMap<String, String> toParameterMap(Map<String, String> map) {
+  private MultiMap<String, String> toMultiMap(Map<String, String> map) {
     MultiMap<String, String> multiMap = new MultiMap<>();
     map.forEach(multiMap::put);
     return multiMap;
