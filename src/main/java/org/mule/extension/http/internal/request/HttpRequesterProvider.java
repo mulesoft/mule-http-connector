@@ -6,8 +6,11 @@
  */
 package org.mule.extension.http.internal.request;
 
+import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
+import static java.lang.System.getProperty;
 import static org.mule.extension.http.internal.HttpConnectorConstants.AUTHENTICATION;
+import static org.mule.extension.http.internal.HttpConnectorConstants.STREAM_RESPONSE_PROPERTY;
 import static org.mule.extension.http.internal.HttpConnectorConstants.TLS_CONFIGURATION;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
@@ -106,6 +109,8 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
 
   private TlsContextFactoryBuilder defaultTlsContextFactoryBuilder = TlsContextFactory.builder();
 
+  private boolean streamResponse = parseBoolean(getProperty(STREAM_RESPONSE_PROPERTY, "true"));
+
   @Override
   public ConnectionValidationResult validate(HttpExtensionClient httpClient) {
     return ConnectionValidationResult.success();
@@ -175,7 +180,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
           .setMaxConnections(connectionParams.getMaxConnections())
           .setUsePersistentConnections(connectionParams.getUsePersistentConnections())
           .setConnectionIdleTimeout(connectionParams.getConnectionIdleTimeout())
-          .setStreaming(connectionParams.getStreamResponse())
+          .setStreaming(streamResponse)
           .setResponseBufferSize(connectionParams.getResponseBufferSize())
           .setName(name)
           .build();
