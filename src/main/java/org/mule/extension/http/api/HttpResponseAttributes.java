@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.api;
 
-import org.mule.runtime.http.api.domain.ParameterMap;
+import org.mule.runtime.api.util.MultiMap;
 
 /**
  * Representation of an HTTP response message attributes.
@@ -14,6 +14,8 @@ import org.mule.runtime.http.api.domain.ParameterMap;
  * @since 1.0
  */
 public class HttpResponseAttributes extends HttpAttributes {
+
+  private static final long serialVersionUID = -3131769059554988414L;
 
   /**
    * HTTP status code of the response. Former 'http.status'.
@@ -24,7 +26,7 @@ public class HttpResponseAttributes extends HttpAttributes {
    */
   private final String reasonPhrase;
 
-  public HttpResponseAttributes(int statusCode, String reasonPhrase, ParameterMap headers) {
+  public HttpResponseAttributes(int statusCode, String reasonPhrase, MultiMap<String, String> headers) {
     super(headers);
     this.statusCode = statusCode;
     this.reasonPhrase = reasonPhrase;

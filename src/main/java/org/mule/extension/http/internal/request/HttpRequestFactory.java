@@ -32,7 +32,7 @@ import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.extension.api.exception.ModuleException;
-import org.mule.runtime.http.api.domain.ParameterMap;
+import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.runtime.http.api.domain.entity.EmptyHttpEntity;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
@@ -100,8 +100,8 @@ public class HttpRequestFactory {
 
     builder.setUri(this.uri);
     builder.setMethod(this.method);
-    builder.setHeaders(toParameterMap(requestBuilder.getHeaders()));
-    builder.setQueryParams(toParameterMap(requestBuilder.getQueryParams()));
+    builder.setHeaders(toMultiMap(requestBuilder.getHeaders()));
+    builder.setQueryParams(toMultiMap(requestBuilder.getQueryParams()));
 
     MediaType mediaType = requestBuilder.getBody().getDataType().getMediaType();
     if (!builder.getHeaderValue(CONTENT_TYPE).isPresent()) {
@@ -143,10 +143,10 @@ public class HttpRequestFactory {
     return builder.build();
   }
 
-  private ParameterMap toParameterMap(Map<String, String> map) {
-    ParameterMap parameterMap = new ParameterMap();
-    map.forEach(parameterMap::put);
-    return parameterMap;
+  private MultiMap<String, String> toMultiMap(Map<String, String> map) {
+    MultiMap<String, String> multiMap = new MultiMap<>();
+    map.forEach(multiMap::put);
+    return multiMap;
   }
 
   private HttpEntity createRequestEntity(HttpRequestBuilder requestBuilder, String resolvedMethod,

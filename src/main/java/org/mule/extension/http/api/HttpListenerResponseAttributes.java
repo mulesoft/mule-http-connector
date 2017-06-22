@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.api;
 
-import org.mule.runtime.http.api.domain.ParameterMap;
+import org.mule.runtime.api.util.MultiMap;
 
 /**
  * HTTP listener specific {@link HttpResponseAttributes}. Only this kind of attributes will be considered within an error message.
@@ -15,7 +15,9 @@ import org.mule.runtime.http.api.domain.ParameterMap;
  */
 public class HttpListenerResponseAttributes extends HttpResponseAttributes {
 
-  public HttpListenerResponseAttributes(int statusCode, String reasonPhrase, ParameterMap headers) {
+  private static final long serialVersionUID = 3126130644609141675L;
+
+  public HttpListenerResponseAttributes(int statusCode, String reasonPhrase, MultiMap<String, String> headers) {
     super(statusCode, reasonPhrase, headers);
   }
 

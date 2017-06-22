@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.api;
 
-import org.mule.runtime.http.api.domain.ParameterMap;
+import org.mule.runtime.api.util.MultiMap;
 
 import java.security.cert.Certificate;
 
@@ -16,6 +16,8 @@ import java.security.cert.Certificate;
  * @since 1.0
  */
 public class HttpRequestAttributes extends BaseHttpRequestAttributes {
+
+  private static final long serialVersionUID = 7227330842640270811L;
 
   /**
    * Full path where the request was received. Former 'http.listener.path'.
@@ -54,9 +56,10 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
    */
   private final Certificate clientCertificate;
 
-  public HttpRequestAttributes(ParameterMap headers, String listenerPath, String relativePath, String version, String scheme,
-                               String method, String requestPath, String requestUri, String queryString, ParameterMap queryParams,
-                               ParameterMap uriParams, String remoteAddress, Certificate clientCertificate) {
+  public HttpRequestAttributes(MultiMap<String, String> headers, String listenerPath, String relativePath, String version,
+                               String scheme, String method, String requestPath, String requestUri, String queryString,
+                               MultiMap<String, String> queryParams, MultiMap<String, String> uriParams,
+                               String remoteAddress, Certificate clientCertificate) {
     super(headers, queryParams, uriParams, requestPath);
     this.listenerPath = listenerPath;
     this.relativePath = relativePath;

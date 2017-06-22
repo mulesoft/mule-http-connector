@@ -32,7 +32,7 @@ import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.http.api.domain.ParameterMap;
+import org.mule.runtime.api.util.MultiMap;
 import org.mule.tck.junit4.matcher.MetadataKeyMatcher;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -86,7 +86,7 @@ public class HttpMetadataResolverTestCase extends AbstractHttpTestCase {
 
   @Test
   public void resolveForm() {
-    verifyType(FORM, ObjectType.class, ParameterMap.class);
+    verifyType(FORM, ObjectType.class, MultiMap.class);
   }
 
   @Test

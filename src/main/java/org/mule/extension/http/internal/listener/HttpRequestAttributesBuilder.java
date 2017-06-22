@@ -12,7 +12,7 @@ import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.extractPat
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.extractQueryParams;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
-import org.mule.runtime.http.api.domain.ParameterMap;
+import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.request.ClientConnection;
 import org.mule.runtime.http.api.domain.request.HttpRequestContext;
@@ -47,15 +47,15 @@ public class HttpRequestAttributesBuilder {
     String uri = request.getUri();
     String path = extractPath(uri);
     String queryString = extractQueryParams(uri);
-    ParameterMap queryParams = decodeQueryString(queryString);
-    ParameterMap uriParams = decodeUriParams(listenerPath, path);
+    MultiMap<String, String> queryParams = decodeQueryString(queryString);
+    MultiMap<String, String> uriParams = decodeUriParams(listenerPath, path);
     ClientConnection clientConnection = requestContext.getClientConnection();
     String remoteHostAddress = clientConnection.getRemoteHostAddress().toString();
     Certificate clientCertificate = clientConnection.getClientCertificate();
     String relativePath = this.listenerPath.getRelativePath(path);
 
     final Collection<String> headerNames = request.getHeaderNames();
-    ParameterMap headers = new ParameterMap();
+    MultiMap<String, String> headers = new MultiMap<>();
     for (String headerName : headerNames) {
       headers.put(headerName, request.getHeaderValues(headerName));
     }
