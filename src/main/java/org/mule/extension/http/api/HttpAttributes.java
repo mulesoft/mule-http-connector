@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.api;
 
-import org.mule.runtime.core.message.BaseAttributes;
+import org.mule.runtime.core.api.message.BaseAttributes;
 import org.mule.runtime.http.api.domain.ParameterMap;
 
 /**
