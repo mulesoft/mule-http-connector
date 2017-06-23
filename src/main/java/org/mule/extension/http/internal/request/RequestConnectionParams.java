@@ -89,30 +89,19 @@ public final class RequestConnectionParams {
   private Integer connectionIdleTimeout;
 
   /**
-   * Whether or not received responses should be streamed, meaning processing will continue as soon as all headers are parsed and
-   * the body streamed as it arrives. When enabled, the response MUST be eventually read since depending on the configured buffer
-   * size it may not fit into memory and processing will stop until space is available.
-   */
-  @Parameter
-  @Optional(defaultValue = "true")
-  @Expression(NOT_SUPPORTED)
-  @Placement(tab = ADVANCED_TAB, order = 4)
-  private boolean streamResponse;
-
-  /**
-   * The space in bytes for the buffer where the HTTP response will be stored.
+   * The space in bytes for the buffer where the HTTP response will be stored as it arrives.
    */
   @Parameter
   @Optional(defaultValue = DEFAULT_RESPONSE_BUFFER_SIZE)
   @Expression(NOT_SUPPORTED)
-  @Placement(tab = ADVANCED_TAB, order = 5)
+  @Placement(tab = ADVANCED_TAB, order = 4)
   private int responseBufferSize;
 
   @Parameter
   @Optional
   @NullSafe
   @Expression(NOT_SUPPORTED)
-  @Placement(tab = ADVANCED_TAB, order = 6)
+  @Placement(tab = ADVANCED_TAB, order = 5)
   private TcpClientSocketProperties clientSocketProperties;
 
   public HttpConstants.Protocol getProtocol() {
@@ -137,10 +126,6 @@ public final class RequestConnectionParams {
 
   public Integer getConnectionIdleTimeout() {
     return connectionIdleTimeout;
-  }
-
-  public boolean getStreamResponse() {
-    return streamResponse;
   }
 
   public int getResponseBufferSize() {
@@ -173,10 +158,6 @@ public final class RequestConnectionParams {
 
   public void setConnectionIdleTimeout(Integer connectionIdleTimeout) {
     this.connectionIdleTimeout = connectionIdleTimeout;
-  }
-
-  public void setStreamResponse(boolean streamResponse) {
-    this.streamResponse = streamResponse;
   }
 
   public void setResponseBufferSize(int responseBufferSize) {
