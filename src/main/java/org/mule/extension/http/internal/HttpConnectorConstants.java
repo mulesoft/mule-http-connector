@@ -20,6 +20,6 @@ public interface HttpConnectorConstants {
   String CONNECTOR_OVERRIDES = "Connector Overrides";
   String TLS_CONFIGURATION = "TLS Configuration";
   String AUTHENTICATION = "Authentication";
-  String STREAM_RESPONSE_PROPERTY = "mule.http.streamResponse";
+  String DISABLE_RESPONSE_STREAMING_PROPERTY = "mule.http.disableResponseStreaming";
 
 }

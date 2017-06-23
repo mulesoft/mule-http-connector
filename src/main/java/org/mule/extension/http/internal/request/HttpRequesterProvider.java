@@ -6,11 +6,10 @@
  */
 package org.mule.extension.http.internal.request;
 
-import static java.lang.Boolean.parseBoolean;
+import static java.lang.Boolean.getBoolean;
 import static java.lang.String.format;
-import static java.lang.System.getProperty;
 import static org.mule.extension.http.internal.HttpConnectorConstants.AUTHENTICATION;
-import static org.mule.extension.http.internal.HttpConnectorConstants.STREAM_RESPONSE_PROPERTY;
+import static org.mule.extension.http.internal.HttpConnectorConstants.DISABLE_RESPONSE_STREAMING_PROPERTY;
 import static org.mule.extension.http.internal.HttpConnectorConstants.TLS_CONFIGURATION;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
@@ -20,7 +19,6 @@ import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CON
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.SECURITY_TAB;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTP;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
-
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.internal.request.client.DefaultUriParameters;
@@ -109,7 +107,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
 
   private TlsContextFactoryBuilder defaultTlsContextFactoryBuilder = TlsContextFactory.builder();
 
-  private boolean streamResponse = parseBoolean(getProperty(STREAM_RESPONSE_PROPERTY, "true"));
+  private boolean streamResponse = !getBoolean(DISABLE_RESPONSE_STREAMING_PROPERTY);
 
   @Override
   public ConnectionValidationResult validate(HttpExtensionClient httpClient) {
