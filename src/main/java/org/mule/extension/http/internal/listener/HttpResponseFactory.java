@@ -36,7 +36,7 @@ import org.mule.runtime.core.api.TransformationService;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
