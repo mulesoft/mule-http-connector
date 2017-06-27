@@ -51,8 +51,8 @@ import org.mule.runtime.http.api.client.proxy.ProxyConfig;
 @SubTypeMapping(baseType = ProxyConfig.class, subTypes = {DefaultProxyConfig.class, DefaultNtlmProxyConfig.class})
 @SubTypeMapping(baseType = ResponseValidator.class,
     subTypes = {SuccessStatusCodeValidator.class, FailureStatusCodeValidator.class})
-@Import(type = TcpClientSocketProperties.class, from = "Sockets")
-@Import(type = TcpServerSocketProperties.class, from = "Sockets")
+@Import(type = TcpClientSocketProperties.class)
+@Import(type = TcpServerSocketProperties.class)
 @ErrorTypes(HttpError.class)
 @Xml(namespace = "http://www.mulesoft.org/schema/mule/http", prefix = HTTP_NAMESPACE)
 // TODO move back to package org.mule.extension.http.internal as part of MULE-10651. Now we are using this package
