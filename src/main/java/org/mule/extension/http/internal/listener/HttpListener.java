@@ -12,31 +12,28 @@ import static java.util.Optional.ofNullable;
 import static org.mule.extension.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.extension.http.api.error.HttpError.BASIC_AUTHENTICATION;
 import static org.mule.extension.http.api.error.HttpError.NOT_FOUND;
-import static org.mule.extension.http.internal.HttpConnectorConstants.CONNECTOR_OVERRIDES;
 import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE;
 import static org.mule.extension.http.internal.listener.HttpRequestToResult.transform;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.SECURITY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.SECURITY;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.getReasonPhraseForStatusCode;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.extension.http.api.error.HttpMessageParsingException;
 import org.mule.extension.http.api.listener.builder.HttpListenerErrorResponseBuilder;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.api.listener.builder.HttpListenerSuccessResponseBuilder;
 import org.mule.extension.http.api.listener.server.HttpListenerConfig;
-import org.mule.extension.http.internal.HttpListenerMetadataResolver;
+import org.mule.extension.http.internal.HttpMetadataResolver;
 import org.mule.extension.http.internal.HttpStreamingType;
 import org.mule.extension.http.internal.listener.server.ModuleRequestHandler;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -84,6 +81,7 @@ import org.mule.runtime.http.api.server.RequestHandlerManager;
 import org.mule.runtime.http.api.server.async.HttpResponseReadyCallback;
 import org.mule.runtime.http.api.server.async.ResponseStatusCallback;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -98,10 +96,10 @@ import org.slf4j.Logger;
  * @since 1.0
  */
 @Alias("listener")
-@MetadataScope(outputResolver = HttpListenerMetadataResolver.class)
+@MetadataScope(outputResolver = HttpMetadataResolver.class)
 @EmitsResponse
 @Streaming
-public class HttpListener extends Source<Object, HttpRequestAttributes> {
+public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
 
   public static final String HTTP_NAMESPACE = "http";
   private static final Logger LOGGER = getLogger(HttpListener.class);
@@ -137,15 +135,6 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
   private String allowedMethods;
 
   /**
-   * By default, the request will be parsed (for example, a multi part request will be mapped as a Mule message with null payload
-   * and inbound attachments with each part). If this property is set to false, no parsing will be done, and the payload will
-   * always contain the raw contents of the HTTP request.
-   */
-  @Placement(tab = Placement.ADVANCED_TAB)
-  @ParameterGroup(name = CONNECTOR_OVERRIDES)
-  private ConfigurationOverrides configurationOverrides;
-
-  /**
    * Defines if the response should be sent using streaming or not. If this attribute is not present, the behavior will depend on
    * the type of the payload (it will stream only for InputStream). If set to true, it will always stream. If set to false, it
    * will never stream. As streaming is done the response will be sent user Transfer-Encoding: chunked.
@@ -160,7 +149,6 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
   private RequestHandlerManager requestHandlerManager;
   private HttpResponseFactory responseFactory;
   private ErrorTypeMatcher knownErrors;
-  private Boolean parseRequest;
   private Class interpretedAttributes;
 
   // TODO: MULE-10900 figure out a way to have a shared group between callbacks and possibly regular params
@@ -244,7 +232,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
   }
 
   @Override
-  public void onStart(SourceCallback<Object, HttpRequestAttributes> sourceCallback) throws MuleException {
+  public void onStart(SourceCallback<InputStream, HttpRequestAttributes> sourceCallback) throws MuleException {
     listenerPath = config.getFullListenerPath(config.sanitizePathWithStartSlash(path));
     path = listenerPath.getResolvedPath();
     responseFactory =
@@ -253,7 +241,6 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
     startIfNeeded(responseFactory);
 
     validatePath();
-    this.parseRequest = configurationOverrides.getParseRequest();
     interpretedAttributes = HttpListenerResponseAttributes.class;
 
     try {
@@ -292,12 +279,11 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
     }
   }
 
-  private RequestHandler getRequestHandler(SourceCallback<Object, HttpRequestAttributes> sourceCallback) {
+  private RequestHandler getRequestHandler(SourceCallback<InputStream, HttpRequestAttributes> sourceCallback) {
     return new ModuleRequestHandler() {
 
       @Override
-      public Result<Object, HttpRequestAttributes> createResult(HttpRequestContext requestContext)
-          throws HttpMessageParsingException {
+      public Result<InputStream, HttpRequestAttributes> createResult(HttpRequestContext requestContext) {
         return HttpListener.this.createResult(requestContext);
       }
 
@@ -315,7 +301,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
           context.addVariable(RESPONSE_CONTEXT, responseContext);
 
           sourceCallback.handle(createResult(requestContext), context);
-        } catch (HttpMessageParsingException | IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
           LOGGER.warn("Exception occurred parsing request:", e);
           sendErrorResponse(BAD_REQUEST, e.getMessage(), responseCallback);
         } catch (RuntimeException e) {
@@ -365,9 +351,8 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
         .setReasonPhrase(reasonPhraseFromException != null ? reasonPhraseFromException : throwable.getMessage());
   }
 
-  private Result<Object, HttpRequestAttributes> createResult(HttpRequestContext requestContext)
-      throws HttpMessageParsingException {
-    return transform(requestContext, getDefaultEncoding(muleContext), parseRequest, listenerPath);
+  private Result<InputStream, HttpRequestAttributes> createResult(HttpRequestContext requestContext) {
+    return transform(requestContext, getDefaultEncoding(muleContext), listenerPath);
     // TODO: MULE-9748 Analyse RequestContext use in HTTP extension
     // Update RequestContext ThreadLocal for backwards compatibility
     // setCurrentEvent(muleEvent);
@@ -453,7 +438,4 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
     }
   }
 
-  public Boolean getParseRequest() {
-    return parseRequest;
-  }
 }

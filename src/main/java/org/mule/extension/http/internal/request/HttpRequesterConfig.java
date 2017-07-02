@@ -72,10 +72,6 @@ public class HttpRequesterConfig implements Initialisable, HttpRequesterCookieCo
     return requestSettings.getFollowRedirects();
   }
 
-  public boolean getParseResponse() {
-    return responseSettings.getParseResponse();
-  }
-
   public HttpStreamingType getRequestStreamingMode() {
     return requestSettings.getRequestStreamingMode();
   }

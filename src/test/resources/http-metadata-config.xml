@@ -14,29 +14,12 @@
     </http:listener-config>
 
     <flow name="server">
-        <http:listener responseStreamingMode="AUTO" path="test" allowedMethods="GET" parseRequest="true"
-                        config-ref="lisConfig"/>
+        <http:listener responseStreamingMode="AUTO" path="test" allowedMethods="GET" config-ref="lisConfig"/>
         <logger/>
     </flow>
 
-    <flow name="any">
-        <http:request path="/" config-ref="reqConfig" outputType="ANY"/>
-    </flow>
-
-    <flow name="streamImplicit">
+    <flow name="client">
         <http:request path="/" config-ref="reqConfig"/>
-    </flow>
-
-    <flow name="multipart">
-        <http:request path="/multipart" config-ref="reqConfig" outputType="MULTIPART"/>
-    </flow>
-
-    <flow name="form">
-        <http:request path="/form" config-ref="reqConfig" outputType="FORM"/>
-    </flow>
-
-    <flow name="stream">
-        <http:request path="/stream" config-ref="reqConfig" outputType="STREAM"/>
     </flow>
 
 </mule>
