@@ -17,8 +17,7 @@ import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.request.validator.SuccessStatusCodeValidator;
-import org.mule.extension.http.internal.HttpMetadataKey;
-import org.mule.extension.http.internal.HttpRequestMetadataResolver;
+import org.mule.extension.http.internal.HttpMetadataResolver;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -29,7 +28,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.scheduler.SchedulerService;
 import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.error.Throws;
-import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -40,6 +38,8 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.http.api.HttpConstants;
+
+import java.io.InputStream;
 
 import javax.inject.Inject;
 
@@ -62,13 +62,12 @@ public class HttpRequestOperations implements Initialisable, Disposable {
    * @param overrides configuration overrides parameter group
    * @param responseValidationSettings response validation parameter group
    * @param requestBuilder configures the request
-   * @param outputType the expected response type (STREAM, MULTIPART, FORM or ANY)
    * @param client the http connection
    * @param config the configuration for this operation. All parameters not configured will be taken from it.
    * @return an {@link Result} with {@link HttpResponseAttributes}
    */
   @Summary("Executes a HTTP Request")
-  @OutputResolver(output = HttpRequestMetadataResolver.class)
+  @OutputResolver(output = HttpMetadataResolver.class)
   @Throws(RequestErrorTypeProvider.class)
   @Streaming
   public void request(@Placement(order = 1) @ParameterGroup(name = "URI Settings") UriSettings uriSettings,
@@ -76,11 +75,9 @@ public class HttpRequestOperations implements Initialisable, Disposable {
                       @ParameterGroup(name = CONNECTOR_OVERRIDES) ConfigurationOverrides overrides,
                       @Placement(order = 3) @ParameterGroup(name = REQUEST) HttpRequesterRequestBuilder requestBuilder,
                       @ParameterGroup(name = RESPONSE) ResponseValidationSettings responseValidationSettings,
-                      @Placement(tab = RESPONSE,
-                          order = 1) @Optional(defaultValue = "STREAM") @MetadataKeyId HttpMetadataKey outputType,
                       @Connection HttpExtensionClient client,
                       @Config HttpRequesterConfig config,
-                      CompletionCallback<Object, HttpResponseAttributes> callback) {
+                      CompletionCallback<InputStream, HttpResponseAttributes> callback) {
     try {
       HttpRequesterRequestBuilder resolvedBuilder = requestBuilder != null ? requestBuilder : new HttpRequesterRequestBuilder();
 
@@ -108,7 +105,6 @@ public class HttpRequestOperations implements Initialisable, Disposable {
               .setRequestStreamingMode(overrides.getRequestStreamingMode())
               .setSendBodyMode(overrides.getSendBodyMode())
               .setAuthentication(client.getDefaultAuthentication())
-              .setParseResponse(overrides.getParseResponse())
               .setResponseTimeout(resolvedTimeout)
               .setResponseValidator(responseValidator)
               .setTransformationService(muleContext.getTransformationService()).setScheduler(scheduler)

@@ -14,6 +14,8 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
+import java.io.InputStream;
+
 /**
  * Signals that an error occurred while validating a {@link Message}
  *
@@ -27,7 +29,7 @@ public class ResponseValidatorTypedException extends ModuleException implements 
     super(message, error);
   }
 
-  public ResponseValidatorTypedException(String message, HttpError error, Result<Object, HttpResponseAttributes> result) {
+  public ResponseValidatorTypedException(String message, HttpError error, Result<InputStream, HttpResponseAttributes> result) {
     this(message, error);
     this.errorMessage = Message.builder()
         .payload(result.getOutput())

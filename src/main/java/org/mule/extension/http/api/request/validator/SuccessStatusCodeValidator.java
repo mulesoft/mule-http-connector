@@ -11,6 +11,8 @@ import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 
+import java.io.InputStream;
+
 /**
  * Response validator that allows specifying which status codes will be considered as successful. Other status codes in the
  * response will cause the component to throw an exception.
@@ -26,7 +28,7 @@ public class SuccessStatusCodeValidator extends RangeStatusCodeValidator {
   }
 
   @Override
-  public void validate(Result<Object, HttpResponseAttributes> result, HttpRequest request) {
+  public void validate(Result<InputStream, HttpResponseAttributes> result, HttpRequest request) {
     int status = result.getAttributes().get().getStatusCode();
 
     if (!belongs(status)) {

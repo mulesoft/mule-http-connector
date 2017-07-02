@@ -8,7 +8,6 @@ package org.mule.extension.http.internal.request;
 
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 /**
  * Groups parameters regarding how to generate responses
@@ -18,26 +17,12 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
 public final class ResponseSettings {
 
   /**
-   * By default, the response will be parsed (for example, a multipart response will be mapped as a Mule message with null payload
-   * and inbound attachments with each part). If this property is set to false, no parsing will be done, and the payload will
-   * always contain the raw contents of the HTTP response.
-   */
-  @Parameter
-  @Optional(defaultValue = "true")
-  @Summary("Indicates if the HTTP response should be parsed, or directly receive the raw content")
-  private boolean parseResponse;
-
-  /**
    * Maximum time that the request element will block the execution of the flow waiting for the HTTP response. If this value is
    * not present, the default response timeout from the Mule configuration will be used.
    */
   @Parameter
   @Optional
   private Integer responseTimeout;
-
-  public boolean getParseResponse() {
-    return parseResponse;
-  }
 
   public Integer getResponseTimeout() {
     return responseTimeout;

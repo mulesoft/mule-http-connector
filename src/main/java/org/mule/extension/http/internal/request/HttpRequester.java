@@ -55,7 +55,6 @@ public class HttpRequester {
 
   private final boolean followRedirects;
   private final HttpAuthentication authentication;
-  private final boolean parseResponse;
   private final int responseTimeout;
   private final ResponseValidator responseValidator;
 
@@ -65,11 +64,10 @@ public class HttpRequester {
   private final Scheduler scheduler;
 
   public HttpRequester(HttpRequestFactory eventToHttpRequest, boolean followRedirects, HttpAuthentication authentication,
-                       boolean parseResponse, int responseTimeout, ResponseValidator responseValidator,
-                       HttpRequesterConfig config, Scheduler scheduler) {
+                       int responseTimeout, ResponseValidator responseValidator, HttpRequesterConfig config,
+                       Scheduler scheduler) {
     this.followRedirects = followRedirects;
     this.authentication = authentication;
-    this.parseResponse = parseResponse;
     this.responseTimeout = responseTimeout;
     this.responseValidator = responseValidator;
     this.config = config;
@@ -81,7 +79,7 @@ public class HttpRequester {
 
   public void doRequest(HttpExtensionClient client, HttpRequesterRequestBuilder requestBuilder,
                         boolean checkRetry, MuleContext muleContext,
-                        CompletionCallback<Object, HttpResponseAttributes> callback) {
+                        CompletionCallback<InputStream, HttpResponseAttributes> callback) {
     HttpRequest httpRequest = eventToHttpRequest.create(requestBuilder, authentication, muleContext);
 
     // TODO: MULE-10340 - Add notifications to HTTP request
@@ -94,14 +92,15 @@ public class HttpRequester {
   private ResponseHandler createResponseHandler(MuleContext muleContext,
                                                 HttpRequesterRequestBuilder requestBuilder, HttpExtensionClient client,
                                                 HttpRequest httpRequest,
-                                                boolean checkRetry, CompletionCallback<Object, HttpResponseAttributes> callback) {
+                                                boolean checkRetry,
+                                                CompletionCallback<InputStream, HttpResponseAttributes> callback) {
     return new ResponseHandler() {
 
       @Override
       public void onCompletion(HttpResponse response) {
-        HttpResponseToResult httpResponseToResult = new HttpResponseToResult(config, parseResponse, muleContext);
+        HttpResponseToResult httpResponseToResult = new HttpResponseToResult(config, muleContext);
         MediaType mediaType = requestBuilder.getBody().getDataType().getMediaType();
-        from(httpResponseToResult.convert(mediaType, response, httpRequest.getUri(), scheduler))
+        from(httpResponseToResult.convert(mediaType, response, httpRequest.getUri()))
             .doOnNext(result -> {
               // TODO: MULE-10340 - Add notifications to HTTP request
               // notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct, MESSAGE_REQUEST_END);
@@ -176,7 +175,6 @@ public class HttpRequester {
     private HttpAuthentication authentication;
 
     private int responseTimeout;
-    private boolean parseResponse;
     private ResponseValidator responseValidator;
 
     private HttpRequesterConfig config;
@@ -213,11 +211,6 @@ public class HttpRequester {
       return this;
     }
 
-    public Builder setParseResponse(boolean parseResponse) {
-      this.parseResponse = parseResponse;
-      return this;
-    }
-
     public Builder setResponseTimeout(int responseTimeout) {
       this.responseTimeout = responseTimeout;
       return this;
@@ -246,7 +239,7 @@ public class HttpRequester {
     public HttpRequester build() {
       HttpRequestFactory eventToHttpRequest =
           new HttpRequestFactory(config, uri, method, requestStreamingMode, sendBodyMode, transformationService);
-      return new HttpRequester(eventToHttpRequest, followRedirects, authentication, parseResponse, responseTimeout,
+      return new HttpRequester(eventToHttpRequest, followRedirects, authentication, responseTimeout,
                                responseValidator, config, scheduler);
     }
   }

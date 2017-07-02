@@ -14,6 +14,8 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
+import java.io.InputStream;
+
 /**
  * Signals that an error occurred while validating a {@link Message}
  *
@@ -27,7 +29,7 @@ public class ResponseValidatorException extends MuleRuntimeException implements 
     super(createStaticMessage(message));
   }
 
-  public ResponseValidatorException(String message, Result<Object, HttpResponseAttributes> result) {
+  public ResponseValidatorException(String message, Result<InputStream, HttpResponseAttributes> result) {
     this(message);
     this.errorMessage = Message.builder()
         .payload(result.getOutput())

@@ -14,7 +14,7 @@
     </http:listener-config>
     
     <flow name="client">
-        <http:request path="/" config-ref="reqConfig" outputType="ANY">
+        <http:request path="/" config-ref="reqConfig">
             <http:headers>
                 #[{'X-Custom' : 'custom-value'}]
             </http:headers>
@@ -26,7 +26,7 @@
     </flow>
 
     <flow name="server">
-        <http:listener responseStreamingMode="AUTO" path="test" allowedMethods="GET" parseRequest="true" config-ref="lisConfig">
+        <http:listener responseStreamingMode="AUTO" path="test" allowedMethods="GET" config-ref="lisConfig">
             <http:response statusCode="200" reasonPhrase="OK">
                 <http:body>#[payload]</http:body>
                 <http:headers>#[{'Name':'Value'}]</http:headers>
