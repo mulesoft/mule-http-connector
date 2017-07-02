@@ -13,6 +13,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 
+import java.io.InputStream;
 import java.util.Optional;
 
 /**
@@ -92,7 +93,7 @@ public abstract class RangeStatusCodeValidator implements ResponseValidator {
    * @return
    * @throws ResponseValidatorTypedException
    */
-  protected void throwValidationException(Result<Object, HttpResponseAttributes> result, HttpRequest request, int status) {
+  protected void throwValidationException(Result<InputStream, HttpResponseAttributes> result, HttpRequest request, int status) {
     Optional<HttpError> error = getErrorByCode(status);
     if (error.isPresent()) {
       throw new ResponseValidatorTypedException(getExceptionMessage(status, request), error.get(), result);

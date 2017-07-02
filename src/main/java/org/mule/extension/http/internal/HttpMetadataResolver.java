@@ -7,10 +7,8 @@
 package org.mule.extension.http.internal;
 
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-
-import org.mule.extension.http.internal.listener.HttpListener;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
-import org.mule.metadata.api.model.AnyType;
+import org.mule.metadata.api.model.BinaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
@@ -18,21 +16,22 @@ import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 
 /**
- * Dummy {@link OutputTypeResolver} implementation for the {@link HttpListener} which always returns an {@link AnyType}
+ * HTTP {@link OutputTypeResolver} implementation for the basic operations that always return a {@link BinaryType}.
  *
  * @since 1.0
  */
-public class HttpListenerMetadataResolver implements OutputTypeResolver<Object> {
+public class HttpMetadataResolver implements OutputTypeResolver<Object> {
 
-  private static final AnyType ANY_TYPE = BaseTypeBuilder.create(JAVA).anyType().build();
+  private static final BinaryType BINARY_TYPE = BaseTypeBuilder.create(JAVA).binaryType().build();
 
   @Override
   public String getCategoryName() {
-    return "HttpListener";
+    return "HTTP";
   }
 
   @Override
   public MetadataType getOutputType(MetadataContext context, Object key) throws MetadataResolvingException, ConnectionException {
-    return ANY_TYPE;
+    return BINARY_TYPE;
   }
+
 }

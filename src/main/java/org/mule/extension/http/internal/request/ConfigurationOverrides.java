@@ -45,19 +45,11 @@ public final class ConfigurationOverrides {
   private HttpStreamingType requestStreamingMode;
 
   /**
-   * Defines if the HTTP response should be parsed or it's raw contents should be propagated instead.
-   */
-  @Parameter
-  @ConfigOverride
-  @Placement(tab = RESPONSE, order = 1)
-  private boolean parseResponse;
-
-  /**
    * Maximum time that the request element will block the execution of the flow waiting for the HTTP response.
    */
   @Parameter
   @ConfigOverride
-  @Placement(tab = RESPONSE, order = 2)
+  @Placement(tab = RESPONSE, order = 1)
   private Integer responseTimeout;
 
   public boolean getFollowRedirects() {
@@ -70,10 +62,6 @@ public final class ConfigurationOverrides {
 
   public HttpStreamingType getRequestStreamingMode() {
     return requestStreamingMode;
-  }
-
-  public boolean getParseResponse() {
-    return parseResponse;
   }
 
   public Integer getResponseTimeout() {

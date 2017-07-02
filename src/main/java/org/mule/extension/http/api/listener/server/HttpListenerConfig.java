@@ -8,8 +8,6 @@ package org.mule.extension.http.api.listener.server;
 
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
-
 import org.mule.extension.http.internal.listener.HttpListener;
 import org.mule.extension.http.internal.listener.HttpListenerProvider;
 import org.mule.extension.http.internal.listener.ListenerPath;
@@ -21,7 +19,6 @@ import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 /**
  * Configuration element for a {@link HttpListener}.
@@ -41,17 +38,6 @@ public class HttpListenerConfig implements Initialisable {
   @Expression(NOT_SUPPORTED)
   private String basePath;
 
-  /**
-   * By default, the request will be parsed (for example, a multi part request will be mapped as a Mule message with no payload
-   * and attributes with each part). If this property is set to false, no parsing will be done, and the payload will always
-   * contain the raw contents of the HTTP request.
-   */
-  @Parameter
-  @Optional(defaultValue = "true")
-  @Expression(NOT_SUPPORTED)
-  @Placement(tab = ADVANCED_TAB)
-  private boolean parseRequest;
-
   @Override
   public void initialise() throws InitialisationException {
     basePath = sanitizePathWithStartSlash(this.basePath);
@@ -67,10 +53,6 @@ public class HttpListenerConfig implements Initialisable {
       return null;
     }
     return path.startsWith("/") ? path : "/" + path;
-  }
-
-  public boolean getParseRequest() {
-    return parseRequest;
   }
 
 }

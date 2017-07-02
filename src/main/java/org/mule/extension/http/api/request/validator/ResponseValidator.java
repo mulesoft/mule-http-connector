@@ -10,6 +10,8 @@ import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 
+import java.io.InputStream;
+
 /**
  * Configures error handling of the response.
  *
@@ -27,6 +29,6 @@ public interface ResponseValidator {
    * @throws ResponseValidatorException if the message is not considered valid and the response validator does not relates to an
    *         specific error type.
    */
-  void validate(Result<Object, HttpResponseAttributes> result, HttpRequest request);
+  void validate(Result<InputStream, HttpResponseAttributes> result, HttpRequest request);
 
 }

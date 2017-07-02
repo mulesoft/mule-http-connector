@@ -7,13 +7,14 @@
 package org.mule.extension.http.internal.listener.server;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
-import org.mule.extension.http.api.error.HttpMessageParsingException;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.http.api.domain.request.HttpRequestContext;
 import org.mule.runtime.http.api.server.RequestHandler;
 
+import java.io.InputStream;
+
 public interface ModuleRequestHandler extends RequestHandler {
 
-  Result<Object, HttpRequestAttributes> createResult(HttpRequestContext requestContext) throws HttpMessageParsingException;
+  Result<InputStream, HttpRequestAttributes> createResult(HttpRequestContext requestContext);
 
 }
