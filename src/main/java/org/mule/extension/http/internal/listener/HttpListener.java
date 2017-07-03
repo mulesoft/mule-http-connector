@@ -43,6 +43,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.DisjunctiveErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
@@ -107,6 +108,9 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   private static final String RESPONSE_CONTEXT = "responseContext";
   private static final String RESPONSE_CONTEXT_NOT_FOUND = "Response Context is not present. Could not send response.";
   private static final HttpListenerErrorResponseBuilder NULL_ERROR_RESPONSE = new HttpListenerErrorResponseBuilder();
+
+  @Inject
+  private TransformationService transformationService;
 
   @Inject
   private MuleContext muleContext;
@@ -236,7 +240,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
     listenerPath = config.getFullListenerPath(config.sanitizePathWithStartSlash(path));
     path = listenerPath.getResolvedPath();
     responseFactory =
-        new HttpResponseFactory(responseStreamingMode, muleContext.getTransformationService());
+        new HttpResponseFactory(responseStreamingMode, transformationService);
     responseSender = new HttpListenerResponseSender(responseFactory);
     startIfNeeded(responseFactory);
 

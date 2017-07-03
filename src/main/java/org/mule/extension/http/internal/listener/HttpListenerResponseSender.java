@@ -7,10 +7,9 @@
 package org.mule.extension.http.internal.listener;
 
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
-
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.internal.HttpStreamingType;
-import org.mule.runtime.core.api.TransformationService;
+import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.mule.runtime.http.api.domain.message.response.HttpResponseBuilder;

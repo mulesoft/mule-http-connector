@@ -28,17 +28,15 @@ import static org.mule.runtime.http.api.HttpHeaders.Values.MULTIPART_FORM_DATA;
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.encodeString;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.internal.HttpStreamingType;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.TransformationService;
-import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
+import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.runtime.http.api.domain.entity.EmptyHttpEntity;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
@@ -199,11 +197,7 @@ public class HttpResponseFactory {
   }
 
   private byte[] getMessageAsBytes(Object payload) {
-    try {
-      return (byte[]) transformationService.transform(of(payload), BYTE_ARRAY).getPayload().getValue();
-    } catch (TransformerException e) {
-      throw new MuleRuntimeException(e);
-    }
+    return (byte[]) transformationService.transform(of(payload), BYTE_ARRAY).getPayload().getValue();
   }
 
   public String resolveReasonPhrase(String builderReasonPhrase, Integer statusCode) {
@@ -290,6 +284,6 @@ public class HttpResponseFactory {
       logger.debug("Payload is multipart. Trying to generate multipart response.");
     }
 
-    return new MultipartHttpEntity(createFrom(partPayload, objectToByteArray));
+    return new MultipartHttpEntity(createFrom(partPayload, transformationService));
   }
 }
