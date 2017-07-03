@@ -19,15 +19,14 @@ import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.SECURITY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.SECURITY;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.getReasonPhraseForStatusCode;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
@@ -46,6 +45,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.DisjunctiveErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
@@ -109,6 +109,9 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
   private static final String RESPONSE_CONTEXT = "responseContext";
   private static final String RESPONSE_CONTEXT_NOT_FOUND = "Response Context is not present. Could not send response.";
   private static final HttpListenerErrorResponseBuilder NULL_ERROR_RESPONSE = new HttpListenerErrorResponseBuilder();
+
+  @Inject
+  private TransformationService transformationService;
 
   @Inject
   private MuleContext muleContext;
@@ -248,7 +251,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> {
     listenerPath = config.getFullListenerPath(config.sanitizePathWithStartSlash(path));
     path = listenerPath.getResolvedPath();
     responseFactory =
-        new HttpResponseFactory(responseStreamingMode, muleContext.getTransformationService());
+        new HttpResponseFactory(responseStreamingMode, transformationService);
     responseSender = new HttpListenerResponseSender(responseFactory);
     startIfNeeded(responseFactory);
 

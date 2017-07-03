@@ -7,14 +7,11 @@
 package org.mule.extension.http.internal.multipart;
 
 import static java.lang.Math.toIntExact;
-import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import org.mule.runtime.api.exception.MuleRuntimeException;
+import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.message.PartAttributes;
 import org.mule.runtime.http.api.domain.entity.multipart.HttpPart;
 
@@ -27,24 +24,20 @@ import java.util.Collection;
  */
 public class HttpMultipartTransformer {
 
-  public static Collection<HttpPart> createFrom(MultiPartPayload multiPartPayload, Transformer objectToByteArray) {
+  public static Collection<HttpPart> createFrom(MultiPartPayload multiPartPayload, TransformationService transformationService) {
     return multiPartPayload.getParts().stream().map(message -> {
       PartAttributes partAttributes = (PartAttributes) message.getAttributes().getValue();
       TypedValue<Object> payload = message.getPayload();
       String name = partAttributes.getName();
       byte[] data;
-      try {
-        data = (byte[]) objectToByteArray.transform(payload.getValue());
-        String fileName = partAttributes.getFileName();
-        String contentType = payload.getDataType().getMediaType().toRfcString();
-        int size = toIntExact(partAttributes.getSize());
-        if (fileName != null) {
-          return new HttpPart(name, fileName, data, contentType, size);
-        } else {
-          return new HttpPart(name, data, contentType, size);
-        }
-      } catch (TransformerException e) {
-        throw new MuleRuntimeException(createStaticMessage(format("Could not create HTTP part '%s'", name), e));
+      data = (byte[]) transformationService.transform(payload.getValue(), payload.getDataType(), BYTE_ARRAY);
+      String fileName = partAttributes.getFileName();
+      String contentType = payload.getDataType().getMediaType().toRfcString();
+      int size = toIntExact(partAttributes.getSize());
+      if (fileName != null) {
+        return new HttpPart(name, fileName, data, contentType, size);
+      } else {
+        return new HttpPart(name, data, contentType, size);
       }
     }).collect(toList());
   }
