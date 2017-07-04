@@ -6,9 +6,6 @@
  */
 package org.mule.extension.http.internal.listener;
 
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
-import static java.util.Optional.ofNullable;
 import static org.mule.extension.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.extension.http.api.error.HttpError.BASIC_AUTHENTICATION;
 import static org.mule.extension.http.api.error.HttpError.NOT_FOUND;
@@ -18,16 +15,19 @@ import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.SECURITY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.config.ExceptionHelper.getTransportErrorMapping;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SECURITY;
-import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTP;
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Optional.ofNullable;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
