@@ -9,10 +9,13 @@ package org.mule.extension.http.internal.request;
 import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
 import static org.mule.extension.http.api.error.HttpError.CONNECTIVITY;
 import static org.mule.extension.http.api.error.HttpError.TIMEOUT;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
 import static reactor.core.publisher.Mono.from;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.error.HttpError;
+import org.mule.extension.http.api.error.HttpErrorMessageGenerator;
+import org.mule.extension.http.api.error.HttpRequestFailedException;
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.http.api.request.authentication.UsernamePasswordAuthentication;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
@@ -29,7 +32,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.api.context.notification.NotificationHelper;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.http.api.client.HttpRequestAuthentication;
@@ -62,6 +64,8 @@ public class HttpRequester {
   private final NotificationHelper notificationHelper;
   private final HttpRequestFactory eventToHttpRequest;
   private final Scheduler scheduler;
+
+  private HttpErrorMessageGenerator errorMessageGenerator = new HttpErrorMessageGenerator();
 
   public HttpRequester(HttpRequestFactory eventToHttpRequest, boolean followRedirects, HttpAuthentication authentication,
                        int responseTimeout, ResponseValidator responseValidator, HttpRequesterConfig config,
@@ -125,7 +129,11 @@ public class HttpRequester {
         checkIfRemotelyClosed(exception, client.getDefaultUriParameters());
         logger.error(getErrorMessage(httpRequest));
         HttpError error = exception instanceof TimeoutException ? TIMEOUT : CONNECTIVITY;
-        callback.error(new ModuleException(error, exception));
+        callback.error(new HttpRequestFailedException(
+                                                      createStaticMessage(errorMessageGenerator.createFrom(httpRequest,
+                                                                                                           exception
+                                                                                                               .getMessage())),
+                                                      exception, error));
       }
 
     };

@@ -91,17 +91,16 @@ public class HttpResponseFactory {
                              boolean supportsTransferEncoding)
       throws IOException {
 
-    Map<String, String> headers = listenerResponseBuilder.getHeaders();
+    MultiMap<String, String> headers = listenerResponseBuilder.getHeaders();
 
     final HttpResponseHeaderBuilder httpResponseHeaderBuilder = new HttpResponseHeaderBuilder();
 
-    headers.forEach((key, value) -> {
-      // For now, only support single headers
-      if (TRANSFER_ENCODING.equals(key) && !supportsTransferEncoding) {
+    headers.entryList().forEach(entry -> {
+      if (TRANSFER_ENCODING.equals(entry.getKey()) && !supportsTransferEncoding) {
         logger.debug(
                      "Client HTTP version is lower than 1.1 so the unsupported 'Transfer-Encoding' header has been removed and 'Content-Length' will be sent instead.");
       } else {
-        httpResponseHeaderBuilder.addHeader(key, value);
+        httpResponseHeaderBuilder.addHeader(entry.getKey(), entry.getValue());
       }
     });
 

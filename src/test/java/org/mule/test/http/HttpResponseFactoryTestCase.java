@@ -19,12 +19,11 @@ import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.internal.listener.HttpResponseFactory;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.transformation.TransformationService;
+import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.ByteArrayInputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Description;
@@ -44,7 +43,7 @@ public class HttpResponseFactoryTestCase extends AbstractMuleTestCase {
     HttpListenerResponseBuilder listenerResponseBuilder = mock(HttpListenerResponseBuilder.class);
     TypedValue<Object> payload = new TypedValue<>(new ByteArrayInputStream(EXAMPLE_STRING.getBytes(UTF_8)), INPUT_STREAM);
     when(listenerResponseBuilder.getBody()).thenReturn(payload);
-    Map<String, String> headers = new HashMap<>();
+    MultiMap<String, String> headers = new MultiMap<>();
     headers.put(CONTENT_LENGTH, WRONG_CONTENT_LENGTH);
     when(listenerResponseBuilder.getHeaders()).thenReturn(headers);
     HttpResponseFactory httpResponseBuilder = new HttpResponseFactory(AUTO, mock(TransformationService.class));

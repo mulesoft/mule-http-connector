@@ -7,9 +7,7 @@
 package org.mule.extension.http.api.policy;
 
 import org.mule.runtime.api.message.Attributes;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.mule.runtime.api.util.MultiMap;
 
 /**
  * Representation of an HTTP response message attributes that can be created through
@@ -32,7 +30,7 @@ public class HttpPolicyResponseAttributes implements Attributes {
   /**
    * Map of HTTP headers in the message. Former properties.
    */
-  private Map<String, String> headers = new HashMap<>();
+  private MultiMap<String, String> headers = new MultiMap<>();
 
   public int getStatusCode() {
     return statusCode;
@@ -50,11 +48,11 @@ public class HttpPolicyResponseAttributes implements Attributes {
     this.reasonPhrase = reasonPhrase;
   }
 
-  public Map<String, String> getHeaders() {
+  public MultiMap<String, String> getHeaders() {
     return headers;
   }
 
-  public void setHeaders(Map<String, String> headers) {
+  public void setHeaders(MultiMap<String, String> headers) {
     this.headers = headers;
   }
 
