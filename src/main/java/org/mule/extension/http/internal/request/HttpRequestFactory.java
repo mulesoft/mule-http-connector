@@ -8,22 +8,17 @@ package org.mule.extension.http.internal.request;
 
 import static org.mule.extension.http.api.error.HttpError.SECURITY;
 import static org.mule.extension.http.api.error.HttpError.TRANSFORMATION;
-import static org.mule.extension.http.internal.multipart.HttpMultipartTransformer.createFrom;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
-import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.COOKIE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
-import static org.mule.runtime.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
-import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.encodeString;
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.internal.HttpStreamingType;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
@@ -32,7 +27,6 @@ import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.runtime.http.api.domain.entity.EmptyHttpEntity;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
 import org.mule.runtime.http.api.domain.entity.InputStreamHttpEntity;
-import org.mule.runtime.http.api.domain.entity.multipart.MultipartHttpEntity;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
 
@@ -59,7 +53,6 @@ public class HttpRequestFactory {
 
   private static final Logger logger = LoggerFactory.getLogger(HttpRequestFactory.class);
   public static final List<String> DEFAULT_EMPTY_BODY_METHODS = Lists.newArrayList("GET", "HEAD", "OPTIONS");
-  private static final String APPLICATION_JAVA = "application/java";
 
   private final String uri;
   private final String method;
@@ -122,7 +115,7 @@ public class HttpRequestFactory {
     }
 
     try {
-      builder.setEntity(createRequestEntity(builder, this.method, muleContext, requestBuilder.getBody().getValue(), mediaType));
+      builder.setEntity(createRequestEntity(builder, this.method, requestBuilder.getBody().getValue()));
     } catch (Exception e) {
       throw new ModuleException(TRANSFORMATION, e);
     }
@@ -138,14 +131,13 @@ public class HttpRequestFactory {
     return builder.build();
   }
 
-  private HttpEntity createRequestEntity(HttpRequestBuilder requestBuilder, String resolvedMethod,
-                                         MuleContext muleContext, Object body, MediaType mediaType) {
+  private HttpEntity createRequestEntity(HttpRequestBuilder requestBuilder, String resolvedMethod, Object body) {
     HttpEntity entity;
 
     if (isEmptyBody(body, resolvedMethod)) {
       entity = new EmptyHttpEntity();
     } else {
-      entity = createRequestEntityFromPayload(requestBuilder, body, muleContext, mediaType);
+      entity = createRequestEntityFromPayload(requestBuilder, body);
     }
 
     return entity;
@@ -168,11 +160,7 @@ public class HttpRequestFactory {
     return emptyBody;
   }
 
-  private HttpEntity createRequestEntityFromPayload(HttpRequestBuilder requestBuilder, Object payload, MuleContext muleContext,
-                                                    MediaType mediaType) {
-    if (payload instanceof MultiPartPayload) {
-      return new MultipartHttpEntity(createFrom((MultiPartPayload) payload, transformationService));
-    }
+  private HttpEntity createRequestEntityFromPayload(HttpRequestBuilder requestBuilder, Object payload) {
 
     if (doStreaming(requestBuilder, payload)) {
 
@@ -183,18 +171,6 @@ public class HttpRequestFactory {
       }
 
     } else {
-      Optional<String> contentType = requestBuilder.getHeaderValue(CONTENT_TYPE);
-
-      if (!contentType.isPresent() || contentType.get().startsWith(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())
-          || contentType.get().startsWith(APPLICATION_JAVA)) {
-        if (payload instanceof Map) {
-          String body = encodeString((Map) payload, mediaType.getCharset()
-              .orElse(getDefaultEncoding(muleContext)));
-          requestBuilder.addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED.toRfcString());
-          return new ByteArrayHttpEntity(body.getBytes());
-        }
-      }
-
       return new ByteArrayHttpEntity(getMessageAsBytes(payload));
     }
   }
