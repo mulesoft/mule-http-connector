@@ -26,7 +26,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.transformation.TransformationService;
-import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
@@ -96,8 +95,8 @@ public class HttpRequestFactory {
 
     builder.setUri(this.uri);
     builder.setMethod(this.method);
-    builder.setHeaders(toMultiMap(requestBuilder.getHeaders()));
-    builder.setQueryParams(toMultiMap(requestBuilder.getQueryParams()));
+    builder.setHeaders(requestBuilder.getHeaders());
+    builder.setQueryParams(requestBuilder.getQueryParams());
 
     MediaType mediaType = requestBuilder.getBody().getDataType().getMediaType();
     if (!builder.getHeaderValue(CONTENT_TYPE).isPresent()) {
@@ -137,12 +136,6 @@ public class HttpRequestFactory {
     }
 
     return builder.build();
-  }
-
-  private MultiMap<String, String> toMultiMap(Map<String, String> map) {
-    MultiMap<String, String> multiMap = new MultiMap<>();
-    map.forEach(multiMap::put);
-    return multiMap;
   }
 
   private HttpEntity createRequestEntity(HttpRequestBuilder requestBuilder, String resolvedMethod,

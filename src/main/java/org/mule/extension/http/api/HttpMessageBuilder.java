@@ -7,8 +7,7 @@
 package org.mule.extension.http.api;
 
 import org.mule.runtime.api.metadata.TypedValue;
-
-import java.util.Map;
+import org.mule.runtime.api.util.MultiMap;
 
 /**
  * Base component to create HTTP messages.
@@ -17,9 +16,9 @@ import java.util.Map;
  */
 public abstract class HttpMessageBuilder {
 
-  public abstract Map<String, String> getHeaders();
+  public abstract MultiMap<String, String> getHeaders();
 
-  public abstract void setHeaders(Map<String, String> headers);
+  public abstract void setHeaders(MultiMap<String, String> headers);
 
   public abstract TypedValue<Object> getBody();
 

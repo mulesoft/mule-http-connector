@@ -7,15 +7,12 @@
 package org.mule.extension.http.api.listener.builder;
 
 import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSES;
-
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Implementation of {@link HttpListenerResponseBuilder} which returns success responses
@@ -39,7 +36,7 @@ public class HttpListenerSuccessResponseBuilder extends HttpListenerResponseBuil
   @Optional
   @Content
   @Placement(tab = RESPONSES, order = 2)
-  protected Map<String, String> headers = new HashMap<>();
+  protected MultiMap<String, String> headers = new MultiMap<>();
 
   /**
    * HTTP status code the response should have.
@@ -84,12 +81,12 @@ public class HttpListenerSuccessResponseBuilder extends HttpListenerResponseBuil
   }
 
   @Override
-  public Map<String, String> getHeaders() {
-    return headers;
+  public MultiMap<String, String> getHeaders() {
+    return headers.toImmutableMultiMap();
   }
 
   @Override
-  public void setHeaders(Map<String, String> headers) {
+  public void setHeaders(MultiMap<String, String> headers) {
     this.headers = headers;
   }
 

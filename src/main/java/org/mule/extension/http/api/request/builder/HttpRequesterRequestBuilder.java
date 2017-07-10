@@ -9,6 +9,7 @@ package org.mule.extension.http.api.request.builder;
 import static java.util.Collections.unmodifiableMap;
 import org.mule.extension.http.api.HttpMessageBuilder;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -37,7 +38,7 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
   @Parameter
   @Optional
   @Content
-  protected Map<String, String> headers = new HashMap<>();
+  protected MultiMap<String, String> headers = new MultiMap<>();
 
   /**
    * URI parameters that should be used to create the request.
@@ -55,7 +56,7 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
   @Optional
   @Content
   @DisplayName("Query Parameters")
-  private Map<String, String> queryParams = new HashMap<>();
+  private MultiMap<String, String> queryParams = new MultiMap<>();
 
   @Override
   public TypedValue<Object> getBody() {
@@ -68,16 +69,15 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
   }
 
   @Override
-  public Map<String, String> getHeaders() {
-    return headers;
+  public MultiMap<String, String> getHeaders() {
+    return headers.toImmutableMultiMap();
   }
 
   @Override
-  public void setHeaders(Map<String, String> headers) {
+  public void setHeaders(MultiMap<String, String> headers) {
     this.headers = headers;
   }
 
-  // For now, only handle single params
   public String replaceUriParams(String path) {
     for (String uriParamName : uriParams.keySet()) {
       String uriParamValue = uriParams.get(uriParamName);
@@ -91,15 +91,15 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
     return path;
   }
 
-  public Map<String, String> getQueryParams() {
-    return unmodifiableMap(queryParams);
+  public MultiMap<String, String> getQueryParams() {
+    return queryParams.toImmutableMultiMap();
   }
 
   public Map<String, String> getUriParams() {
     return unmodifiableMap(uriParams);
   }
 
-  public void setQueryParams(Map<String, String> queryParams) {
+  public void setQueryParams(MultiMap<String, String> queryParams) {
     this.queryParams = queryParams;
   }
 
