@@ -42,19 +42,16 @@ public class HttpErrorMessageGenerator {
   public String createFrom(HttpRequest request, int statusCode) {
     StringBuilder stringBuilder = getBaseMessage(request);
     Optional<HttpError> httpError = getErrorByCode(statusCode);
-    if (httpError.isPresent()) {
-      stringBuilder.append(": ").append(httpError.get().getErrorMessage(request)).append(" (").append(statusCode).append(")");
-    } else {
-      stringBuilder.append(" with status code ").append(statusCode);
-    }
-    stringBuilder.append(".");
+    stringBuilder.append(httpError.map(error -> ": " + error.getErrorMessage(request) + " (" + statusCode + ")")
+        .orElse(" with status code " + statusCode)).append(".");
 
     return stringBuilder.toString();
   }
 
   private StringBuilder getBaseMessage(HttpRequest request) {
     StringBuilder stringBuilder = new StringBuilder();
-    stringBuilder.append("HTTP ").append(request.getMethod()).append(" on resource ").append(request.getUri()).append(" failed");
+    stringBuilder.append("HTTP ").append(request.getMethod()).append(" on resource '").append(request.getUri())
+        .append("' failed");
     return stringBuilder;
   }
 
