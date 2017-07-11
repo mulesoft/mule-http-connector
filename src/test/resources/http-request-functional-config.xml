@@ -7,11 +7,11 @@
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <http:request-config name="requestConfig" basePath="basePath">
-        <http:request-connection host="localhost"/>
+        <http:request-connection host="localhost" port="${httpPort}"/>
     </http:request-config>
 
     <http:request-config name="requestConfigHttp">
-        <http:request-connection host="localhost" responseBufferSize="${bufferSize}" connectionIdleTimeout="${idleTimeout}" maxConnections="${maxConnections}" />
+        <http:request-connection host="localhost"/>
     </http:request-config>
 
     <http:request-config name="requestConfigHttps">
@@ -20,6 +20,43 @@
 
     <flow name="requestFlow">
         <http:request config-ref="requestConfig" method="POST" path="requestPath"/>
+        <object-to-string-transformer />
+    </flow>
+
+    <flow name="requestPropertiesFlow">
+        <http:request config-ref="requestConfig" method="POST" path="request/{param1}/{param2}">
+            <http:headers>
+                #[{'X-Custom-Int' : 5, 'X-Custom-String' : '6'}]
+            </http:headers>
+            <http:uri-params>
+                #[{'param1' : 1, 'param2' : '2'}]
+            </http:uri-params>
+            <http:query-params>
+                #[{'query1' : 4, 'query2' : '5'}]
+            </http:query-params>
+        </http:request>
+        <object-to-string-transformer />
+    </flow>
+
+    <!-- MULE-8956 -->
+    <http:request-config name="blockingRequestConfig" basePath="basePath">
+        <http:request-connection host="localhost" port="${blockingHttpPort}"/>
+    </http:request-config>
+    <http:listener-config name="blockingListenerConfig" basePath="basePath">
+        <http:listener-connection host="localhost" port="${blockingHttpPort}"/>
+    </http:listener-config>
+
+    <flow name="blockingRequestFlow">
+        <flow-ref name="blockingRequest"/>
+    </flow>
+    <flow name="remote">
+        <http:listener config-ref="blockingListenerConfig" path="/remote" allowedMethods="GET"/>
+        <set-payload value="#[output application/xml --- { root: {node: 'value'} } ]"/>
+    </flow>
+    <flow name="blockingRequest">
+        <http:request config-ref="blockingRequestConfig" path="remote" method="GET"/>
+        <set-payload value="#[output application/java --- payload.root.node]"/>
+        <object-to-string-transformer />
     </flow>
 
 </mule>

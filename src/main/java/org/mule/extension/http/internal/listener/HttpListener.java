@@ -107,7 +107,6 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   private static final String SERVER_PROBLEM = "Server encountered a problem";
   private static final String RESPONSE_CONTEXT = "responseContext";
   private static final String RESPONSE_CONTEXT_NOT_FOUND = "Response Context is not present. Could not send response.";
-  private static final HttpListenerErrorResponseBuilder NULL_ERROR_RESPONSE = new HttpListenerErrorResponseBuilder();
 
   @Inject
   private TransformationService transformationService;
@@ -186,7 +185,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   public void onTerminate(SourceResult sourceResult) {
     sourceResult
         .getInvocationError()
-        .ifPresent(error -> sendErrorResponse(NULL_ERROR_RESPONSE,
+        .ifPresent(error -> sendErrorResponse(new HttpListenerErrorResponseBuilder(),
                                               sourceResult.getSourceCallbackContext(),
                                               error,
                                               null));

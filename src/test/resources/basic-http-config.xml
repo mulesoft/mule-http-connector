@@ -6,7 +6,7 @@
       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
     
     <http:request-config name="reqConfig">
-        <http:request-connection host="localhost" protocol="HTTP" port="${clientPort}"/>
+        <http:request-connection host="localhost" protocol="HTTP" port="${httpPort}"/>
     </http:request-config>
     
     <http:listener-config name="lisConfig">
@@ -36,7 +36,7 @@
                 <http:headers>#[{'Name':'Value'}]</http:headers>
             </http:error-response>
         </http:listener>
-        <custom-processor class="org.mule.test.http.BasicHttpTestCase$RequestCheckerMessageProcessor"/>
+        <custom-processor class="org.mule.test.http.functional.BasicHttpTestCase$RequestCheckerMessageProcessor"/>
         <set-payload value="HEY"/>
     </flow>
 

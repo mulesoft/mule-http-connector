@@ -25,6 +25,11 @@ public interface AllureConstants {
       String RESPONSE_BUILDER = "Response Builder";
       String STREAMING = "Streaming";
       String TCP_BUILDER = "TCP Builders";
+      String URL_ENCODED = "URL Encoded";
+      String MULTIPART = "Multipart";
+      String HTTPS = "HTTPS";
+      String PROXY = "Proxy";
+      String NTLM = "NTLM";
     }
 
   }
