@@ -2,13 +2,11 @@
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
-      xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-               http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <http:listener-config name="listenerConfig">
         <http:listener-connection host="localhost" port="${port}"/>
@@ -136,7 +134,7 @@
             <http:response statusCode="202"/>
             <http:error-response statusCode="505"/>
         </http:listener>
-        <validation:is-null value="#[attributes.headers['fail']]"/>
+        <custom-processor class="org.mule.test.http.functional.listener.HttpListenerResponseBuildersTestCase.HeaderCheckerProcessor"/>
     </flow>
 
 </mule>

@@ -18,6 +18,11 @@ import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.functional.matcher.HttpResponseContentStringMatcher.body;
 import static org.mule.test.http.functional.matcher.HttpResponseReasonPhraseMatcher.hasReasonPhrase;
 
+import org.mule.extension.http.api.HttpRequestAttributes;
+import org.mule.functional.api.exception.FunctionalTestException;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.http.api.HttpHeaders;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -38,7 +43,7 @@ import org.junit.Test;
 import ru.yandex.qatools.allure.annotations.Features;
 
 @Features(HTTP_EXTENSION)
-public class HttpListenerSuccessResponseBuilderTestCase extends AbstractHttpTestCase {
+public class HttpListenerResponseBuildersTestCase extends AbstractHttpTestCase {
 
   private static final String FAIL = "fail";
   public static final int TIMEOUT = 100000;
@@ -238,5 +243,17 @@ public class HttpListenerSuccessResponseBuilderTestCase extends AbstractHttpTest
         return true;
       }
     });
+  }
+
+  private static class HeaderCheckerProcessor implements Processor {
+
+    @Override
+    public Event process(Event event) throws MuleException {
+      if (((HttpRequestAttributes) event.getMessage().getAttributes().getValue()).getHeaders().get(FAIL) == null) {
+        return event;
+      } else {
+        throw new FunctionalTestException("Missing header.");
+      }
+    }
   }
 }
