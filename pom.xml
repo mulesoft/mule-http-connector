@@ -202,13 +202,6 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-validation-module</artifactId>
-            <version>${validationsConnectorVersion}</version>
-            <classifier>mule-plugin</classifier>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <distributionManagement>
