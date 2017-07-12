@@ -15,7 +15,7 @@ import org.mule.test.http.functional.AbstractHttpTestCase;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_DISABLE_RESPONSE_TIMEOUT;
 
 public class HttpListenerDisableTimeoutsConfigTestCase extends AbstractHttpTestCase {
 
@@ -23,7 +23,7 @@ public class HttpListenerDisableTimeoutsConfigTestCase extends AbstractHttpTestC
   public DynamicPort port = new DynamicPort("port");
 
   @Rule
-  public SystemProperty disableTimeouts = new SystemProperty(SYSTEM_PROPERTY_PREFIX + "timeout.disable", "true");
+  public SystemProperty disableTimeouts = new SystemProperty(MULE_DISABLE_RESPONSE_TIMEOUT, "true");
 
   @Override
   protected String getConfigFile() {
