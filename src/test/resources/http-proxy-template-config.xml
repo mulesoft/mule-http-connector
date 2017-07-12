@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.mulesoft.org/schema/mule/spring"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+               http://www.mulesoft.org/schema/mule/spring http://www.mulesoft.org/schema/mule/spring/current/mule-spring.xsd
+               http://www.mulesoft.org/schema/mule/test  http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
+
+    <spring:config name="springConfig" files="sensing-request-response-processor-bean.xml"/>
+
+    <http:listener-config name="proxyConfig">
+        <http:listener-connection host="localhost" port="${proxyPort}"/>
+    </http:listener-config>
+
+    <http:request-config name="requestConfig">
+        <http:request-connection host="localhost" port="${httpPort}"/>
+    </http:request-config>
+
+    <flow name="proxyTemplate">
+        <http:listener config-ref="proxyConfig" path="/*" responseStreamingMode="AUTO">
+            <http:response statusCode="#[attributes.statusCode]" reasonPhrase="#[attributes.reasonPhrase]" >
+                <http:headers>#[attributes.headers]</http:headers>
+            </http:response>
+        </http:listener>
+
+        <processor ref="sensingRequestResponseProcessor" />
+        <test:assert-intercepting responseSameTask="false"/>
+
+        <http:request config-ref="requestConfig" method="#[attributes.method]" path="#[attributes.requestPath]">
+            <http:headers>#[attributes.headers ++ {'X-Forwarded-For':attributes.remoteAddress}]</http:headers>
+            <http:query-params>#[attributes.queryParams]</http:query-params>
+        </http:request>
+
+    </flow>
+
+</mule>
