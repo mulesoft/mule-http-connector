@@ -6,6 +6,8 @@
  */
 package org.mule.test.http.functional.listener;
 
+import static java.lang.String.format;
+import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -14,6 +16,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.METHOD_NOT_ALLOWED;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.NOT_FOUND;
 import static org.mule.runtime.http.api.HttpConstants.Method.GET;
+import static org.mule.service.http.impl.service.server.NoListenerRequestHandler.NO_LISTENER_ENTITY_FORMAT;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.http.api.HttpConstants.HttpStatus;
@@ -24,6 +27,7 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 import org.mule.test.http.functional.matcher.HttpResponseReasonPhraseMatcher;
 import org.mule.test.http.functional.matcher.HttpResponseStatusCodeMatcher;
+import org.mule.test.http.utils.SocketRequester;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -69,48 +73,59 @@ public class HttpListenerConfigFunctionalTestCase extends AbstractHttpTestCase {
 
   @Test
   public void emptyConfig() throws Exception {
-    final String url = String.format("http://localhost:%s/%s", emptyConfigPort.getNumber(), path.getValue());
+    final String url = format("http://localhost:%s/%s", emptyConfigPort.getNumber(), path.getValue());
     callAndAssertStatus(url, SC_OK);
   }
 
   @Test
   public void fullConfig() throws Exception {
     final String url =
-        String.format("http://localhost:%s/%s/%s", fullConfigPort.getNumber(), basePath.getValue(), path.getValue());
+        format("http://localhost:%s/%s/%s", fullConfigPort.getNumber(), basePath.getValue(), path.getValue());
     callAndAssertStatus(url, SC_OK);
   }
 
   @Test
   public void fullConfigWrongPath() throws Exception {
     final String url =
-        String.format("http://localhost:%s/%s/%s", fullConfigPort.getNumber(), basePath.getValue(), path.getValue() + "2");
+        format("http://localhost:%s/%s/%s", fullConfigPort.getNumber(), basePath.getValue(), path.getValue() + "2");
     callAndAssertStatus(url, SC_NOT_FOUND);
   }
 
   @Test
   public void listenerConfigOverridesListenerConfig() throws Exception {
-    final String url = String.format("http://%s:%s/%s/%s", nonLocalhostIp.getValue(), fullConfigPort.getNumber(),
-                                     basePath.getValue(), path.getValue());
+    final String url = format("http://%s:%s/%s/%s", nonLocalhostIp.getValue(), fullConfigPort.getNumber(),
+                              basePath.getValue(), path.getValue());
     callAndAssertStatus(url, SC_OK);
   }
 
   @Test
   public void noListenerConfig() throws Exception {
-    final String url = String.format("http://localhost:%s/noListener", noListenerConfigPort.getNumber());
+    final String url = format("http://localhost:%s/noListener", noListenerConfigPort.getNumber());
     final HttpResponse httpResponse = callAndAssertStatus(url, NOT_FOUND);
-    assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), containsString("No listener for endpoint"));
+    assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(format(NO_LISTENER_ENTITY_FORMAT, "/noListener")));
+  }
+
+  @Test
+  public void noListenerConfigWithSpecialCharacters() throws Exception {
+    String invalidPathWithSpecialCharacters = "/<script></script>";
+    SocketRequester socketRequester = new SocketRequester("localhost", noListenerConfigPort.getNumber());
+    socketRequester.initialize();
+    socketRequester.doRequest("GET " + invalidPathWithSpecialCharacters + " HTTP/1.1");
+    assertThat(socketRequester.getResponse(),
+               containsString(format(NO_LISTENER_ENTITY_FORMAT, escapeHtml4(invalidPathWithSpecialCharacters))));
+    socketRequester.finalizeGracefully();
   }
 
   @Test
   public void fullConfigWrongMethod() throws Exception {
-    final String url = String.format("http://localhost:%s/%s/%s", fullConfigPort.getNumber(), basePath.getValue(), "post");
+    final String url = format("http://localhost:%s/%s/%s", fullConfigPort.getNumber(), basePath.getValue(), "post");
     final HttpResponse httpResponse = callAndAssertStatus(url, METHOD_NOT_ALLOWED);
     assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), containsString("Method not allowed for endpoint"));
   }
 
   @Test
   public void useSlashInPathAndBasePath() throws Exception {
-    String baseUrl = String.format("http://localhost:%s/", slashConfigPort.getNumber());
+    String baseUrl = format("http://localhost:%s/", slashConfigPort.getNumber());
     assertThat(callAndAssertStatusWithMuleClient(baseUrl + "/", SC_OK), is("1"));
     assertThat(callAndAssertStatusWithMuleClient(baseUrl + "//", SC_OK), is("2"));
     assertThat(callAndAssertStatusWithMuleClient(baseUrl + "///", SC_OK), is("3"));
