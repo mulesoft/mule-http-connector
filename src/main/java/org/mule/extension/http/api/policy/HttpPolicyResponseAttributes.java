@@ -6,8 +6,9 @@
  */
 package org.mule.extension.http.api.policy;
 
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.util.MultiMap;
+
+import java.io.Serializable;
 
 /**
  * Representation of an HTTP response message attributes that can be created through
@@ -16,7 +17,7 @@ import org.mule.runtime.api.util.MultiMap;
  *
  * @since 1.0
  */
-public class HttpPolicyResponseAttributes implements Attributes {
+public class HttpPolicyResponseAttributes implements Serializable {
 
   /**
    * HTTP status code of the response. Former 'http.status'.

@@ -19,7 +19,6 @@ import org.mule.extension.http.api.policy.HttpListenerPolicyPointcutParameters;
 import org.mule.extension.http.api.policy.HttpListenerPolicyPointcutParametersFactory;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -37,7 +36,7 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
   private final HttpListenerPolicyPointcutParametersFactory factory = new HttpListenerPolicyPointcutParametersFactory();
   private final ComponentLocation componentLocation = mock(ComponentLocation.class);
   private final HttpRequestAttributes httpAttributes = mock(HttpRequestAttributes.class);
-  private final TypedValue attributes = new TypedValue(mock(Attributes.class), OBJECT);
+  private final TypedValue attributes = new TypedValue(mock(Object.class), OBJECT);
 
   @Test
   public void supportsHttpListener() {
