@@ -6,15 +6,19 @@
  */
 package org.mule.extension.http.api;
 
-import org.mule.runtime.core.api.message.BaseAttributes;
+import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 import org.mule.runtime.api.util.MultiMap;
+
+import java.io.Serializable;
+
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 /**
  * Base representation of HTTP message attributes.
  *
  * @since 1.0
  */
-public abstract class HttpAttributes extends BaseAttributes {
+public abstract class HttpAttributes implements Serializable {
 
   /**
    * Map of HTTP headers in the message. Former properties.
@@ -27,5 +31,10 @@ public abstract class HttpAttributes extends BaseAttributes {
 
   public MultiMap<String, String> getHeaders() {
     return headers;
+  }
+
+  @Override
+  public String toString() {
+    return ReflectionToStringBuilder.toString(this, SHORT_PREFIX_STYLE);
   }
 }
