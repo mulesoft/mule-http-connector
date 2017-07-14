@@ -33,7 +33,6 @@ import static org.mule.test.http.functional.matcher.HttpResponseReasonPhraseMatc
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.functional.junit4.rules.HttpServerRule;
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
@@ -71,7 +70,7 @@ public class HttpListenerErrorInterpretationTestCase extends AbstractHttpTestCas
   private static final String OOPS = "Oops";
   private static final String ERROR = "Error";
   private static ErrorType errorToThrow;
-  private static Attributes attributesToSend;
+  private static Object attributesToSend;
 
   private ErrorTypeRepository errorTypeRepository;
 
