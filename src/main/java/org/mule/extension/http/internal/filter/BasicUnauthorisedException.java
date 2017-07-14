@@ -11,8 +11,6 @@ import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.security.UnauthorisedException;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.security.SecurityFilter;
 
 public class BasicUnauthorisedException extends UnauthorisedException implements ErrorMessageAwareException {
 
@@ -26,11 +24,6 @@ public class BasicUnauthorisedException extends UnauthorisedException implements
   public BasicUnauthorisedException(I18nMessage message, Throwable cause, Message errorMessage) {
     super(message, cause);
     this.errorMessage = errorMessage;
-  }
-
-  public BasicUnauthorisedException(Event event, SecurityContext context, SecurityFilter filter) {
-    super(context, filter.getClass().getName(), event.getContext().getOriginatingConnectorName());
-    this.errorMessage = event.getMessage();
   }
 
   public BasicUnauthorisedException(SecurityContext context, String filter, String connector, Message errorMessage) {
