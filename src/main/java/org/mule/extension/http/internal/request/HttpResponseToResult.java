@@ -69,7 +69,7 @@ public class HttpResponseToResult {
     HttpEntity entity = response.getEntity();
     Charset encoding = responseMediaType.getCharset().get();
 
-    Mono<?> payload = just(entity.getContent());
+    Mono<InputStream> payload = just(entity.getContent());
 
     if (config.isEnableCookies()) {
       processCookies(response, uri);

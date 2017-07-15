@@ -39,6 +39,7 @@ import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.http.api.server.HttpServer;
 import org.mule.runtime.http.api.server.HttpServerConfiguration;
 import org.mule.runtime.http.api.server.ServerAddress;
+import org.mule.runtime.http.api.server.ServerCreationException;
 
 import java.io.IOException;
 
@@ -180,7 +181,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
 
     try {
       server = httpService.getServerFactory().create(serverConfiguration);
-    } catch (ConnectionException e) {
+    } catch (ServerCreationException e) {
       throw new InitialisationException(createStaticMessage("Could not create HTTP server"), this);
     }
   }
