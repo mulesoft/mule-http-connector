@@ -18,12 +18,12 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.runners.Parameterized;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @RunnerDelegateTo(Parameterized.class)
-@Features(HTTP_EXTENSION)
-@Stories({NTLM})
+@Feature(HTTP_EXTENSION)
+@Story(NTLM)
 public class HttpRequestNtlmAuthTestCase extends AbstractNtlmTestCase {
 
   @Parameterized.Parameter(0)

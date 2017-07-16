@@ -14,11 +14,11 @@ import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.junit.Rule;
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(HTTP_EXTENSION)
-@Stories(STREAMING)
+@Feature(HTTP_EXTENSION)
+@Story(STREAMING)
 public class HttpRequestResponseNoStreamingTestCase extends AbstractHttpRequestResponseStreamingTestCase {
 
   @Rule

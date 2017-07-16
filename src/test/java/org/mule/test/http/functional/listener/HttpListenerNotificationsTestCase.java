@@ -27,9 +27,9 @@ import java.util.concurrent.TimeUnit;
 import org.apache.http.client.fluent.Request;
 import org.junit.Rule;
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Features;
+import io.qameta.allure.Feature;
 
-@Features(HTTP_EXTENSION)
+@Feature(HTTP_EXTENSION)
 public class HttpListenerNotificationsTestCase extends AbstractHttpTestCase {
 
   @Rule

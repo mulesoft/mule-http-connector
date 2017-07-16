@@ -9,11 +9,11 @@ package org.mule.test.http.functional;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.HTTPS;
 
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(HTTP_EXTENSION)
-@Stories(HTTPS)
+@Feature(HTTP_EXTENSION)
+@Story(HTTPS)
 public class HttpRequesterTlsRestrictedProtocolsAndCiphersTestCase
     extends AbstractClientTlsRestrictedTlsProtocolsAndCiphersTestCase {
 

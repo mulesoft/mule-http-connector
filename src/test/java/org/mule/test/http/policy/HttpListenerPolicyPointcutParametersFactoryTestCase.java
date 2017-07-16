@@ -23,9 +23,9 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Features;
+import io.qameta.allure.Feature;
 
-@Features(HTTP_EXTENSION)
+@Feature(HTTP_EXTENSION)
 public class HttpListenerPolicyPointcutParametersFactoryTestCase extends AbstractMuleTestCase {
 
   private static final ComponentIdentifier HTTP_LISTENER_COMPONENT_IDENTIFIER =

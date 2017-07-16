@@ -22,9 +22,9 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Features;
+import io.qameta.allure.Feature;
 
-@Features(HTTP_EXTENSION)
+@Feature(HTTP_EXTENSION)
 public class HttpRequestCookiesTestCase extends AbstractHttpRequestTestCase {
 
   private static final String COOKIE_ROOT_PATH_LOCAL_DOMAIN = "cookieRootPathLocalDomain";

@@ -31,9 +31,9 @@ import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.StringEntity;
 import org.junit.Rule;
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Features;
+import io.qameta.allure.Feature;
 
-@Features(HTTP_EXTENSION)
+@Feature(HTTP_EXTENSION)
 public class HttpListenerContentTypeTestCase extends AbstractHttpTestCase {
 
   private static final String EXPECTED_CONTENT_TYPE = "application/json; charset=UTF-8";

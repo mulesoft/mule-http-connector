@@ -16,11 +16,11 @@ import org.mule.runtime.core.api.util.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Response;
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(HTTP_EXTENSION)
-@Stories(ERROR_HANDLING)
+@Feature(HTTP_EXTENSION)
+@Story(ERROR_HANDLING)
 public class HttpListenerErrorHandlingTestCase extends AbstractHttpListenerErrorHandlingTestCase {
 
   @Override

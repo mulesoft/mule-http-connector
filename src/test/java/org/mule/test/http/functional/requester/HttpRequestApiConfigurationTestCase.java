@@ -16,9 +16,9 @@ import org.mule.test.http.functional.AbstractHttpTestCase;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Features;
+import io.qameta.allure.Feature;
 
-@Features(HTTP_EXTENSION)
+@Feature(HTTP_EXTENSION)
 @Ignore("MULE-9782: Add RAML metadata support to HTTP extension.")
 public class HttpRequestApiConfigurationTestCase extends AbstractHttpTestCase {
 

@@ -26,12 +26,12 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import java.io.ByteArrayInputStream;
 
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Description;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(HTTP_EXTENSION)
-@Stories("Issues")
+@Feature(HTTP_EXTENSION)
+@Story("Issues")
 public class HttpResponseFactoryTestCase extends AbstractMuleTestCase {
 
   private static final String EXAMPLE_STRING = "exampleString";

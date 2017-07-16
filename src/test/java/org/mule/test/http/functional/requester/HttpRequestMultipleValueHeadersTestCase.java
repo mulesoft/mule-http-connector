@@ -28,12 +28,12 @@ import java.util.List;
 
 import org.junit.Rule;
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Description;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(HTTP_EXTENSION)
-@Stories(MULTI_MAP)
+@Feature(HTTP_EXTENSION)
+@Story(MULTI_MAP)
 public class HttpRequestMultipleValueHeadersTestCase extends AbstractHttpRequestTestCase {
 
   @Rule

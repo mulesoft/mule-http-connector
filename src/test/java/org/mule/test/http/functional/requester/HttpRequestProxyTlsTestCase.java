@@ -29,11 +29,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-import ru.yandex.qatools.allure.annotations.Features;
+import io.qameta.allure.Feature;
 
 
 @RunnerDelegateTo(Parameterized.class)
-@Features(HTTP_EXTENSION)
+@Feature(HTTP_EXTENSION)
 public class HttpRequestProxyTlsTestCase extends AbstractHttpTestCase {
 
   private static final String OK_RESPONSE = "OK";

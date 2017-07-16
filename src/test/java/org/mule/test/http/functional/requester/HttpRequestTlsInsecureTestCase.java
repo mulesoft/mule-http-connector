@@ -27,7 +27,7 @@ import java.util.Collection;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
-import ru.yandex.qatools.allure.annotations.Features;
+import io.qameta.allure.Feature;
 
 /**
  * Sets up two HTTPS clients using a regular trust-store, but one of them insecure. Then two HTTPS servers: one will return a
@@ -35,7 +35,7 @@ import ru.yandex.qatools.allure.annotations.Features;
  * trust-store. Verifies that only the insecure client is successful.
  */
 @RunnerDelegateTo(Parameterized.class)
-@Features(HTTP_EXTENSION)
+@Feature(HTTP_EXTENSION)
 public class HttpRequestTlsInsecureTestCase extends AbstractHttpTestCase {
 
   @Parameterized.Parameter

@@ -26,9 +26,9 @@ import org.mule.test.http.functional.AbstractHttpTestCase;
 
 import org.junit.Rule;
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Features;
+import io.qameta.allure.Feature;
 
-@Features(HTTP_EXTENSION)
+@Feature(HTTP_EXTENSION)
 public class HttpRequestConfigTestCase extends AbstractHttpTestCase {
 
   private static final String DEFAULT_HTTP_REQUEST_CONFIG_NAME = "requestConfig";

@@ -37,9 +37,9 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.slf4j.Logger;
-import ru.yandex.qatools.allure.annotations.Features;
+import io.qameta.allure.Feature;
 
-@Features(HTTP_EXTENSION)
+@Feature(HTTP_EXTENSION)
 @RunnerDelegateTo(Parameterized.class)
 public class HttpRequestProxyConfigTestCase extends MuleArtifactFunctionalTestCase {
 

@@ -10,9 +10,9 @@ import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
 import org.apache.http.HttpVersion;
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Features;
+import io.qameta.allure.Feature;
 
-@Features(HTTP_EXTENSION)
+@Feature(HTTP_EXTENSION)
 public class HttpListenerResponseStreaming11TestCase extends HttpListenerResponseStreamingTestCase {
 
   @Override

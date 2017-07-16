@@ -22,11 +22,11 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(HTTP_EXTENSION)
-@Stories(URL_ENCODED)
+@Feature(HTTP_EXTENSION)
+@Story(URL_ENCODED)
 public class HttpRequestUrlEncodedTestCase extends AbstractHttpRequestTestCase {
 
   private static final String URL_ENCODED_STRING = "testName1=testValue1&testName2=testValue2";

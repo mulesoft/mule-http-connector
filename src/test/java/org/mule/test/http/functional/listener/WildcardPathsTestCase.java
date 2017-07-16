@@ -24,10 +24,10 @@ import org.apache.http.client.fluent.Response;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
-import ru.yandex.qatools.allure.annotations.Features;
+import io.qameta.allure.Feature;
 
 @RunnerDelegateTo(Parameterized.class)
-@Features(HTTP_EXTENSION)
+@Feature(HTTP_EXTENSION)
 public class WildcardPathsTestCase extends AbstractHttpTestCase {
 
   private static final String response1 = "V1 Flow invoked";

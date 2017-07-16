@@ -14,18 +14,20 @@ import static org.mule.functional.junit4.matchers.ThatMatcher.that;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.ERROR_HANDLING;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.ERROR_MAPPINGS;
+
+import io.qameta.allure.Stories;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Description;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(HTTP_EXTENSION)
-@Stories({ERROR_HANDLING, ERROR_MAPPINGS})
+@Feature(HTTP_EXTENSION)
+@Stories({@Story(ERROR_HANDLING), @Story(ERROR_MAPPINGS)})
 public class HttpRequestErrorMappingsTestCase extends AbstractHttpTestCase {
 
   private static final String CONNECT_ERROR_MESSAGE = "Could not connect.";

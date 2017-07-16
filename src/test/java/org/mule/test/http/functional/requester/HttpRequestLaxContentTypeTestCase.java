@@ -20,9 +20,9 @@ import org.mule.test.http.functional.AbstractHttpTestCase;
 
 import org.junit.Rule;
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Features;
+import io.qameta.allure.Feature;
 
-@Features(HTTP_EXTENSION)
+@Feature(HTTP_EXTENSION)
 public class HttpRequestLaxContentTypeTestCase extends AbstractHttpTestCase {
 
   @Rule

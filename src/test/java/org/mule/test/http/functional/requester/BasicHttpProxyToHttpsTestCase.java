@@ -27,9 +27,9 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Features;
+import io.qameta.allure.Feature;
 
-@Features(HTTP_EXTENSION)
+@Feature(HTTP_EXTENSION)
 public class BasicHttpProxyToHttpsTestCase extends AbstractHttpRequestTestCase {
 
   private static final String AUTHORIZED = "Authorized";
