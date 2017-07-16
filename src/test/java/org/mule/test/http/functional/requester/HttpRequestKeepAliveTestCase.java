@@ -21,9 +21,9 @@ import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.api.util.MultiMap;
 
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Features;
+import io.qameta.allure.Feature;
 
-@Features(HTTP_EXTENSION)
+@Feature(HTTP_EXTENSION)
 public class HttpRequestKeepAliveTestCase extends AbstractHttpRequestTestCase {
 
   @Override

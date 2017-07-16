@@ -21,13 +21,13 @@ import java.io.IOException;
 
 import org.junit.Rule;
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Features;
+import io.qameta.allure.Feature;
 
 /**
  * Sets up two HTTPS servers with regular trust-stores, except one is insecure. Verifies that a request using a certificate not
  * present in the trust-store only works for the insecure server.
  */
-@Features(HTTP_EXTENSION)
+@Feature(HTTP_EXTENSION)
 public class HttpListenerTlsInsecureTestCase extends AbstractHttpTestCase {
 
   @Rule

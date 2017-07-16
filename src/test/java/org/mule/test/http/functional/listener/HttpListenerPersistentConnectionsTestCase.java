@@ -29,9 +29,9 @@ import org.apache.http.HttpVersion;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.fluent.Request;
 import org.junit.Rule;
-import ru.yandex.qatools.allure.annotations.Features;
+import io.qameta.allure.Feature;
 
-@Features(HTTP_EXTENSION)
+@Feature(HTTP_EXTENSION)
 public abstract class HttpListenerPersistentConnectionsTestCase extends AbstractHttpTestCase {
 
   private static final int HTTP_OK = 200;

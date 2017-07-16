@@ -25,10 +25,10 @@ import java.util.Collection;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
-import ru.yandex.qatools.allure.annotations.Features;
+import io.qameta.allure.Feature;
 
 @RunnerDelegateTo(Parameterized.class)
-@Features(HTTP_EXTENSION)
+@Feature(HTTP_EXTENSION)
 public class HttpListenerMethodRoutingTestCase extends AbstractHttpTestCase {
 
   @Rule

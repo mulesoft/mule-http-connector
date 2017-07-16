@@ -32,14 +32,14 @@ import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.test.http.functional.matcher.HttpMessageAttributesMatchers;
 
-import ru.yandex.qatools.allure.annotations.Description;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+import io.qameta.allure.junit4.DisplayName;
 
-@Features(HTTP_EXTENSION)
-@Stories({NTLM})
-@Description("This is a simple Functional TestCase that simulates the case of a NTLM HTTP Proxy and " +
-    "an HTTPS Server behind that proxy. Authentication is required.")
+@Feature(HTTP_EXTENSION)
+@Story(NTLM)
+@DisplayName("HTTPS server behind NTLM HTTP proxy. Authentication is required.")
 public class HttpsRequestNtlmProxyTestCase extends AbstractNtlmTestCase {
 
   private static final String TARGET_RESPONSE = "Response";

@@ -17,9 +17,9 @@ import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.junit.Rule;
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Features;
+import io.qameta.allure.Feature;
 
-@Features(HTTP_EXTENSION)
+@Feature(HTTP_EXTENSION)
 public class HttpRequestContentTypeTestCase extends AbstractHttpRequestTestCase {
 
   private static final String EXPECTED_CONTENT_TYPE = "application/json; charset=UTF-8";

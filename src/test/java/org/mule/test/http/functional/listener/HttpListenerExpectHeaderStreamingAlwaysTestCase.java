@@ -12,10 +12,10 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.runner.RunnerDelegateTo;
 
 import org.junit.runners.Parameterized;
-import ru.yandex.qatools.allure.annotations.Features;
+import io.qameta.allure.Feature;
 
 @RunnerDelegateTo(Parameterized.class)
-@Features(HTTP_EXTENSION)
+@Feature(HTTP_EXTENSION)
 public class HttpListenerExpectHeaderStreamingAlwaysTestCase extends HttpListenerExpectHeaderStreamingNeverTestCase {
 
   @Override

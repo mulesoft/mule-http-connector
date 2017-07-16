@@ -22,11 +22,11 @@ import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 import org.junit.Rule;
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(HTTP_EXTENSION)
-@Stories(PROXY)
+@Feature(HTTP_EXTENSION)
+@Story(PROXY)
 public class HttpProxyExpectHeaderTestCase extends AbstractHttpExpectHeaderServerTestCase {
 
   @Rule

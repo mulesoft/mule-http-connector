@@ -20,9 +20,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Features;
+import io.qameta.allure.Feature;
 
-@Features(HTTP_EXTENSION)
+@Feature(HTTP_EXTENSION)
 public class HttpRequestExpectHeaderTestCase extends AbstractHttpExpectHeaderServerTestCase {
 
   private static final String REQUEST_FLOW_NAME = "requestFlow";

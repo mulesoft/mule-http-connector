@@ -44,9 +44,9 @@ import org.apache.http.HttpVersion;
 import org.apache.http.client.fluent.Response;
 import org.eclipse.jetty.util.MultiPartInputStreamParser;
 import org.junit.Rule;
-import ru.yandex.qatools.allure.annotations.Features;
+import io.qameta.allure.Feature;
 
-@Features(HTTP_EXTENSION)
+@Feature(HTTP_EXTENSION)
 public abstract class HttpListenerResponseStreamingTestCase extends AbstractHttpTestCase {
 
   private static final int DEFAULT_TIMEOUT = 5000;

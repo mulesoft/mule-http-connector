@@ -25,9 +25,9 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.fluent.Request;
 import org.junit.Rule;
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Features;
+import io.qameta.allure.Feature;
 
-@Features(HTTP_EXTENSION)
+@Feature(HTTP_EXTENSION)
 public class HttpListenerHeaderSizeTestCase extends AbstractHttpTestCase {
 
   private static final int SIZE_DELTA = 1000;

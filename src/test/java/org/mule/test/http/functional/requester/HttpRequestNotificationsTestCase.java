@@ -28,11 +28,11 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Features;
+import io.qameta.allure.Feature;
 
 //TODO: MULE-10340 - Add notifications to HTTP request
 @Ignore("MULE-10340: Add notifications to HTTP request")
-@Features(HTTP_EXTENSION)
+@Feature(HTTP_EXTENSION)
 public class HttpRequestNotificationsTestCase extends AbstractHttpRequestTestCase {
 
   @Override

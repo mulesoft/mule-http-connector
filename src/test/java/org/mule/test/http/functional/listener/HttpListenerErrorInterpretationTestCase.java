@@ -30,6 +30,8 @@ import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.ERRORS;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.ERROR_HANDLING;
 import static org.mule.test.http.functional.matcher.HttpResponseContentStringMatcher.body;
 import static org.mule.test.http.functional.matcher.HttpResponseReasonPhraseMatcher.hasReasonPhrase;
+
+import io.qameta.allure.Stories;
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.functional.junit4.rules.HttpServerRule;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -53,11 +55,11 @@ import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(HTTP_EXTENSION)
-@Stories({ERROR_HANDLING, ERRORS})
+@Feature(HTTP_EXTENSION)
+@Stories({@Story(ERROR_HANDLING), @Story(ERRORS)})
 public class HttpListenerErrorInterpretationTestCase extends AbstractHttpTestCase {
 
   public static final String HEADER_NAME = "X-Custom";

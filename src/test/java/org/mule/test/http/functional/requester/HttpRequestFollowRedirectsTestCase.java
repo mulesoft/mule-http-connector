@@ -23,9 +23,9 @@ import org.eclipse.jetty.server.Request;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import ru.yandex.qatools.allure.annotations.Features;
+import io.qameta.allure.Feature;
 
-@Features(HTTP_EXTENSION)
+@Feature(HTTP_EXTENSION)
 public class HttpRequestFollowRedirectsTestCase extends AbstractHttpRequestTestCase {
 
   @Rule

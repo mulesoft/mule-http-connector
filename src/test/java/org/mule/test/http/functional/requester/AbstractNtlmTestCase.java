@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.Request;
 import org.junit.Before;
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Description;
+import io.qameta.allure.Description;
 
 public abstract class AbstractNtlmTestCase extends AbstractHttpRequestTestCase {
 

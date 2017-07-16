@@ -20,14 +20,12 @@ import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.junit.Rule;
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Description;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(HTTP_EXTENSION)
-@Stories("Header case preservation")
-@Description("Sets up a listener that returns form data and a requester that triggers it, all while preserving the headers name case. That way "
-    + "we make sure the Host, Content-Type and other headers are handled correctly by both listener and requester.")
+@Feature(HTTP_EXTENSION)
+@Story("Header case preservation")
 public class HttpHeaderCaseTestCase extends AbstractHttpTestCase {
 
   public static final String PRESERVE_HEADER_CASE = "org.glassfish.grizzly.http.PRESERVE_HEADER_CASE";
@@ -43,6 +41,8 @@ public class HttpHeaderCaseTestCase extends AbstractHttpTestCase {
   }
 
   @Test
+  @Description("Sets up a listener that returns form data and a requester that triggers it, all while preserving the headers name case. That way "
+      + "we make sure the Host, Content-Type and other headers are handled correctly by both listener and requester.")
   public void worksPreservingHeaders() throws Exception {
     Event response = runFlow("client");
     assertThat(response.getMessage(), hasPayload(equalTo("CustomValue=value")));

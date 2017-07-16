@@ -22,9 +22,9 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Features;
+import io.qameta.allure.Feature;
 
-@Features(HTTP_EXTENSION)
+@Feature(HTTP_EXTENSION)
 public class HttpRequestTlsConnectionCloseTestCase extends AbstractHttpRequestTestCase {
 
   @Override

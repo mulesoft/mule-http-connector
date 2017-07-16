@@ -32,11 +32,11 @@ import org.apache.http.client.fluent.Response;
 import org.apache.http.entity.StringEntity;
 import org.junit.Rule;
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(HTTP_EXTENSION)
-@Stories(MULTI_MAP)
+@Feature(HTTP_EXTENSION)
+@Story(MULTI_MAP)
 public class HttpListenerMultipleValueHeadersTestCase extends AbstractHttpTestCase {
 
   @Rule

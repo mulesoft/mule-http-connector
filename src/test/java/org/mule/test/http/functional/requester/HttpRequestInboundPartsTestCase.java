@@ -36,11 +36,11 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.util.MultiPartWriter;
 import org.junit.Ignore;
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(HTTP_EXTENSION)
-@Stories(MULTIPART)
+@Feature(HTTP_EXTENSION)
+@Story(MULTIPART)
 @Ignore("MULE-12976 - DW: Support multipart mime types")
 public class HttpRequestInboundPartsTestCase extends AbstractHttpRequestTestCase {
 

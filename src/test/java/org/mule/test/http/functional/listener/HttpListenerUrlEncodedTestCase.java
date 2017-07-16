@@ -19,11 +19,11 @@ import org.apache.http.client.fluent.Response;
 import org.apache.http.message.BasicNameValuePair;
 import org.junit.Rule;
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(HTTP_EXTENSION)
-@Stories(URL_ENCODED)
+@Feature(HTTP_EXTENSION)
+@Story(URL_ENCODED)
 public class HttpListenerUrlEncodedTestCase extends AbstractHttpTestCase {
 
   private static final String PARAM_1_NAME = "param1";

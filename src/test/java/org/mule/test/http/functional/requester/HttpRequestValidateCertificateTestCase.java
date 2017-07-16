@@ -19,9 +19,9 @@ import org.mule.runtime.core.api.exception.MessagingException;
 import java.security.GeneralSecurityException;
 
 import org.junit.Test;
-import ru.yandex.qatools.allure.annotations.Features;
+import io.qameta.allure.Feature;
 
-@Features(HTTP_EXTENSION)
+@Feature(HTTP_EXTENSION)
 public class HttpRequestValidateCertificateTestCase extends AbstractHttpRequestTestCase {
 
   @Override

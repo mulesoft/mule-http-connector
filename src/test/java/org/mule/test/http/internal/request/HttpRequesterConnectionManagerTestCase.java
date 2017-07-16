@@ -30,11 +30,11 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import ru.yandex.qatools.allure.annotations.Features;
-import ru.yandex.qatools.allure.annotations.Stories;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
-@Features(HTTP_EXTENSION)
-@Stories("HTTP Request")
+@Feature(HTTP_EXTENSION)
+@Story("HTTP Request")
 public class HttpRequesterConnectionManagerTestCase extends AbstractMuleTestCase {
 
   private static final String CONFIG_NAME = "config";
