@@ -182,7 +182,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
     try {
       server = httpService.getServerFactory().create(serverConfiguration);
     } catch (ServerCreationException e) {
-      throw new InitialisationException(createStaticMessage("Could not create HTTP server"), this);
+      throw new InitialisationException(createStaticMessage("Could not create HTTP server"), e, this);
     }
   }
 

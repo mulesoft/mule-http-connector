@@ -82,77 +82,44 @@ public class HttpRequester {
   public void doRequest(HttpExtensionClient client, HttpRequesterRequestBuilder requestBuilder,
                         boolean checkRetry, MuleContext muleContext,
                         CompletionCallback<InputStream, HttpResponseAttributes> callback) {
-    HttpRequest httpRequest = eventToHttpRequest.create(requestBuilder, authentication, muleContext);
+    HttpRequest httpRequest = eventToHttpRequest.create(requestBuilder, authentication);
 
     // TODO: MULE-10340 - Add notifications to HTTP request
     // notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct, MESSAGE_REQUEST_BEGIN);
-    client.send(httpRequest, responseTimeout, followRedirects, resolveAuthentication(authentication)).whenComplete(
-                                                                                                                   (response,
-                                                                                                                    exception) -> {
-                                                                                                                     if (response != null) {
-                                                                                                                       HttpResponseToResult httpResponseToResult =
-                                                                                                                           new HttpResponseToResult(config,
-                                                                                                                                                    muleContext);
-                                                                                                                       MediaType mediaType =
-                                                                                                                           requestBuilder
-                                                                                                                               .getBody()
-                                                                                                                               .getDataType()
-                                                                                                                               .getMediaType();
-                                                                                                                       from(httpResponseToResult
-                                                                                                                           .convert(mediaType,
-                                                                                                                                    response,
-                                                                                                                                    httpRequest
-                                                                                                                                        .getUri()))
-                                                                                                                                            .doOnNext(result -> {
-                                                                                                                                              // TODO: MULE-10340 - Add notifications to HTTP request
-                                                                                                                                              // notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct, MESSAGE_REQUEST_END);
-                                                                                                                                              try {
-                                                                                                                                                if (resendRequest(result,
-                                                                                                                                                                  checkRetry,
-                                                                                                                                                                  authentication)) {
-                                                                                                                                                  scheduler
-                                                                                                                                                      .submit(() -> consumePayload(result));
-                                                                                                                                                  doRequest(client,
-                                                                                                                                                            requestBuilder,
-                                                                                                                                                            false,
-                                                                                                                                                            muleContext,
-                                                                                                                                                            callback);
-                                                                                                                                                } else {
-                                                                                                                                                  responseValidator
-                                                                                                                                                      .validate(result,
-                                                                                                                                                                httpRequest);
-                                                                                                                                                  callback
-                                                                                                                                                      .success(result);
-                                                                                                                                                }
-                                                                                                                                              } catch (Exception e) {
-                                                                                                                                                callback
-                                                                                                                                                    .error(e);
-                                                                                                                                              }
-                                                                                                                                            })
-                                                                                                                                            .doOnError(Exception.class,
-                                                                                                                                                       e -> callback
-                                                                                                                                                           .error(e))
-                                                                                                                                            .subscribe();
-                                                                                                                     } else {
-                                                                                                                       checkIfRemotelyClosed(exception,
-                                                                                                                                             client
-                                                                                                                                                 .getDefaultUriParameters());
-                                                                                                                       logger
-                                                                                                                           .error(getErrorMessage(httpRequest));
-                                                                                                                       HttpError error =
-                                                                                                                           exception instanceof TimeoutException
-                                                                                                                               ? TIMEOUT
-                                                                                                                               : CONNECTIVITY;
-                                                                                                                       callback
-                                                                                                                           .error(new HttpRequestFailedException(
-                                                                                                                                                                 createStaticMessage(errorMessageGenerator
-                                                                                                                                                                     .createFrom(httpRequest,
-                                                                                                                                                                                 exception
-                                                                                                                                                                                     .getMessage())),
-                                                                                                                                                                 exception,
-                                                                                                                                                                 error));
-                                                                                                                     }
-                                                                                                                   });
+    client.send(httpRequest, responseTimeout, followRedirects, resolveAuthentication(authentication))
+        .whenComplete(
+                      (response, exception) -> {
+                        if (response != null) {
+                          HttpResponseToResult httpResponseToResult = new HttpResponseToResult(config, muleContext);
+                          MediaType mediaType = requestBuilder.getBody().getDataType().getMediaType();
+                          from(httpResponseToResult.convert(mediaType, response, httpRequest.getUri()))
+                              .doOnNext(result -> {
+                                // TODO: MULE-10340 - Add notifications to HTTP request
+                                // notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct, MESSAGE_REQUEST_END);
+                                try {
+                                  if (resendRequest(result, checkRetry, authentication)) {
+                                    scheduler.submit(() -> consumePayload(result));
+                                    doRequest(client, requestBuilder, false, muleContext, callback);
+                                  } else {
+                                    responseValidator.validate(result, httpRequest);
+                                    callback.success(result);
+                                  }
+                                } catch (Exception e) {
+                                  callback.error(e);
+                                }
+                              })
+                              .doOnError(Exception.class, e -> callback.error(e))
+                              .subscribe();
+                        } else {
+                          checkIfRemotelyClosed(exception, client.getDefaultUriParameters());
+                          logger.error(getErrorMessage(httpRequest));
+                          HttpError error = exception instanceof TimeoutException ? TIMEOUT : CONNECTIVITY;
+                          callback.error(new HttpRequestFailedException(
+                                                                        createStaticMessage(errorMessageGenerator
+                                                                            .createFrom(httpRequest, exception.getMessage())),
+                                                                        exception, error));
+                        }
+                      });
   }
 
   private String getErrorMessage(HttpRequest httpRequest) {

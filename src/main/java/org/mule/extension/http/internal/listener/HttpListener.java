@@ -223,8 +223,8 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
       Message errorMessage = error.getErrorMessage();
       HttpResponseAttributes attributes = (HttpResponseAttributes) errorMessage.getAttributes().getValue();
       failureResponseBuilder = HttpResponse.builder()
-          .setStatusCode(attributes.getStatusCode())
-          .setReasonPhrase(attributes.getReasonPhrase());
+          .statusCode(attributes.getStatusCode())
+          .reasonPhrase(attributes.getReasonPhrase());
       attributes.getHeaders().forEach(failureResponseBuilder::addHeader);
     } else if (error != null) {
       failureResponseBuilder = createDefaultFailureResponseBuilder(error);
@@ -319,9 +319,9 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
                                      HttpResponseReadyCallback responseCallback) {
         byte[] responseData = message.getBytes();
         responseCallback.responseReady(HttpResponse.builder()
-            .setStatusCode(status.getStatusCode())
-            .setReasonPhrase(status.getReasonPhrase())
-            .setEntity(new ByteArrayHttpEntity(responseData))
+            .statusCode(status.getStatusCode())
+            .reasonPhrase(status.getReasonPhrase())
+            .entity(new ByteArrayHttpEntity(responseData))
             .addHeader(CONTENT_LENGTH, Integer.toString(responseData.length))
             .build(), new ResponseStatusCallback() {
 
@@ -350,8 +350,8 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
     Throwable throwable = error.getCause();
     String reasonPhraseFromException = getReasonPhraseForStatusCode(INTERNAL_SERVER_ERROR.getStatusCode());
     return HttpResponse.builder()
-        .setStatusCode(INTERNAL_SERVER_ERROR.getStatusCode())
-        .setReasonPhrase(reasonPhraseFromException != null ? reasonPhraseFromException : throwable.getMessage());
+        .statusCode(INTERNAL_SERVER_ERROR.getStatusCode())
+        .reasonPhrase(reasonPhraseFromException != null ? reasonPhraseFromException : throwable.getMessage());
   }
 
   private Result<InputStream, HttpRequestAttributes> createResult(HttpRequestContext requestContext) {
@@ -371,8 +371,8 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
 
   protected HttpResponse buildErrorResponse() {
     final HttpResponseBuilder errorResponseBuilder = HttpResponse.builder();
-    final HttpResponse errorResponse = errorResponseBuilder.setStatusCode(INTERNAL_SERVER_ERROR.getStatusCode())
-        .setReasonPhrase(INTERNAL_SERVER_ERROR.getReasonPhrase())
+    final HttpResponse errorResponse = errorResponseBuilder.statusCode(INTERNAL_SERVER_ERROR.getStatusCode())
+        .reasonPhrase(INTERNAL_SERVER_ERROR.getReasonPhrase())
         .build();
     return errorResponse;
   }

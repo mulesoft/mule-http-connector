@@ -93,8 +93,8 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
     createHttpClient();
 
     // Uses default ciphers and protocols
-    HttpRequest request = HttpRequest.builder().setUri(format("https://localhost:%s", port1.getValue())).setMethod(POST)
-        .setEntity(new ByteArrayHttpEntity(TEST_PAYLOAD.getBytes())).build();
+    HttpRequest request = HttpRequest.builder().uri(format("https://localhost:%s", port1.getValue())).method(POST)
+        .entity(new ByteArrayHttpEntity(TEST_PAYLOAD.getBytes())).build();
     final HttpResponse response = httpClientWithCertificate.send(request, RECEIVE_TIMEOUT, false, null);
     assertThat(IOUtils.toString(response.getEntity().getContent()), is(TEST_PAYLOAD));
   }
@@ -106,8 +106,8 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
     createHttpClient();
 
     // Forces TLS_DHE_DSS_WITH_AES_128_CBC_SHA
-    HttpRequest request = HttpRequest.builder().setUri(format("https://localhost:%s", port3.getValue())).setMethod(POST)
-        .setEntity(new ByteArrayHttpEntity(TEST_PAYLOAD.getBytes())).build();
+    HttpRequest request = HttpRequest.builder().uri(format("https://localhost:%s", port3.getValue())).method(POST)
+        .entity(new ByteArrayHttpEntity(TEST_PAYLOAD.getBytes())).build();
     final HttpResponse response = httpClientWithCertificate.send(request, RECEIVE_TIMEOUT, false, null);
     assertThat(IOUtils.toString(response.getEntity().getContent()), is(TEST_PAYLOAD));
   }
