@@ -21,6 +21,8 @@ import static org.mule.runtime.api.metadata.MediaType.HTML;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.MULTIPART;
+
+import io.qameta.allure.Issue;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
@@ -42,6 +44,7 @@ import io.qameta.allure.Story;
 @Feature(HTTP_EXTENSION)
 @Story(MULTIPART)
 @Ignore("MULE-12976 - DW: Support multipart mime types")
+@Issue("MULE-12976")
 public class HttpRequestInboundPartsTestCase extends AbstractHttpRequestTestCase {
 
   @Override
