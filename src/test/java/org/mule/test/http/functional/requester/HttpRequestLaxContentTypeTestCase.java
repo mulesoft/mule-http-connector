@@ -37,7 +37,7 @@ public class HttpRequestLaxContentTypeTestCase extends AbstractHttpTestCase {
   public void sendsInvalidContentTypeOnRequest() throws Exception {
     final String url = String.format("http://localhost:%s/requestClientInvalid", httpPort.getNumber());
     HttpRequest request =
-        HttpRequest.builder().setUri(url).setMethod(GET).setEntity(new ByteArrayHttpEntity(TEST_MESSAGE.getBytes())).build();
+        HttpRequest.builder().uri(url).method(GET).entity(new ByteArrayHttpEntity(TEST_MESSAGE.getBytes())).build();
     final HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
 
     assertThat(IOUtils.toString(response.getEntity().getContent()), equalTo("invalidMimeType"));

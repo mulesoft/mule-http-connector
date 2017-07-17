@@ -8,7 +8,6 @@ package org.mule.extension.http.internal.request.client;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.runtime.api.exception.MuleException;
@@ -16,8 +15,10 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.http.api.client.HttpClient;
 import org.mule.runtime.http.api.client.HttpRequestAuthentication;
-import org.mule.runtime.http.api.client.async.ResponseHandler;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
+import org.mule.runtime.http.api.domain.message.response.HttpResponse;
+
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Composition of an {@link HttpClient} with URI and authentication parameters that allow falling back to connection default
@@ -65,8 +66,8 @@ public class HttpExtensionClient implements Startable, Stoppable {
     httpClient.stop();
   }
 
-  public void send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpRequestAuthentication authentication,
-                   ResponseHandler handler) {
-    httpClient.send(request, responseTimeout, followRedirects, authentication, handler);
+  public CompletableFuture<HttpResponse> send(HttpRequest request, int responseTimeout, boolean followRedirects,
+                                              HttpRequestAuthentication authentication) {
+    return httpClient.sendAsync(request, responseTimeout, followRedirects, authentication);
   }
 }

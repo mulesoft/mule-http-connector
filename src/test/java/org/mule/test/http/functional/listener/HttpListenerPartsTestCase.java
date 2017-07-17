@@ -153,8 +153,8 @@ public class HttpListenerPartsTestCase extends AbstractHttpTestCase {
 
   @Test
   public void respondWithSeveralAttachments() throws Exception {
-    HttpRequest request = HttpRequest.builder().setUri(getUrl(filePath.getValue())).setMethod(GET)
-        .setEntity(new ByteArrayHttpEntity(TEST_PAYLOAD.getBytes())).build();
+    HttpRequest request = HttpRequest.builder().uri(getUrl(filePath.getValue())).method(GET)
+        .entity(new ByteArrayHttpEntity(TEST_PAYLOAD.getBytes())).build();
     final HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
     final Collection<HttpPart> parts = parseMultipartContent(response.getEntity().getContent(),
                                                              response.getHeaderValueIgnoreCase(CONTENT_TYPE));

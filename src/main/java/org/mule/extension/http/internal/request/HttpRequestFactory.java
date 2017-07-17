@@ -21,7 +21,6 @@ import org.mule.extension.http.internal.HttpStreamingType;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.transformation.TransformationService;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.runtime.http.api.domain.entity.EmptyHttpEntity;
@@ -78,18 +77,16 @@ public class HttpRequestFactory {
    * @param requestBuilder The generic {@link HttpRequesterRequestBuilder} from the request component that should be used to
    *        create the {@link HttpRequest}.
    * @param authentication The {@link HttpAuthentication} that should be used to create the {@link HttpRequest}.
-   * @param muleContext the Mule node.
    * @return an {@HttpRequest} configured based on the parameters.
    * @throws MuleException if the request creation fails.
    */
-  public HttpRequest create(HttpRequesterRequestBuilder requestBuilder, HttpAuthentication authentication,
-                            MuleContext muleContext) {
+  public HttpRequest create(HttpRequesterRequestBuilder requestBuilder, HttpAuthentication authentication) {
     HttpRequestBuilder builder = HttpRequest.builder();
 
-    builder.setUri(this.uri);
-    builder.setMethod(this.method);
-    builder.setHeaders(requestBuilder.getHeaders());
-    builder.setQueryParams(requestBuilder.getQueryParams());
+    builder.uri(this.uri)
+        .method(this.method)
+        .headers(requestBuilder.getHeaders())
+        .queryParams(requestBuilder.getQueryParams());
 
     MediaType mediaType = requestBuilder.getBody().getDataType().getMediaType();
     if (!builder.getHeaderValue(CONTENT_TYPE).isPresent()) {
@@ -115,7 +112,7 @@ public class HttpRequestFactory {
     }
 
     try {
-      builder.setEntity(createRequestEntity(builder, this.method, requestBuilder.getBody().getValue()));
+      builder.entity(createRequestEntity(builder, this.method, requestBuilder.getBody().getValue()));
     } catch (Exception e) {
       throw new ModuleException(TRANSFORMATION, e);
     }

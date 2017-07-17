@@ -77,8 +77,8 @@ public class HttpListenerResponseSender {
 
   protected HttpResponse buildErrorResponse() {
     final HttpResponseBuilder errorResponseBuilder = HttpResponse.builder();
-    final HttpResponse errorResponse = errorResponseBuilder.setStatusCode(INTERNAL_SERVER_ERROR.getStatusCode())
-        .setReasonPhrase(INTERNAL_SERVER_ERROR.getReasonPhrase())
+    final HttpResponse errorResponse = errorResponseBuilder.statusCode(INTERNAL_SERVER_ERROR.getStatusCode())
+        .reasonPhrase(INTERNAL_SERVER_ERROR.getReasonPhrase())
         .build();
     return errorResponse;
   }

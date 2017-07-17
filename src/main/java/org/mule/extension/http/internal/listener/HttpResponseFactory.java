@@ -122,7 +122,7 @@ public class HttpResponseFactory {
 
     Integer statusCode = listenerResponseBuilder.getStatusCode();
     if (statusCode != null) {
-      responseBuilder.setStatusCode(statusCode);
+      responseBuilder.statusCode(statusCode);
       if (statusCode == NO_CONTENT.getStatusCode() || statusCode == NOT_MODIFIED.getStatusCode()) {
         httpEntity = new EmptyHttpEntity();
         httpResponseHeaderBuilder.removeHeader(TRANSFER_ENCODING);
@@ -130,7 +130,7 @@ public class HttpResponseFactory {
     }
     String reasonPhrase = resolveReasonPhrase(listenerResponseBuilder.getReasonPhrase(), statusCode);
     if (reasonPhrase != null) {
-      responseBuilder.setReasonPhrase(reasonPhrase);
+      responseBuilder.reasonPhrase(reasonPhrase);
     }
 
     Collection<String> headerNames = httpResponseHeaderBuilder.getHeaderNames();
@@ -141,7 +141,7 @@ public class HttpResponseFactory {
       }
     }
 
-    responseBuilder.setEntity(httpEntity);
+    responseBuilder.entity(httpEntity);
     return responseBuilder.build();
   }
 

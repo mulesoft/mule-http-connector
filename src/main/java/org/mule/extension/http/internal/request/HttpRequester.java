@@ -35,9 +35,7 @@ import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.http.api.client.HttpRequestAuthentication;
-import org.mule.runtime.http.api.client.async.ResponseHandler;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
-import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 
 import java.io.InputStream;
 import java.util.concurrent.TimeoutException;
@@ -84,59 +82,44 @@ public class HttpRequester {
   public void doRequest(HttpExtensionClient client, HttpRequesterRequestBuilder requestBuilder,
                         boolean checkRetry, MuleContext muleContext,
                         CompletionCallback<InputStream, HttpResponseAttributes> callback) {
-    HttpRequest httpRequest = eventToHttpRequest.create(requestBuilder, authentication, muleContext);
+    HttpRequest httpRequest = eventToHttpRequest.create(requestBuilder, authentication);
 
     // TODO: MULE-10340 - Add notifications to HTTP request
     // notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct, MESSAGE_REQUEST_BEGIN);
-    client.send(httpRequest, responseTimeout, followRedirects, resolveAuthentication(authentication),
-                createResponseHandler(muleContext, requestBuilder, client, httpRequest, checkRetry,
-                                      callback));
-  }
-
-  private ResponseHandler createResponseHandler(MuleContext muleContext,
-                                                HttpRequesterRequestBuilder requestBuilder, HttpExtensionClient client,
-                                                HttpRequest httpRequest,
-                                                boolean checkRetry,
-                                                CompletionCallback<InputStream, HttpResponseAttributes> callback) {
-    return new ResponseHandler() {
-
-      @Override
-      public void onCompletion(HttpResponse response) {
-        HttpResponseToResult httpResponseToResult = new HttpResponseToResult(config, muleContext);
-        MediaType mediaType = requestBuilder.getBody().getDataType().getMediaType();
-        from(httpResponseToResult.convert(mediaType, response, httpRequest.getUri()))
-            .doOnNext(result -> {
-              // TODO: MULE-10340 - Add notifications to HTTP request
-              // notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct, MESSAGE_REQUEST_END);
-              try {
-                if (resendRequest(result, checkRetry, authentication)) {
-                  scheduler.submit(() -> consumePayload(result));
-                  doRequest(client, requestBuilder, false, muleContext, callback);
-                } else {
-                  responseValidator.validate(result, httpRequest);
-                  callback.success(result);
-                }
-              } catch (Exception e) {
-                callback.error(e);
-              }
-            })
-            .doOnError(Exception.class, exception -> callback.error(exception))
-            .subscribe();
-      }
-
-      @Override
-      public void onFailure(Exception exception) {
-        checkIfRemotelyClosed(exception, client.getDefaultUriParameters());
-        logger.error(getErrorMessage(httpRequest));
-        HttpError error = exception instanceof TimeoutException ? TIMEOUT : CONNECTIVITY;
-        callback.error(new HttpRequestFailedException(
-                                                      createStaticMessage(errorMessageGenerator.createFrom(httpRequest,
-                                                                                                           exception
-                                                                                                               .getMessage())),
-                                                      exception, error));
-      }
-
-    };
+    client.send(httpRequest, responseTimeout, followRedirects, resolveAuthentication(authentication))
+        .whenComplete(
+                      (response, exception) -> {
+                        if (response != null) {
+                          HttpResponseToResult httpResponseToResult = new HttpResponseToResult(config, muleContext);
+                          MediaType mediaType = requestBuilder.getBody().getDataType().getMediaType();
+                          from(httpResponseToResult.convert(mediaType, response, httpRequest.getUri()))
+                              .doOnNext(result -> {
+                                // TODO: MULE-10340 - Add notifications to HTTP request
+                                // notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct, MESSAGE_REQUEST_END);
+                                try {
+                                  if (resendRequest(result, checkRetry, authentication)) {
+                                    scheduler.submit(() -> consumePayload(result));
+                                    doRequest(client, requestBuilder, false, muleContext, callback);
+                                  } else {
+                                    responseValidator.validate(result, httpRequest);
+                                    callback.success(result);
+                                  }
+                                } catch (Exception e) {
+                                  callback.error(e);
+                                }
+                              })
+                              .doOnError(Exception.class, e -> callback.error(e))
+                              .subscribe();
+                        } else {
+                          checkIfRemotelyClosed(exception, client.getDefaultUriParameters());
+                          logger.error(getErrorMessage(httpRequest));
+                          HttpError error = exception instanceof TimeoutException ? TIMEOUT : CONNECTIVITY;
+                          callback.error(new HttpRequestFailedException(
+                                                                        createStaticMessage(errorMessageGenerator
+                                                                            .createFrom(httpRequest, exception.getMessage())),
+                                                                        exception, error));
+                        }
+                      });
   }
 
   private String getErrorMessage(HttpRequest httpRequest) {
@@ -165,7 +148,7 @@ public class HttpRequester {
     return requestAuthentication;
   }
 
-  private void checkIfRemotelyClosed(Exception exception, UriParameters uriParameters) {
+  private void checkIfRemotelyClosed(Throwable exception, UriParameters uriParameters) {
     if (HTTPS.getScheme().equals(uriParameters.getScheme())
         && containsIgnoreCase(exception.getMessage(), REMOTELY_CLOSED)) {
       logger

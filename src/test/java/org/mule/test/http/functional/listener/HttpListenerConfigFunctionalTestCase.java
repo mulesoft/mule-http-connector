@@ -135,7 +135,7 @@ public class HttpListenerConfigFunctionalTestCase extends AbstractHttpTestCase {
 
   private String callAndAssertStatusWithMuleClient(String url, int expectedStatus) throws Exception {
     HttpRequest request =
-        HttpRequest.builder().setUri(url).setMethod(GET).setEntity(new ByteArrayHttpEntity(TEST_PAYLOAD.getBytes())).build();
+        HttpRequest.builder().uri(url).method(GET).entity(new ByteArrayHttpEntity(TEST_PAYLOAD.getBytes())).build();
     final org.mule.runtime.http.api.domain.message.response.HttpResponse response =
         httpClient.send(request, RECEIVE_TIMEOUT, false, null);
     assertThat(response.getStatusCode(), is(expectedStatus));

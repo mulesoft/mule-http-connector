@@ -114,7 +114,7 @@ public class HttpListenerValidateCertificateTestCase extends AbstractHttpTestCas
 
   private String sendRequest(String url, String payload) throws Exception {
     HttpRequest request =
-        HttpRequest.builder().setUri(url).setMethod(POST).setEntity(new ByteArrayHttpEntity(payload.getBytes())).build();
+        HttpRequest.builder().uri(url).method(POST).entity(new ByteArrayHttpEntity(payload.getBytes())).build();
     final HttpResponse response = httpClientWithCertificate.send(request, RECEIVE_TIMEOUT, false, null);
 
     return IOUtils.toString(response.getEntity().getContent());
