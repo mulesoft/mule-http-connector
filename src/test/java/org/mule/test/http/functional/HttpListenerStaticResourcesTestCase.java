@@ -16,6 +16,7 @@ import static org.mule.runtime.http.api.HttpConstants.HttpStatus.NOT_FOUND;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 
+import io.qameta.allure.Issue;
 import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.util.IOUtils;
@@ -107,6 +108,7 @@ public class HttpListenerStaticResourcesTestCase extends AbstractHttpTestCase {
 
   // TODO(gfernandes) MULE-10117
   @Ignore("MULE-10117: It is not supported to access application resources from extension classloader")
+  @Issue("MULE-10117")
   @Test
   public void explicitMimeTypeConfigurationShouldOverrideDefaults() throws Exception {
     String url = format("http://localhost:%d/static/image.png", port1.getNumber());
