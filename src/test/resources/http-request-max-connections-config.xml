@@ -11,7 +11,7 @@
     </http:request-config>
 
     <!-- TODO MULE-11351 Rework ring-buffer based processing strategy implementations for stream approach -->
-    <flow name="limitedConnections" processingStrategy="synchronous">
+    <flow name="limitedConnections">
         <http:request config-ref="requestConfig" path="testPath"/>
     </flow>
 
