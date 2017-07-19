@@ -71,7 +71,7 @@ public class BasicHttpTestCase extends AbstractHttpRequestTestCase {
         assertThat(response.getStatusLine().getStatusCode(), is(500));
         assertThat(response.getStatusLine().getReasonPhrase(), is("Server Error"));
         assertThat(IOUtils.toString(response.getEntity().getContent()),
-                   is(containsString("Script 'error.description ++ ' has errors")));
+                   is(containsString("Script \'error.description ++ \' has errors")));
       }
     }
   }
