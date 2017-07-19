@@ -8,13 +8,14 @@ package org.mule.extension.http.api.policy;
 
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
+
 import org.mule.extension.http.api.BaseHttpRequestAttributes;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -34,13 +35,12 @@ public class HttpPolicyRequestParametersTransformer implements OperationPolicyPa
 
   @Override
   public Message fromParametersToMessage(Map<String, Object> parameters) {
-    HttpRequesterRequestBuilder requestBuilder = (HttpRequesterRequestBuilder) parameters.get("requestBuilder");
     String path = (String) parameters.get("path");
-    TypedValue<Object> body = requestBuilder.getBody();
+    TypedValue<Object> body = (TypedValue<Object>) parameters.get("body");
     return Message.builder().payload(body.getValue())
-        .attributes(new HttpPolicyRequestAttributes(new MultiMap<>(requestBuilder.getHeaders()),
-                                                    new MultiMap<>(requestBuilder.getQueryParams()),
-                                                    new MultiMap<>(requestBuilder.getQueryParams()), path))
+        .attributes(new HttpPolicyRequestAttributes((MultiMap<String, String>) parameters.get("headers"),
+                                                    (MultiMap<String, String>) parameters.get("queryParams"),
+                                                    (MultiMap<String, String>) parameters.get("uriParams"), path))
         .mediaType(body.getDataType().getMediaType())
         .build();
   }
