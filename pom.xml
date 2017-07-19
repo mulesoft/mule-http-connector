@@ -28,7 +28,7 @@
         <guavaVersion>18.0</guavaVersion>
         <formatterConfigPath>formatter.xml</formatterConfigPath>
 
-        <muleSocketsConnectorVersion>0.8.0-BETA.4</muleSocketsConnectorVersion>
+        <muleSocketsConnectorVersion>0.8.0</muleSocketsConnectorVersion>
     </properties>
 
     <dependencies>
