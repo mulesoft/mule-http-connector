@@ -27,7 +27,6 @@
         <projectReactorVersion>3.0.7.RELEASE</projectReactorVersion>
         <socketsConnectorVersion>1.0.0-SNAPSHOT</socketsConnectorVersion>
         <validationsConnectorVersion>1.0.0-SNAPSHOT</validationsConnectorVersion>
-        <springSecurityVersion>4.0.0-SNAPSHOT</springSecurityVersion>
         <commonsLangVersion>3.6</commonsLangVersion>
         <commonsIoVersion>2.4</commonsIoVersion>
         <guavaVersion>18.0</guavaVersion>
