@@ -42,7 +42,7 @@ public class HttpListenerPersistentConnections10TestCase extends HttpListenerPer
   public void persistentCloseHeaderCheckHeader() throws Exception {
     assertThat(performRequest(persistentPortCloseHeader.getNumber(), getHttpVersion(), false), is(CLOSE));
   }
-  
+
   @Test
   public void persistentEchoCheckHeader() throws IOException {
     assertThat(performRequest(persistentStreamingPort.getNumber(), getHttpVersion(), true), is(CLOSE));
