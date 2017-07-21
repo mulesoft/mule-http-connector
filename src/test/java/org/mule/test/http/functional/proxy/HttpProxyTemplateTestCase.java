@@ -13,14 +13,12 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
-import static org.mule.functional.api.component.FlowAssert.verify;
 import static org.mule.runtime.http.api.HttpHeaders.Names.X_FORWARDED_FOR;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.PROXY;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.runtime.http.api.HttpHeaders;
-import org.mule.tck.SensingNullRequestResponseMessageProcessor;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.TestInputStream;
 import org.mule.test.http.functional.requester.AbstractHttpRequestTestCase;
@@ -39,6 +37,8 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
@@ -48,8 +48,6 @@ import org.apache.http.entity.ContentType;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 
 @Feature(HTTP_EXTENSION)
 @Story(PROXY)
@@ -60,7 +58,6 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
 
   private static final String HEADER = "multiple";
   private static final String MULTIPLE_KEY_QUERY = "/test?key=value&key=value%202";
-  private static String SENSING_REQUEST_RESPONSE_PROCESSOR_NAME = "sensingRequestResponseProcessor";
   private RequestHandlerExtender handlerExtender;
   private boolean consumeAllRequest = true;
   private static String IO_THREAD_PREFIX = "[MuleRuntime].io";
@@ -243,21 +240,6 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
   }
 
   @Test
-  public void requestThread() throws Exception {
-    Request.Get(getProxyUrl("")).connectTimeout(RECEIVE_TIMEOUT).execute();
-    SensingNullRequestResponseMessageProcessor sensingMessageProcessor = getSensingNullRequestResponseMessageProcessor();
-    assertThat(sensingMessageProcessor.requestThread.getName(), startsWith(IO_THREAD_PREFIX));
-  }
-
-  @Test
-  public void responseThread() throws Exception {
-    assertRequestOk(getProxyUrl(""), null);
-    SensingNullRequestResponseMessageProcessor requestResponseProcessor = getSensingNullRequestResponseMessageProcessor();
-    assertThat(requestResponseProcessor.responseThread.getName(), startsWith(IO_THREAD_PREFIX));
-    verify();
-  }
-
-  @Test
   public void forwardsMultipleValuedHeadersAndQueryParams() throws Exception {
     Response response = Request.Get(getProxyUrl(MULTIPLE_KEY_QUERY))
         .addHeader(HEADER, "value1")
@@ -272,10 +254,6 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
     assertThat(headerValues, containsInAnyOrder("value1", "value2"));
 
     assertThat(uri, endsWith(MULTIPLE_KEY_QUERY));
-  }
-
-  private SensingNullRequestResponseMessageProcessor getSensingNullRequestResponseMessageProcessor() {
-    return muleContext.getRegistry().lookupObject(SENSING_REQUEST_RESPONSE_PROCESSOR_NAME);
   }
 
   private void assertRequestOk(String url, String expectedResponse) throws IOException {
