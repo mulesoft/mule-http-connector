@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.metadata.DataType.ATOM_STRING;
+import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 
 import org.mule.extension.http.api.policy.HttpPolicyRequestAttributes;
@@ -32,14 +33,14 @@ public class HttpPolicyRequestParametersTransformerTestCase {
     MultiMap<String, String> queryParams = new MultiMap<>(of("queryParam", "queryParamValue"));
     MultiMap<String, String> uriParams = new MultiMap<>(of("uriParam", "uriParamValue"));
 
-    Map<String, Object> map = new HashMap<>();
-    map.put("path", PATH);
-    map.put("body", body);
-    map.put("headers", headers);
-    map.put("queryParams", queryParams);
-    map.put("uriParams", uriParams);
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("path", PATH);
+    parameters.put("body", body);
+    parameters.put("headers", headers);
+    parameters.put("queryParams", queryParams);
+    parameters.put("uriParams", uriParams);
 
-    Message message = transformer.fromParametersToMessage(map);
+    Message message = transformer.fromParametersToMessage(parameters);
 
     assertThat(message.getPayload().getValue(), is(BODY));
     assertThat(message.getPayload().getDataType(), is(ATOM_STRING));
@@ -57,12 +58,12 @@ public class HttpPolicyRequestParametersTransformerTestCase {
     TypedValue<Object> body = new TypedValue<>(BODY, ATOM_STRING);
     MultiMap<String, String> headers = new MultiMap<>(of("header", "headerValue"));
 
-    Map<String, Object> map = new HashMap<>();
-    map.put("path", PATH);
-    map.put("body", body);
-    map.put("headers", headers);
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("path", PATH);
+    parameters.put("body", body);
+    parameters.put("headers", headers);
 
-    Message message = transformer.fromParametersToMessage(map);
+    Message message = transformer.fromParametersToMessage(parameters);
 
     assertThat(message.getPayload().getValue(), is(BODY));
     assertThat(message.getPayload().getDataType(), is(ATOM_STRING));
@@ -71,8 +72,29 @@ public class HttpPolicyRequestParametersTransformerTestCase {
     HttpPolicyRequestAttributes requestAttributes = (HttpPolicyRequestAttributes) message.getAttributes().getValue();
     assertThat(requestAttributes.getRequestPath(), is(PATH));
     assertThat(requestAttributes.getHeaders(), is(headers));
-    assertThat(requestAttributes.getQueryParams(), nullValue());
-    assertThat(requestAttributes.getUriParams(), nullValue());
+    assertThat(requestAttributes.getQueryParams(), is(emptyMultiMap()));
+    assertThat(requestAttributes.getUriParams(), is(emptyMultiMap()));
+  }
+
+  @Test
+  public void fromParametersToMessageEmptyParameters() {
+    Map<String, Object> parameters = new HashMap<>();
+
+    Message message = transformer.fromParametersToMessage(parameters);
+
+    assertThat(message.getPayload().getValue(), nullValue());
+    assertThat(message.getPayload().getDataType(), is(OBJECT));
+    assertThat(message.getAttributes().getDataType(), is(fromType(HttpPolicyRequestAttributes.class)));
+
+    HttpPolicyRequestAttributes requestAttributes = (HttpPolicyRequestAttributes) message.getAttributes().getValue();
+    assertThat(requestAttributes.getRequestPath(), nullValue());
+    assertThat(requestAttributes.getHeaders(), is(emptyMultiMap()));
+    assertThat(requestAttributes.getQueryParams(), is(emptyMultiMap()));
+    assertThat(requestAttributes.getUriParams(), is(emptyMultiMap()));
+  }
+
+  private MultiMap<String, String> emptyMultiMap() {
+    return new MultiMap<>();
   }
 
 }
