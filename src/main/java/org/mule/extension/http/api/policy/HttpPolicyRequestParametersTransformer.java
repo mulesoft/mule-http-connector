@@ -36,11 +36,13 @@ public class HttpPolicyRequestParametersTransformer implements OperationPolicyPa
   @Override
   public Message fromParametersToMessage(Map<String, Object> parameters) {
     String path = (String) parameters.get("path");
-    TypedValue<Object> body = (TypedValue<Object>) parameters.get("body");
+    TypedValue<Object> body = (TypedValue<Object>) parameters.getOrDefault("body", TypedValue.of(null));
+
     return Message.builder().payload(body.getValue())
-        .attributes(new HttpPolicyRequestAttributes((MultiMap<String, String>) parameters.get("headers"),
-                                                    (MultiMap<String, String>) parameters.get("queryParams"),
-                                                    (MultiMap<String, String>) parameters.get("uriParams"), path))
+        .attributes(new HttpPolicyRequestAttributes(getMap(parameters, "headers"),
+                                                    getMap(parameters, "queryParams"),
+                                                    getMap(parameters, "uriParams"),
+                                                    path))
         .mediaType(body.getDataType().getMediaType())
         .build();
   }
@@ -58,5 +60,9 @@ public class HttpPolicyRequestParametersTransformer implements OperationPolicyPa
     } else {
       return emptyMap();
     }
+  }
+
+  private MultiMap<String, String> getMap(Map<String, Object> parameters, String key) {
+    return (MultiMap<String, String>) parameters.getOrDefault(key, new MultiMap<String, String>());
   }
 }
