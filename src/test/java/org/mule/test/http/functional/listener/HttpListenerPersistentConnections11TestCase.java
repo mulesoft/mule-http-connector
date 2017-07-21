@@ -42,11 +42,6 @@ public class HttpListenerPersistentConnections11TestCase extends HttpListenerPer
   }
 
   @Test
-  public void persistentClosePropertyCheckHeader() throws Exception {
-    assertThat(performRequest(persistentPortCloseProperty.getNumber(), getHttpVersion(), false), is(nullValue()));
-  }
-
-  @Test
   public void persistentEchoCheckHeader() throws IOException {
     assertThat(performRequest(persistentStreamingPort.getNumber(), getHttpVersion(), true), is(nullValue()));
   }
@@ -74,11 +69,6 @@ public class HttpListenerPersistentConnections11TestCase extends HttpListenerPer
   @Test
   public void persistentConnectionCloseHeaderClosing() throws Exception {
     assertConnectionClosesAfterSend(persistentPortCloseHeader, getHttpVersion());
-  }
-
-  @Test
-  public void persistentConnectionClosePropertyClosing() throws Exception {
-    assertConnectionClosesAfterTimeout(persistentPortCloseProperty, getHttpVersion());
   }
 
 }

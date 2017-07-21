@@ -35,15 +35,6 @@
         <logger/>
     </flow>
 
-    <http:listener-config name="persistentConfigCloseProperty">
-        <http:listener-connection host="localhost" port="${persistentPortCloseProperty}" usePersistentConnections="true" connectionIdleTimeout="1000"/>
-    </http:listener-config>
-    <flow name="persistentCloseProperty">
-        <http:listener path="/" config-ref="persistentConfigCloseProperty"/>
-        <set-property propertyName="Connection" value="close"/>
-        <logger/>
-    </flow>
-
     <!-- MULE-8502 -->
     <http:listener-config name="persistentConfigStreaming">
         <http:listener-connection host="localhost" port="${persistentStreamingPort}" usePersistentConnections="true" connectionIdleTimeout="1000"/>
