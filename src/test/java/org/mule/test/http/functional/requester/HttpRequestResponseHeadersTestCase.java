@@ -9,8 +9,12 @@ package org.mule.test.http.functional.requester;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
+import static org.mule.runtime.http.api.HttpHeaders.Names.CONNECTION;
+import static org.mule.runtime.http.api.HttpHeaders.Names.UPGRADE;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
 import org.mule.runtime.api.message.Message;
@@ -24,6 +28,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.Request;
 import org.junit.Rule;
 import org.junit.Test;
+
+import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 
 @Feature(HTTP_EXTENSION)
@@ -31,6 +37,7 @@ public class HttpRequestResponseHeadersTestCase extends AbstractHttpRequestTestC
 
   private static final String EMPTY_PATH = "empty";
   private static final String SIMPLE_PATH = "simple";
+  private static final String MULTIPLE_PATH = "multiple";
 
   @Rule
   public SystemProperty header = new SystemProperty("header", "custom");
@@ -47,10 +54,13 @@ public class HttpRequestResponseHeadersTestCase extends AbstractHttpRequestTestC
       response.addHeader(header.getValue(), EMPTY);
     } else if (SIMPLE_PATH.equals(path)) {
       response.addHeader(header.getValue(), "custom1");
-    } else {
-      // Must be "multiple"
+    } else if (MULTIPLE_PATH.equals(path)) {
       response.addHeader(header.getValue(), "custom1");
       response.addHeader(header.getValue(), "custom2");
+    } else if ("responseWithUpgradeToHttp2Header".equals(path)) {
+      response.addHeader(UPGRADE, "h2,h2c");
+      response.addHeader(CONNECTION, "Upgrade, close");
+      super.writeResponse(response);
     }
     super.writeResponse(response);
   }
@@ -73,6 +83,12 @@ public class HttpRequestResponseHeadersTestCase extends AbstractHttpRequestTestC
   @Test
   public void handlesMultipleHeadersCollection() throws Exception {
     testHeaders("multipleCollection", "custom1");
+  }
+
+  @Test
+  @Description("This case is not valid according to the RFC (https://http2.github.io/http2-spec/), but in any case, it shouldn't cause the request to fail.")
+  public void responseWithUpgradeToHttp2Header() throws Exception {
+    assertThat(flowRunner("responseWithUpgradeToHttp2Header").run(), not(nullValue()));
   }
 
   private void testHeaders(String flowName, String expectedResponse) throws Exception {
