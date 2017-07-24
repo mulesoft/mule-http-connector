@@ -13,7 +13,7 @@
     <flow name="default">
         <http:request config-ref="requestConfig" path="status">
             <http:query-params>
-                #[{'code' : code}]
+                #[{'code' : vars.code}]
             </http:query-params>
         </http:request>
     </flow>
@@ -21,7 +21,7 @@
     <flow name="success">
         <http:request config-ref="requestConfig" path="status">
             <http:query-params>
-                #[{'code' : code}]
+                #[{'code' : vars.code}]
             </http:query-params>
             <http:response-validator>
                 <http:success-status-code-validator values="409" />
@@ -32,7 +32,7 @@
     <flow name="failure">
         <http:request config-ref="requestConfig" path="status">
             <http:query-params>
-                #[{'code' : code}]
+                #[{'code' : vars.code}]
             </http:query-params>
             <http:response-validator>
                 <http:failure-status-code-validator values="201" />

@@ -44,7 +44,7 @@
     </flow>
 
     <flow name="requestFlow">
-        <http:request path="${path}" method="#[method]" config-ref="requestConfig" sendBodyMode="ALWAYS"/>
+        <http:request path="${path}" method="#[vars.method]" config-ref="requestConfig" sendBodyMode="ALWAYS"/>
         <object-to-string-transformer />
     </flow>
 

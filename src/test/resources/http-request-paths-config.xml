@@ -6,7 +6,7 @@
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <http:request-config name="configWithBasePath" basePath="#[mel:basePath]">
+    <http:request-config name="configWithBasePath" basePath="#[vars.basePath]">
         <http:request-connection host="localhost" port="${httpPort}"/>
     </http:request-config>
     <http:request-config name="configWithoutBasePath">
@@ -14,11 +14,11 @@
     </http:request-config>
 
     <flow name="requestWithBasePath">
-        <http:request config-ref="configWithBasePath" path="#[mel:requestPath]"/>
+        <http:request config-ref="configWithBasePath" path="#[vars.requestPath]"/>
     </flow>
 
     <flow name="requestWithoutBasePath">
-        <http:request config-ref="configWithoutBasePath" path="#[mel:requestPath]"/>
+        <http:request config-ref="configWithoutBasePath" path="#[vars.requestPath]"/>
     </flow>
 
 </mule>

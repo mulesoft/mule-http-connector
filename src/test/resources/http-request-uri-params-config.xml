@@ -13,7 +13,7 @@
     <flow name="uriParamList">
         <http:request config-ref="config" path="testPath/{testParam1}/{testParam2}">
             <http:uri-params>
-                #[{'testParam1' : 'testValue1', (paramName) : paramValue}]
+                #[{'testParam1' : 'testValue1', (vars.paramName) : vars.paramValue}]
             </http:uri-params>
         </http:request>
     </flow>
@@ -21,7 +21,7 @@
     <flow name="uriParamMap">
         <http:request config-ref="config" path="testPath/{testParam1}/{testParam2}">
             <http:uri-params>
-                #[params]
+                #[vars.params]
             </http:uri-params>
         </http:request>
     </flow>
@@ -29,7 +29,7 @@
     <flow name="uriParamOverride">
         <http:request config-ref="config" path="testPath/{testParam1}/{testParam2}">
             <http:uri-params>
-                #[params]
+                #[vars.params]
             </http:uri-params>
         </http:request>
     </flow>

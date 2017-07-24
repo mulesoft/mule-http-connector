@@ -15,12 +15,12 @@
     </flow>
 
     <flow name="expressionRequest">
-        <http:request url="#[url]" method="PUT"/>
+        <http:request url="#[vars.url]" method="PUT"/>
     </flow>
 
     <flow name="queryParamsRequest">
         <http:request url="http://localhost:${httpPort}/test?query=param" method="GET">
-            <http:query-params>#[queryParams]</http:query-params>
+            <http:query-params>#[vars.queryParams]</http:query-params>
         </http:request>
     </flow>
 

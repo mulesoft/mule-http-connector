@@ -13,20 +13,20 @@
     <flow name="headerList">
         <http:request config-ref="config" path="testPath">
             <http:headers>
-                #[{'testName1' : 'testValue1', (headerName) : headerValue}]
+                #[{'testName1' : 'testValue1', (vars.headerName) : vars.headerValue}]
             </http:headers>
         </http:request>
     </flow>
 
     <flow name="headerMap">
         <http:request config-ref="config" path="testPath">
-            <http:headers>#[headers]</http:headers>
+            <http:headers>#[vars.headers]</http:headers>
         </http:request>
     </flow>
 
     <flow name="headerOverride">
         <http:request config-ref="config" path="testPath">
-            <http:headers>#[headers ++ {'testName1':'testValue1'}]</http:headers>
+            <http:headers>#[vars.headers ++ {'testName1':'testValue1'}]</http:headers>
         </http:request>
     </flow>
 

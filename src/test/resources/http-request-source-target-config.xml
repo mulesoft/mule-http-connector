@@ -22,7 +22,7 @@
     <flow name="customSourceFlow">
         <http:request config-ref="config" path="test" method="POST">
             <http:body>
-                #[customSource]
+                #[vars.customSource]
             </http:body>
         </http:request>
         <object-to-string-transformer />

@@ -9,7 +9,7 @@
     <http:request-config name="basicConfig">
         <http:request-connection host="localhost" port="${httpPort}">
             <http:authentication>
-                <http:basic-authentication username="#[mel:user]" password="#[mel:password]" preemptive="#[mel:preemptive]" />
+                <http:basic-authentication username="#[vars.user]" password="#[vars.password]" preemptive="#[vars.preemptive]" />
             </http:authentication>
         </http:request-connection>
     </http:request-config>
@@ -22,7 +22,7 @@
     <http:request-config name="digestConfig">
         <http:request-connection host="localhost" port="${httpPort}">
             <http:authentication>
-                <http:digest-authentication username="#[mel:user]" password="#[mel:password]" />
+                <http:digest-authentication username="#[vars.user]" password="#[vars.password]" />
             </http:authentication>
         </http:request-connection>
     </http:request-config>

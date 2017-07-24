@@ -14,7 +14,7 @@
     </http:request-config>
 
     <flow name="clientCookiesEnabled" >
-        <http:request config-ref="requesterConfigCookiesEnabled" path="#[mel:path]" method="GET"/>
+        <http:request config-ref="requesterConfigCookiesEnabled" path="#[vars.path]" method="GET"/>
     </flow>
 
     <flow name="clientCookiesDisabled" >

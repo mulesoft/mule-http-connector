@@ -6,22 +6,22 @@
             http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
             http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <http:request-config name="dynamicConfig1" basePath="#[basePath]" followRedirects="#[follow]" sendBodyMode="#[send]">
-        <http:request-connection host="#[host]" port="${httpPort}"/>
+    <http:request-config name="dynamicConfig1" basePath="#[vars.basePath]" followRedirects="#[vars.follow]" sendBodyMode="#[vars.send]">
+        <http:request-connection host="#[vars.host]" port="${httpPort}"/>
     </http:request-config>
-    <http:request-config name="dynamicConfig2" requestStreamingMode="#[stream]" responseTimeout="#[timeout]">
-        <http:request-connection host="localhost" port="#[port]"/>
+    <http:request-config name="dynamicConfig2" requestStreamingMode="#[vars.stream]" responseTimeout="#[vars.timeout]">
+        <http:request-connection host="localhost" port="#[vars.port]"/>
     </http:request-config>
 
     <flow name="client1">
-        <http:request config-ref="dynamicConfig1" path="#[path]" method="#[method]"/>
+        <http:request config-ref="dynamicConfig1" path="#[vars.path]" method="#[vars.method]"/>
         <object-to-string-transformer />
     </flow>
 
     <flow name="client2" >
         <http:request config-ref="dynamicConfig2" path="testPath" method="POST">
             <http:body>
-                #[body]
+                #[vars.body]
             </http:body>
         </http:request>
         <object-to-string-transformer />

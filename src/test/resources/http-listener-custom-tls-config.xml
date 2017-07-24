@@ -27,7 +27,7 @@
     </http:listener-config>
 
     <http:request-config name="clientGlobalConfig">
-        <http:request-connection protocol="HTTPS" host="localhost" port="#[port]" tlsContext="globalTlsContext"/>
+        <http:request-connection protocol="HTTPS" host="localhost" port="#[vars.port]" tlsContext="globalTlsContext"/>
     </http:request-config>
 
     <flow name="testFlowGlobalContext">
