@@ -36,7 +36,7 @@
     <flow name="complexMapping">
         <http:request config-ref="simpleConfig" path="testPath">
             <error-mapping sourceType="CONNECTIVITY" targetType="MY_REQUESTER"/>
-            <http:headers>#[headers]</http:headers>
+            <http:headers>#[vars.headers]</http:headers>
         </http:request>
         <error-handler>
             <on-error-continue type="MY_REQUESTER">
@@ -52,7 +52,7 @@
         <http:request config-ref="simpleConfig" path="testPath">
             <error-mapping sourceType="CONNECTIVITY" targetType="MY_REQUESTER"/>
             <error-mapping sourceType="EXPRESSION" targetType="MY_OTHER_ERROR"/>
-            <http:headers>#[headers]</http:headers>
+            <http:headers>#[vars.headers]</http:headers>
         </http:request>
         <error-handler>
             <on-error-continue type="MY_REQUESTER">

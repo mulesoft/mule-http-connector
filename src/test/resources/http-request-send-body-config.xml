@@ -11,19 +11,19 @@
     </http:request-config>
 
     <flow name="sendBodyConfig">
-        <http:request config-ref="config" path="requestPath" method="#[method]" />
+        <http:request config-ref="config" path="requestPath" method="#[vars.method]" />
     </flow>
 
     <flow name="sendBodyAuto">
-        <http:request config-ref="config" path="requestPath" method="#[method]" sendBodyMode="AUTO"/>
+        <http:request config-ref="config" path="requestPath" method="#[vars.method]" sendBodyMode="AUTO"/>
     </flow>
 
     <flow name="sendBodyAlways">
-        <http:request config-ref="config" path="requestPath" method="#[method]" sendBodyMode="ALWAYS"/>
+        <http:request config-ref="config" path="requestPath" method="#[vars.method]" sendBodyMode="ALWAYS"/>
     </flow>
 
     <flow name="sendBodyNever">
-        <http:request config-ref="config" path="requestPath" method="#[method]" sendBodyMode="NEVER"/>
+        <http:request config-ref="config" path="requestPath" method="#[vars.method]" sendBodyMode="NEVER"/>
     </flow>
 
 

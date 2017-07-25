@@ -25,7 +25,7 @@
 
     <flow name="streamingAuto">
         <http:request config-ref="requestConfig"  method="POST" path="path">
-            <http:headers>#[headers]</http:headers>
+            <http:headers>#[vars.headers]</http:headers>
         </http:request>
         <object-to-string-transformer />
     </flow>
@@ -41,14 +41,14 @@
 
     <flow name="streamingAlways">
         <http:request config-ref="requestConfig"  method="POST" path="path" requestStreamingMode="ALWAYS">
-            <http:headers>#[headers]</http:headers>
+            <http:headers>#[vars.headers]</http:headers>
         </http:request>
         <object-to-string-transformer />
     </flow>
 
     <flow name="streamingNever">
         <http:request config-ref="requestConfig"  method="POST" path="path" requestStreamingMode="NEVER">
-            <http:headers>#[headers]</http:headers>
+            <http:headers>#[vars.headers]</http:headers>
         </http:request>
         <object-to-string-transformer />
     </flow>

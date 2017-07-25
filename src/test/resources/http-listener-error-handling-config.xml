@@ -43,7 +43,7 @@
         <http:listener config-ref="listenerConfig" path="/exceptionPropagation">
             <http:error-response>
                 <http:body>#[payload]</http:body>
-                <http:headers>#[{'headerName':myHeader}]</http:headers>
+                <http:headers>#[{'headerName':vars.myHeader}]</http:headers>
             </http:error-response>
         </http:listener>
         <test:processor throwException="true"/>

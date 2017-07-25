@@ -13,20 +13,20 @@
     <flow name="queryParamList">
         <http:request config-ref="config" path="testPath" method="POST">
             <http:query-params>
-                #[{'testName1' : 'testValue1', (paramName) : paramValue}]
+                #[{'testName1' : 'testValue1', (vars.paramName) : vars.paramValue}]
             </http:query-params>
         </http:request>
     </flow>
 
     <flow name="queryParamMap">
         <http:request config-ref="config" path="testPath">
-            <http:query-params>#[params]</http:query-params>
+            <http:query-params>#[vars.params]</http:query-params>
         </http:request>
     </flow>
 
     <flow name="multipleQueryParam">
         <http:request config-ref="config" path="testPath">
-            <http:query-params>#[params ++ {'testName1':'testValue1'}]</http:query-params>
+            <http:query-params>#[vars.params ++ {'testName1':'testValue1'}]</http:query-params>
         </http:request>
     </flow>
 

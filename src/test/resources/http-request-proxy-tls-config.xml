@@ -11,7 +11,7 @@
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <http:request-config name="requestConfig">
-        <http:request-connection host="#[mel:host]" port="${httpPort}" protocol="HTTPS">
+        <http:request-connection host="#[vars.host]" port="${httpPort}" protocol="HTTPS">
             <tls:context>
                 <tls:trust-store path="${trustStorePath}" password="changeit"/>
             </tls:context>
@@ -30,7 +30,7 @@
     </http:listener-config>
 
     <flow name="clientFlow">
-        <http:request config-ref="requestConfig" path="#[mel:path]" method="POST"/>
+        <http:request config-ref="requestConfig" path="#[vars.path]" method="POST"/>
         <object-to-string-transformer />
     </flow>
 

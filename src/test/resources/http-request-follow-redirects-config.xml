@@ -16,7 +16,7 @@
         <http:request-connection host="localhost" port="${httpPort}"/>
     </http:request-config>
 
-    <http:request-config name="withFollowRedirectsExpression" followRedirects="#[mel:redirect]">
+    <http:request-config name="withFollowRedirectsExpression" followRedirects="#[vars.redirect]">
         <http:request-connection host="localhost" port="${httpPort}"/>
     </http:request-config>
 
@@ -45,7 +45,7 @@
     </flow>
 
     <flow name="followRedirectsExpression">
-        <http:request config-ref="noFollowRedirects" path="testPath" followRedirects="#[mel:redirect]"/>
+        <http:request config-ref="noFollowRedirects" path="testPath" followRedirects="#[vars.redirect]"/>
         <object-to-string-transformer />
     </flow>
 

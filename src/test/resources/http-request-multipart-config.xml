@@ -11,7 +11,7 @@
     </http:request-config>
 
     <flow name="requestFlow">
-        <http:request config-ref="requestConfig" method="GET" path="#[mel:requestPath]"/>
+        <http:request config-ref="requestConfig" method="GET" path="#[vars.requestPath]"/>
     </flow>
 
 </mule>
