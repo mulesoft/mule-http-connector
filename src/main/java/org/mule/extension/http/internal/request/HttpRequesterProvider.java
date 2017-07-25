@@ -19,6 +19,7 @@ import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CON
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.SECURITY_TAB;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTP;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.internal.request.client.DefaultUriParameters;
@@ -27,6 +28,7 @@ import org.mule.extension.socket.api.socket.tcp.TcpClientSocketProperties;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -35,10 +37,10 @@ import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
-import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.RefName;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
@@ -50,7 +52,6 @@ import org.mule.runtime.http.api.client.proxy.ProxyConfig;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Connection provider for a HTTP request, handles the creation of {@link HttpExtensionClient} instances.
@@ -60,7 +61,7 @@ import org.slf4j.LoggerFactory;
 @Alias("request")
 public class HttpRequesterProvider implements CachedConnectionProvider<HttpExtensionClient>, Initialisable, Disposable {
 
-  private static final Logger logger = LoggerFactory.getLogger(HttpRequesterProvider.class);
+  private static final Logger LOGGER = getLogger(HttpRequesterProvider.class);
 
   private static final int UNLIMITED_CONNECTIONS = -1;
   private static final String NAME_PATTERN = "http.requester.%s";
@@ -68,7 +69,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
   @Inject
   private MuleContext muleContext;
 
-  @ConfigName
+  @RefName
   private String configName;
 
   @ParameterGroup(name = CONNECTION)
@@ -146,7 +147,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
   @Override
   public void dispose() {
     if (authentication != null) {
-      disposeIfNeeded(authentication, logger);
+      disposeIfNeeded(authentication, LOGGER);
     }
   }
 
@@ -187,7 +188,14 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
     }
     UriParameters uriParameters = new DefaultUriParameters(connectionParams.getProtocol(), connectionParams.getHost(),
                                                            connectionParams.getPort());
-    return new HttpExtensionClient(httpClient, uriParameters, authentication);
+    HttpExtensionClient extensionClient = new HttpExtensionClient(httpClient, uriParameters, authentication);
+    try {
+      extensionClient.start();
+    } catch (MuleException e) {
+      throw new ConnectionException(e);
+    }
+
+    return extensionClient;
   }
 
   private org.mule.runtime.http.api.tcp.TcpClientSocketProperties buildTcpProperties(TcpClientSocketProperties socketProperties) {
@@ -203,7 +211,15 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
   }
 
   @Override
-  public void disconnect(HttpExtensionClient httpClient) {}
+  public void disconnect(HttpExtensionClient httpClient) {
+    try {
+      httpClient.stop();
+    } catch (MuleException e) {
+      if (LOGGER.isWarnEnabled()) {
+        LOGGER.warn("Found exception trying to stop http client: " + e.getMessage(), e);
+      }
+    }
+  }
 
   public RequestConnectionParams getConnectionParams() {
     return connectionParams;
