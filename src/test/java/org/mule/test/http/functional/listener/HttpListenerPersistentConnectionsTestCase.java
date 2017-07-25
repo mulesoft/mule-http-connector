@@ -45,8 +45,6 @@ public abstract class HttpListenerPersistentConnectionsTestCase extends Abstract
   @Rule
   public DynamicPort persistentPortCloseHeader = new DynamicPort("persistentPortCloseHeader");
   @Rule
-  public DynamicPort persistentPortCloseProperty = new DynamicPort("persistentPortCloseProperty");
-  @Rule
   public DynamicPort persistentStreamingPort = new DynamicPort("persistentStreamingPort");
   @Rule
   public DynamicPort persistentStreamingTransformerPort = new DynamicPort("persistentStreamingTransformerPort");
