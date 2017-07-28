@@ -27,7 +27,7 @@ import javax.inject.Inject;
  *
  * @since 1.0
  */
-@Configuration(name = "request-config")
+@Configuration(name = "requestConfig")
 @ConnectionProviders(HttpRequesterProvider.class)
 @Operations({HttpRequestOperations.class})
 public class HttpRequesterConfig implements Initialisable, HttpRequesterCookieConfig {
