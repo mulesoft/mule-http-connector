@@ -19,8 +19,10 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
+
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.internal.HttpStreamingType;
+import org.mule.extension.http.internal.listener.intercepting.Interception;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.api.util.MultiMap;
@@ -63,28 +65,21 @@ public class HttpResponseFactory {
    *
    * @param responseBuilder The {@link HttpResponseBuilder} that should be modified if necessary and used to build the
    *        {@link HttpResponse}.
+   * @param interception
    * @param listenerResponseBuilder The generic {@HttpListenerResponseBuilder} configured for this listener.
-   * @param supportsTransferEncoding boolean that determines whether the HTTP protocol of the response supports streaming.
-   * @return an {@HttpResponse} configured based on the parameters.
+   * @param supportsTransferEncoding boolean that determines whether the HTTP protocol of the response supports streaming. @return
+   *        an {@HttpResponse} configured based on the parameters.
    * @throws MessagingException if the response creation fails.
    */
   public HttpResponse create(HttpResponseBuilder responseBuilder,
-                             HttpListenerResponseBuilder listenerResponseBuilder,
+                             Interception interception, HttpListenerResponseBuilder listenerResponseBuilder,
                              boolean supportsTransferEncoding)
       throws IOException {
 
-    MultiMap<String, String> headers = listenerResponseBuilder.getHeaders();
-
     final HttpResponseHeaderBuilder httpResponseHeaderBuilder = new HttpResponseHeaderBuilder();
 
-    headers.entryList().forEach(entry -> {
-      if (TRANSFER_ENCODING.equals(entry.getKey()) && !supportsTransferEncoding) {
-        logger.debug(
-                     "Client HTTP version is lower than 1.1 so the unsupported 'Transfer-Encoding' header has been removed and 'Content-Length' will be sent instead.");
-      } else {
-        httpResponseHeaderBuilder.addHeader(entry.getKey(), entry.getValue());
-      }
-    });
+    addInterceptingHeaders(interception, httpResponseHeaderBuilder);
+    addUserHeaders(listenerResponseBuilder, supportsTransferEncoding, httpResponseHeaderBuilder);
 
     TypedValue<Object> body = listenerResponseBuilder.getBody();
     if (httpResponseHeaderBuilder.getContentType() == null && !ANY.matches(body.getDataType().getMediaType())) {
@@ -143,6 +138,26 @@ public class HttpResponseFactory {
 
     responseBuilder.entity(httpEntity);
     return responseBuilder.build();
+  }
+
+  private void addInterceptingHeaders(Interception interception, HttpResponseHeaderBuilder httpResponseHeaderBuilder) {
+    interception
+        .getHeaders().keySet()
+        .forEach(headerKey -> httpResponseHeaderBuilder.addHeader(headerKey, interception.getHeaders().get(headerKey)));
+  }
+
+  private void addUserHeaders(HttpListenerResponseBuilder listenerResponseBuilder, boolean supportsTransferEncoding,
+                              HttpResponseHeaderBuilder httpResponseHeaderBuilder) {
+    MultiMap<String, String> headers = listenerResponseBuilder.getHeaders();
+
+    headers.entryList().forEach(entry -> {
+      if (TRANSFER_ENCODING.equals(entry.getKey()) && !supportsTransferEncoding) {
+        logger.debug(
+                     "Client HTTP version is lower than 1.1 so the unsupported 'Transfer-Encoding' header has been removed and 'Content-Length' will be sent instead.");
+      } else {
+        httpResponseHeaderBuilder.addHeader(entry.getKey(), entry.getValue());
+      }
+    });
   }
 
   private byte[] getMessageAsBytes(Object payload) {

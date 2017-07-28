@@ -6,6 +6,8 @@
  */
 package org.mule.extension.http.internal.listener;
 
+import org.mule.extension.http.internal.listener.intercepting.Interception;
+import org.mule.extension.http.internal.listener.intercepting.NoInterception;
 import org.mule.runtime.http.api.server.async.HttpResponseReadyCallback;
 
 /**
@@ -18,6 +20,7 @@ public class HttpResponseContext {
   private String httpVersion;
   private boolean supportStreaming = true;
   private HttpResponseReadyCallback responseCallback;
+  private Interception interception;
 
   public String getHttpVersion() {
     return httpVersion;
@@ -41,5 +44,13 @@ public class HttpResponseContext {
 
   public void setResponseCallback(HttpResponseReadyCallback responseCallback) {
     this.responseCallback = responseCallback;
+  }
+
+  public void setInterception(Interception interception) {
+    this.interception = interception;
+  }
+
+  public Interception getInterception() {
+    return interception != null ? interception : new NoInterception();
   }
 }

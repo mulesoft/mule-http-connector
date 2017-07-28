@@ -25,6 +25,9 @@ import org.mule.extension.http.internal.request.HttpRequesterConfig;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
 import org.mule.extension.socket.api.socket.tcp.TcpClientSocketProperties;
 import org.mule.extension.socket.api.socket.tcp.TcpServerSocketProperties;
+import org.mule.modules.cors.configuration.origin.EveryOrigin;
+import org.mule.modules.cors.configuration.origin.Origin;
+import org.mule.modules.cors.configuration.origin.SingleOrigin;
 import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extension;
@@ -51,6 +54,7 @@ import org.mule.runtime.http.api.client.proxy.ProxyConfig;
 @SubTypeMapping(baseType = ProxyConfig.class, subTypes = {DefaultProxyConfig.class, DefaultNtlmProxyConfig.class})
 @SubTypeMapping(baseType = ResponseValidator.class,
     subTypes = {SuccessStatusCodeValidator.class, FailureStatusCodeValidator.class})
+@SubTypeMapping(baseType = Origin.class, subTypes = {EveryOrigin.class, SingleOrigin.class})
 @Import(type = TcpClientSocketProperties.class)
 @Import(type = TcpServerSocketProperties.class)
 @ErrorTypes(HttpError.class)

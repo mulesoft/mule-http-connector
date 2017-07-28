@@ -7,8 +7,10 @@
 package org.mule.extension.http.internal.listener;
 
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
+
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.internal.HttpStreamingType;
+import org.mule.extension.http.internal.listener.intercepting.Interception;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
@@ -32,23 +34,25 @@ public class HttpListenerResponseSender {
                            HttpListenerResponseBuilder response,
                            SourceCompletionCallback completionCallback)
       throws Exception {
-    HttpResponse httpResponse = buildResponse(response, context.isSupportStreaming());
+    HttpResponse httpResponse = buildResponse(response, context.getInterception(), context.isSupportStreaming());
     final HttpResponseReadyCallback responseCallback = context.getResponseCallback();
     responseCallback.responseReady(httpResponse, getResponseFailureCallback(responseCallback, completionCallback));
   }
 
-  protected HttpResponse buildResponse(HttpListenerResponseBuilder listenerResponseBuilder, boolean supportStreaming)
+  protected HttpResponse buildResponse(HttpListenerResponseBuilder listenerResponseBuilder, Interception interception,
+                                       boolean supportStreaming)
       throws Exception {
     HttpResponseBuilder responseBuilder = HttpResponse.builder();
 
-    return doBuildResponse(responseBuilder, listenerResponseBuilder, supportStreaming);
+    return doBuildResponse(responseBuilder, listenerResponseBuilder, interception, supportStreaming);
   }
 
   protected HttpResponse doBuildResponse(HttpResponseBuilder responseBuilder,
                                          HttpListenerResponseBuilder listenerResponseBuilder,
+                                         Interception interception,
                                          boolean supportsStreaming)
       throws Exception {
-    return responseFactory.create(responseBuilder, listenerResponseBuilder, supportsStreaming);
+    return responseFactory.create(responseBuilder, interception, listenerResponseBuilder, supportsStreaming);
   }
 
   private ResponseStatusCallback getResponseFailureCallback(HttpResponseReadyCallback responseReadyCallback,

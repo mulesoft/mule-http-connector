@@ -27,10 +27,10 @@ import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
-import org.mule.runtime.extension.api.annotation.param.RefName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.RefName;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
@@ -57,8 +57,8 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
 
     /**
      * Protocol to use for communication. Valid values are HTTP and HTTPS. Default value is HTTP. When using HTTPS the HTTP
-     * communication is going to be secured using TLS / SSL. If HTTPS was configured as protocol then the user needs to configure at
-     * least the keystore in the tls:context child element of this listener-config.
+     * communication is going to be secured using TLS / SSL. If HTTPS was configured as protocol then the user needs to configure
+     * at least the keystore in the tls:context child element of this listener-config.
      */
     @Parameter
     @Optional(defaultValue = "HTTP")
