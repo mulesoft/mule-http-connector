@@ -29,7 +29,8 @@ import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.ERRORS;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.ERROR_HANDLING;
 
 import io.qameta.allure.Stories;
-import org.mule.functional.junit4.FlowRunner;
+
+import org.mule.functional.api.flow.FlowRunner;
 import org.mule.functional.junit4.rules.ExpectedError;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.util.concurrent.Latch;

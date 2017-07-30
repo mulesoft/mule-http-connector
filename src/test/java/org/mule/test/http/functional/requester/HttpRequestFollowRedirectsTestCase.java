@@ -7,10 +7,12 @@
 package org.mule.test.http.functional.requester;
 
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
+
+import org.mule.functional.api.flow.FlowRunner;
+
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.Event;
 
