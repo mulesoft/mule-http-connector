@@ -121,7 +121,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
     MultiMap<String, String> retrivedQueryParams = attributes.getQueryParams();
     assertThat(retrivedQueryParams, notNullValue());
     assertThat(retrivedQueryParams.size(), is(2));
-    assertThat(retrivedQueryParams.get(QUERY_PARAM_NAME), is(QUERY_PARAM_SECOND_VALUE));
+    assertThat(retrivedQueryParams.get(QUERY_PARAM_NAME), is(QUERY_PARAM_VALUE));
     assertThat(retrivedQueryParams.getAll(QUERY_PARAM_NAME).size(), is(2));
     assertThat(retrivedQueryParams.getAll(QUERY_PARAM_NAME),
                Matchers.containsInAnyOrder(new String[] {QUERY_PARAM_VALUE, QUERY_PARAM_SECOND_VALUE}));
