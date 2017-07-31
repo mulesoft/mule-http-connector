@@ -8,8 +8,8 @@ package org.mule.test.http.functional.listener;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.mule.functional.api.component.FlowAssert.verify;
 import static org.mule.runtime.http.api.HttpConstants.Method.POST;
+import static org.mule.tck.processor.FlowAssert.verify;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
 import org.mule.runtime.api.tls.TlsContextFactory;

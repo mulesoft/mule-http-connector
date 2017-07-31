@@ -115,11 +115,11 @@
         </dependency>
 
         <!-- Tests -->
-        <!-- MULE-9702 Remove once tests are migrated-->
         <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-unit</artifactId>
+            <groupId>org.mule.tests.plugin</groupId>
+            <artifactId>mule-tests-component-plugin</artifactId>
             <version>${mule.version}</version>
+            <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
 
