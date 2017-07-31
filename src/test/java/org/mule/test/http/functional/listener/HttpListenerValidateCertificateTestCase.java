@@ -56,8 +56,8 @@ public class HttpListenerValidateCertificateTestCase extends AbstractHttpTestCas
   @Before
   public void setup() {
     // Configure trust store in the client with the certificate of the server.
-    tlsContextFactoryBuilder.setTrustStorePath("tls/trustStore");
-    tlsContextFactoryBuilder.setTrustStorePassword("mulepassword");
+    tlsContextFactoryBuilder.trustStorePath("tls/trustStore");
+    tlsContextFactoryBuilder.trustStorePassword("mulepassword");
   }
 
   @After
@@ -128,9 +128,9 @@ public class HttpListenerValidateCertificateTestCase extends AbstractHttpTestCas
    * Configure key store for the client (the server contains this certificate in its trust store)
    */
   private void configureClientKeyStore() {
-    tlsContextFactoryBuilder.setKeyStorePath("tls/ssltest-keystore.jks");
-    tlsContextFactoryBuilder.setKeyStorePassword("changeit");
-    tlsContextFactoryBuilder.setKeyPassword("changeit");
+    tlsContextFactoryBuilder.keyStorePath("tls/ssltest-keystore.jks");
+    tlsContextFactoryBuilder.keyStorePassword("changeit");
+    tlsContextFactoryBuilder.keyPassword("changeit");
   }
 
   private String getUrl(int port) {

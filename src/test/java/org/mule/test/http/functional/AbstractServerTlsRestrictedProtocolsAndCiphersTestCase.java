@@ -92,8 +92,8 @@ public abstract class AbstractServerTlsRestrictedProtocolsAndCiphersTestCase
 
   private SSLSocket createSocket(String[] cipherSuites, String[] enabledProtocols) throws Exception {
     TlsContextFactory tlsContextFactory = TlsContextFactory.builder()
-        .setTrustStorePath("tls/trustStore")
-        .setTrustStorePassword("mulepassword")
+        .trustStorePath("tls/trustStore")
+        .trustStorePassword("mulepassword")
         .build();
 
     SSLContext sslContext = tlsContextFactory.createSslContext();

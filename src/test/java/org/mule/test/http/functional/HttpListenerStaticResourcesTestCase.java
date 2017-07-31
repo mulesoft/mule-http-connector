@@ -62,8 +62,8 @@ public class HttpListenerStaticResourcesTestCase extends AbstractHttpTestCase {
   public void setup() throws CreateException {
     // Configure trust store in the client with the certificate of the server.
     tlsContextFactory = TlsContextFactory.builder()
-        .setTrustStorePath("tls/trustStore")
-        .setTrustStorePassword("mulepassword")
+        .trustStorePath("tls/trustStore")
+        .trustStorePassword("mulepassword")
         .build();
   }
 

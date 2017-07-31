@@ -36,7 +36,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 
@@ -71,8 +70,8 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
 
   @Before
   public void setUp() {
-    tlsContextFactoryBuilder.setTrustStorePath("tls/trustStore");
-    tlsContextFactoryBuilder.setTrustStorePassword("mulepassword");
+    tlsContextFactoryBuilder.trustStorePath("tls/trustStore");
+    tlsContextFactoryBuilder.trustStorePassword("mulepassword");
   }
 
   @After
@@ -102,7 +101,7 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
 
   @Test
   public void worksWithCipherSuiteMatch() throws Exception {
-    tlsContextFactoryBuilder.setEnabledCipherSuites(cipherSuites.getValue());
+    tlsContextFactoryBuilder.enabledCipherSuites(cipherSuites.getValue());
     tlsContextFactory = tlsContextFactoryBuilder.build();
     createHttpClient();
 
