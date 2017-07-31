@@ -24,12 +24,12 @@
 
     <flow name="multipleString">
         <http:listener config-ref="listenerConfig" path="multipleHeadersString"/>
-        <set-payload value="#[attributes.headers['${header}']]"/>
+        <set-payload value="#[attributes.headers.*'${header}'[-1]]"/>
     </flow>
 
     <flow name="multipleCollection">
         <http:listener config-ref="listenerConfig" path="multipleHeadersCollection"/>
-        <set-payload value="#[mel:message.getAttributes().getHeaders().getAll('${header}').iterator().next()]"/>
+        <set-payload value="#[attributes.headers.*'${header}'[0]]"/>
     </flow>
 
     <flow name="returnHeaders">
