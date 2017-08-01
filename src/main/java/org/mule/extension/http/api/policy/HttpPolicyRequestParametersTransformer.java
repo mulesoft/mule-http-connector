@@ -38,11 +38,11 @@ public class HttpPolicyRequestParametersTransformer implements OperationPolicyPa
     String path = (String) parameters.get("path");
     TypedValue<Object> body = (TypedValue<Object>) parameters.getOrDefault("body", TypedValue.of(null));
 
-    return Message.builder().payload(body.getValue())
-        .attributes(new HttpPolicyRequestAttributes(getMap(parameters, "headers"),
-                                                    getMap(parameters, "queryParams"),
-                                                    getMap(parameters, "uriParams"),
-                                                    path))
+    return Message.builder().value(body.getValue())
+        .attributesValue(new HttpPolicyRequestAttributes(getMap(parameters, "headers"),
+                                                         getMap(parameters, "queryParams"),
+                                                         getMap(parameters, "uriParams"),
+                                                         path))
         .mediaType(body.getDataType().getMediaType())
         .build();
   }

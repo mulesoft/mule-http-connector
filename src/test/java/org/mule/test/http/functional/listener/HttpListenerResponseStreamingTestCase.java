@@ -158,7 +158,7 @@ public abstract class HttpListenerResponseStreamingTestCase extends AbstractHttp
 
   private static MultiPartPayload createMultipartPayload() {
     PartAttributes partAttributes = new PartAttributes("aName");
-    Message part = builder().payload(TEST_BODY).attributes(partAttributes).mediaType(TEXT).build();
+    Message part = builder().value(TEST_BODY).attributesValue(partAttributes).mediaType(TEXT).build();
     return new DefaultMultiPartPayload(part);
   }
 

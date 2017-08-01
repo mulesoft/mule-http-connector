@@ -32,8 +32,8 @@ public class ResponseValidatorException extends MuleRuntimeException implements 
   public ResponseValidatorException(String message, Result<InputStream, HttpResponseAttributes> result) {
     this(message);
     this.errorMessage = Message.builder()
-        .payload(result.getOutput())
-        .attributes(result.getAttributes().get())
+        .value(result.getOutput())
+        .attributesValue(result.getAttributes().get())
         .mediaType(result.getMediaType().orElse(ANY))
         .build();
   }
