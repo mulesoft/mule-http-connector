@@ -37,6 +37,7 @@ import org.mule.extension.http.internal.HttpMetadataResolver;
 import org.mule.extension.http.internal.HttpStreamingType;
 import org.mule.extension.http.internal.listener.server.ModuleRequestHandler;
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -118,7 +119,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   private HttpListenerConfig config;
 
   @Connection
-  private HttpServer server;
+  private ConnectionProvider<HttpServer> serverProvider;
 
   /**
    * Relative path from the path set in the HTTP Listener configuration
@@ -147,6 +148,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   @Placement(tab = ADVANCED_TAB)
   private HttpStreamingType responseStreamingMode;
 
+  private HttpServer server;
   private HttpListenerResponseSender responseSender;
   private ListenerPath listenerPath;
   private RequestHandlerManager requestHandlerManager;
@@ -236,6 +238,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
 
   @Override
   public void onStart(SourceCallback<InputStream, HttpRequestAttributes> sourceCallback) throws MuleException {
+    server = serverProvider.connect();
     listenerPath = config.getFullListenerPath(config.sanitizePathWithStartSlash(path));
     path = listenerPath.getResolvedPath();
     responseFactory =
@@ -279,6 +282,10 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
     if (requestHandlerManager != null) {
       requestHandlerManager.stop();
       requestHandlerManager.dispose();
+    }
+
+    if (server != null) {
+      serverProvider.disconnect(server);
     }
   }
 
