@@ -32,8 +32,8 @@ public class ResponseValidatorTypedException extends ModuleException implements 
   public ResponseValidatorTypedException(String message, HttpError error, Result<InputStream, HttpResponseAttributes> result) {
     this(message, error);
     this.errorMessage = Message.builder()
-        .payload(result.getOutput())
-        .attributes(result.getAttributes().get())
+        .value(result.getOutput())
+        .attributesValue(result.getAttributes().get())
         .mediaType(result.getMediaType().orElse(ANY))
         .build();
   }

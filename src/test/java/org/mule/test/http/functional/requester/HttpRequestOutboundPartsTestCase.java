@@ -126,7 +126,7 @@ public class HttpRequestOutboundPartsTestCase extends AbstractHttpRequestTestCas
   }
 
   private void addPartToSend(Object content, PartAttributes partAttributes) {
-    partsToSend.add(builder().payload(content).attributes(partAttributes).build());
+    partsToSend.add(builder().value(content).attributesValue(partAttributes).build());
   }
 
   @Test
@@ -168,7 +168,7 @@ public class HttpRequestOutboundPartsTestCase extends AbstractHttpRequestTestCas
   }
 
   private void addPartToSend(Object content, MediaType contentType, PartAttributes attributes) throws Exception {
-    partsToSend.add(builder().payload(content).attributes(attributes).mediaType(contentType).build());
+    partsToSend.add(builder().value(content).attributesValue(attributes).mediaType(contentType).build());
   }
 
   private void assertPart(String name, MediaType expectedContentType, String expectedBody) throws Exception {

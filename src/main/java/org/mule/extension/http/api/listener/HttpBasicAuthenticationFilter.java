@@ -124,9 +124,9 @@ public class HttpBasicAuthenticationFilter {
     }
     MultiMap<String, String> headers = new MultiMap<>();
     headers.put(WWW_AUTHENTICATE, realmHeader);
-    return Message.builder().nullPayload().attributes(new HttpListenerResponseAttributes(UNAUTHORIZED.getStatusCode(),
-                                                                                         UNAUTHORIZED.getReasonPhrase(),
-                                                                                         headers))
+    return Message.builder().nullValue().attributesValue(new HttpListenerResponseAttributes(UNAUTHORIZED.getStatusCode(),
+                                                                                            UNAUTHORIZED.getReasonPhrase(),
+                                                                                            headers))
         .build();
   }
 

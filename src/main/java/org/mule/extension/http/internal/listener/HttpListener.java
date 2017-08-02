@@ -264,12 +264,12 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   private List<ErrorTypeMatcher> createErrorMatcherList(ErrorTypeRepository errorTypeRepository) {
     List<ErrorTypeMatcher> matchers = new LinkedList<>();
     matchers.add(new SingleErrorTypeMatcher(errorTypeRepository.lookupErrorType(SECURITY).get()));
-    ComponentIdentifier.Builder httpErrorBuilder = builder().withNamespace(HTTP_NAMESPACE.toUpperCase());
+    ComponentIdentifier.Builder httpErrorBuilder = builder().namespace(HTTP_NAMESPACE.toUpperCase());
     matchers.add(new SingleErrorTypeMatcher(errorTypeRepository.lookupErrorType(httpErrorBuilder
-        .withName(NOT_FOUND.name())
+        .name(NOT_FOUND.name())
         .build()).get()));
     matchers.add(new SingleErrorTypeMatcher(errorTypeRepository.lookupErrorType(httpErrorBuilder
-        .withName(BASIC_AUTHENTICATION.name())
+        .name(BASIC_AUTHENTICATION.name())
         .build()).get()));
     return matchers;
   }

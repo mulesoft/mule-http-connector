@@ -34,9 +34,9 @@ public class ResourceNotFoundException extends ModuleException implements ErrorM
   @Override
   public Message getErrorMessage() {
     return Message.builder()
-        .payload(null)
-        .attributes(new HttpListenerResponseAttributes(NOT_FOUND.getStatusCode(), NOT_FOUND.getReasonPhrase(),
-                                                       new MultiMap<>()))
+        .nullValue()
+        .attributesValue(new HttpListenerResponseAttributes(NOT_FOUND.getStatusCode(), NOT_FOUND.getReasonPhrase(),
+                                                            new MultiMap<>()))
         .build();
   }
 

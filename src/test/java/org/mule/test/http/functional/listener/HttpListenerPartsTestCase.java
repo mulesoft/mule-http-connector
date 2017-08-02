@@ -284,7 +284,7 @@ public class HttpListenerPartsTestCase extends AbstractHttpTestCase {
     @Override
     public Event process(Event event) throws MuleException {
       PartAttributes partAttributes = new PartAttributes(TEXT_BODY_FIELD_NAME);
-      Message part = builder().payload(TEXT_BODY_FIELD_VALUE).attributes(partAttributes).mediaType(TEXT_PLAIN_LATIN).build();
+      Message part = builder().value(TEXT_BODY_FIELD_VALUE).attributesValue(partAttributes).mediaType(TEXT_PLAIN_LATIN).build();
       return Event.builder(event).message(of(new DefaultMultiPartPayload(part))).build();
     }
   }
@@ -294,12 +294,12 @@ public class HttpListenerPartsTestCase extends AbstractHttpTestCase {
     @Override
     public Event process(Event event) throws MuleException {
       PartAttributes part1Attributes = new PartAttributes(TEXT_BODY_FIELD_NAME);
-      Message part1 = builder().payload(TEXT_BODY_FIELD_VALUE).attributes(part1Attributes).mediaType(TEXT_PLAIN_LATIN).build();
+      Message part1 = builder().value(TEXT_BODY_FIELD_VALUE).attributesValue(part1Attributes).mediaType(TEXT_PLAIN_LATIN).build();
       PartAttributes part2Attributes = new PartAttributes(FILE_BODY_FIELD_NAME,
                                                           FILE_BODY_FIELD_FILENAME,
                                                           FILE_BODY_FIELD_VALUE.length(),
                                                           emptyMap());
-      Message part2 = builder().payload(FILE_BODY_FIELD_VALUE).attributes(part2Attributes).mediaType(BINARY).build();
+      Message part2 = builder().value(FILE_BODY_FIELD_VALUE).attributesValue(part2Attributes).mediaType(BINARY).build();
       return Event.builder(event).message(of(new DefaultMultiPartPayload(part1, part2))).build();
     }
   }

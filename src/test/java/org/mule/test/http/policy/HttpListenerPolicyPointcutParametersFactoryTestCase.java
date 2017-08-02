@@ -29,7 +29,7 @@ import io.qameta.allure.Feature;
 public class HttpListenerPolicyPointcutParametersFactoryTestCase extends AbstractMuleTestCase {
 
   private static final ComponentIdentifier HTTP_LISTENER_COMPONENT_IDENTIFIER =
-      builder().withNamespace("http").withName("listener").build();
+      builder().namespace("http").name("listener").build();
   private static final String TEST_REQUEST_PATH = "test-request-path";
   private static final String TEST_METHOD = "PUT";
 
@@ -48,7 +48,7 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
   @Test
   public void doesNotSupportHttpRequester() {
     assertThat(factory
-        .supportsSourceIdentifier(ComponentIdentifier.builder().withNamespace("http").withName("request").build()),
+        .supportsSourceIdentifier(ComponentIdentifier.builder().namespace("http").name("request").build()),
                is(false));
   }
 

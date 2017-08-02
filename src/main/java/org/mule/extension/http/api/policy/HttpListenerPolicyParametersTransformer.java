@@ -46,13 +46,13 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
     Message.PayloadBuilder builder = Message.builder();
     TypedValue<Object> body = responseBuilder.getBody();
     if (body.getValue() == null) {
-      messageBuilder = builder.nullPayload();
+      messageBuilder = builder.nullValue();
     } else {
-      messageBuilder = builder.payload(body.getValue()).mediaType(body.getDataType().getMediaType());
+      messageBuilder = builder.value(body.getValue()).mediaType(body.getDataType().getMediaType());
     }
     int statusCode = responseBuilder.getStatusCode() == null ? defaultStatusCode : responseBuilder.getStatusCode();
     return messageBuilder
-        .attributes(new HttpResponseAttributes(statusCode, responseBuilder.getReasonPhrase(), headers))
+        .attributesValue(new HttpResponseAttributes(statusCode, responseBuilder.getReasonPhrase(), headers))
         .build();
   }
 

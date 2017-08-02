@@ -246,8 +246,8 @@ public class HttpListenerErrorInterpretationTestCase extends AbstractHttpTestCas
 
     public ErrorMessageException() {
       super(new WrapperErrorMessageAwareException(Message.builder()
-          .payload(ERROR)
-          .attributes(attributesToSend)
+          .value(ERROR)
+          .attributesValue(attributesToSend)
           .build(), new IOException(OOPS)), errorToThrow);
     }
 

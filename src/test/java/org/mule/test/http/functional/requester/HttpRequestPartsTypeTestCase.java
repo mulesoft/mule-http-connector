@@ -74,7 +74,7 @@ public class HttpRequestPartsTypeTestCase extends AbstractHttpTestCase {
 
   private MultiPartPayload getMultiPartPayload(Object data) {
     PartAttributes partAttributes = new PartAttributes("someJson");
-    Message part = builder().payload(data).attributes(partAttributes).mediaType(JSON).build();
+    Message part = builder().value(data).attributesValue(partAttributes).mediaType(JSON).build();
     return new DefaultMultiPartPayload(part);
   }
 }

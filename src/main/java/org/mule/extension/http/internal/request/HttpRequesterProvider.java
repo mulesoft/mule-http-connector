@@ -200,13 +200,13 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
 
   private org.mule.runtime.http.api.tcp.TcpClientSocketProperties buildTcpProperties(TcpClientSocketProperties socketProperties) {
     return org.mule.runtime.http.api.tcp.TcpClientSocketProperties.builder()
-        .setSendBufferSize(socketProperties.getSendBufferSize())
-        .setSendBufferSize(socketProperties.getSendBufferSize())
-        .setClientTimeout(socketProperties.getClientTimeout())
-        .setSendTcpNoDelay(socketProperties.getSendTcpNoDelay())
-        .setLinger(socketProperties.getLinger())
-        .setKeepAlive(socketProperties.getKeepAlive())
-        .setConnectionTimeout(socketProperties.getConnectionTimeout())
+        .sendBufferSize(socketProperties.getSendBufferSize())
+        .sendBufferSize(socketProperties.getSendBufferSize())
+        .clientTimeout(socketProperties.getClientTimeout())
+        .sendTcpNoDelay(socketProperties.getSendTcpNoDelay())
+        .linger(socketProperties.getLinger())
+        .keepAlive(socketProperties.getKeepAlive())
+        .connectionTimeout(socketProperties.getConnectionTimeout())
         .build();
   }
 

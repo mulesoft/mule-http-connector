@@ -84,7 +84,7 @@ public class HttpListenerNoBodyStatusTestCase extends AbstractHttpTestCase {
     @Override
     public Event process(Event event) throws MuleException {
       return Event.builder(event)
-          .message(Message.builder(event.getMessage()).payload(new ByteArrayInputStream(new byte[] {})).build())
+          .message(Message.builder(event.getMessage()).value(new ByteArrayInputStream(new byte[] {})).build())
           .build();
     }
   }
