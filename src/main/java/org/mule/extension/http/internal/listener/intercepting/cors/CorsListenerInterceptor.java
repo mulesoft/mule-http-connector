@@ -14,12 +14,21 @@ import org.mule.runtime.api.util.MultiMap;
 
 import java.util.ArrayList;
 
+/**
+ * CORS interceptor for {@link org.mule.extension.http.internal.listener.HttpListener}
+ */
 public class CorsListenerInterceptor extends CorsKernel implements HttpListenerInterceptor {
 
   public CorsListenerInterceptor() {
     super(new ArrayList<>());
   }
 
+  /**
+   * Validates that request matches CORS specification, and creates an {@link Interception} result.
+   * @param method request's method
+   * @param headers request's headers
+   * @return the suggested {@link Interception} result.
+   */
   @Override
   public Interception request(String method, MultiMap<String, String> headers) {
     CorsAction action = validate(method, headers);

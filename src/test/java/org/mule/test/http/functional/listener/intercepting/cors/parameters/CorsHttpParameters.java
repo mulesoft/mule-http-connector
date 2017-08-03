@@ -8,7 +8,7 @@ package org.mule.test.http.functional.listener.intercepting.cors.parameters;
 
 import static org.mule.runtime.http.api.HttpConstants.Method.GET;
 
-import org.mule.modules.cors.query.CorsTestQuery;
+import org.mule.modules.cors.query.KernelTestParameters;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.HttpConstants;
 import org.mule.test.http.functional.listener.intercepting.cors.runner.CorsHttpEndpoint;
@@ -16,14 +16,10 @@ import org.mule.test.http.functional.listener.intercepting.cors.runner.CorsHttpE
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 
-public class CorsParameters implements CorsTestQuery {
+public class CorsHttpParameters extends KernelTestParameters {
 
-  private final HttpConstants.Method method;
-  private final MultiMap<String, String> headers;
-
-  public CorsParameters(HttpConstants.Method method, MultiMap<String, String> headers) {
-    this.method = method != null ? method : GET;
-    this.headers = headers;
+  public CorsHttpParameters(HttpConstants.Method method, MultiMap<String, String> headers) {
+    super(asString(method), headers);
   }
 
   public HttpUriRequest buildRequest(String port, CorsHttpEndpoint endpoint) {
@@ -38,5 +34,9 @@ public class CorsParameters implements CorsTestQuery {
 
   protected RequestBuilder request(String uri) {
     return RequestBuilder.create(method.toString()).setUri(uri);
+  }
+
+  private static String asString(HttpConstants.Method method) {
+    return method != null ? method.toString() : GET.toString();
   }
 }

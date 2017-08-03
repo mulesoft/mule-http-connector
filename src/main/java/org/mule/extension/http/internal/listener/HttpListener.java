@@ -35,7 +35,7 @@ import org.mule.extension.http.api.listener.builder.HttpListenerSuccessResponseB
 import org.mule.extension.http.api.listener.server.HttpListenerConfig;
 import org.mule.extension.http.internal.HttpMetadataResolver;
 import org.mule.extension.http.internal.HttpStreamingType;
-import org.mule.extension.http.internal.listener.intercepting.InterceptorException;
+import org.mule.extension.http.internal.listener.intercepting.InterceptingException;
 import org.mule.extension.http.internal.listener.server.ModuleRequestHandler;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -321,7 +321,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
         } catch (IllegalArgumentException e) {
           LOGGER.warn("Exception occurred parsing request:", e);
           sendErrorResponse(BAD_REQUEST, e.getMessage(), responseCallback);
-        } catch (InterceptorException e) {
+        } catch (InterceptingException e) {
           sendErrorResponse(e, responseCallback);
         } catch (RuntimeException e) {
           LOGGER.warn("Exception occurred processing request:", e);
@@ -339,7 +339,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
         return result.getAttributes().get().getHeaders();
       }
 
-      private void sendErrorResponse(InterceptorException interceptor, HttpResponseReadyCallback responseCallback) {
+      private void sendErrorResponse(InterceptingException interceptor, HttpResponseReadyCallback responseCallback) {
         HttpStatus status = interceptor.status();
 
         HttpResponseBuilder responseBuilder = HttpResponse.builder()

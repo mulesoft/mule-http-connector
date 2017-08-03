@@ -7,9 +7,11 @@
 package org.mule.extension.http.internal.listener.intercepting.cors;
 
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.ACCEPTED;
+import static org.mule.runtime.http.api.HttpHeaders.Names.ACCESS_CONTROL_ALLOW_ORIGIN;
 
 import org.mule.extension.http.internal.listener.intercepting.Interception;
 import org.mule.extension.http.internal.listener.intercepting.NoInterception;
+import org.mule.extension.http.internal.listener.intercepting.RequestInterruptedException;
 import org.mule.modules.cors.response.AddCorsHeaders;
 import org.mule.modules.cors.response.BlockRequest;
 import org.mule.modules.cors.response.CorsAction;
@@ -18,7 +20,11 @@ import org.mule.modules.cors.response.PreflightAction;
 import org.mule.modules.cors.response.visitor.CorsResponseVisitor;
 
 import java.util.HashMap;
+import java.util.Map;
 
+/**
+ * Creates an {@link Interception} from a {@link CorsAction}
+ */
 public class CorsInterceptionFactory implements CorsResponseVisitor<Interception> {
 
   public Interception from(CorsAction action) {
@@ -42,6 +48,8 @@ public class CorsInterceptionFactory implements CorsResponseVisitor<Interception
 
   @Override
   public Interception visit(PreflightAction preflightAction) {
-    throw new RequestInterruptedException(ACCEPTED, preflightAction.headers());
+    Map<String, String> headers = preflightAction.headers();
+    headers.put(ACCESS_CONTROL_ALLOW_ORIGIN, preflightAction.origin());
+    throw new RequestInterruptedException(ACCEPTED, headers);
   }
 }

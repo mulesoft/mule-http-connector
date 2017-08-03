@@ -6,16 +6,16 @@
  */
 package org.mule.extension.http.internal.listener.intercepting;
 
+import org.mule.runtime.http.api.HttpConstants;
+
 import java.util.Map;
 
 /**
- * Defines the protocol an interception of a resquest must contain.
+ * Exception that suggest request to be interrupted and flow not executed.
  */
-public interface Interception {
+public class RequestInterruptedException extends InterceptingException {
 
-  /**
-   * Returns the headers used for response decoration, blacklist or other operation defined by the interceptor.
-   * @return headers to operate with.
-   */
-  Map<String, String> getHeaders();
+  public RequestInterruptedException(HttpConstants.HttpStatus status, Map<String, String> headers) {
+    super(status, headers);
+  }
 }

@@ -6,13 +6,13 @@
  */
 package org.mule.test.http.functional.listener.intercepting.cors.runner;
 
-import org.mule.modules.cors.attributes.CorsTestAttributesBuilder;
-import org.mule.test.http.functional.listener.intercepting.cors.parameters.CorsParameters;
+import org.mule.modules.cors.attributes.KernelTestAttributesBuilder;
+import org.mule.test.http.functional.listener.intercepting.cors.parameters.CorsHttpParameters;
 
-public class CorsHttpAttributesBuilder extends CorsTestAttributesBuilder<CorsHttpAttributesBuilder, CorsParameters> {
+public class CorsHttpAttributesBuilder extends KernelTestAttributesBuilder<CorsHttpParameters> {
 
   @Override
-  public CorsParameters build() {
-    return new CorsParameters(method, headers);
+  public CorsHttpParameters build() {
+    return new CorsHttpParameters(method, headers);
   }
 }

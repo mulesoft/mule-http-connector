@@ -8,9 +8,9 @@ package org.mule.test.http.functional.listener.intercepting.cors.runner;
 
 import static org.junit.Assert.fail;
 
-import org.mule.modules.cors.result.CorsTestResult;
-import org.mule.test.http.functional.listener.intercepting.cors.parameters.CorsParameters;
-import org.mule.test.http.functional.listener.intercepting.cors.result.HttpCorsTestResult;
+import org.mule.modules.cors.result.KernelTestResult;
+import org.mule.test.http.functional.listener.intercepting.cors.parameters.CorsHttpParameters;
+import org.mule.test.http.functional.listener.intercepting.cors.result.CorsHttpTestResult;
 
 import java.io.IOException;
 
@@ -21,9 +21,9 @@ public class CorsRequestExecutor {
 
   private CloseableHttpClient httpClient = HttpClients.createDefault();
 
-  public CorsTestResult execute(CorsParameters parameters, CorsHttpEndpoint endpoint) {
+  public KernelTestResult execute(CorsHttpParameters parameters, CorsHttpEndpoint endpoint) {
     try {
-      return new HttpCorsTestResult(httpClient.execute(parameters.buildRequest(endpoint.port(), endpoint)));
+      return new CorsHttpTestResult(httpClient.execute(parameters.buildRequest(endpoint.port(), endpoint)));
     } catch (IOException e) {
       fail(e.getMessage());
       return null;

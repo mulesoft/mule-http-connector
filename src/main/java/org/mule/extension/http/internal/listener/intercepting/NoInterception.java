@@ -10,6 +10,9 @@ import org.mule.runtime.api.util.MultiMap;
 
 import java.util.Map;
 
+/**
+ * Null object pattern for {@link Interception}
+ */
 public class NoInterception implements Interception {
 
   @Override

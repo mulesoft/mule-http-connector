@@ -7,19 +7,26 @@
 package org.mule.test.http.functional.listener.intercepting.cors;
 
 import org.mule.modules.cors.PreflightKernelTestCase;
-import org.mule.modules.cors.result.CorsTestResult;
+import org.mule.modules.cors.attributes.KernelTestAttributesBuilder;
+import org.mule.modules.cors.result.KernelTestResult;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.test.http.functional.listener.intercepting.cors.parameters.CorsParameters;
+import org.mule.test.http.functional.listener.intercepting.cors.parameters.CorsHttpParameters;
 import org.mule.test.http.functional.listener.intercepting.cors.runner.CorsHttpAttributesBuilder;
 import org.mule.test.http.functional.listener.intercepting.cors.runner.CorsHttpEndpoint;
 import org.mule.test.http.functional.listener.intercepting.cors.runner.CorsRequestExecutor;
 
 import org.junit.Before;
 import org.junit.Rule;
+import org.junit.Test;
 
+/**
+ * Runs all preflight tests defined in CORS kernel.
+ *
+ * Other tests have been added to deal with HTTP specifics
+ */
 public class CorsPreflightTestCase extends
-    PreflightKernelTestCase<CorsParameters, CorsHttpAttributesBuilder, CorsHttpEndpoint> {
+    PreflightKernelTestCase<CorsHttpParameters, CorsHttpEndpoint> {
 
   private CorsRequestExecutor request;
 
@@ -43,13 +50,39 @@ public class CorsPreflightTestCase extends
     request = new CorsRequestExecutor();
   }
 
+  @Test
+  public void preflightOnAppendHeadersListener() {
+    preflightOnListener(appendHeadersEndpoint());
+  }
+
+  @Test
+  public void preflightOnErrorInFlowListener() {
+    preflightOnListener(errorInFlowEndpoint());
+  }
+
+  @Test
+  public void preflightOnErrorInFlowWithHeadersListener() {
+    preflightOnListener(errorInFlowAppendHeadersEndpoint());
+  }
+
+  private void preflightOnListener(CorsHttpEndpoint endpoint) {
+    CorsHttpParameters parameters = (CorsHttpParameters) preflight().withOrigin(ORIGIN).withRequestMethod(GET).build();
+    KernelTestResult response = run(parameters, endpoint);
+    check(response)
+        .origin(ORIGIN)
+        .maxAge(30)
+        .missingHeader("user-agent")
+        .missingHeader("x-miniverse")
+        .noPayload().go();
+  }
+
   @Override
   protected String getConfigFile() {
     return "http-listener-cors-interceptor.xml";
   }
 
   @Override
-  protected CorsHttpAttributesBuilder preflight() {
+  protected KernelTestAttributesBuilder preflight() {
     return new CorsHttpAttributesBuilder().preflight();
   }
 
@@ -74,7 +107,20 @@ public class CorsPreflightTestCase extends
   }
 
   @Override
-  protected CorsTestResult run(CorsParameters parameters, CorsHttpEndpoint endpoint) {
+  protected KernelTestResult run(CorsHttpParameters parameters, CorsHttpEndpoint endpoint) {
     return request.execute(parameters, endpoint);
+  }
+
+
+  private CorsHttpEndpoint appendHeadersEndpoint() {
+    return new CorsHttpEndpoint("listener-appends-headers", basicPort);
+  }
+
+  private CorsHttpEndpoint errorInFlowEndpoint() {
+    return new CorsHttpEndpoint("listener-error-no-extra-headers", basicPort);
+  }
+
+  private CorsHttpEndpoint errorInFlowAppendHeadersEndpoint() {
+    return new CorsHttpEndpoint("listener-error-with-headers", basicPort);
   }
 }

@@ -10,20 +10,34 @@ import org.mule.runtime.http.api.HttpConstants;
 
 import java.util.Map;
 
-public abstract class InterceptorException extends RuntimeException {
+/**
+ * If the {@link org.mule.extension.http.internal.listener.HttpListener} needs to be notified about an error in the intecepting
+ * process, then it should raise a child of {@link InterceptingException}.
+ *
+ * This object suggests the expected return headers and status code of the blocked request.
+ */
+public abstract class InterceptingException extends RuntimeException {
 
   private final HttpConstants.HttpStatus status;
   private final Map<String, String> headers;
 
-  public InterceptorException(HttpConstants.HttpStatus status, Map<String, String> headers) {
+  public InterceptingException(HttpConstants.HttpStatus status, Map<String, String> headers) {
     this.status = status;
     this.headers = headers;
   }
 
+  /**
+   * Suggested status code
+   * @return status code
+   */
   public HttpConstants.HttpStatus status() {
     return status;
   }
 
+  /**
+   * Suggested response headers
+   * @return response headers
+   */
   public Map<String, String> headers() {
     return headers;
   }

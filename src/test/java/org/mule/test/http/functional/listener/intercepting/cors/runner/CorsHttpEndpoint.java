@@ -6,10 +6,10 @@
  */
 package org.mule.test.http.functional.listener.intercepting.cors.runner;
 
-import org.mule.modules.cors.endpoint.Endpoint;
+import org.mule.modules.cors.endpoint.KernelTestEndpoint;
 import org.mule.tck.junit4.rule.DynamicPort;
 
-public class CorsHttpEndpoint implements Endpoint {
+public class CorsHttpEndpoint implements KernelTestEndpoint {
 
   private final String path;
   private final DynamicPort port;

@@ -6,20 +6,28 @@
  */
 package org.mule.test.http.functional.listener.intercepting.cors;
 
+import static org.mule.runtime.http.api.HttpConstants.Method.GET;
+
 import org.mule.modules.cors.ResourceRequestsKernelTestCase;
-import org.mule.modules.cors.result.CorsTestResult;
+import org.mule.modules.cors.result.KernelTestResult;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.test.http.functional.listener.intercepting.cors.parameters.CorsParameters;
+import org.mule.test.http.functional.listener.intercepting.cors.parameters.CorsHttpParameters;
 import org.mule.test.http.functional.listener.intercepting.cors.runner.CorsHttpAttributesBuilder;
 import org.mule.test.http.functional.listener.intercepting.cors.runner.CorsHttpEndpoint;
 import org.mule.test.http.functional.listener.intercepting.cors.runner.CorsRequestExecutor;
 
 import org.junit.Before;
 import org.junit.Rule;
+import org.junit.Test;
 
+/**
+ * Runs all resource requests tests defined in CORS kernel.
+ *
+ * Other tests have been added to deal with HTTP specifics
+ */
 public class CorsResourceRequestTestCase
-    extends ResourceRequestsKernelTestCase<CorsParameters, CorsHttpAttributesBuilder, CorsHttpEndpoint> {
+    extends ResourceRequestsKernelTestCase<CorsHttpParameters, CorsHttpEndpoint> {
 
   private CorsRequestExecutor request;
 
@@ -41,6 +49,86 @@ public class CorsResourceRequestTestCase
   @Before
   public void setUp() {
     request = new CorsRequestExecutor();
+  }
+
+  @Test
+  public void appendHeadersOnSimpleRequest() {
+    CorsHttpParameters parameters = simpleGet();
+    KernelTestResult response = run(parameters, appendHeadersEndpoint());
+    check(response)
+        .origin(ORIGIN)
+        .noExposeHeaders()
+        .header("user-agent", "Mule 4.0.0")
+        .header("x-miniverse", "Rick and Morty miniverse")
+        .payload(PAYLOAD).go();
+  }
+
+  @Test
+  public void appendHeadersOnComplexRequest() {
+    CorsHttpParameters parameters = complexGet();
+    KernelTestResult response = run(parameters, appendHeadersEndpoint());
+    check(response)
+        .origin(ORIGIN)
+        .exposeHeaders(X_FORWARDED_FOR)
+        .header("user-agent", "Mule 4.0.0")
+        .header("x-miniverse", "Rick and Morty miniverse")
+        .payload(PAYLOAD).go();
+  }
+
+  @Test
+  public void errorInFlowOnSimpleRequest() {
+    CorsHttpParameters parameters = simpleGet();
+    KernelTestResult response = run(parameters, errorInFlowEndpoint());
+    check(response)
+        .origin(ORIGIN)
+        .noExposeHeaders()
+        .payloadDiffers(PAYLOAD).go();
+  }
+
+  @Test
+  public void errorInFlowOnComplexRequest() {
+    CorsHttpParameters parameters = complexGet();
+    KernelTestResult response = run(parameters, errorInFlowEndpoint());
+    check(response)
+        .origin(ORIGIN)
+        .exposeHeaders(X_FORWARDED_FOR)
+        .payloadDiffers(PAYLOAD).go();
+  }
+
+  @Test
+  public void errorInFlowAppendHeadersOnSimpleRequest() {
+    CorsHttpParameters parameters = simpleGet();
+    KernelTestResult response = run(parameters, errorInFlowAppendHeadersEndpoint());
+    check(response)
+        .origin(ORIGIN)
+        .noExposeHeaders()
+        .header("user-agent", "Mule 4.0.0")
+        .header("x-miniverse", "Rick and Morty miniverse")
+        .payloadDiffers(PAYLOAD).go();
+  }
+
+  @Test
+  public void errorInFlowAppendHeadersOnComplexRequest() {
+    CorsHttpParameters parameters = complexGet();
+    KernelTestResult response = run(parameters, errorInFlowAppendHeadersEndpoint());
+    check(response)
+        .origin(ORIGIN)
+        .exposeHeaders(X_FORWARDED_FOR)
+        .header("user-agent", "Mule 4.0.0")
+        .header("x-miniverse", "Rick and Morty miniverse")
+        .payloadDiffers(PAYLOAD).go();
+  }
+
+  private CorsHttpParameters simpleGet() {
+    return resourceRequest().withOrigin(ORIGIN).withMethod(GET).build();
+  }
+
+
+  private CorsHttpParameters complexGet() {
+    return resourceRequest().withOrigin(ORIGIN)
+        .withMethod(GET)
+        .withHeader("X-Custom-Header", "custom-value")
+        .build();
   }
 
   @Override
@@ -74,7 +162,24 @@ public class CorsResourceRequestTestCase
   }
 
   @Override
-  protected CorsTestResult run(CorsParameters parameters, CorsHttpEndpoint endpoint) {
+  protected KernelTestResult run(CorsHttpParameters parameters, CorsHttpEndpoint endpoint) {
     return request.execute(parameters, endpoint);
+  }
+
+  @Override
+  protected void assertCorsHeadersOnSimpleHeadRequest(KernelTestResult response) {
+    check(response).origin(ORIGIN).noExposeHeaders().noPayload().go();
+  }
+
+  private CorsHttpEndpoint appendHeadersEndpoint() {
+    return new CorsHttpEndpoint("listener-appends-headers", basicPort);
+  }
+
+  private CorsHttpEndpoint errorInFlowEndpoint() {
+    return new CorsHttpEndpoint("listener-error-no-extra-headers", basicPort);
+  }
+
+  private CorsHttpEndpoint errorInFlowAppendHeadersEndpoint() {
+    return new CorsHttpEndpoint("listener-error-with-headers", basicPort);
   }
 }

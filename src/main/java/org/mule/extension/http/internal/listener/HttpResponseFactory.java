@@ -63,16 +63,17 @@ public class HttpResponseFactory {
   /**
    * Creates an {@HttpResponse}.
    *
-   * @param responseBuilder The {@link HttpResponseBuilder} that should be modified if necessary and used to build the
+   * @param responseBuilder the {@link HttpResponseBuilder} that should be modified if necessary and used to build the
    *        {@link HttpResponse}.
-   * @param interception
-   * @param listenerResponseBuilder The generic {@HttpListenerResponseBuilder} configured for this listener.
-   * @param supportsTransferEncoding boolean that determines whether the HTTP protocol of the response supports streaming. @return
-   *        an {@HttpResponse} configured based on the parameters.
+   * @param interception the {@link Interception} that should be taken into account when building the {@link HttpResponse}.
+   * @param listenerResponseBuilder the generic {@HttpListenerResponseBuilder} configured for this listener.
+   * @param supportsTransferEncoding boolean that determines whether the HTTP protocol of the response supports streaming.
+   * @return an {@HttpResponse} configured based on the parameters.
    * @throws MessagingException if the response creation fails.
    */
   public HttpResponse create(HttpResponseBuilder responseBuilder,
-                             Interception interception, HttpListenerResponseBuilder listenerResponseBuilder,
+                             Interception interception,
+                             HttpListenerResponseBuilder listenerResponseBuilder,
                              boolean supportsTransferEncoding)
       throws IOException {
 

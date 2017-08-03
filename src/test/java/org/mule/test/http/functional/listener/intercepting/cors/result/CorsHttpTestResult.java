@@ -10,7 +10,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.fail;
 
-import org.mule.modules.cors.result.CorsTestResult;
+import org.mule.modules.cors.result.KernelTestResult;
 import org.mule.runtime.core.api.util.IOUtils;
 
 import java.io.IOException;
@@ -21,11 +21,11 @@ import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 
-public class HttpCorsTestResult implements CorsTestResult {
+public class CorsHttpTestResult implements KernelTestResult {
 
   private final HttpResponse response;
 
-  public HttpCorsTestResult(HttpResponse response) throws IOException {
+  public CorsHttpTestResult(HttpResponse response) throws IOException {
     this.response = response;
   }
 
