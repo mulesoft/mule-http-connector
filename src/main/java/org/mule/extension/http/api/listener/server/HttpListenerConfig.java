@@ -45,6 +45,7 @@ public class HttpListenerConfig implements Initialisable {
 
   @Parameter
   @Optional
+  @Expression(NOT_SUPPORTED)
   private CorsInterceptorWrapper listenerInterceptors;
 
   @Override

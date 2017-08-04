@@ -8,15 +8,13 @@ package org.mule.extension.http.internal.listener.intercepting;
 
 import org.mule.runtime.api.util.MultiMap;
 
-import java.util.Map;
-
 /**
  * Null object pattern for {@link Interception}
  */
 public class NoInterception implements Interception {
 
   @Override
-  public Map<String, String> getHeaders() {
+  public MultiMap<String, String> getHeaders() {
     return new MultiMap<>();
   }
 }

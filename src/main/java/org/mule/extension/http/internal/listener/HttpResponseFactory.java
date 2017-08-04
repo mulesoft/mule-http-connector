@@ -143,8 +143,8 @@ public class HttpResponseFactory {
 
   private void addInterceptingHeaders(Interception interception, HttpResponseHeaderBuilder httpResponseHeaderBuilder) {
     interception
-        .getHeaders().keySet()
-        .forEach(headerKey -> httpResponseHeaderBuilder.addHeader(headerKey, interception.getHeaders().get(headerKey)));
+        .getHeaders().entryList()
+        .forEach(entry -> httpResponseHeaderBuilder.addHeader(entry.getKey(), entry.getValue()));
   }
 
   private void addUserHeaders(HttpListenerResponseBuilder listenerResponseBuilder, boolean supportsTransferEncoding,

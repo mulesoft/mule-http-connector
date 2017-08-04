@@ -7,14 +7,13 @@
 package org.mule.test.http.functional.listener.intercepting.cors.runner;
 
 import org.mule.modules.cors.endpoint.KernelTestEndpoint;
-import org.mule.tck.junit4.rule.DynamicPort;
 
 public class CorsHttpEndpoint implements KernelTestEndpoint {
 
   private final String path;
-  private final DynamicPort port;
+  private final String port;
 
-  public CorsHttpEndpoint(String path, DynamicPort port) {
+  public CorsHttpEndpoint(String path, String port) {
     this.path = path;
     this.port = port;
   }
@@ -24,6 +23,6 @@ public class CorsHttpEndpoint implements KernelTestEndpoint {
   }
 
   public String port() {
-    return port.getValue();
+    return port;
   }
 }

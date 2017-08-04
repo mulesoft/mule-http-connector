@@ -13,7 +13,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
  * The HTTP Connector MAY allow (in the future) a collection of interceptors in the listener. If this is implemented, we would
  * like to have the XML config structure backward compatible.
  * <p>
- * {@link CorsInterceptorWrapper} emulates the XML structure within the ListenerConfig for handling multiple interceptors but
+ * {@link CorsInterceptorWrapper} emulates the XML structure within the listener config for handling multiple interceptors but
  * restricted only to CORS.
  */
 public class CorsInterceptorWrapper {

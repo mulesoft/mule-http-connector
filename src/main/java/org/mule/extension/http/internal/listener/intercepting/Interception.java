@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.internal.listener.intercepting;
 
-import java.util.Map;
+import org.mule.runtime.api.util.MultiMap;
 
 /**
  * Defines the protocol an interception of a resquest must contain.
@@ -15,7 +15,8 @@ public interface Interception {
 
   /**
    * Returns the headers used for response decoration, blacklist or other operation defined by the interceptor.
+   * 
    * @return headers to operate with.
    */
-  Map<String, String> getHeaders();
+  MultiMap<String, String> getHeaders();
 }

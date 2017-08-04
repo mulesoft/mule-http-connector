@@ -7,6 +7,8 @@
 package org.mule.test.http.functional.listener.intercepting.cors;
 
 import static org.mule.runtime.http.api.HttpConstants.Method.GET;
+import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.CORS;
 
 import org.mule.modules.cors.ResourceRequestsKernelTestCase;
 import org.mule.modules.cors.result.KernelTestResult;
@@ -17,6 +19,9 @@ import org.mule.test.http.functional.listener.intercepting.cors.runner.CorsHttpA
 import org.mule.test.http.functional.listener.intercepting.cors.runner.CorsHttpEndpoint;
 import org.mule.test.http.functional.listener.intercepting.cors.runner.CorsRequestExecutor;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -26,6 +31,8 @@ import org.junit.Test;
  *
  * Other tests have been added to deal with HTTP specifics
  */
+@Feature(HTTP_EXTENSION)
+@Story(CORS)
 public class CorsResourceRequestTestCase
     extends ResourceRequestsKernelTestCase<CorsHttpParameters, CorsHttpEndpoint> {
 
@@ -49,6 +56,11 @@ public class CorsResourceRequestTestCase
   @Before
   public void setUp() {
     request = new CorsRequestExecutor();
+  }
+
+  @Override
+  protected String getConfigFile() {
+    return "http-listener-cors-interceptor.xml";
   }
 
   @Test
@@ -119,10 +131,14 @@ public class CorsResourceRequestTestCase
         .payloadDiffers(PAYLOAD).go();
   }
 
+  @After
+  public void tearDown() {
+    request.dispose();
+  }
+
   private CorsHttpParameters simpleGet() {
     return resourceRequest().withOrigin(ORIGIN).withMethod(GET).build();
   }
-
 
   private CorsHttpParameters complexGet() {
     return resourceRequest().withOrigin(ORIGIN)
@@ -132,33 +148,28 @@ public class CorsResourceRequestTestCase
   }
 
   @Override
-  protected String getConfigFile() {
-    return "http-listener-cors-interceptor.xml";
-  }
-
-  @Override
   protected CorsHttpAttributesBuilder resourceRequest() {
     return new CorsHttpAttributesBuilder();
   }
 
   @Override
   protected CorsHttpEndpoint basic() {
-    return new CorsHttpEndpoint("basic", basicPort);
+    return new CorsHttpEndpoint("basic", basicPort.getValue());
   }
 
   @Override
   protected CorsHttpEndpoint publicResource() {
-    return new CorsHttpEndpoint("public-resource", publicResourcePort);
+    return new CorsHttpEndpoint("public-resource", publicResourcePort.getValue());
   }
 
   @Override
   protected CorsHttpEndpoint allowCredentials() {
-    return new CorsHttpEndpoint("allow-credentials", allowCredentialsPort);
+    return new CorsHttpEndpoint("allow-credentials", allowCredentialsPort.getValue());
   }
 
   @Override
   protected CorsHttpEndpoint allowCredentialsPublicResource() {
-    return new CorsHttpEndpoint("allow-credentials-public-resource", allowCredentialsPublicResourcePort);
+    return new CorsHttpEndpoint("allow-credentials-public-resource", allowCredentialsPublicResourcePort.getValue());
   }
 
   @Override
@@ -172,14 +183,14 @@ public class CorsResourceRequestTestCase
   }
 
   private CorsHttpEndpoint appendHeadersEndpoint() {
-    return new CorsHttpEndpoint("listener-appends-headers", basicPort);
+    return new CorsHttpEndpoint("listener-appends-headers", basicPort.getValue());
   }
 
   private CorsHttpEndpoint errorInFlowEndpoint() {
-    return new CorsHttpEndpoint("listener-error-no-extra-headers", basicPort);
+    return new CorsHttpEndpoint("listener-error-no-extra-headers", basicPort.getValue());
   }
 
   private CorsHttpEndpoint errorInFlowAppendHeadersEndpoint() {
-    return new CorsHttpEndpoint("listener-error-with-headers", basicPort);
+    return new CorsHttpEndpoint("listener-error-with-headers", basicPort.getValue());
   }
 }

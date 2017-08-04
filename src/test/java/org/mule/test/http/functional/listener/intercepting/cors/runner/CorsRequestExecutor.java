@@ -29,4 +29,12 @@ public class CorsRequestExecutor {
       return null;
     }
   }
+
+  public void dispose() {
+    try {
+      httpClient.close();
+    } catch (IOException e) {
+      fail("Failed to close httpClient: " + e.getMessage());
+    }
+  }
 }

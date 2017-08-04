@@ -312,7 +312,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
           responseContext.setSupportStreaming(supportsTransferEncoding(httpVersion));
           responseContext.setResponseCallback(responseCallback);
           config.getInterceptor().ifPresent(interceptor -> responseContext
-              .setInterception(interceptor.request(getMethod(requestContext), getHeaders(result))));
+              .setInterception(interceptor.request(getMethod(result), getHeaders(result))));
 
           SourceCallbackContext context = sourceCallback.createContext();
           context.addVariable(RESPONSE_CONTEXT, responseContext);
@@ -331,8 +331,8 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
         }
       }
 
-      private String getMethod(HttpRequestContext requestContext) {
-        return requestContext.getRequest().getMethod();
+      private String getMethod(Result<InputStream, HttpRequestAttributes> result) {
+        return result.getAttributes().get().getMethod();
       }
 
       private MultiMap<String, String> getHeaders(Result<InputStream, HttpRequestAttributes> result) {
@@ -346,8 +346,8 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
             .statusCode(status.getStatusCode())
             .reasonPhrase(status.getReasonPhrase());
 
-        interceptor.headers().keySet()
-            .forEach(headerName -> responseBuilder.addHeader(headerName, interceptor.headers().get(headerName)));
+        interceptor.headers().entryList()
+            .forEach(entry -> responseBuilder.addHeader(entry.getKey(), entry.getValue()));
 
         responseCallback.responseReady(responseBuilder
             .build(), new ResponseStatusCallback() {

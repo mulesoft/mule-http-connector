@@ -6,9 +6,8 @@
  */
 package org.mule.extension.http.internal.listener.intercepting;
 
-import org.mule.runtime.http.api.HttpConstants;
-
-import java.util.Map;
+import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.http.api.HttpConstants.HttpStatus;
 
 /**
  * If the {@link org.mule.extension.http.internal.listener.HttpListener} needs to be notified about an error in the intecepting
@@ -18,27 +17,29 @@ import java.util.Map;
  */
 public abstract class InterceptingException extends RuntimeException {
 
-  private final HttpConstants.HttpStatus status;
-  private final Map<String, String> headers;
+  private final HttpStatus status;
+  private final MultiMap<String, String> headers;
 
-  public InterceptingException(HttpConstants.HttpStatus status, Map<String, String> headers) {
+  public InterceptingException(HttpStatus status, MultiMap<String, String> headers) {
     this.status = status;
     this.headers = headers;
   }
 
   /**
    * Suggested status code
+   * 
    * @return status code
    */
-  public HttpConstants.HttpStatus status() {
+  public HttpStatus status() {
     return status;
   }
 
   /**
    * Suggested response headers
+   * 
    * @return response headers
    */
-  public Map<String, String> headers() {
+  public MultiMap<String, String> headers() {
     return headers;
   }
 }

@@ -10,7 +10,7 @@ import static org.mule.runtime.http.api.HttpConstants.Method.GET;
 
 import org.mule.modules.cors.query.KernelTestParameters;
 import org.mule.runtime.api.util.MultiMap;
-import org.mule.runtime.http.api.HttpConstants;
+import org.mule.runtime.http.api.HttpConstants.Method;
 import org.mule.test.http.functional.listener.intercepting.cors.runner.CorsHttpEndpoint;
 
 import org.apache.http.client.methods.HttpUriRequest;
@@ -18,7 +18,7 @@ import org.apache.http.client.methods.RequestBuilder;
 
 public class CorsHttpParameters extends KernelTestParameters {
 
-  public CorsHttpParameters(HttpConstants.Method method, MultiMap<String, String> headers) {
+  public CorsHttpParameters(Method method, MultiMap<String, String> headers) {
     super(asString(method), headers);
   }
 
@@ -29,14 +29,14 @@ public class CorsHttpParameters extends KernelTestParameters {
   }
 
   private String uri(String port, String path) {
-    return "http://localhost:" + port + "/" + path; // TODO should we parameterize the host?
+    return "http://localhost:" + port + "/" + path;
   }
 
   protected RequestBuilder request(String uri) {
     return RequestBuilder.create(method.toString()).setUri(uri);
   }
 
-  private static String asString(HttpConstants.Method method) {
+  private static String asString(Method method) {
     return method != null ? method.toString() : GET.toString();
   }
 }

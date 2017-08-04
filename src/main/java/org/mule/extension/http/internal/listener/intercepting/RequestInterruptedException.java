@@ -6,16 +6,15 @@
  */
 package org.mule.extension.http.internal.listener.intercepting;
 
-import org.mule.runtime.http.api.HttpConstants;
-
-import java.util.Map;
+import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.http.api.HttpConstants.HttpStatus;
 
 /**
  * Exception that suggest request to be interrupted and flow not executed.
  */
 public class RequestInterruptedException extends InterceptingException {
 
-  public RequestInterruptedException(HttpConstants.HttpStatus status, Map<String, String> headers) {
+  public RequestInterruptedException(HttpStatus status, MultiMap<String, String> headers) {
     super(status, headers);
   }
 }

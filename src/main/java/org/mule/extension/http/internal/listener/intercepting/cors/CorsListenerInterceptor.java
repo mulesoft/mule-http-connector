@@ -25,8 +25,9 @@ public class CorsListenerInterceptor extends CorsKernel implements HttpListenerI
 
   /**
    * Validates that request matches CORS specification, and creates an {@link Interception} result.
-   * @param method request's method
-   * @param headers request's headers
+   * 
+   * @param method request's method.
+   * @param headers request's headers.
    * @return the suggested {@link Interception} result.
    */
   @Override

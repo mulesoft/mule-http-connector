@@ -6,11 +6,12 @@
  */
 package org.mule.extension.http.internal.listener.intercepting.cors;
 
+import static org.mule.runtime.http.api.HttpHeaders.Names.ACCESS_CONTROL_ALLOW_ORIGIN;
+
 import org.mule.extension.http.internal.listener.intercepting.Interception;
 import org.mule.modules.cors.response.AddCorsHeaders;
+import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.HttpHeaders;
-
-import java.util.Map;
 
 public class AddHeadersInterception implements Interception {
 
@@ -21,9 +22,13 @@ public class AddHeadersInterception implements Interception {
   }
 
   @Override
-  public Map<String, String> getHeaders() {
-    Map<String, String> headers = addCorsHeaders.headers();
-    headers.put(HttpHeaders.Names.ACCESS_CONTROL_ALLOW_ORIGIN, addCorsHeaders.origin());
+  public MultiMap<String, String> getHeaders() {
+    MultiMap<String, String> headers = new MultiMap<>();
+    addCorsHeaders
+        .headers()
+        .keySet()
+        .forEach(headerName -> headers.put(headerName, addCorsHeaders.headers().get(headerName)));
+    headers.put(ACCESS_CONTROL_ALLOW_ORIGIN, addCorsHeaders.origin());
     return headers;
   }
 }
