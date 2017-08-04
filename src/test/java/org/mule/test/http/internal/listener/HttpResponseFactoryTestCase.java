@@ -17,6 +17,7 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.internal.listener.HttpResponseFactory;
+import org.mule.extension.http.internal.listener.intercepting.NoInterception;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.api.util.MultiMap;
@@ -48,7 +49,8 @@ public class HttpResponseFactoryTestCase extends AbstractMuleTestCase {
     when(listenerResponseBuilder.getHeaders()).thenReturn(headers);
     HttpResponseFactory httpResponseBuilder = new HttpResponseFactory(AUTO, mock(TransformationService.class));
 
-    HttpResponse httpResponse = httpResponseBuilder.create(HttpResponse.builder(), listenerResponseBuilder, true);
+    HttpResponse httpResponse =
+        httpResponseBuilder.create(HttpResponse.builder(), new NoInterception(), listenerResponseBuilder, true);
     assertThat(httpResponse.getHeaderValue(CONTENT_LENGTH), is(String.valueOf(EXAMPLE_STRING.length())));
   }
 

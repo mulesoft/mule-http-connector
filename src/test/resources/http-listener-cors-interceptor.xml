@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <flow name="basic">
+        <http:listener path="/basic" config-ref="basic-config"/>
+        <set-payload value="${payload}"/>
+    </flow>
+
+    <http:listener-config name="basic-config">
+        <http:listener-connection host="localhost" port="${basicConfigPort}"/>
+        <http:listener-interceptors>
+            <http:cors-interceptor>
+                <http:origins>
+                    <http:origin url="http://www.the-origin-of-time.com" accessControlMaxAge="30">
+                        <http:allowed-methods>
+                            <http:method methodName="PUT"/>
+                            <http:method methodName="GET"/>
+                        </http:allowed-methods>
+                        <http:allowed-headers>
+                            <http:header headerName="content-type"/>
+                            <http:header headerName="x-allow-origin"/>
+                            <http:header headerName="x-yet-another-valid-header"/>
+                        </http:allowed-headers>
+                        <http:expose-headers>
+                            <http:header headerName="x-forwarded-for"/>
+                        </http:expose-headers>
+                    </http:origin>
+                </http:origins>
+            </http:cors-interceptor>
+        </http:listener-interceptors>
+    </http:listener-config>
+
+    <!-- +++++++++++++++++++++++++++++++++++ -->
+
+    <flow name="allow-credentials">
+        <http:listener path="/allow-credentials" config-ref="allow-credentials-config"/>
+        <set-payload value="${payload}"/>
+    </flow>
+
+    <http:listener-config name="allow-credentials-config">
+        <http:listener-connection host="localhost" port="${allowCredentialsConfigPort}"/>
+        <http:listener-interceptors>
+            <http:cors-interceptor allowCredentials="true">
+                <http:origins>
+                    <http:origin url="http://www.the-origin-of-time.com" accessControlMaxAge="30">
+                        <http:allowed-methods>
+                            <http:method methodName="POST"/>
+                            <http:method methodName="PUT"/>
+                            <http:method methodName="GET"/>
+                        </http:allowed-methods>
+                        <http:allowed-headers>
+                            <http:header headerName="x-allow-origin"/>
+                            <http:header headerName="x-yet-another-valid-header"/>
+                        </http:allowed-headers>
+                        <http:expose-headers>
+                            <http:header headerName="x-forwarded-for"/>
+                        </http:expose-headers>
+                    </http:origin>
+                </http:origins>
+            </http:cors-interceptor>
+        </http:listener-interceptors>
+    </http:listener-config>
+
+    <!-- +++++++++++++++++++++++++++++++++++ -->
+
+    <flow name="public-resource">
+        <http:listener path="/public-resource" config-ref="public-resource-config"/>
+        <set-payload value="${payload}"/>
+    </flow>
+
+    <http:listener-config name="public-resource-config">
+        <http:listener-connection host="localhost" port="${publicResourceConfigPort}"/>
+        <http:listener-interceptors>
+            <http:cors-interceptor>
+                <http:origins>
+                    <http:public-resource/>
+                </http:origins>
+            </http:cors-interceptor>
+        </http:listener-interceptors>
+    </http:listener-config>
+
+    <!-- +++++++++++++++++++++++++++++++++++ -->
+
+    <flow name="allow-credentials-public-resource">
+        <http:listener path="/allow-credentials-public-resource" config-ref="allow-credentials-public-resource-config"/>
+        <set-payload value="${payload}"/>
+    </flow>
+
+    <http:listener-config name="allow-credentials-public-resource-config">
+        <http:listener-connection host="localhost" port="${allowCredentialsPublicResourceConfigPort}"/>
+        <http:listener-interceptors>
+            <http:cors-interceptor allowCredentials="true">
+                <http:origins>
+                    <http:public-resource/>
+                </http:origins>
+            </http:cors-interceptor>
+        </http:listener-interceptors>
+    </http:listener-config>
+
+    <!-- +++++++++++++++++++++++++++++++++++ -->
+
+    <flow name="append-headers">
+        <http:listener path="/listener-appends-headers" config-ref="basic-config">
+            <http:response>
+                <http:headers>
+                    #[{'User-Agent' : 'Mule 4.0.0', 'X-Miniverse' : 'Rick and Morty miniverse'}]
+                </http:headers>
+            </http:response>
+        </http:listener>
+        <set-payload value="${payload}"/>
+    </flow>
+
+    <!-- +++++++++++++++++++++++++++++++++++ -->
+
+    <flow name="error-response-no-headers">
+        <http:listener path="/listener-error-no-extra-headers" config-ref="basic-config">
+            <http:error-response statusCode="201"/>
+        </http:listener>
+        <test:processor throwException="true"/>
+        <set-payload value="${payload}"/>
+    </flow>
+
+    <!-- +++++++++++++++++++++++++++++++++++ -->
+
+    <flow name="error-response-with-headers">
+        <http:listener path="/listener-error-with-headers" config-ref="basic-config">
+            <http:error-response statusCode="201">
+                <http:headers>
+                    #[{'User-Agent' : 'Mule 4.0.0', 'X-Miniverse' : 'Rick and Morty miniverse'}]
+                </http:headers>
+            </http:error-response>
+        </http:listener>
+        <test:processor throwException="true"/>
+        <set-payload value="${payload}"/>
+    </flow>
+
+</mule>

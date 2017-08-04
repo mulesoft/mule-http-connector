@@ -30,6 +30,7 @@ public interface AllureConstants {
       String HTTPS = "HTTPS";
       String PROXY = "Proxy";
       String NTLM = "NTLM";
+      String CORS = "Cross Origin Resource Sharing";
     }
 
   }

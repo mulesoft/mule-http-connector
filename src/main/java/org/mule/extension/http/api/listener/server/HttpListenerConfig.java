@@ -6,11 +6,16 @@
  */
 package org.mule.extension.http.api.listener.server;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import org.mule.extension.http.internal.listener.HttpListener;
 import org.mule.extension.http.internal.listener.HttpListenerProvider;
 import org.mule.extension.http.internal.listener.ListenerPath;
+import org.mule.extension.http.internal.listener.intercepting.HttpListenerInterceptor;
+import org.mule.extension.http.internal.listener.intercepting.cors.CorsInterceptorWrapper;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.Configuration;
@@ -38,6 +43,11 @@ public class HttpListenerConfig implements Initialisable {
   @Expression(NOT_SUPPORTED)
   private String basePath;
 
+  @Parameter
+  @Optional
+  @Expression(NOT_SUPPORTED)
+  private CorsInterceptorWrapper listenerInterceptors;
+
   @Override
   public void initialise() throws InitialisationException {
     basePath = sanitizePathWithStartSlash(this.basePath);
@@ -55,4 +65,7 @@ public class HttpListenerConfig implements Initialisable {
     return path.startsWith("/") ? path : "/" + path;
   }
 
+  public java.util.Optional<HttpListenerInterceptor> getInterceptor() {
+    return listenerInterceptors != null ? of(listenerInterceptors.getInterceptor()) : empty();
+  }
 }

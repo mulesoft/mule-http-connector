@@ -33,6 +33,7 @@
         <formatterConfigPath>formatter.xml</formatterConfigPath>
 
         <muleSocketsConnectorVersion>1.0.0-SNAPSHOT</muleSocketsConnectorVersion>
+        <muleCorsKernelVersion>1.0.0-SNAPSHOT</muleCorsKernelVersion>
     </properties>
 
     <build>
@@ -85,6 +86,11 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-cors-kernel</artifactId>
+            <version>${muleCorsKernelVersion}</version>
+        </dependency>
+        <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
             <version>${javaxMailVersion}</version>
@@ -121,6 +127,13 @@
             <artifactId>mule-tests-component-plugin</artifactId>
             <version>${mule.version}</version>
             <classifier>mule-plugin</classifier>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${mule.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -166,6 +179,14 @@
             <version>${muleHttpServiceVersion}</version>
             <scope>test</scope>
             <type>test-jar</type>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-cors-kernel</artifactId>
+            <version>${muleCorsKernelVersion}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
