@@ -11,10 +11,10 @@ import static org.apache.commons.collections.CollectionUtils.select;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.core.api.context.notification.ConnectorMessageNotificationListener;
-import org.mule.runtime.core.api.context.notification.ServerNotification;
-import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
 import org.mule.runtime.core.api.context.notification.ConnectorMessageNotification;
+import org.mule.runtime.core.api.context.notification.ConnectorMessageNotificationListener;
+import org.mule.runtime.core.api.context.notification.Notification;
+import org.mule.runtime.core.api.context.notification.NotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ import java.util.concurrent.CountDownLatch;
 
 import org.apache.commons.collections.Transformer;
 
-public class TestConnectorMessageNotificationListener implements ServerNotificationListener<ConnectorMessageNotification> {
+public class TestConnectorMessageNotificationListener implements NotificationListener<ConnectorMessageNotification> {
 
   private final CountDownLatch latch;
   private final String expectedExchangePoint;
@@ -73,7 +73,7 @@ public class TestConnectorMessageNotificationListener implements ServerNotificat
   }
 
   public static ServerNotificationManager register(ServerNotificationManager serverNotificationManager) {
-    final Map<Class<? extends ServerNotificationListener>, Set<Class<? extends ServerNotification>>> mapping =
+    final Map<Class<? extends NotificationListener>, Set<Class<? extends Notification>>> mapping =
         serverNotificationManager.getInterfaceToTypes();
     if (!mapping.containsKey(ConnectorMessageNotificationListener.class)) {
       serverNotificationManager.addInterfaceToType(TestConnectorMessageNotificationListener.class,
