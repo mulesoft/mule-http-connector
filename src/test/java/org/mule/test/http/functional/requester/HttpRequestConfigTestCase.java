@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.extension.http.internal.request.RequestConnectionParams.DEFAULT_CONNECTION_IDLE_TIMEOUT;
 import static org.mule.extension.http.internal.request.RequestConnectionParams.DEFAULT_MAX_CONNECTIONS;
 import static org.mule.extension.http.internal.request.RequestConnectionParams.DEFAULT_RESPONSE_BUFFER_SIZE;
-import static org.mule.runtime.core.internal.connection.ConnectionProviderWrapper.unwrapProviderWrapper;
+import static org.mule.runtime.core.api.connection.ConnectionProviderUtils.unwrapProviderWrapper;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTP;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
@@ -24,9 +24,9 @@ import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
+import io.qameta.allure.Feature;
 import org.junit.Rule;
 import org.junit.Test;
-import io.qameta.allure.Feature;
 
 @Feature(HTTP_EXTENSION)
 public class HttpRequestConfigTestCase extends AbstractHttpTestCase {
