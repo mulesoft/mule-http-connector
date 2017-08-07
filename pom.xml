@@ -12,7 +12,7 @@
     <groupId>org.mule.connectors</groupId>
     <artifactId>mule-http-connector</artifactId>
     <packaging>mule-extension</packaging>
-    <version>0.8.2-SNAPSHOT</version>
+    <version>0.8.2</version>
 
     <name>HTTP Connector</name>
     <description>A Mule extension that provides HTTP server and client functionality</description>
