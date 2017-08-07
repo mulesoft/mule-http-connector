@@ -26,6 +26,12 @@ import java.util.Map;
  */
 public class HttpPolicyRequestParametersTransformer implements OperationPolicyParametersTransformer {
 
+  private static final String BODY = "body";
+  private static final String PATH = "path";
+  private static final String HEADERS = "headers";
+  private static final String QUERY_PARAMS = "queryParams";
+  private static final String URI_PARAMS = "uriParams";
+
   @Override
   public boolean supports(ComponentIdentifier componentIdentifier) {
     return componentIdentifier.equals(buildFromStringRepresentation("http:request"));
@@ -33,13 +39,13 @@ public class HttpPolicyRequestParametersTransformer implements OperationPolicyPa
 
   @Override
   public Message fromParametersToMessage(Map<String, Object> parameters) {
-    String path = (String) parameters.get("path");
-    TypedValue<Object> body = (TypedValue<Object>) parameters.getOrDefault("body", TypedValue.of(null));
+    String path = (String) parameters.get(PATH);
+    TypedValue<Object> body = (TypedValue<Object>) parameters.getOrDefault(BODY, TypedValue.of(null));
 
     return Message.builder().value(body.getValue())
-        .attributesValue(new HttpPolicyRequestAttributes(getMap(parameters, "headers"),
-                                                         getMap(parameters, "queryParams"),
-                                                         getMap(parameters, "uriParams"),
+        .attributesValue(new HttpPolicyRequestAttributes(getMap(parameters, HEADERS),
+                                                         getMap(parameters, QUERY_PARAMS),
+                                                         getMap(parameters, URI_PARAMS),
                                                          path))
         .mediaType(body.getDataType().getMediaType())
         .build();
@@ -52,10 +58,10 @@ public class HttpPolicyRequestParametersTransformer implements OperationPolicyPa
     if (message.getAttributes().getValue() instanceof BaseHttpRequestAttributes) {
       BaseHttpRequestAttributes requestAttributes = (BaseHttpRequestAttributes) message.getAttributes().getValue();
 
-      putIfNotNull(builder, "headers", requestAttributes.getHeaders());
-      putIfNotNull(builder, "queryParams", requestAttributes.getQueryParams());
-      putIfNotNull(builder, "uriParams", requestAttributes.getUriParams());
-      putIfNotNull(builder, "path", requestAttributes.getRequestPath());
+      putIfNotNull(builder, PATH, requestAttributes.getRequestPath());
+      putIfNotNull(builder, HEADERS, requestAttributes.getHeaders());
+      putIfNotNull(builder, QUERY_PARAMS, requestAttributes.getQueryParams());
+      putIfNotNull(builder, URI_PARAMS, requestAttributes.getUriParams());
     }
 
     putIfNotNull(builder, "body", message.getPayload());
