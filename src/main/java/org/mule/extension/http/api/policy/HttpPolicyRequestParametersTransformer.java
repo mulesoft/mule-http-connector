@@ -6,11 +6,9 @@
  */
 package org.mule.extension.http.api.policy;
 
-import static java.util.Collections.emptyMap;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 
 import org.mule.extension.http.api.BaseHttpRequestAttributes;
-import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -49,16 +47,25 @@ public class HttpPolicyRequestParametersTransformer implements OperationPolicyPa
 
   @Override
   public Map<String, Object> fromMessageToParameters(Message message) {
+    ImmutableMap.Builder<String, Object> builder = ImmutableMap.builder();
+
     if (message.getAttributes().getValue() instanceof BaseHttpRequestAttributes) {
       BaseHttpRequestAttributes requestAttributes = (BaseHttpRequestAttributes) message.getAttributes().getValue();
-      HttpRequesterRequestBuilder httpRequesterRequestBuilder = new HttpRequesterRequestBuilder();
-      httpRequesterRequestBuilder.setHeaders(requestAttributes.getHeaders());
-      httpRequesterRequestBuilder.setQueryParams(requestAttributes.getQueryParams());
-      httpRequesterRequestBuilder.setUriParams(requestAttributes.getUriParams());
-      httpRequesterRequestBuilder.setBody(message.getPayload());
-      return ImmutableMap.<String, Object>builder().put("requestBuilder", httpRequesterRequestBuilder).build();
-    } else {
-      return emptyMap();
+
+      putIfNotNull(builder, "headers", requestAttributes.getHeaders());
+      putIfNotNull(builder, "queryParams", requestAttributes.getQueryParams());
+      putIfNotNull(builder, "uriParams", requestAttributes.getUriParams());
+      putIfNotNull(builder, "path", requestAttributes.getRequestPath());
+    }
+
+    putIfNotNull(builder, "body", message.getPayload());
+
+    return builder.build();
+  }
+
+  private void putIfNotNull(ImmutableMap.Builder<String, Object> builder, String key, Object value) {
+    if (value != null) {
+      builder.put(key, value);
     }
   }
 
