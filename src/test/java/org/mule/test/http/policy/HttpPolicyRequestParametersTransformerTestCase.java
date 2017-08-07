@@ -23,6 +23,10 @@ import org.junit.Test;
 
 public class HttpPolicyRequestParametersTransformerTestCase {
 
+  private static final MultiMap<String, String> HEADERS = new MultiMap<>(of("header", "headerValue"));
+  private static final MultiMap<String, String> QUERY_PARAMS = new MultiMap<>(of("queryParam", "queryParamValue"));
+  private static final MultiMap<String, String> URI_PARAMS = new MultiMap<>(of("uriParam", "uriParamValue"));
+
   private static final String BODY = "Body";
   private static final String PATH = "myPath";
 
@@ -31,16 +35,13 @@ public class HttpPolicyRequestParametersTransformerTestCase {
   @Test
   public void fromParametersToMessage() {
     TypedValue<Object> body = new TypedValue<>(BODY, ATOM_STRING);
-    MultiMap<String, String> headers = new MultiMap<>(of("header", "headerValue"));
-    MultiMap<String, String> queryParams = new MultiMap<>(of("queryParam", "queryParamValue"));
-    MultiMap<String, String> uriParams = new MultiMap<>(of("uriParam", "uriParamValue"));
 
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("path", PATH);
     parameters.put("body", body);
-    parameters.put("headers", headers);
-    parameters.put("queryParams", queryParams);
-    parameters.put("uriParams", uriParams);
+    parameters.put("headers", HEADERS);
+    parameters.put("queryParams", QUERY_PARAMS);
+    parameters.put("uriParams", URI_PARAMS);
 
     Message message = transformer.fromParametersToMessage(parameters);
 
@@ -50,20 +51,19 @@ public class HttpPolicyRequestParametersTransformerTestCase {
 
     HttpPolicyRequestAttributes requestAttributes = (HttpPolicyRequestAttributes) message.getAttributes().getValue();
     assertThat(requestAttributes.getRequestPath(), is(PATH));
-    assertThat(requestAttributes.getHeaders(), is(headers));
-    assertThat(requestAttributes.getQueryParams(), is(queryParams));
-    assertThat(requestAttributes.getUriParams(), is(uriParams));
+    assertThat(requestAttributes.getHeaders(), is(HEADERS));
+    assertThat(requestAttributes.getQueryParams(), is(QUERY_PARAMS));
+    assertThat(requestAttributes.getUriParams(), is(URI_PARAMS));
   }
 
   @Test
   public void fromParametersToMessageMissingParameter() {
     TypedValue<Object> body = new TypedValue<>(BODY, ATOM_STRING);
-    MultiMap<String, String> headers = new MultiMap<>(of("header", "headerValue"));
 
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("path", PATH);
     parameters.put("body", body);
-    parameters.put("headers", headers);
+    parameters.put("headers", HEADERS);
 
     Message message = transformer.fromParametersToMessage(parameters);
 
@@ -73,7 +73,7 @@ public class HttpPolicyRequestParametersTransformerTestCase {
 
     HttpPolicyRequestAttributes requestAttributes = (HttpPolicyRequestAttributes) message.getAttributes().getValue();
     assertThat(requestAttributes.getRequestPath(), is(PATH));
-    assertThat(requestAttributes.getHeaders(), is(headers));
+    assertThat(requestAttributes.getHeaders(), is(HEADERS));
     assertThat(requestAttributes.getQueryParams(), is(emptyMultiMap()));
     assertThat(requestAttributes.getUriParams(), is(emptyMultiMap()));
   }
@@ -98,26 +98,22 @@ public class HttpPolicyRequestParametersTransformerTestCase {
   @Test
   public void fromMessageToParameters() {
     TypedValue<Object> payload = new TypedValue<>(BODY, ATOM_STRING);
-    MultiMap<String, String> headers = new MultiMap<>(of("header", "headerValue"));
-    MultiMap<String, String> queryParams = new MultiMap<>(of("queryParam", "queryParamValue"));
-    MultiMap<String, String> uriParams = new MultiMap<>(of("uriParam", "uriParamValue"));
     TypedValue<HttpPolicyRequestAttributes> attributes =
-        of(new HttpPolicyRequestAttributes(headers, queryParams, uriParams, PATH));
+        of(new HttpPolicyRequestAttributes(HEADERS, QUERY_PARAMS, URI_PARAMS, PATH));
     Message message = Message.builder().payload(payload).attributes(attributes).build();
 
     Map<String, Object> parameters = transformer.fromMessageToParameters(message);
 
     assertThat(parameters.get("body"), is(payload));
     assertThat(parameters.get("path"), is(PATH));
-    assertThat(parameters.get("headers"), is(headers));
-    assertThat(parameters.get("uriParams"), is(uriParams));
-    assertThat(parameters.get("queryParams"), is(queryParams));
+    assertThat(parameters.get("headers"), is(HEADERS));
+    assertThat(parameters.get("uriParams"), is(URI_PARAMS));
+    assertThat(parameters.get("queryParams"), is(QUERY_PARAMS));
   }
 
   @Test
   public void fromMessageToParametersMissingAttributesProperty() {
     TypedValue<Object> payload = new TypedValue<>(BODY, ATOM_STRING);
-    MultiMap<String, String> headers = new MultiMap<>(of("header", "headerValue"));
     TypedValue<HttpPolicyRequestAttributes> attributes =
         of(new HttpPolicyRequestAttributes(emptyMultiMap(), null, null, null));
     Message message = Message.builder().payload(payload).attributes(attributes).build();
@@ -133,26 +129,22 @@ public class HttpPolicyRequestParametersTransformerTestCase {
 
   @Test
   public void fromMessageToParametersMissingPayload() {
-    TypedValue<Object> payload = null;
-    MultiMap<String, String> headers = new MultiMap<>(of("header", "headerValue"));
-    MultiMap<String, String> queryParams = new MultiMap<>(of("queryParam", "queryParamValue"));
-    MultiMap<String, String> uriParams = new MultiMap<>(of("uriParam", "uriParamValue"));
     TypedValue<HttpPolicyRequestAttributes> attributes =
-        of(new HttpPolicyRequestAttributes(headers, queryParams, uriParams, PATH));
-    Message message = Message.builder().payload(payload).attributes(attributes).build();
+        of(new HttpPolicyRequestAttributes(HEADERS, QUERY_PARAMS, URI_PARAMS, PATH));
+    Message message = Message.builder().payload(null).attributes(attributes).build();
 
     Map<String, Object> parameters = transformer.fromMessageToParameters(message);
 
     assertThat(parameters.get("body"), nullValue());
     assertThat(parameters.get("path"), is(PATH));
-    assertThat(parameters.get("headers"), is(headers));
-    assertThat(parameters.get("uriParams"), is(uriParams));
-    assertThat(parameters.get("queryParams"), is(queryParams));
+    assertThat(parameters.get("headers"), is(HEADERS));
+    assertThat(parameters.get("uriParams"), is(URI_PARAMS));
+    assertThat(parameters.get("queryParams"), is(QUERY_PARAMS));
   }
 
   @Test
   public void fromMessageToParametersNotRequestAttributes() {
-    TypedValue<Object> payload = null;
+    TypedValue<Object> payload = new TypedValue<>(BODY, ATOM_STRING);
     TypedValue<HttpPolicyResponseAttributes> attributes = of(new HttpPolicyResponseAttributes());
     Message message = Message.builder().payload(payload).attributes(attributes).build();
 
