@@ -9,24 +9,23 @@ package org.mule.test.http.functional.listener;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
-import org.mule.runtime.module.extension.internal.runtime.config.LifecycleAwareConfigurationProvider;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
 import java.io.IOException;
 import java.net.ConnectException;
 
+import io.qameta.allure.Feature;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import io.qameta.allure.Feature;
 
 @Feature(HTTP_EXTENSION)
 public class HttpListenerLifecycleTestCase extends AbstractHttpTestCase {
@@ -45,7 +44,7 @@ public class HttpListenerLifecycleTestCase extends AbstractHttpTestCase {
 
   @Test
   public void stopOneListenerDoesNotAffectAnother() throws Exception {
-    ExtensionComponent httpListener = (ExtensionComponent) ((Flow) getFlowConstruct("testPathFlow")).getSource();
+    Lifecycle httpListener = (Lifecycle) ((Flow) getFlowConstruct("testPathFlow")).getSource();
     httpListener.stop();
     callAndAssertResponseFromUnaffectedListener(getLifecycleConfigUrl("/path/catch"), "catchAll");
     httpListener.start();
@@ -53,7 +52,7 @@ public class HttpListenerLifecycleTestCase extends AbstractHttpTestCase {
 
   @Test
   public void restartListener() throws Exception {
-    ExtensionComponent httpListener = (ExtensionComponent) ((Flow) getFlowConstruct("testPathFlow")).getSource();
+    Lifecycle httpListener = (Lifecycle) ((Flow) getFlowConstruct("testPathFlow")).getSource();
     httpListener.stop();
     httpListener.start();
     final Response response = Request.Get(getLifecycleConfigUrl("/path/subpath")).execute();
@@ -73,7 +72,7 @@ public class HttpListenerLifecycleTestCase extends AbstractHttpTestCase {
 
   @Test
   public void stoppedListenerConfigDoNotListen() throws Exception {
-    LifecycleAwareConfigurationProvider httpListenerConfig = muleContext.getRegistry().get("testLifecycleListenerConfig");
+    Lifecycle httpListenerConfig = muleContext.getRegistry().get("testLifecycleListenerConfig");
     httpListenerConfig.stop();
     try {
       expectedException.expect(ConnectException.class);
@@ -85,7 +84,7 @@ public class HttpListenerLifecycleTestCase extends AbstractHttpTestCase {
 
   @Test
   public void stopOneListenerConfigDoesNotAffectAnother() throws Exception {
-    LifecycleAwareConfigurationProvider httpListenerConfig = muleContext.getRegistry().get("testLifecycleListenerConfig");
+    Lifecycle httpListenerConfig = muleContext.getRegistry().get("testLifecycleListenerConfig");
     httpListenerConfig.stop();
     callAndAssertResponseFromUnaffectedListener(getUnchangedConfigUrl(), "works");
     httpListenerConfig.start();
@@ -93,7 +92,7 @@ public class HttpListenerLifecycleTestCase extends AbstractHttpTestCase {
 
   @Test
   public void restartListenerConfig() throws Exception {
-    LifecycleAwareConfigurationProvider httpListenerConfig = muleContext.getRegistry().get("testLifecycleListenerConfig");
+    Lifecycle httpListenerConfig = muleContext.getRegistry().get("testLifecycleListenerConfig");
     httpListenerConfig.stop();
     httpListenerConfig.start();
     final Response response = Request.Get(getLifecycleConfigUrl("/path/anotherPath")).execute();
