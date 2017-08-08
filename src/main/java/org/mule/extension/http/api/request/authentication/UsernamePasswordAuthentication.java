@@ -8,11 +8,11 @@ package org.mule.extension.http.api.request.authentication;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.http.api.client.HttpAuthenticationType;
-import org.mule.runtime.http.api.client.HttpRequestAuthentication;
+import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
 
 /**
@@ -20,7 +20,7 @@ import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
  *
  * @since 1.0
  */
-public abstract class UsernamePasswordAuthentication implements HttpAuthentication {
+public abstract class UsernamePasswordAuthentication implements HttpAuthentication, HttpRequestAuthentication {
 
   /**
    * The username to authenticate.
@@ -35,6 +35,14 @@ public abstract class UsernamePasswordAuthentication implements HttpAuthenticati
   @Password
   private String password;
 
+  /**
+   * Configures if authentication should be preemptive or not. Preemptive authentication will send the authentication header in
+   * the first request, instead of waiting for a 401 response code to send it.
+   */
+  @Parameter
+  @Optional(defaultValue = "true")
+  private boolean preemptive;
+
   @Override
   public void authenticate(HttpRequestBuilder builder) throws MuleException {
     // do nothing
@@ -45,12 +53,19 @@ public abstract class UsernamePasswordAuthentication implements HttpAuthenticati
     return false;
   }
 
-  public abstract HttpRequestAuthentication buildRequestAuthentication();
-
-  protected HttpRequestAuthentication getBaseRequestAuthentication(HttpAuthenticationType authType) {
-    HttpRequestAuthentication requestAuthentication = new HttpRequestAuthentication(authType);
-    requestAuthentication.setUsername(username);
-    requestAuthentication.setPassword(password);
-    return requestAuthentication;
+  @Override
+  public String getUsername() {
+    return username;
   }
+
+  @Override
+  public String getPassword() {
+    return password;
+  }
+
+  @Override
+  public boolean isPreemptive() {
+    return preemptive;
+  }
+
 }

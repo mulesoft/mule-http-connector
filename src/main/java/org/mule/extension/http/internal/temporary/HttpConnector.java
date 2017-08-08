@@ -13,7 +13,7 @@ import org.mule.extension.http.api.listener.server.HttpListenerConfig;
 import org.mule.extension.http.api.policy.HttpPolicyRequestAttributes;
 import org.mule.extension.http.api.request.authentication.BasicAuthentication;
 import org.mule.extension.http.api.request.authentication.DigestAuthentication;
-import org.mule.extension.http.api.request.authentication.HttpAuthentication;
+import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
 import org.mule.extension.http.api.request.authentication.NtlmAuthentication;
 import org.mule.extension.http.api.request.proxy.DefaultNtlmProxyConfig;
 import org.mule.extension.http.api.request.proxy.DefaultProxyConfig;
@@ -49,7 +49,7 @@ import org.mule.runtime.http.api.client.proxy.ProxyConfig;
 @Extension(name = "HTTP", description = "Connector to handle and perform HTTP requests")
 @Configurations({HttpListenerConfig.class, HttpRequesterConfig.class})
 @Operations(HttpOperations.class)
-@SubTypeMapping(baseType = HttpAuthentication.class,
+@SubTypeMapping(baseType = HttpRequestAuthentication.class,
     subTypes = {BasicAuthentication.class, DigestAuthentication.class, NtlmAuthentication.class})
 @SubTypeMapping(baseType = ProxyConfig.class, subTypes = {DefaultProxyConfig.class, DefaultNtlmProxyConfig.class})
 @SubTypeMapping(baseType = ResponseValidator.class,

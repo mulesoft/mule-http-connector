@@ -16,7 +16,7 @@ import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
  *
  * @since 1.0
  */
-public interface HttpAuthentication {
+public interface HttpRequestAuthentication {
 
   /**
    * Adds authentication information to the request. This method will be executed before creating and sending the request.

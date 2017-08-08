@@ -6,19 +6,18 @@
  */
 package org.mule.extension.http.api.request.authentication;
 
-import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.http.api.client.HttpRequestAuthentication;
-
-import static org.mule.runtime.http.api.client.HttpAuthenticationType.NTLM;
-
+import static org.mule.runtime.http.api.client.auth.HttpAuthenticationType.NTLM;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.http.api.client.auth.HttpAuthentication.HttpNtlmAuthentication;
+import org.mule.runtime.http.api.client.auth.HttpAuthenticationType;
 
 /**
  * Configures NTLM authentication for the requests.
  *
  * @since 1.0
  */
-public class NtlmAuthentication extends UsernamePasswordAuthentication {
+public class NtlmAuthentication extends UsernamePasswordAuthentication implements HttpNtlmAuthentication {
 
   /**
    * The domain to authenticate.
@@ -34,19 +33,19 @@ public class NtlmAuthentication extends UsernamePasswordAuthentication {
   @Optional
   private String workstation;
 
+  @Override
+  public HttpAuthenticationType getType() {
+    return NTLM;
+  }
+
+  @Override
   public String getDomain() {
     return domain;
   }
 
+  @Override
   public String getWorkstation() {
     return workstation;
   }
 
-  @Override
-  public HttpRequestAuthentication buildRequestAuthentication() {
-    HttpRequestAuthentication requestAuthentication = getBaseRequestAuthentication(NTLM);
-    requestAuthentication.setDomain(domain);
-    requestAuthentication.setWorkstation(workstation);
-    return requestAuthentication;
-  }
 }

@@ -16,7 +16,7 @@ import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.error.HttpError;
 import org.mule.extension.http.api.error.HttpErrorMessageGenerator;
 import org.mule.extension.http.api.error.HttpRequestFailedException;
-import org.mule.extension.http.api.request.authentication.HttpAuthentication;
+import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
 import org.mule.extension.http.api.request.authentication.UsernamePasswordAuthentication;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.api.request.client.UriParameters;
@@ -34,7 +34,6 @@ import org.mule.runtime.core.api.context.notification.NotificationHelper;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
-import org.mule.runtime.http.api.client.HttpRequestAuthentication;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 
 import java.io.InputStream;
@@ -54,7 +53,7 @@ public class HttpRequester {
   private static final String REMOTELY_CLOSED = "Remotely closed";
 
   private final boolean followRedirects;
-  private final HttpAuthentication authentication;
+  private final HttpRequestAuthentication authentication;
   private final int responseTimeout;
   private final ResponseValidator responseValidator;
 
@@ -65,7 +64,7 @@ public class HttpRequester {
 
   private HttpErrorMessageGenerator errorMessageGenerator = new HttpErrorMessageGenerator();
 
-  public HttpRequester(HttpRequestFactory eventToHttpRequest, boolean followRedirects, HttpAuthentication authentication,
+  public HttpRequester(HttpRequestFactory eventToHttpRequest, boolean followRedirects, HttpRequestAuthentication authentication,
                        int responseTimeout, ResponseValidator responseValidator, HttpRequesterConfig config,
                        Scheduler scheduler) {
     this.followRedirects = followRedirects;
@@ -126,7 +125,7 @@ public class HttpRequester {
     return String.format("Error sending HTTP request to %s", httpRequest.getUri());
   }
 
-  private boolean resendRequest(Result result, boolean retry, HttpAuthentication authentication) throws MuleException {
+  private boolean resendRequest(Result result, boolean retry, HttpRequestAuthentication authentication) throws MuleException {
     return retry && authentication != null && authentication.shouldRetry(result);
   }
 
@@ -140,10 +139,10 @@ public class HttpRequester {
     }
   }
 
-  private HttpRequestAuthentication resolveAuthentication(HttpAuthentication authentication) {
-    HttpRequestAuthentication requestAuthentication = null;
+  private org.mule.runtime.http.api.client.auth.HttpAuthentication resolveAuthentication(HttpRequestAuthentication authentication) {
+    org.mule.runtime.http.api.client.auth.HttpAuthentication requestAuthentication = null;
     if (authentication instanceof UsernamePasswordAuthentication) {
-      requestAuthentication = ((UsernamePasswordAuthentication) authentication).buildRequestAuthentication();
+      requestAuthentication = (org.mule.runtime.http.api.client.auth.HttpAuthentication) authentication;
     }
     return requestAuthentication;
   }
@@ -163,7 +162,7 @@ public class HttpRequester {
     private boolean followRedirects;
     private HttpStreamingType requestStreamingMode;
     private HttpSendBodyMode sendBodyMode;
-    private HttpAuthentication authentication;
+    private HttpRequestAuthentication authentication;
 
     private int responseTimeout;
     private ResponseValidator responseValidator;
@@ -197,7 +196,7 @@ public class HttpRequester {
       return this;
     }
 
-    public Builder setAuthentication(HttpAuthentication authentication) {
+    public Builder setAuthentication(HttpRequestAuthentication authentication) {
       this.authentication = authentication;
       return this;
     }

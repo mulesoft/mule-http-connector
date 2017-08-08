@@ -15,7 +15,7 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.COOKIE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
-import org.mule.extension.http.api.request.authentication.HttpAuthentication;
+import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.internal.HttpStreamingType;
 import org.mule.runtime.api.exception.MuleException;
@@ -76,11 +76,11 @@ public class HttpRequestFactory {
    *
    * @param requestBuilder The generic {@link HttpRequesterRequestBuilder} from the request component that should be used to
    *        create the {@link HttpRequest}.
-   * @param authentication The {@link HttpAuthentication} that should be used to create the {@link HttpRequest}.
+   * @param authentication The {@link HttpRequestAuthentication} that should be used to create the {@link HttpRequest}.
    * @return an {@HttpRequest} configured based on the parameters.
    * @throws MuleException if the request creation fails.
    */
-  public HttpRequest create(HttpRequesterRequestBuilder requestBuilder, HttpAuthentication authentication) {
+  public HttpRequest create(HttpRequesterRequestBuilder requestBuilder, HttpRequestAuthentication authentication) {
     HttpRequestBuilder builder = HttpRequest.builder();
 
     builder.uri(this.uri)

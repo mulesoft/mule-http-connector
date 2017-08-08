@@ -6,9 +6,8 @@
  */
 package org.mule.extension.http.api.request.authentication;
 
-import static org.mule.runtime.http.api.client.HttpAuthenticationType.DIGEST;
-
-import org.mule.runtime.http.api.client.HttpRequestAuthentication;
+import static org.mule.runtime.http.api.client.auth.HttpAuthenticationType.DIGEST;
+import org.mule.runtime.http.api.client.auth.HttpAuthenticationType;
 
 /**
  * Configures digest authentication for the requests.
@@ -18,7 +17,8 @@ import org.mule.runtime.http.api.client.HttpRequestAuthentication;
 public class DigestAuthentication extends UsernamePasswordAuthentication {
 
   @Override
-  public HttpRequestAuthentication buildRequestAuthentication() {
-    return getBaseRequestAuthentication(DIGEST);
+  public HttpAuthenticationType getType() {
+    return DIGEST;
   }
+
 }
