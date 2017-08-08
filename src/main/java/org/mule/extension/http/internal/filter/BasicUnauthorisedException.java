@@ -9,7 +9,7 @@ package org.mule.extension.http.internal.filter;
 import org.mule.runtime.api.exception.ErrorMessageAwareException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.security.SecurityContext;
+import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.core.api.security.UnauthorisedException;
 
 public class BasicUnauthorisedException extends UnauthorisedException implements ErrorMessageAwareException {
