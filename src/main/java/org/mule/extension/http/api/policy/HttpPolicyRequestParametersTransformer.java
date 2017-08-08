@@ -6,11 +6,9 @@
  */
 package org.mule.extension.http.api.policy;
 
-import static java.util.Collections.emptyMap;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 
 import org.mule.extension.http.api.BaseHttpRequestAttributes;
-import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -28,6 +26,12 @@ import java.util.Map;
  */
 public class HttpPolicyRequestParametersTransformer implements OperationPolicyParametersTransformer {
 
+  private static final String BODY = "body";
+  private static final String PATH = "path";
+  private static final String HEADERS = "headers";
+  private static final String QUERY_PARAMS = "queryParams";
+  private static final String URI_PARAMS = "uriParams";
+
   @Override
   public boolean supports(ComponentIdentifier componentIdentifier) {
     return componentIdentifier.equals(buildFromStringRepresentation("http:request"));
@@ -35,13 +39,13 @@ public class HttpPolicyRequestParametersTransformer implements OperationPolicyPa
 
   @Override
   public Message fromParametersToMessage(Map<String, Object> parameters) {
-    String path = (String) parameters.get("path");
-    TypedValue<Object> body = (TypedValue<Object>) parameters.getOrDefault("body", TypedValue.of(null));
+    String path = (String) parameters.get(PATH);
+    TypedValue<Object> body = (TypedValue<Object>) parameters.getOrDefault(BODY, TypedValue.of(null));
 
     return Message.builder().value(body.getValue())
-        .attributesValue(new HttpPolicyRequestAttributes(getMap(parameters, "headers"),
-                                                         getMap(parameters, "queryParams"),
-                                                         getMap(parameters, "uriParams"),
+        .attributesValue(new HttpPolicyRequestAttributes(getMap(parameters, HEADERS),
+                                                         getMap(parameters, QUERY_PARAMS),
+                                                         getMap(parameters, URI_PARAMS),
                                                          path))
         .mediaType(body.getDataType().getMediaType())
         .build();
@@ -49,16 +53,25 @@ public class HttpPolicyRequestParametersTransformer implements OperationPolicyPa
 
   @Override
   public Map<String, Object> fromMessageToParameters(Message message) {
+    ImmutableMap.Builder<String, Object> builder = ImmutableMap.builder();
+
     if (message.getAttributes().getValue() instanceof BaseHttpRequestAttributes) {
       BaseHttpRequestAttributes requestAttributes = (BaseHttpRequestAttributes) message.getAttributes().getValue();
-      HttpRequesterRequestBuilder httpRequesterRequestBuilder = new HttpRequesterRequestBuilder();
-      httpRequesterRequestBuilder.setHeaders(requestAttributes.getHeaders());
-      httpRequesterRequestBuilder.setQueryParams(requestAttributes.getQueryParams());
-      httpRequesterRequestBuilder.setUriParams(requestAttributes.getUriParams());
-      httpRequesterRequestBuilder.setBody(message.getPayload());
-      return ImmutableMap.<String, Object>builder().put("requestBuilder", httpRequesterRequestBuilder).build();
-    } else {
-      return emptyMap();
+
+      putIfNotNull(builder, PATH, requestAttributes.getRequestPath());
+      putIfNotNull(builder, HEADERS, requestAttributes.getHeaders());
+      putIfNotNull(builder, QUERY_PARAMS, requestAttributes.getQueryParams());
+      putIfNotNull(builder, URI_PARAMS, requestAttributes.getUriParams());
+    }
+
+    putIfNotNull(builder, "body", message.getPayload());
+
+    return builder.build();
+  }
+
+  private void putIfNotNull(ImmutableMap.Builder<String, Object> builder, String key, Object value) {
+    if (value != null) {
+      builder.put(key, value);
     }
   }
 
