@@ -14,6 +14,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.http.api.client.HttpClient;
+import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 
@@ -66,7 +67,7 @@ public class HttpExtensionClient implements Startable, Stoppable {
   }
 
   public CompletableFuture<HttpResponse> send(HttpRequest request, int responseTimeout, boolean followRedirects,
-                                              org.mule.runtime.http.api.client.auth.HttpAuthentication authentication) {
+                                              HttpAuthentication authentication) {
     return httpClient.sendAsync(request, responseTimeout, followRedirects, authentication);
   }
 }

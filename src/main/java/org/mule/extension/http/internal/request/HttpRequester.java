@@ -34,6 +34,7 @@ import org.mule.runtime.core.api.context.notification.NotificationHelper;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
+import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 
 import java.io.InputStream;
@@ -139,10 +140,10 @@ public class HttpRequester {
     }
   }
 
-  private org.mule.runtime.http.api.client.auth.HttpAuthentication resolveAuthentication(HttpRequestAuthentication authentication) {
-    org.mule.runtime.http.api.client.auth.HttpAuthentication requestAuthentication = null;
+  private HttpAuthentication resolveAuthentication(HttpRequestAuthentication authentication) {
+    HttpAuthentication requestAuthentication = null;
     if (authentication instanceof UsernamePasswordAuthentication) {
-      requestAuthentication = (org.mule.runtime.http.api.client.auth.HttpAuthentication) authentication;
+      requestAuthentication = (HttpAuthentication) authentication;
     }
     return requestAuthentication;
   }
