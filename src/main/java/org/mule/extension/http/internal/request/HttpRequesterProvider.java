@@ -20,7 +20,7 @@ import static org.mule.runtime.extension.api.annotation.param.display.Placement.
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTP;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
 import static org.slf4j.LoggerFactory.getLogger;
-import org.mule.extension.http.api.request.authentication.HttpAuthentication;
+import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.internal.request.client.DefaultUriParameters;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
@@ -101,7 +101,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
   @Parameter
   @Optional
   @Placement(tab = AUTHENTICATION)
-  private HttpAuthentication authentication;
+  private HttpRequestAuthentication authentication;
 
   @Inject
   private HttpRequesterConnectionManager connectionManager;
@@ -233,7 +233,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
     return tlsContext;
   }
 
-  public HttpAuthentication getAuthentication() {
+  public HttpRequestAuthentication getAuthentication() {
     return authentication;
   }
 

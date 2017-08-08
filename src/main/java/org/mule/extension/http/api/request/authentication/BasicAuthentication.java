@@ -6,12 +6,9 @@
  */
 package org.mule.extension.http.api.request.authentication;
 
-import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.http.api.client.HttpRequestAuthentication;
+import static org.mule.runtime.http.api.client.auth.HttpAuthenticationType.BASIC;
+import org.mule.runtime.http.api.client.auth.HttpAuthenticationType;
 
-import static org.mule.runtime.http.api.client.HttpAuthenticationType.BASIC;
-
-import org.mule.runtime.extension.api.annotation.param.Optional;
 
 /**
  * Configures basic authentication for the requests.
@@ -20,18 +17,9 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
  */
 public class BasicAuthentication extends UsernamePasswordAuthentication {
 
-  /**
-   * Configures if authentication should be preemptive or not. Preemptive authentication will send the authentication header in
-   * the first request, instead of waiting for a 401 response code to send it.
-   */
-  @Parameter
-  @Optional(defaultValue = "true")
-  private boolean preemptive;
-
   @Override
-  public HttpRequestAuthentication buildRequestAuthentication() {
-    HttpRequestAuthentication requestAuthentication = getBaseRequestAuthentication(BASIC);
-    requestAuthentication.setPreemptive(preemptive);
-    return requestAuthentication;
+  public HttpAuthenticationType getType() {
+    return BASIC;
   }
+
 }
