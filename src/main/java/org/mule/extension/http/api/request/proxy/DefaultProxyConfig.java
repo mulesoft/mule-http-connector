@@ -7,7 +7,7 @@
 package org.mule.extension.http.api.request.proxy;
 
 import org.mule.runtime.extension.api.annotation.Alias;
-import org.mule.runtime.extension.api.annotation.dsl.xml.TypeXmlHints;
+import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
@@ -19,7 +19,7 @@ import org.mule.runtime.http.api.client.proxy.ProxyConfig;
  * @since 1.0
  */
 @Alias("proxy")
-@TypeXmlHints(allowTopLevelDefinition = true)
+@TypeDsl(allowTopLevelDefinition = true)
 public class DefaultProxyConfig implements ProxyConfig {
 
   /**
