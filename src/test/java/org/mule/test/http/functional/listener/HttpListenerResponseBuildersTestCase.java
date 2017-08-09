@@ -21,7 +21,7 @@ import static org.mule.test.http.functional.matcher.HttpResponseReasonPhraseMatc
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.functional.api.exception.FunctionalTestException;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.http.api.HttpHeaders;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -248,7 +248,7 @@ public class HttpListenerResponseBuildersTestCase extends AbstractHttpTestCase {
   private static class HeaderCheckerProcessor implements Processor {
 
     @Override
-    public Event process(Event event) throws MuleException {
+    public InternalEvent process(InternalEvent event) throws MuleException {
       if (((HttpRequestAttributes) event.getMessage().getAttributes().getValue()).getHeaders().get(FAIL) == null) {
         return event;
       } else {

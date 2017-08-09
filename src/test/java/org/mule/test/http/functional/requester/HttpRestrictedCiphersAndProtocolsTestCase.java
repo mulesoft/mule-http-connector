@@ -20,7 +20,7 @@ import org.mule.extension.http.api.error.HttpRequestFailedException;
 import org.mule.functional.junit4.rules.ExpectedError;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.http.api.client.HttpClient;
@@ -83,7 +83,7 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
 
   @Test
   public void worksWithProtocolAndCipherSuiteMatch() throws Exception {
-    Event response = flowRunner("12Client12Server").withPayload(TEST_PAYLOAD).run();
+    InternalEvent response = flowRunner("12Client12Server").withPayload(TEST_PAYLOAD).run();
     assertThat(response.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
   }
 

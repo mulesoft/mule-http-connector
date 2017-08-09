@@ -10,7 +10,7 @@ import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
@@ -47,7 +47,7 @@ public class HttpRequestBodyTargetTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void responseBodyToPayloadTarget() throws Exception {
-    Event event = flowRunner("payloadTargetFlow").withPayload(AbstractMuleContextTestCase.TEST_MESSAGE).run();
+    InternalEvent event = flowRunner("payloadTargetFlow").withPayload(AbstractMuleContextTestCase.TEST_MESSAGE).run();
     assertThat(event.getMessage().getPayload().getValue(), equalTo(DEFAULT_RESPONSE));
   }
 }

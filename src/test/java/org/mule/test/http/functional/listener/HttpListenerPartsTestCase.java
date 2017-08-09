@@ -41,7 +41,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.api.message.DefaultMultiPartPayload;
@@ -282,17 +282,17 @@ public class HttpListenerPartsTestCase extends AbstractHttpTestCase {
   public static class CreatePartMessageProcessor implements Processor {
 
     @Override
-    public Event process(Event event) throws MuleException {
+    public InternalEvent process(InternalEvent event) throws MuleException {
       PartAttributes partAttributes = new PartAttributes(TEXT_BODY_FIELD_NAME);
       Message part = builder().value(TEXT_BODY_FIELD_VALUE).attributesValue(partAttributes).mediaType(TEXT_PLAIN_LATIN).build();
-      return Event.builder(event).message(of(new DefaultMultiPartPayload(part))).build();
+      return InternalEvent.builder(event).message(of(new DefaultMultiPartPayload(part))).build();
     }
   }
 
   public static class CreatePartsMessageProcessor implements Processor {
 
     @Override
-    public Event process(Event event) throws MuleException {
+    public InternalEvent process(InternalEvent event) throws MuleException {
       PartAttributes part1Attributes = new PartAttributes(TEXT_BODY_FIELD_NAME);
       Message part1 = builder().value(TEXT_BODY_FIELD_VALUE).attributesValue(part1Attributes).mediaType(TEXT_PLAIN_LATIN).build();
       PartAttributes part2Attributes = new PartAttributes(FILE_BODY_FIELD_NAME,
@@ -300,7 +300,7 @@ public class HttpListenerPartsTestCase extends AbstractHttpTestCase {
                                                           FILE_BODY_FIELD_VALUE.length(),
                                                           emptyMap());
       Message part2 = builder().value(FILE_BODY_FIELD_VALUE).attributesValue(part2Attributes).mediaType(BINARY).build();
-      return Event.builder(event).message(of(new DefaultMultiPartPayload(part1, part2))).build();
+      return InternalEvent.builder(event).message(of(new DefaultMultiPartPayload(part1, part2))).build();
     }
   }
 

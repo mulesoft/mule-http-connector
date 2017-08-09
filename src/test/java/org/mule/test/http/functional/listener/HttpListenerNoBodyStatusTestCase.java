@@ -15,7 +15,7 @@ import static org.mule.runtime.http.api.HttpConstants.HttpStatus.NO_CONTENT;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.http.api.HttpConstants.HttpStatus;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -82,8 +82,8 @@ public class HttpListenerNoBodyStatusTestCase extends AbstractHttpTestCase {
   private static class StreamingProcessor implements Processor {
 
     @Override
-    public Event process(Event event) throws MuleException {
-      return Event.builder(event)
+    public InternalEvent process(InternalEvent event) throws MuleException {
+      return InternalEvent.builder(event)
           .message(Message.builder(event.getMessage()).value(new ByteArrayInputStream(new byte[] {})).build())
           .build();
     }

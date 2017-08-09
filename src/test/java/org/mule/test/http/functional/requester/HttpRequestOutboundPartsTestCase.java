@@ -24,7 +24,7 @@ import static org.junit.Assert.assertThat;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.api.message.PartAttributes;
 import org.mule.runtime.core.api.util.IOUtils;
@@ -158,7 +158,7 @@ public class HttpRequestOutboundPartsTestCase extends AbstractHttpRequestTestCas
     // Set a part bigger than the queue size.
     addPartToSend(new byte[maxAsyncWriteQueueSize * 2], TEXT, new PartAttributes(TEST_PART_NAME));
 
-    Event response = flowRunner("requestFlowTls").withPayload(TEST_MESSAGE).withVariable(PARTS, partsToSend).run();
+    InternalEvent response = flowRunner("requestFlowTls").withPayload(TEST_MESSAGE).withVariable(PARTS, partsToSend).run();
 
     assertThat((HttpResponseAttributes) response.getMessage().getAttributes().getValue(), hasStatusCode(OK.getStatusCode()));
   }

@@ -26,7 +26,7 @@ import io.qameta.allure.Issue;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.http.api.HttpHeaders;
 
 import java.io.IOException;
@@ -54,7 +54,7 @@ public class HttpRequestInboundPartsTestCase extends AbstractHttpRequestTestCase
 
   @Test
   public void processInboundAttachments() throws Exception {
-    Event event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
+    InternalEvent event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
 
     assertThat(event.getMessage().getPayload().getValue(), instanceOf(MultiPartPayload.class));
     assertThat(event.getMessage(), hasMediaType(APPLICATION_JAVA.withCharset(ISO_8859_1)));

@@ -14,7 +14,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 
 import java.io.IOException;
 
@@ -138,7 +138,7 @@ public class HttpRequestFollowRedirectsTestCase extends AbstractHttpRequestTestC
   }
 
   private void doTest(String expectedPayload, String expectedPath, FlowRunner runner) throws MuleException, Exception {
-    Event result = runner.run();
+    InternalEvent result = runner.run();
     assertThat(getPayloadAsString(result.getMessage()), is(expectedPayload));
     assertThat(uri, is(expectedPath));
   }
