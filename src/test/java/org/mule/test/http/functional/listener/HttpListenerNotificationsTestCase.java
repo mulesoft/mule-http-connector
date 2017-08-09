@@ -6,7 +6,7 @@
  */
 package org.mule.test.http.functional.listener;
 
-import static org.mule.runtime.core.api.context.notification.ServerNotification.getActionName;
+import static org.mule.runtime.core.api.context.notification.AbstractServerNotification.getActionName;
 import static org.mule.runtime.core.api.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.runtime.core.api.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;

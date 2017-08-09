@@ -6,7 +6,7 @@
  */
 package org.mule.test.http.functional.requester;
 
-import static org.mule.runtime.core.api.context.notification.ServerNotification.getActionName;
+import static org.mule.runtime.core.api.context.notification.AbstractServerNotification.getActionName;
 import static org.mule.runtime.core.api.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
 import static org.mule.runtime.core.api.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_END;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
