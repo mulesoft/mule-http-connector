@@ -18,7 +18,7 @@ import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.MULTIPART
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MultiPartPayload;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.api.message.PartAttributes;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -56,7 +56,7 @@ public class HttpRequestPartsTypeTestCase extends AbstractHttpTestCase {
   @Test
   public void inputStreamAttachmentWithUnsupportedContentType() throws Exception {
     MultiPartPayload partPayload = getMultiPartPayload(dataBytes);
-    final Event result = flowRunner("attachmentFromBytes").withPayload(partPayload).run();
+    final InternalEvent result = flowRunner("attachmentFromBytes").withPayload(partPayload).run();
     assertThat(result.getMessage(), hasPayload(equalTo("OK")));
     verify("reqWithAttachment");
   }
@@ -67,7 +67,7 @@ public class HttpRequestPartsTypeTestCase extends AbstractHttpTestCase {
   @Test
   public void byteArrayAttachmentWithUnsupportedContentType() throws Exception {
     MultiPartPayload partPayload = getMultiPartPayload(new ByteArrayInputStream(dataBytes));
-    final Event result = flowRunner("attachmentFromStream").withPayload(partPayload).run();
+    final InternalEvent result = flowRunner("attachmentFromStream").withPayload(partPayload).run();
     assertThat(result.getMessage(), hasPayload(equalTo("OK")));
     verify("reqWithAttachment");
   }

@@ -32,7 +32,7 @@ import io.qameta.allure.Stories;
 
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.functional.junit4.rules.ExpectedError;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.util.concurrent.Latch;
 import org.mule.runtime.http.api.HttpConstants.HttpStatus;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -124,14 +124,14 @@ public class HttpRequestErrorHandlingTestCase extends AbstractHttpRequestTestCas
   @Test
   public void timeout() throws Exception {
     timeout = true;
-    Event result = getFlowRunner("handled", httpPort.getNumber()).run();
+    InternalEvent result = getFlowRunner("handled", httpPort.getNumber()).run();
     done.release();
     assertThat(result.getMessage(), hasPayload(equalTo(getErrorMessage(": Timeout exceeded") + " timeout")));
   }
 
   @Test
   public void connectivity() throws Exception {
-    Event result = getFlowRunner("handled", unusedPort.getNumber()).run();
+    InternalEvent result = getFlowRunner("handled", unusedPort.getNumber()).run();
     assertThat(result.getMessage(), hasPayload(equalTo(getErrorMessage(": Connection refused", unusedPort) + " connectivity")));
   }
 
@@ -152,7 +152,7 @@ public class HttpRequestErrorHandlingTestCase extends AbstractHttpRequestTestCas
       throws Exception {
     serverStatus = status.getStatusCode();
     // Hit flow with error handler
-    Event result = getFlowRunner("handled", httpPort.getNumber()).run();
+    InternalEvent result = getFlowRunner("handled", httpPort.getNumber()).run();
     assertThat(result.getMessage().getPayload().getValue(), is(expectedResult));
     // Hit flow that will throw back the error
     if (!expectedError.endsWith("ANY")) {

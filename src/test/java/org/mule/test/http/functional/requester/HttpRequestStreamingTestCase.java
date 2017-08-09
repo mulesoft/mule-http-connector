@@ -17,7 +17,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
@@ -150,7 +150,7 @@ public class HttpRequestStreamingTestCase extends AbstractHttpRequestTestCase {
     assertNoStreaming(runFlowWithPayload("streamingNever", TEST_MESSAGE));
   }
 
-  public Event runFlowWithPayload(String flow, Object payload) throws Exception {
+  public InternalEvent runFlowWithPayload(String flow, Object payload) throws Exception {
     return flowRunner(flow).withPayload(payload).withVariable(HEADERS, headersToSend).run();
   }
 
@@ -158,13 +158,13 @@ public class HttpRequestStreamingTestCase extends AbstractHttpRequestTestCase {
     headersToSend.put(name, value);
   }
 
-  private void assertNoStreaming(Event response) throws Exception {
+  private void assertNoStreaming(InternalEvent response) throws Exception {
     assertNull(transferEncodingHeader);
     assertThat(Integer.parseInt(contentLengthHeader), equalTo(TEST_MESSAGE.length()));
     assertThat(getPayloadAsString(response.getMessage()), equalTo(DEFAULT_RESPONSE));
   }
 
-  private void assertStreaming(Event response) throws Exception {
+  private void assertStreaming(InternalEvent response) throws Exception {
     assertThat(transferEncodingHeader, equalTo(CHUNKED));
     assertNull(contentLengthHeader);
     assertThat(response.getMessage().getPayload().getValue(), equalTo(DEFAULT_RESPONSE));

@@ -16,7 +16,7 @@ import static org.mule.functional.junit4.TestLegacyMessageUtils.getInboundProper
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.matcher.HttpMessageAttributesMatchers;
@@ -50,7 +50,7 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void responseBodyIsMappedToPayload() throws Exception {
-    Event event = flowRunner("requestFlow").withPayload(AbstractMuleContextTestCase.TEST_MESSAGE).run();
+    InternalEvent event = flowRunner("requestFlow").withPayload(AbstractMuleContextTestCase.TEST_MESSAGE).run();
     assertThat(event.getMessage().getPayload().getValue(), equalTo(DEFAULT_RESPONSE));
   }
 
@@ -59,21 +59,21 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void blockingResponseBodyIsMappedToPayload() throws Exception {
-    Event event = flowRunner("blockingRequestFlow").withPayload(AbstractMuleContextTestCase.TEST_MESSAGE).run();
+    InternalEvent event = flowRunner("blockingRequestFlow").withPayload(AbstractMuleContextTestCase.TEST_MESSAGE).run();
     assertTrue(event.getMessage().getPayload().getValue() instanceof String);
     assertThat(event.getMessage().getPayload().getValue(), equalTo("value"));
   }
 
   @Test
   public void responseStatusCodeIsSetAsInboundProperty() throws Exception {
-    Event event = flowRunner("requestFlow").withPayload(AbstractMuleContextTestCase.TEST_MESSAGE).run();
+    InternalEvent event = flowRunner("requestFlow").withPayload(AbstractMuleContextTestCase.TEST_MESSAGE).run();
     assertThat((HttpResponseAttributes) event.getMessage().getAttributes().getValue(), HttpMessageAttributesMatchers
         .hasStatusCode(OK.getStatusCode()));
   }
 
   @Test
   public void responseHeadersAreMappedInAttributes() throws Exception {
-    Event event = flowRunner("requestFlow").withPayload(AbstractMuleContextTestCase.TEST_MESSAGE).run();
+    InternalEvent event = flowRunner("requestFlow").withPayload(AbstractMuleContextTestCase.TEST_MESSAGE).run();
     HttpResponseAttributes responseAttributes = (HttpResponseAttributes) event.getMessage().getAttributes().getValue();
     assertThat(responseAttributes.getHeaders(), hasEntry(TEST_HEADER_NAME.toLowerCase(), TEST_HEADER_VALUE));
   }
@@ -86,7 +86,7 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void previousInboundPropertiesAreCleared() throws Exception {
-    Event event =
+    InternalEvent event =
         flowRunner("requestFlow").withPayload(AbstractMuleContextTestCase.TEST_MESSAGE)
             .withInboundProperty("TestInboundProperty", "TestValue").run();
     assertThat(getInboundProperty(event.getMessage(), "TestInboundProperty"), nullValue());

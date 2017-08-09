@@ -12,7 +12,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.test.http.functional.AbstractHttpExpectHeaderServerTestCase;
 import org.mule.test.http.functional.matcher.HttpMessageAttributesMatchers;
 
@@ -48,7 +48,7 @@ public class HttpRequestExpectHeaderTestCase extends AbstractHttpExpectHeaderSer
 
     // Set a payload that will fail when consumed. As the server rejects the request after processing
     // the header, the client should not send the body.
-    Event response = flowRunner(REQUEST_FLOW_NAME).withPayload(new InputStream() {
+    InternalEvent response = flowRunner(REQUEST_FLOW_NAME).withPayload(new InputStream() {
 
       @Override
       public int read() throws IOException {

@@ -16,7 +16,7 @@ import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.MULTIPART
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.message.MultiPartPayload;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 
 import java.io.IOException;
 
@@ -71,7 +71,7 @@ public class HttpRequestMultipartTestCase extends AbstractHttpRequestTestCase {
   }
 
   private void testWithPath(String path) throws Exception {
-    Event response = flowRunner("requestFlow").withVariable("requestPath", path).run();
+    InternalEvent response = flowRunner("requestFlow").withVariable("requestPath", path).run();
     Object attributes = response.getMessage().getAttributes().getValue();
     assertThat(attributes, instanceOf(HttpResponseAttributes.class));
     assertThat(((MultiPartPayload) response.getMessage().getPayload().getValue()), hasSize(1));

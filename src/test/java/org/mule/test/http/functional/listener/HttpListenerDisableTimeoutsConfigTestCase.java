@@ -8,7 +8,7 @@ package org.mule.test.http.functional.listener;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;
@@ -32,7 +32,7 @@ public class HttpListenerDisableTimeoutsConfigTestCase extends AbstractHttpTestC
 
   @Test
   public void httpListenerDefaultResponseTimeout() throws Exception {
-    final Event res = flowRunner("httpFlowWithDefaultResponseTimeout")
+    final InternalEvent res = flowRunner("httpFlowWithDefaultResponseTimeout")
         .withVariable("port", port.getNumber())
         .withPayload("hi")
         .run();
@@ -42,7 +42,7 @@ public class HttpListenerDisableTimeoutsConfigTestCase extends AbstractHttpTestC
 
   @Test
   public void httpListenerCustomResponseTimeout() throws Exception {
-    final Event res = flowRunner("httpFlowWithCustomResponseTimeout")
+    final InternalEvent res = flowRunner("httpFlowWithCustomResponseTimeout")
         .withVariable("port", port.getNumber())
         .withPayload("hi")
         .run();

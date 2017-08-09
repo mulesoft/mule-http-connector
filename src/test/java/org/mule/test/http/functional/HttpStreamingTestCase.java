@@ -19,7 +19,7 @@ import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.STREAMING
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -60,7 +60,7 @@ public class HttpStreamingTestCase extends AbstractHttpTestCase {
 
   @Test
   public void requesterStreams() throws Exception {
-    Event response = flowRunner("client").run();
+    InternalEvent response = flowRunner("client").run();
     stop.set(true);
     assertThat(response.getMessage(), hasAttributes(instanceOf(HttpResponseAttributes.class)));
     assertThat(response.getMessage().getPayload().getValue(), instanceOf(CursorStreamProvider.class));
@@ -84,7 +84,7 @@ public class HttpStreamingTestCase extends AbstractHttpTestCase {
   protected static class StoppableInputStreamProcessor implements Processor {
 
     @Override
-    public Event process(Event event) throws MuleException {
+    public InternalEvent process(InternalEvent event) throws MuleException {
       InputStream inputStream = new InputStream() {
 
         @Override
@@ -96,7 +96,7 @@ public class HttpStreamingTestCase extends AbstractHttpTestCase {
           }
         }
       };
-      return Event.builder(event).message(of(inputStream)).build();
+      return InternalEvent.builder(event).message(of(inputStream)).build();
     }
 
   }
