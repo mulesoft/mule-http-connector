@@ -7,7 +7,7 @@
 package org.mule.extension.http.api.request.proxy;
 
 import org.mule.runtime.extension.api.annotation.Alias;
-import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
+import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.http.api.client.proxy.ProxyConfig.NtlmProxyConfig;
@@ -18,7 +18,7 @@ import org.mule.runtime.http.api.client.proxy.ProxyConfig.NtlmProxyConfig;
  * @since 1.0
  */
 @Alias("ntlm-proxy")
-@XmlHints(allowTopLevelDefinition = true)
+@TypeDsl(allowTopLevelDefinition = true)
 public class DefaultNtlmProxyConfig extends DefaultProxyConfig implements NtlmProxyConfig {
 
   /**
