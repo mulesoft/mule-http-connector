@@ -18,7 +18,7 @@ import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.InternalEvent.setCurrentEvent;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.SECURITY;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SECURITY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
