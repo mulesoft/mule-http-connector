@@ -6,12 +6,14 @@
  */
 package org.mule.test.http.functional.listener.intercepting.cors;
 
+import static org.junit.Assert.fail;
+import static org.mule.runtime.http.api.HttpConstants.Method.GET;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.CORS;
 
-import org.mule.modules.cors.PreflightKernelTestCase;
 import org.mule.modules.cors.attributes.KernelTestAttributesBuilder;
 import org.mule.modules.cors.result.KernelTestResult;
+import org.mule.modules.cors.tests.functional.PreflightArtifactFunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.listener.intercepting.cors.parameters.CorsHttpParameters;
@@ -34,7 +36,7 @@ import org.junit.Test;
 @Feature(HTTP_EXTENSION)
 @Story(CORS)
 public class CorsPreflightTestCase extends
-    PreflightKernelTestCase<CorsHttpParameters, CorsHttpEndpoint> {
+    PreflightArtifactFunctionalTestCase<CorsHttpParameters, CorsHttpEndpoint> {
 
   private CorsRequestExecutor request;
 
@@ -79,7 +81,7 @@ public class CorsPreflightTestCase extends
   }
 
   private void preflightOnListener(CorsHttpEndpoint endpoint) {
-    CorsHttpParameters parameters = (CorsHttpParameters) preflight().withOrigin(ORIGIN).withRequestMethod(GET).build();
+    CorsHttpParameters parameters = attributesBuilder().preflight().withOrigin(ORIGIN).withRequestMethod(GET.name()).build();
     KernelTestResult response = run(parameters, endpoint);
     check(response)
         .origin(ORIGIN)
@@ -95,32 +97,37 @@ public class CorsPreflightTestCase extends
   }
 
   @Override
-  protected KernelTestAttributesBuilder preflight() {
-    return new CorsHttpAttributesBuilder().preflight();
-  }
-
-  @Override
-  protected CorsHttpEndpoint basic() {
+  public CorsHttpEndpoint basic() {
     return new CorsHttpEndpoint("basic", basicPort.getValue());
   }
 
   @Override
-  protected CorsHttpEndpoint publicResource() {
+  public CorsHttpEndpoint publicResource() {
     return new CorsHttpEndpoint("public-resource", publicResourcePort.getValue());
   }
 
   @Override
-  protected CorsHttpEndpoint allowCredentials() {
+  public CorsHttpEndpoint allowCredentials() {
     return new CorsHttpEndpoint("allow-credentials", allowCredentialsPort.getValue());
   }
 
   @Override
-  protected CorsHttpEndpoint allowCredentialsPublicResource() {
+  public CorsHttpEndpoint allowCredentialsPublicResource() {
     return new CorsHttpEndpoint("allow-credentials-public-resource", allowCredentialsPublicResourcePort.getValue());
   }
 
   @Override
-  protected KernelTestResult run(CorsHttpParameters parameters, CorsHttpEndpoint endpoint) {
+  public KernelTestAttributesBuilder<CorsHttpParameters> attributesBuilder() {
+    return new CorsHttpAttributesBuilder();
+  }
+
+  @Override
+  public void assertCorsHeadersOnSimpleHeadRequest(KernelTestResult kernelTestResult) {
+    fail("Preflight tests should never assert about any method other than OPTIONS");
+  }
+
+  @Override
+  public KernelTestResult run(CorsHttpParameters parameters, CorsHttpEndpoint endpoint) {
     return request.execute(parameters, endpoint);
   }
 

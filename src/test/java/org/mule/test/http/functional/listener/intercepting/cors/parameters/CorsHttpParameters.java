@@ -6,8 +6,6 @@
  */
 package org.mule.test.http.functional.listener.intercepting.cors.parameters;
 
-import static org.mule.runtime.http.api.HttpConstants.Method.GET;
-
 import org.mule.modules.cors.query.KernelTestParameters;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.HttpConstants.Method;
@@ -36,7 +34,4 @@ public class CorsHttpParameters extends KernelTestParameters {
     return RequestBuilder.create(method.toString()).setUri(uri);
   }
 
-  private static String asString(Method method) {
-    return method != null ? method.toString() : GET.toString();
-  }
 }
