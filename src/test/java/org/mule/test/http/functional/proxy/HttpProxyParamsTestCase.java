@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.error.HttpRequestFailedException;
-import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalEvent;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.requester.AbstractHttpRequestTestCase;
 
@@ -32,21 +32,21 @@ public class HttpProxyParamsTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void proxyWithNonProxyHostsParam() throws Exception {
-    final Event event = runFlow("nonProxyParamProxy");
+    final InternalEvent event = runFlow("nonProxyParamProxy");
     assertThat(((HttpResponseAttributes) event.getMessage().getAttributes().getValue()).getStatusCode(), is(SC_OK));
     assertThat(event.getMessage(), hasPayload(equalTo((DEFAULT_RESPONSE))));
   }
 
   @Test
   public void innerProxyWithNonProxyHostsParam() throws Exception {
-    final Event event = runFlow("innerNonProxyParamProxy");
+    final InternalEvent event = runFlow("innerNonProxyParamProxy");
     assertThat(((HttpResponseAttributes) event.getMessage().getAttributes().getValue()).getStatusCode(), is(SC_OK));
     assertThat(event.getMessage(), hasPayload(equalTo((DEFAULT_RESPONSE))));
   }
 
   @Test
   public void proxyWithMultipleHostsNonProxyHostsParam() throws Exception {
-    final Event event = runFlow("innerNonProxyParamProxyMultipleHosts");
+    final InternalEvent event = runFlow("innerNonProxyParamProxyMultipleHosts");
     assertThat(((HttpResponseAttributes) event.getMessage().getAttributes().getValue()).getStatusCode(), is(SC_OK));
     assertThat(event.getMessage(), hasPayload(equalTo((DEFAULT_RESPONSE))));
   }
@@ -69,7 +69,7 @@ public class HttpProxyParamsTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void noProxy() throws Exception {
-    final Event event = runFlow("noProxy");
+    final InternalEvent event = runFlow("noProxy");
     assertThat(((HttpResponseAttributes) event.getMessage().getAttributes().getValue()).getStatusCode(), is(SC_OK));
     assertThat(event.getMessage(), hasPayload(equalTo((DEFAULT_RESPONSE))));
   }
