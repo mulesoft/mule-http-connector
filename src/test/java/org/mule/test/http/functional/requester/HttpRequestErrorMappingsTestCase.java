@@ -15,16 +15,14 @@ import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.ERROR_HANDLING;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.ERROR_MAPPINGS;
 
-import io.qameta.allure.Stories;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
-
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
+import io.qameta.allure.Stories;
 import io.qameta.allure.Story;
+import org.junit.Rule;
+import org.junit.Test;
 
 @Feature(HTTP_EXTENSION)
 @Stories({@Story(ERROR_HANDLING), @Story(ERROR_MAPPINGS)})
@@ -54,7 +52,6 @@ public class HttpRequestErrorMappingsTestCase extends AbstractHttpTestCase {
     verify("simpleMapping", CONNECT_ERROR_MESSAGE);
   }
 
-  @Ignore("MULE-13009: Operation error mappings are broken.")
   @Test
   @Description("Verifies that a mapped error via a custom matcher is handled. ")
   public void matchingMappedRequest() throws Exception {
@@ -64,14 +61,13 @@ public class HttpRequestErrorMappingsTestCase extends AbstractHttpTestCase {
   @Test
   @Description("Verifies that an unmapped error is handled as ANY.")
   public void noMatchingMappedRequest() throws Exception {
-    verify("complexMapping", UNMATCHED_ERROR_MESSAGE, "Potato!");
+    verify("complexMapping", UNMATCHED_ERROR_MESSAGE, this);
   }
 
-  @Ignore("MULE-13009: Operation error mappings are broken.")
   @Test
   @Description("Verifies that each error is correctly handled given an operation with multiple mappings.")
   public void multipleMappingsRequest() throws Exception {
-    verify("multipleMappings", EXPRESSION_ERROR_MESSAGE, "Potato!");
+    verify("multipleMappings", EXPRESSION_ERROR_MESSAGE, this);
     verify("multipleMappings", CONNECT_ERROR_MESSAGE);
   }
 
@@ -82,6 +78,4 @@ public class HttpRequestErrorMappingsTestCase extends AbstractHttpTestCase {
   private void verify(String flowName, String expectedPayload, Object headers) throws Exception {
     assertThat(flowRunner(flowName).withVariable("headers", headers).run().getMessage(), hasPayload(that(is(expectedPayload))));
   }
-
-
 }
