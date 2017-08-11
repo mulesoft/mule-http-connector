@@ -14,7 +14,6 @@ import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.api.message.Message.builder;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
@@ -22,11 +21,7 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.runtime.http.api.HttpHeaders.Values.MULTIPART_FORM_DATA;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.core.api.message.DefaultMultiPartPayload;
-import org.mule.runtime.core.api.message.PartAttributes;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;
@@ -37,6 +32,7 @@ import java.io.InputStream;
 import javax.servlet.ServletException;
 import javax.servlet.http.Part;
 
+import io.qameta.allure.Feature;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -44,7 +40,6 @@ import org.apache.http.HttpVersion;
 import org.apache.http.client.fluent.Response;
 import org.eclipse.jetty.util.MultiPartInputStreamParser;
 import org.junit.Rule;
-import io.qameta.allure.Feature;
 
 @Feature(HTTP_EXTENSION)
 public abstract class HttpListenerResponseStreamingTestCase extends AbstractHttpTestCase {
@@ -156,10 +151,10 @@ public abstract class HttpListenerResponseStreamingTestCase extends AbstractHttp
     assertThat(IOUtils.toString(part.getInputStream()), is(TEST_BODY));
   }
 
-  private static MultiPartPayload createMultipartPayload() {
-    PartAttributes partAttributes = new PartAttributes("aName");
-    Message part = builder().value(TEST_BODY).attributesValue(partAttributes).mediaType(TEXT).build();
-    return new DefaultMultiPartPayload(part);
-  }
+  //  private static MultiPartPayload createMultipartPayload() {
+  //    PartAttributes partAttributes = new PartAttributes("aName");
+  //    Message part = builder().value(TEST_BODY).attributesValue(partAttributes).mediaType(TEXT).build();
+  //    return new DefaultMultiPartPayload(part);
+  //  }
 
 }

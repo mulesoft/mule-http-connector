@@ -6,7 +6,10 @@
  */
 package org.mule.test.http.functional.requester;
 
-import static org.mule.runtime.api.message.Message.builder;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.startsWith;
+import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.metadata.MediaType.HTML;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
@@ -15,23 +18,14 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.MULTIPART;
 import static org.mule.test.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
-import static java.util.Collections.emptyMap;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.startsWith;
-import static org.junit.Assert.assertThat;
-
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.InternalEvent;
-import org.mule.runtime.core.api.message.DefaultMultiPartPayload;
-import org.mule.runtime.core.api.message.PartAttributes;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -42,13 +36,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.util.MultiPartInputStreamParser;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 
 @Feature(HTTP_EXTENSION)
 @Story(MULTIPART)
@@ -79,12 +73,12 @@ public class HttpRequestOutboundPartsTestCase extends AbstractHttpRequestTestCas
   @Test
   public void partsAreSent() throws Exception {
     String content1 = "content 1";
-    PartAttributes part1Attributes = new PartAttributes("part1", null, content1.length(), emptyMap());
-    addPartToSend(content1, TEXT, part1Attributes);
+    //    PartAttributes part1Attributes = new PartAttributes("part1", null, content1.length(), emptyMap());
+    //    addPartToSend(content1, TEXT, part1Attributes);
     String content2 = "content 2";
-    PartAttributes part2Attributes = new PartAttributes("part2", "myPart.txt", content2.length(), emptyMap());
-    addPartToSend(content2.getBytes(), TEXT, part2Attributes);
-    flowRunner("requestPartFlow").withPayload(getPayload()).run();
+    //    PartAttributes part2Attributes = new PartAttributes("part2", "myPart.txt", content2.length(), emptyMap());
+    //    addPartToSend(content2.getBytes(), TEXT, part2Attributes);
+    //    flowRunner("requestPartFlow").withPayload(getPayload()).run();
 
     assertThat(requestContentType, startsWith("multipart/form-data; boundary="));
     assertThat(parts.size(), equalTo(2));
@@ -97,14 +91,14 @@ public class HttpRequestOutboundPartsTestCase extends AbstractHttpRequestTestCas
   @Test
   public void partsCustomContentType() throws Exception {
     String content1 = "Contents 1";
-    PartAttributes part1Attributes = new PartAttributes("part1", null, content1.length(), emptyMap());
-    addPartToSend(content1, TEXT, part1Attributes);
+    //    PartAttributes part1Attributes = new PartAttributes("part1", null, content1.length(), emptyMap());
+    //    addPartToSend(content1, TEXT, part1Attributes);
     String content2 = "Contents 2";
-    PartAttributes part2Attributes = new PartAttributes("part2", null, content2.length(), emptyMap());
-    addPartToSend(content2, HTML, part2Attributes);
+    //    PartAttributes part2Attributes = new PartAttributes("part2", null, content2.length(), emptyMap());
+    //    addPartToSend(content2, HTML, part2Attributes);
 
-    flowRunner("requestFlow").withPayload(getPayload())
-        .withMediaType(MediaType.parse("multipart/form-data2")).run();
+    //    flowRunner("requestFlow").withPayload(getPayload())
+    //        .withMediaType(MediaType.parse("multipart/form-data2")).run();
 
     assertThat(requestContentType, startsWith("multipart/form-data2; boundary="));
     assertThat(parts.size(), equalTo(2));
@@ -116,25 +110,25 @@ public class HttpRequestOutboundPartsTestCase extends AbstractHttpRequestTestCas
   @Test
   public void filePartSetsContentDispositionWithFileName() throws Exception {
     File file = new File(IOUtils.getResourceAsUrl(TEST_FILE_NAME, getClass()).getPath());
-    PartAttributes partAttributes = new PartAttributes(TEST_PART_NAME, TEST_FILE_NAME.substring(5), file.length(), emptyMap());
-    addPartToSend(new FileInputStream(file), partAttributes);
+    //    PartAttributes partAttributes = new PartAttributes(TEST_PART_NAME, TEST_FILE_NAME.substring(5), file.length(), emptyMap());
+    //    addPartToSend(new FileInputStream(file), partAttributes);
 
-    flowRunner("requestFlow").withPayload(getPayload()).run();
+    //    flowRunner("requestFlow").withPayload(getPayload()).run();
 
     Part part = getPart(TEST_PART_NAME);
     assertFormDataContentDisposition(part, TEST_PART_NAME, TEST_FILE_NAME.substring(5));
   }
 
-  private void addPartToSend(Object content, PartAttributes partAttributes) {
-    partsToSend.add(builder().value(content).attributesValue(partAttributes).build());
-  }
+  //  private void addPartToSend(Object content, PartAttributes partAttributes) {
+  //    partsToSend.add(builder().value(content).attributesValue(partAttributes).build());
+  //  }
 
   @Test
   public void byteArrayPartSetsContentDispositionWithFileName() throws Exception {
-    PartAttributes partAttributes = new PartAttributes(TEST_PART_NAME, TEST_FILE_NAME, TEST_MESSAGE.length(), emptyMap());
-    addPartToSend(TEST_MESSAGE.getBytes(), TEXT, partAttributes);
+    //    PartAttributes partAttributes = new PartAttributes(TEST_PART_NAME, TEST_FILE_NAME, TEST_MESSAGE.length(), emptyMap());
+    //    addPartToSend(TEST_MESSAGE.getBytes(), TEXT, partAttributes);
 
-    flowRunner("requestFlow").withPayload(getPayload()).run();
+    //    flowRunner("requestFlow").withPayload(getPayload()).run();
 
     Part part = getPart(TEST_PART_NAME);
     assertFormDataContentDisposition(part, TEST_PART_NAME, TEST_FILE_NAME);
@@ -142,9 +136,9 @@ public class HttpRequestOutboundPartsTestCase extends AbstractHttpRequestTestCas
 
   @Test
   public void stringPartSetsContentDispositionWithoutFileName() throws Exception {
-    addPartToSend(TEST_MESSAGE, TEXT, new PartAttributes(TEST_PART_NAME));
+    //    addPartToSend(TEST_MESSAGE, TEXT, new PartAttributes(TEST_PART_NAME));
 
-    flowRunner("requestFlow").withPayload(getPayload()).run();
+    //    flowRunner("requestFlow").withPayload(getPayload()).run();
 
     Part part = getPart(TEST_PART_NAME);
     assertFormDataContentDisposition(part, TEST_PART_NAME, null);
@@ -156,20 +150,20 @@ public class HttpRequestOutboundPartsTestCase extends AbstractHttpRequestTestCas
     // (org.glassfish.grizzly.nio.transport.TCPNIOConnection).
     int maxAsyncWriteQueueSize = Integer.valueOf(sendBufferSize.getValue()) * 4;
     // Set a part bigger than the queue size.
-    addPartToSend(new byte[maxAsyncWriteQueueSize * 2], TEXT, new PartAttributes(TEST_PART_NAME));
+    //    addPartToSend(new byte[maxAsyncWriteQueueSize * 2], TEXT, new PartAttributes(TEST_PART_NAME));
 
     InternalEvent response = flowRunner("requestFlowTls").withPayload(TEST_MESSAGE).withVariable(PARTS, partsToSend).run();
 
     assertThat((HttpResponseAttributes) response.getMessage().getAttributes().getValue(), hasStatusCode(OK.getStatusCode()));
   }
 
-  private DefaultMultiPartPayload getPayload() {
-    return new DefaultMultiPartPayload(partsToSend);
-  }
+  //  private DefaultMultiPartPayload getPayload() {
+  //    return new DefaultMultiPartPayload(partsToSend);
+  //  }
 
-  private void addPartToSend(Object content, MediaType contentType, PartAttributes attributes) throws Exception {
-    partsToSend.add(builder().value(content).attributesValue(attributes).mediaType(contentType).build());
-  }
+  //  private void addPartToSend(Object content, MediaType contentType, PartAttributes attributes) throws Exception {
+  //    partsToSend.add(builder().value(content).attributesValue(attributes).mediaType(contentType).build());
+  //  }
 
   private void assertPart(String name, MediaType expectedContentType, String expectedBody) throws Exception {
     Part part = getPart(name);
