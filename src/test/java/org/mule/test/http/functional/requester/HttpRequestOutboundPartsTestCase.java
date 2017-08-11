@@ -37,6 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.util.MultiPartInputStreamParser;
@@ -46,7 +47,8 @@ import org.junit.Test;
 
 @Feature(HTTP_EXTENSION)
 @Story(MULTIPART)
-@Ignore("MULE-12976 - DW: Support multipart mime types")
+@Ignore("MULE-12985: Move multipart test cases to HTTP service and adapt extension ones")
+@Issue("MULE-12985")
 public class HttpRequestOutboundPartsTestCase extends AbstractHttpRequestTestCase {
 
   private static final String TEST_FILE_NAME = "auth/realm.properties";

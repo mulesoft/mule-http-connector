@@ -9,17 +9,12 @@ package org.mule.test.http.functional.listener;
 import static org.apache.http.client.fluent.Request.Get;
 import static org.apache.http.client.fluent.Request.Post;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.startsWith;
-import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
-import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
-import static org.mule.runtime.http.api.HttpHeaders.Values.MULTIPART_FORM_DATA;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -27,10 +22,6 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
 import java.io.IOException;
-import java.io.InputStream;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.Part;
 
 import io.qameta.allure.Feature;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -38,7 +29,6 @@ import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.fluent.Response;
-import org.eclipse.jetty.util.MultiPartInputStreamParser;
 import org.junit.Rule;
 
 @Feature(HTTP_EXTENSION)
@@ -99,19 +89,6 @@ public abstract class HttpListenerResponseStreamingTestCase extends AbstractHttp
     assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(expectedBody));
   }
 
-  protected void testResponseIsMultipartContentLengthEncoding(String url, HttpVersion httpVersion) throws Exception {
-    HttpResponse httpResponse = verifyIsContentLength(url, httpVersion);
-    verifyMultipart(httpResponse);
-  }
-
-  protected void testResponseIsMultipartChunkedEncoding(String url, HttpVersion httpVersion) throws Exception {
-    final Response response = Post(url).version(httpVersion).connectTimeout(DEFAULT_TIMEOUT).socketTimeout(DEFAULT_TIMEOUT)
-        .execute();
-    final HttpResponse httpResponse = response.returnResponse();
-    verifyIsChunked(httpResponse);
-    verifyMultipart(httpResponse);
-  }
-
   private HttpResponse verifyIsContentLength(String url, HttpVersion httpVersion) throws IOException {
     final Response response =
         Get(url).version(httpVersion).connectTimeout(DEFAULT_TIMEOUT).socketTimeout(DEFAULT_TIMEOUT).execute();
@@ -137,24 +114,5 @@ public abstract class HttpListenerResponseStreamingTestCase extends AbstractHttp
     assertThat(contentLengthHeader, nullValue());
     assertThat(transferEncodingHeader, is(nullValue()));
   }
-
-  private void verifyMultipart(HttpResponse httpResponse) throws IOException, ServletException {
-    String contentType = httpResponse.getFirstHeader(CONTENT_TYPE).getValue();
-    assertThat(contentType, startsWith(MULTIPART_FORM_DATA));
-    InputStream content = httpResponse.getEntity().getContent();
-    MultiPartInputStreamParser partParser = new MultiPartInputStreamParser(content, contentType, null, null);
-    Object[] parts = partParser.getParts().toArray();
-    assertThat(parts, arrayWithSize(1));
-    Part part = (Part) parts[0];
-    assertThat(part.getContentType(), is(TEXT.toRfcString()));
-    assertThat(part.getName(), is("aName"));
-    assertThat(IOUtils.toString(part.getInputStream()), is(TEST_BODY));
-  }
-
-  //  private static MultiPartPayload createMultipartPayload() {
-  //    PartAttributes partAttributes = new PartAttributes("aName");
-  //    Message part = builder().value(TEST_BODY).attributesValue(partAttributes).mediaType(TEXT).build();
-  //    return new DefaultMultiPartPayload(part);
-  //  }
 
 }

@@ -33,8 +33,8 @@ import org.junit.Test;
 
 @Feature(HTTP_EXTENSION)
 @Story(MULTIPART)
-@Ignore("MULE-12976 - DW: Support multipart mime types")
-@Issue("MULE-12976")
+@Ignore("MULE-12985: Move multipart test cases to HTTP service and adapt extension ones")
+@Issue("MULE-12985")
 public class HttpRequestInboundPartsTestCase extends AbstractHttpRequestTestCase {
 
   @Override

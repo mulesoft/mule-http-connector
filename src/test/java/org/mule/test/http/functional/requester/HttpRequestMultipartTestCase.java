@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.eclipse.jetty.server.Request;
 import org.junit.Ignore;
@@ -28,7 +29,8 @@ import org.junit.Test;
 
 @Feature(HTTP_EXTENSION)
 @Story(MULTIPART)
-@Ignore("MULE-12976 - DW: Support multipart mime types")
+@Ignore("MULE-12985: Move multipart test cases to HTTP service and adapt extension ones")
+@Issue("MULE-12985")
 public class HttpRequestMultipartTestCase extends AbstractHttpRequestTestCase {
 
   private static final String BOUNDARY = "bec89590-35fe-11e5-a966-de100cec9c0d";

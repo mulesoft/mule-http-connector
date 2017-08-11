@@ -13,6 +13,7 @@ import org.mule.runtime.http.api.domain.entity.multipart.HttpPart;
  *
  * @since 1.0
  */
+//TODO: MULE-12985 - Move multipart test cases to HTTP service and adapt extension ones
 public class HttpMultipartTransformer {
 
   //  public static Collection<HttpPart> createFrom(MultiPartPayload multiPartPayload, TransformationService transformationService) {
