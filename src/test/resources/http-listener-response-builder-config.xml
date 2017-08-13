@@ -134,7 +134,11 @@
             <http:response statusCode="202"/>
             <http:error-response statusCode="505"/>
         </http:listener>
-        <custom-processor class="org.mule.test.http.functional.listener.HttpListenerResponseBuildersTestCase.HeaderCheckerProcessor"/>
+        <choice>
+            <when expression="#[attributes.headers.fail != null]">
+                <test:processor throwException="true" exceptionText="Missing header."/>
+            </when>
+        </choice>
     </flow>
 
 </mule>
