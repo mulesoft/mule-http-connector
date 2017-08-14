@@ -10,34 +10,24 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
-import static org.mule.runtime.api.message.Message.builder;
-import static org.mule.runtime.api.metadata.MediaType.JSON;
 import static org.mule.tck.processor.FlowAssert.verify;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.MULTIPART;
-
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.core.api.InternalEvent;
-import org.mule.runtime.core.api.message.DefaultMultiPartPayload;
-import org.mule.runtime.core.api.message.PartAttributes;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
-
-import java.io.ByteArrayInputStream;
-
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
 
 @Feature(HTTP_EXTENSION)
 @Story(MULTIPART)
-@Ignore("MULE-12976 - DW: Support multipart mime types")
-@Issue("MULE-12976")
+@Ignore("MULE-12985: Move multipart test cases to HTTP service and adapt extension ones")
+@Issue("MULE-12985")
 public class HttpRequestPartsTypeTestCase extends AbstractHttpTestCase {
 
   @Rule
@@ -55,8 +45,8 @@ public class HttpRequestPartsTypeTestCase extends AbstractHttpTestCase {
    */
   @Test
   public void inputStreamAttachmentWithUnsupportedContentType() throws Exception {
-    MultiPartPayload partPayload = getMultiPartPayload(dataBytes);
-    final InternalEvent result = flowRunner("attachmentFromBytes").withPayload(partPayload).run();
+    //    MultiPartPayload partPayload = getMultiPartPayload(dataBytes);
+    final InternalEvent result = flowRunner("attachmentFromBytes").withPayload("").run();
     assertThat(result.getMessage(), hasPayload(equalTo("OK")));
     verify("reqWithAttachment");
   }
@@ -66,15 +56,15 @@ public class HttpRequestPartsTypeTestCase extends AbstractHttpTestCase {
    */
   @Test
   public void byteArrayAttachmentWithUnsupportedContentType() throws Exception {
-    MultiPartPayload partPayload = getMultiPartPayload(new ByteArrayInputStream(dataBytes));
-    final InternalEvent result = flowRunner("attachmentFromStream").withPayload(partPayload).run();
+    //    MultiPartPayload partPayload = getMultiPartPayload(new ByteArrayInputStream(dataBytes));
+    final InternalEvent result = flowRunner("attachmentFromStream").withPayload("").run();
     assertThat(result.getMessage(), hasPayload(equalTo("OK")));
     verify("reqWithAttachment");
   }
 
-  private MultiPartPayload getMultiPartPayload(Object data) {
-    PartAttributes partAttributes = new PartAttributes("someJson");
-    Message part = builder().value(data).attributesValue(partAttributes).mediaType(JSON).build();
-    return new DefaultMultiPartPayload(part);
-  }
+  //  private MultiPartPayload getMultiPartPayload(Object data) {
+  //    PartAttributes partAttributes = new PartAttributes("someJson");
+  //    Message part = builder().value(data).attributesValue(partAttributes).mediaType(JSON).build();
+  //    return new DefaultMultiPartPayload(part);
+  //  }
 }
