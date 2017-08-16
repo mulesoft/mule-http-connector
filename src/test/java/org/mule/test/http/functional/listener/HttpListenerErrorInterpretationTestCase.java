@@ -13,8 +13,8 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.http.internal.listener.HttpListener.HTTP_NAMESPACE;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.EXPRESSION;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.SECURITY;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.EXPRESSION;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SECURITY;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.FORBIDDEN;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
@@ -30,33 +30,32 @@ import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.ERRORS;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.ERROR_HANDLING;
 import static org.mule.test.http.functional.matcher.HttpResponseContentStringMatcher.body;
 import static org.mule.test.http.functional.matcher.HttpResponseReasonPhraseMatcher.hasReasonPhrase;
-
-import io.qameta.allure.Stories;
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.functional.junit4.rules.HttpServerRule;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.api.exception.TypedException;
 import org.mule.runtime.core.api.exception.WrapperErrorMessageAwareException;
 import org.mule.runtime.http.api.HttpConstants.HttpStatus;
-import org.mule.runtime.api.util.MultiMap;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.test.http.functional.AbstractHttpTestCase;
 import org.mule.test.http.functional.matcher.HttpResponseHeaderStringMatcher;
 import org.mule.test.http.functional.matcher.HttpResponseStatusCodeMatcher;
-import org.mule.test.http.functional.AbstractHttpTestCase;
 
 import java.io.IOException;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Stories;
+import io.qameta.allure.Story;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Response;
 import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 
 @Feature(HTTP_EXTENSION)
 @Stories({@Story(ERROR_HANDLING), @Story(ERRORS)})
