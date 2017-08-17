@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.api.policy;
 
-import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.http.policy.api.HttpPolicyPointcutParameters;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 
@@ -20,12 +20,12 @@ public class HttpRequestPolicyPointcutParameters extends HttpPolicyPointcutParam
   /**
    * Creates a new {@link PolicyPointcutParameters}
    *
-   * @param componentLocation the component location where the source / operation is defined.
+   * @param requester the requester where the policy is being applied.
    * @param path the target path of the http:request operation.
    * @param method the HTTP method of the http:request operation.
    */
-  public HttpRequestPolicyPointcutParameters(ComponentLocation componentLocation, String path, String method) {
-    super(componentLocation, path, method);
+  public HttpRequestPolicyPointcutParameters(AnnotatedObject requester, String path, String method) {
+    super(requester, path, method);
   }
 
 }
