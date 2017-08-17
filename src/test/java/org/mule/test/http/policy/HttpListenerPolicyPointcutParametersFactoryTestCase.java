@@ -18,7 +18,7 @@ import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.policy.HttpListenerPolicyPointcutParameters;
 import org.mule.extension.http.api.policy.HttpListenerPolicyPointcutParametersFactory;
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -34,7 +34,7 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
   private static final String TEST_METHOD = "PUT";
 
   private final HttpListenerPolicyPointcutParametersFactory factory = new HttpListenerPolicyPointcutParametersFactory();
-  private final ComponentLocation componentLocation = mock(ComponentLocation.class);
+  private final AnnotatedObject component = mock(AnnotatedObject.class);
   private final HttpRequestAttributes httpAttributes = mock(HttpRequestAttributes.class);
   private final TypedValue attributes = new TypedValue(mock(Object.class), OBJECT);
 
@@ -54,7 +54,7 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
 
   @Test(expected = IllegalArgumentException.class)
   public void failIfAttributesIsNotHttpRequestAttributes() {
-    factory.createPolicyPointcutParameters(componentLocation, attributes);
+    factory.createPolicyPointcutParameters(component, attributes);
   }
 
   @Test(expected = NullPointerException.class)
@@ -68,10 +68,10 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
     when(httpAttributes.getMethod()).thenReturn(TEST_METHOD);
 
     HttpListenerPolicyPointcutParameters policyPointcutParameters =
-        (HttpListenerPolicyPointcutParameters) factory.createPolicyPointcutParameters(componentLocation,
+        (HttpListenerPolicyPointcutParameters) factory.createPolicyPointcutParameters(component,
                                                                                       new TypedValue<>(httpAttributes, OBJECT));
 
-    assertThat(policyPointcutParameters.getComponentLocation(), is(componentLocation));
+    assertThat(policyPointcutParameters.getComponent(), is(component));
     assertThat(policyPointcutParameters.getPath(), is(TEST_REQUEST_PATH));
     assertThat(policyPointcutParameters.getMethod(), is(TEST_METHOD));
   }

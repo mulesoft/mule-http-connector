@@ -17,7 +17,7 @@ import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import org.mule.extension.http.api.policy.HttpRequestPolicyPointcutParameters;
 import org.mule.extension.http.api.policy.HttpRequestPolicyPointcutParametersFactory;
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import com.google.common.collect.ImmutableMap;
@@ -58,15 +58,15 @@ public class HttpRequestPolicyPointcutParametersFactoryTestCase extends Abstract
 
   @Test
   public void policyPointcutParameters() {
-    ComponentLocation componentLocation = mock(ComponentLocation.class);
+    AnnotatedObject component = mock(AnnotatedObject.class);
     Map<String, Object> parametersMap =
         ImmutableMap.<String, Object>builder().put(HttpRequestPolicyPointcutParametersFactory.METHOD_PARAMETER_NAME, TEST_METHOD)
             .put(PATH_PARAMETER_NAME, TEST_REQUEST_PATH).build();
 
     HttpRequestPolicyPointcutParameters policyPointcutParameters =
-        (HttpRequestPolicyPointcutParameters) factory.createPolicyPointcutParameters(componentLocation, parametersMap);
+        (HttpRequestPolicyPointcutParameters) factory.createPolicyPointcutParameters(component, parametersMap);
 
-    assertThat(policyPointcutParameters.getComponentLocation(), is(componentLocation));
+    assertThat(policyPointcutParameters.getComponent(), is(component));
     assertThat(policyPointcutParameters.getPath(), is(TEST_REQUEST_PATH));
     assertThat(policyPointcutParameters.getMethod(), is(TEST_METHOD));
   }
