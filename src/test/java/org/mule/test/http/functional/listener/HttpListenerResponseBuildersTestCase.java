@@ -18,20 +18,11 @@ import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.functional.matcher.HttpResponseContentStringMatcher.body;
 import static org.mule.test.http.functional.matcher.HttpResponseReasonPhraseMatcher.hasReasonPhrase;
 
-import org.mule.extension.http.api.HttpRequestAttributes;
-import org.mule.functional.api.exception.FunctionalTestException;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.InternalEvent;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.http.api.HttpHeaders;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.test.http.functional.matcher.HttpResponseStatusCodeMatcher;
 import org.mule.test.http.functional.AbstractHttpTestCase;
-
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import org.mule.test.http.functional.matcher.HttpResponseStatusCodeMatcher;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
@@ -40,6 +31,11 @@ import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.Rule;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 import io.qameta.allure.Feature;
 
 @Feature(HTTP_EXTENSION)
@@ -245,15 +241,4 @@ public class HttpListenerResponseBuildersTestCase extends AbstractHttpTestCase {
     });
   }
 
-  private static class HeaderCheckerProcessor implements Processor {
-
-    @Override
-    public InternalEvent process(InternalEvent event) throws MuleException {
-      if (((HttpRequestAttributes) event.getMessage().getAttributes().getValue()).getHeaders().get(FAIL) == null) {
-        return event;
-      } else {
-        throw new FunctionalTestException("Missing header.");
-      }
-    }
-  }
 }
