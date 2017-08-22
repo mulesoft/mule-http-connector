@@ -445,7 +445,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
       public void responseSendSuccessfully() {
         // TODO: MULE-9749 Figure out how to handle this. Maybe doing nothing is right since this will be executed later if
         // everything goes right.
-        // responseCompletationCallback.responseSentSuccessfully();        
+        // responseCompletationCallback.responseSentSuccessfully();
         if (completionCallback != null) {
           completionCallback.success();
         }
