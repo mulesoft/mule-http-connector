@@ -225,7 +225,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
 
     final HttpResponseReadyCallback responseCallback = context.getResponseCallback();
     callbackContext.addVariable(RESPONSE_SEND_ATTEMPT, true);
-    responseCallback.responseReady(response, getResponseFailureCallback(responseCallback, completionCallback, callbackContext));
+    responseCallback.responseReady(response, getResponseFailureCallback(responseCallback, completionCallback));
   }
 
   private HttpResponseBuilder createFailureResponseBuilder(Error error) {
@@ -429,8 +429,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   }
 
   private ResponseStatusCallback getResponseFailureCallback(HttpResponseReadyCallback responseReadyCallback,
-                                                            SourceCompletionCallback completionCallback,
-                                                            SourceCallbackContext callbackContext) {
+                                                            SourceCompletionCallback completionCallback) {
     return new ResponseStatusCallback() {
 
       @Override
