@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.internal.listener;
 
+import static java.lang.Boolean.FALSE;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
@@ -26,7 +27,6 @@ import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.getReasonPhraseForStatusCode;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
@@ -85,14 +85,14 @@ import org.mule.runtime.http.api.server.RequestHandlerManager;
 import org.mule.runtime.http.api.server.async.HttpResponseReadyCallback;
 import org.mule.runtime.http.api.server.async.ResponseStatusCallback;
 
+import org.slf4j.Logger;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.inject.Inject;
-
-import org.slf4j.Logger;
 
 /**
  * Represents a listener for HTTP requests.
@@ -104,6 +104,8 @@ import org.slf4j.Logger;
 @EmitsResponse
 @Streaming
 public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
+
+  private static final String RESPONSE_SEND_ATTEMPT = "responseSendAttempt";
 
   public static final String HTTP_NAMESPACE = "http";
   private static final Logger LOGGER = getLogger(HttpListener.class);
@@ -188,12 +190,15 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
 
   @OnTerminate
   public void onTerminate(SourceResult sourceResult) {
-    sourceResult
-        .getInvocationError()
-        .ifPresent(error -> sendErrorResponse(new HttpListenerErrorResponseBuilder(),
-                                              sourceResult.getSourceCallbackContext(),
-                                              error,
-                                              null));
+    Boolean sendingResponse = (Boolean) sourceResult.getSourceCallbackContext().getVariable(RESPONSE_SEND_ATTEMPT).orElse(false);
+    if (FALSE.equals(sendingResponse)) {
+      sourceResult
+          .getInvocationError()
+          .ifPresent(error -> sendErrorResponse(new HttpListenerErrorResponseBuilder(),
+                                                sourceResult.getSourceCallbackContext(),
+                                                error,
+                                                null));
+    }
   }
 
   private void sendErrorResponse(HttpListenerErrorResponseBuilder errorResponse,
@@ -219,7 +224,8 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
     }
 
     final HttpResponseReadyCallback responseCallback = context.getResponseCallback();
-    responseCallback.responseReady(response, getResponseFailureCallback(responseCallback, completionCallback));
+    callbackContext.addVariable(RESPONSE_SEND_ATTEMPT, true);
+    responseCallback.responseReady(response, getResponseFailureCallback(responseCallback, completionCallback, callbackContext));
   }
 
   private HttpResponseBuilder createFailureResponseBuilder(Error error) {
@@ -423,7 +429,8 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   }
 
   private ResponseStatusCallback getResponseFailureCallback(HttpResponseReadyCallback responseReadyCallback,
-                                                            SourceCompletionCallback completionCallback) {
+                                                            SourceCompletionCallback completionCallback,
+                                                            SourceCallbackContext callbackContext) {
     return new ResponseStatusCallback() {
 
       @Override
@@ -439,6 +446,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
         // TODO: MULE-9749 Figure out how to handle this. Maybe doing nothing is right since this will be executed later if
         // everything goes right.
         // responseCompletationCallback.responseSentSuccessfully();
+        callbackContext.addVariable(RESPONSE_SEND_ATTEMPT, RESPONSE_SEND_ATTEMPT);
         if (completionCallback != null) {
           completionCallback.success();
         }
