@@ -41,8 +41,8 @@ import org.mule.runtime.http.api.client.proxy.ProxyConfig;
 /**
  * HTTP connector used to handle and perform HTTP requests.
  * <p>
- * This class only serves as an extension definition. It's configurations are divided on server ({@link HttpListenerConfig}) and
- * client ({@link HttpRequesterConfig}) capabilities.
+ * This class only serves as an extension definition. It's configurations are divided on server ({@code <http:listener-config>}) and
+ * client ({@code <http:requester-config>}) capabilities.
  *
  * @since 1.0
  */
