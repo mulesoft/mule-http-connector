@@ -6,6 +6,7 @@
  */
 package org.mule.test.http.functional.listener;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.http.client.fluent.Request.Get;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
@@ -13,6 +14,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.http.internal.listener.HttpListener.HTTP_NAMESPACE;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
+import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.EXPRESSION;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SECURITY;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
@@ -25,11 +27,14 @@ import static org.mule.runtime.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAIL
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.TOO_MANY_REQUESTS;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.UNSUPPORTED_MEDIA_TYPE;
+import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.ERRORS;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.ERROR_HANDLING;
 import static org.mule.test.http.functional.matcher.HttpResponseContentStringMatcher.body;
+import static org.mule.test.http.functional.matcher.HttpResponseHeaderStringMatcher.header;
 import static org.mule.test.http.functional.matcher.HttpResponseReasonPhraseMatcher.hasReasonPhrase;
+import static org.mule.test.http.functional.matcher.HttpResponseStatusCodeMatcher.hasStatusCode;
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.functional.junit4.rules.HttpServerRule;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -42,8 +47,6 @@ import org.mule.runtime.core.api.exception.WrapperErrorMessageAwareException;
 import org.mule.runtime.http.api.HttpConstants.HttpStatus;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
-import org.mule.test.http.functional.matcher.HttpResponseHeaderStringMatcher;
-import org.mule.test.http.functional.matcher.HttpResponseStatusCodeMatcher;
 
 import java.io.IOException;
 
@@ -87,7 +90,7 @@ public class HttpListenerErrorInterpretationTestCase extends AbstractHttpTestCas
 
   @Test
   public void unknownErrorCauses500() throws Exception {
-    verifyStatus(INTERNAL_SERVER_ERROR, errorTypeRepository.lookupErrorType(EXPRESSION).get());
+    verifyStatus(errorTypeRepository.lookupErrorType(EXPRESSION).get());
   }
 
   @Test
@@ -150,7 +153,7 @@ public class HttpListenerErrorInterpretationTestCase extends AbstractHttpTestCas
   @Test
   public void knownErrorTypeWithMessageIsConsidered() throws Exception {
     final HttpResponse httpResponse = getAndVerifyResponseFromErrorWithCustomMessage(SECURITY, UNAUTHORIZED, UNAUTHORIZED, OOPS);
-    assertThat(httpResponse, HttpResponseHeaderStringMatcher.header(HEADER_NAME, is(HEADER_VALUE)));
+    assertThat(httpResponse, header(HEADER_NAME, is(HEADER_VALUE)));
   }
 
   @Test
@@ -170,16 +173,17 @@ public class HttpListenerErrorInterpretationTestCase extends AbstractHttpTestCas
 
   void verifyStatusIsKnown(HttpStatus status) throws IOException {
     ErrorType statusError = errorTypeRepository.lookupErrorType(buildFromStringRepresentation(getErrorName(status))).get();
-    verifyStatus(status, statusError);
+    verifyStatus(statusError);
   }
 
-  void verifyStatus(HttpStatus status, ErrorType errorType) throws IOException {
+  void verifyStatus(ErrorType errorType) throws IOException {
     errorToThrow = errorType;
     final Response response = Get(getUrl("error")).execute();
     final HttpResponse httpResponse = response.returnResponse();
 
-    assertThat(httpResponse, HttpResponseStatusCodeMatcher.hasStatusCode(INTERNAL_SERVER_ERROR.getStatusCode()));
+    assertThat(httpResponse, hasStatusCode(INTERNAL_SERVER_ERROR.getStatusCode()));
     assertThat(httpResponse, hasReasonPhrase(INTERNAL_SERVER_ERROR.getReasonPhrase()));
+    assertThat(httpResponse, header(CONTENT_TYPE, is(TEXT.withCharset(UTF_8).toRfcString())));
     assertThat(httpResponse, body(is(OOPS)));
   }
 
@@ -191,7 +195,7 @@ public class HttpListenerErrorInterpretationTestCase extends AbstractHttpTestCas
     final Response response = Get(getUrl("errorMessage")).execute();
     final HttpResponse httpResponse = response.returnResponse();
 
-    assertThat(httpResponse, HttpResponseStatusCodeMatcher.hasStatusCode(expectedStatus.getStatusCode()));
+    assertThat(httpResponse, hasStatusCode(expectedStatus.getStatusCode()));
     assertThat(httpResponse, hasReasonPhrase(expectedStatus.getReasonPhrase()));
     assertThat(httpResponse, body(is(expectedBody)));
     return httpResponse;
@@ -208,7 +212,7 @@ public class HttpListenerErrorInterpretationTestCase extends AbstractHttpTestCas
     final Response response = Get(getUrl(path)).execute();
     final HttpResponse httpResponse = response.returnResponse();
 
-    assertThat(httpResponse, HttpResponseStatusCodeMatcher.hasStatusCode(expectedStatus.getStatusCode()));
+    assertThat(httpResponse, hasStatusCode(expectedStatus.getStatusCode()));
     assertThat(httpResponse, hasReasonPhrase(expectedStatus.getReasonPhrase()));
     assertThat(httpResponse, body(expectedBody));
   }
@@ -219,10 +223,10 @@ public class HttpListenerErrorInterpretationTestCase extends AbstractHttpTestCas
     final Response response = Get(getUrl(path)).execute();
     final HttpResponse httpResponse = response.returnResponse();
 
-    assertThat(httpResponse, HttpResponseStatusCodeMatcher.hasStatusCode(FORBIDDEN.getStatusCode()));
+    assertThat(httpResponse, hasStatusCode(FORBIDDEN.getStatusCode()));
     assertThat(httpResponse, hasReasonPhrase(FORBIDDEN.getReasonPhrase()));
     assertThat(httpResponse, body(is("Cant see this")));
-    assertThat(httpResponse, HttpResponseHeaderStringMatcher.header("XX-Custom", is("Xcustom")));
+    assertThat(httpResponse, header("XX-Custom", is("Xcustom")));
   }
 
   private String getErrorName(HttpStatus status) {
