@@ -46,7 +46,7 @@ import org.mule.runtime.http.api.client.proxy.ProxyConfig;
  *
  * @since 1.0
  */
-@Extension(name = "HTTP", description = "Connector to handle and perform HTTP requests")
+@Extension(name = "HTTP")
 @Configurations({HttpListenerConfig.class, HttpRequesterConfig.class})
 @Operations(HttpOperations.class)
 @SubTypeMapping(baseType = HttpRequestAuthentication.class,
