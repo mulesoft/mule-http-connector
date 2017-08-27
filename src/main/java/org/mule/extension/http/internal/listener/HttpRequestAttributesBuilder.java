@@ -20,6 +20,8 @@ import org.mule.runtime.http.api.domain.request.HttpRequestContext;
 import java.security.cert.Certificate;
 import java.util.Collection;
 
+import javax.net.ssl.SSLSession;
+
 /**
  * Creates {@link HttpRequestAttributes} based on an {@link HttpRequestContext}, it's parts and a {@link ListenerPath}.
  */
@@ -53,6 +55,7 @@ public class HttpRequestAttributesBuilder {
     String remoteHostAddress = clientConnection.getRemoteHostAddress().toString();
     Certificate clientCertificate = clientConnection.getClientCertificate();
     String relativePath = this.listenerPath.getRelativePath(path);
+    SSLSession sslSession = requestContext.getClientConnection().getSslSession();
 
     final Collection<String> headerNames = request.getHeaderNames();
     MultiMap<String, String> headers = new MultiMap<>();
@@ -60,6 +63,6 @@ public class HttpRequestAttributesBuilder {
       headers.put(headerName, request.getHeaderValues(headerName));
     }
     return new HttpRequestAttributes(headers, listenerPath, relativePath, version, scheme, method, path, uri, queryString,
-                                     queryParams, uriParams, remoteHostAddress, clientCertificate);
+                                     queryParams, uriParams, remoteHostAddress, clientCertificate, sslSession);
   }
 }
