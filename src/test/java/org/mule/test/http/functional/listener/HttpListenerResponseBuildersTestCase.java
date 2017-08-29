@@ -8,22 +8,24 @@ package org.mule.test.http.functional.listener;
 
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.CREATED;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.functional.matcher.HttpResponseContentStringMatcher.body;
 import static org.mule.test.http.functional.matcher.HttpResponseReasonPhraseMatcher.hasReasonPhrase;
-
 import org.mule.runtime.http.api.HttpHeaders;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 import org.mule.test.http.functional.matcher.HttpResponseStatusCodeMatcher;
 
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
+import io.qameta.allure.Feature;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
@@ -31,12 +33,6 @@ import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.Rule;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-
-import io.qameta.allure.Feature;
 
 @Feature(HTTP_EXTENSION)
 public class HttpListenerResponseBuildersTestCase extends AbstractHttpTestCase {
@@ -103,8 +99,7 @@ public class HttpListenerResponseBuildersTestCase extends AbstractHttpTestCase {
   @Test
   public void statusLineResponseBuilder() throws Exception {
     final String url = getUrl(statusResponseBuilderPath);
-    HttpResponse httpResponse = statusLineResponseBuilderTest(url, CREATED.getStatusCode());
-    assertThat(httpResponse.getFirstHeader(CONTENT_LENGTH).getValue(), is("0"));
+    statusLineResponseBuilderTest(url, CREATED.getStatusCode());
   }
 
   @Test
@@ -157,9 +152,7 @@ public class HttpListenerResponseBuildersTestCase extends AbstractHttpTestCase {
   @Test
   public void errorStatusLineResponseBuilder() throws Exception {
     final String url = getUrl(errorStatusResponseBuilderPath);
-    HttpResponse httpResponse = statusLineResponseBuilderTest(url, CREATED.getStatusCode());
-    // we'll get the Exception message in the body
-    assertThat(httpResponse.getFirstHeader(CONTENT_LENGTH).getValue(), is(not("0")));
+    statusLineResponseBuilderTest(url, CREATED.getStatusCode());
   }
 
   @Test

@@ -14,30 +14,36 @@
         <http:request-connection host="localhost" port="${httpPort}"/>
     </http:request-config>
 
-    <flow name="requestFlow">
-        <http:request config-ref="requestConfig" path="path" method="POST"/>
-    </flow>
-
-    <flow name="requestPartFlow">
-        <http:request config-ref="requestConfig" path="path" method="POST"/>
-    </flow>
-
-    <!-- Requester with TLS and a small send buffer size to test that big attachments work over HTTPS -->
-
-    <sockets:tcp-client-socket-properties name="requesterSocketPropertiesTls" sendBufferSize="${sendBufferSize}" />
-
-    <tls:context name="tlsContext" >
-        <tls:trust-store path="tls/trustStore" password="mulepassword"/>
-        <tls:key-store path="tls/clientKeystore" keyPassword="mulepassword" password="mulepassword"/>
-    </tls:context>
-
-    <http:request-config name="requestConfigTls">
-        <http:request-connection host="localhost" port="${httpsPort}" protocol="HTTPS"
-                                    tlsContext="tlsContext" clientSocketProperties="requesterSocketPropertiesTls"/>
-    </http:request-config>
-
-    <flow name="requestFlowTls">
-        <http:request config-ref="requestConfigTls" path="path" method="POST" responseTimeout="5000"/>
+    <flow name="partsFlow">
+        <http:request config-ref="requestConfig" path="/" method="POST">
+            <http:body><![CDATA[
+                #[
+                %dw 2.0
+                output multipart/form-data
+                ---
+                {
+                parts : {
+                    partOne : {
+                        headers : {
+                            "Content-Type": "text/plain",
+                            "Custom" : "myHeader"
+                            },
+                        content : "content 1"
+                        },
+                    partTwo : {
+                        headers : {
+                            "Content-Disposition" : {
+                                "name": "partTwo",
+                                "filename": "a.html"
+                                },
+                            "Content-Type" : payload.^mimeType
+                            },
+                        content : payload as Binary
+                        }
+                    }
+                }]
+            ]]></http:body>
+        </http:request>
     </flow>
 
 </mule>

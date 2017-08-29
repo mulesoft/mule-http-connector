@@ -8,10 +8,11 @@ package org.mule.test.http.functional.requester;
 
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
-import static org.mule.functional.junit4.matchers.MessageMatchers.hasMediaType;
-import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
 import static org.mule.runtime.api.metadata.MediaType.HTML;
+import static org.mule.runtime.api.metadata.MediaType.MULTIPART_FORM_DATA;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.MULTIPART;
@@ -23,18 +24,15 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.util.MultiPartWriter;
-import org.junit.Ignore;
 import org.junit.Test;
 
 @Feature(HTTP_EXTENSION)
 @Story(MULTIPART)
-@Ignore("MULE-12985: Move multipart test cases to HTTP service and adapt extension ones")
-@Issue("MULE-12985")
 public class HttpRequestInboundPartsTestCase extends AbstractHttpRequestTestCase {
 
   @Override
@@ -43,26 +41,14 @@ public class HttpRequestInboundPartsTestCase extends AbstractHttpRequestTestCase
   }
 
   @Test
+  @Description("Verifies that parts are received, even considering an unknown type (HTML) and a custom header.")
   public void processInboundAttachments() throws Exception {
     InternalEvent event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
+    String contentType = event.getMessage().getPayload().getDataType().getMediaType().toRfcString();
 
-    //    assertThat(event.getMessage().getPayload().getValue(), instanceOf(MultiPartPayload.class));
-    assertThat(event.getMessage(), hasMediaType(APPLICATION_JAVA.withCharset(ISO_8859_1)));
-
-    //    MultiPartPayload payload = (MultiPartPayload) event.getMessage().getPayload().getValue();
-    //    assertThat(payload, hasSize(2));
-    //    assertAttachment(payload, "partName1", "Test part 1", TEXT);
-    //    assertAttachment(payload, "partName2", "Test part 2", HTML);
+    assertThat(contentType, startsWith(MULTIPART_FORM_DATA.withCharset(ISO_8859_1).toRfcString()));
+    assertThat(contentType, containsString(" boundary="));
   }
-
-  //  private void assertAttachment(MultiPartPayload payload, String attachmentName, String attachmentContents, MediaType contentType)
-  //      throws IOException {
-  //    assertThat(payload, hasPartThat(hasName(attachmentName)));
-  //
-  //    Message part = payload.getPart(attachmentName);
-  //    assertThat(part, hasMediaType(contentType));
-  //    assertThat(part, hasPayload(equalTo(attachmentContents)));
-  //  }
 
   @Override
   protected void handleRequest(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -71,11 +57,12 @@ public class HttpRequestInboundPartsTestCase extends AbstractHttpRequestTestCase
     response.setContentType(HttpHeaders.Values.MULTIPART_FORM_DATA + "; boundary=" + multiPartWriter.getBoundary());
     response.setStatus(SC_OK);
 
-    multiPartWriter.startPart(TEXT.toRfcString(), new String[] {"Content-Disposition: form-data; name=\"partName1\""});
+    multiPartWriter.startPart(TEXT.toRfcString(), new String[] {"Content-Disposition: form-data; name=\"partName1\"",
+        "Custom: myHeader"});
     multiPartWriter.write("Test part 1");
     multiPartWriter.endPart();
 
-    multiPartWriter.startPart(HTML.toRfcString(), new String[] {"Content-Disposition: form-data; name=\"partName2\""});
+    multiPartWriter.startPart(HTML.toRfcString(), new String[] {"Content-Disposition: form-data; filename=\"a.html\""});
     multiPartWriter.write("Test part 2");
     multiPartWriter.endPart();
 
