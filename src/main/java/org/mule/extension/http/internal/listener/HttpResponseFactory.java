@@ -19,11 +19,11 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
-
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.internal.HttpStreamingType;
 import org.mule.extension.http.internal.listener.intercepting.Interception;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.exception.MessagingException;
@@ -96,9 +96,9 @@ public class HttpResponseFactory {
     if (payload == null) {
       setupContentLengthEncoding(httpResponseHeaderBuilder, 0);
       httpEntity = new EmptyHttpEntity();
-    } else if (payload instanceof InputStream) {
-      if (responseStreaming == ALWAYS
-          || (responseStreaming == AUTO && existingContentLength == null)) {
+    } else if (payload instanceof CursorStreamProvider || payload instanceof InputStream) {
+      payload = payload instanceof CursorStreamProvider ? ((CursorStreamProvider) payload).openCursor() : payload;
+      if (responseStreaming == ALWAYS || (responseStreaming == AUTO && existingContentLength == null)) {
         if (supportsTransferEncoding) {
           setupChunkedEncoding(httpResponseHeaderBuilder);
         }

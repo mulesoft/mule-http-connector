@@ -34,8 +34,7 @@
         <http:listener config-ref="listenerConfig" path="${statusResponseBuilderPath}">
             <http:response statusCode="201" reasonPhrase="everything works!"/>
         </http:listener>
-        <logger/>
-        <logger level="ERROR" message="#[mel:payload]"/>
+        <logger level="ERROR" message="#[payload]"/>
     </flow>
 
     <flow name="headerResponseBuilderFlow">
@@ -94,7 +93,7 @@
         <http:listener config-ref="listenerConfig" path="${errorStatusResponseBuilderPath}">
             <http:error-response statusCode="201" reasonPhrase="everything works!"/>
         </http:listener>
-        <logger level="ERROR" message="#[mel:payload]"/>
+        <logger level="ERROR" message="#[payload]"/>
         <test:processor throwException="true"/>
     </flow>
 

@@ -13,37 +13,137 @@
     </http:listener-config>
 
     <flow name="testFlow1">
-        <http:listener config-ref="listenerConfig" path="${formDataPath}"/>
-        <test:queue name="out"/>
+        <http:listener config-ref="listenerConfig" path="${formDataPath}">
+            <http:response>
+                <http:body>
+                    #[
+                    %dw 2.0
+                    output multipart/form-data
+                    ---
+                    {
+                        parts : [payload.parts[1], payload.parts[0]]
+                    }]
+                </http:body>
+            </http:response>
+        </http:listener>
+        <logger message="Returning multipart received content."/>
     </flow>
 
     <flow name="testFlow2">
         <http:listener config-ref="listenerConfig" path="${mixedPath}">
             <http:response>
-                <http:headers>
-                    #[mel:['Content-Type' : 'multipart/mixed']]
-                </http:headers>
+                <http:body>
+                    #[
+                    %dw 2.0
+                    output multipart/mixed boundary='the-boundary'
+                    ---
+                    {
+                        parts : {
+                            field1 : {
+                                    headers : payload.parts.field1.headers - "Content-Disposition" ++ {
+                                        "Content-Disposition" : {
+                                            name : "field1"
+                                        }
+                                    },
+                                    content : payload.parts.field1.content
+                                }
+                        }
+                    }]
+                </http:body>
             </http:response>
         </http:listener>
-        <test:queue name="out"/>
+        <logger message="Returning multipart mixed content."/>
     </flow>
 
-    <flow name="testFlow3">
-        <http:listener config-ref="listenerConfig" path="${contentLength}"/>
-        <custom-processor
-                class="org.mule.test.http.functional.listener.HttpListenerPartsTestCase$CreatePartMessageProcessor"/>
+    <flow name="onePartWhole">
+        <http:listener config-ref="listenerConfig" path="${contentLength}" responseStreamingMode="NEVER">
+            <http:response>
+                <http:body>
+                    #[
+                    %dw 2.0
+                    output multipart/form-data
+                    ---
+                    {
+                    parts : {
+                        file : {
+                            headers : {
+                                "Content-Disposition" : {
+                                    "name" : "file",
+                                    "filename": "file.ext"
+                                    },
+                                "Content-Type" : payload.^mimeType
+                                },
+                            content : payload
+                            }
+                        }
+                    }]
+                </http:body>
+            </http:response>
+        </http:listener>
+        <logger message="Returning multipart whole content."/>
     </flow>
 
-    <flow name="testFlow4">
-        <http:listener config-ref="listenerConfig" path="${chunked}" responseStreamingMode="ALWAYS"/>
-        <custom-processor
-                class="org.mule.test.http.functional.listener.HttpListenerPartsTestCase$CreatePartMessageProcessor"/>
+    <flow name="onePartChunked">
+        <http:listener config-ref="listenerConfig" path="${chunked}" responseStreamingMode="ALWAYS">
+            <http:response>
+                <http:body>
+                    #[
+                    %dw 2.0
+                    output multipart/form-data
+                    ---
+                    {
+                        parts : {
+                            file : {
+                                headers : {
+                                    "Content-Disposition" : {
+                                        "name" : "file",
+                                        "filename": "file.ext"
+                                        },
+                                    "Content-Type" : payload.^mimeType
+                                    },
+                                content : payload
+                            }
+                        }
+                    }]
+                </http:body>
+            </http:response>
+        </http:listener>
+        <logger message="Returning multipart chunked content."/>
     </flow>
 
-    <flow name="testFlow5">
-        <http:listener config-ref="listenerConfig" path="${filePath}"/>
-        <custom-processor
-                class="org.mule.test.http.functional.listener.HttpListenerPartsTestCase$CreatePartsMessageProcessor"/>
+    <flow name="severalParts">
+        <http:listener config-ref="listenerConfig" path="${filePath}">
+            <http:response>
+                <http:body><![CDATA[
+                #[
+                %dw 2.0
+                output multipart/form-data
+                ---
+                {
+                parts : {
+                    field1 : {
+                        headers : {
+                            "Content-Type": "text/plain",
+                            "Custom" : "myHeader"
+                            },
+                        content : "yes"
+                        },
+                    file : {
+                        headers : {
+                            "Content-Disposition" : {
+                                "name" : "file",
+                                "filename": "file.ext"
+                                },
+                            "Content-Type" : payload.^mimeType
+                            },
+                        content : payload
+                        }
+                    }
+                }]
+            ]]></http:body>
+            </http:response>
+        </http:listener>
+        <logger message="Returning multipart content."/>
     </flow>
 
 </mule>
