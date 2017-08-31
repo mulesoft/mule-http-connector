@@ -30,7 +30,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
  *
  * @since 1.0
  */
-@Configuration(name = "listener-config")
+@Configuration(name = "listenerConfig")
 @ConnectionProviders(HttpListenerProvider.class)
 @Sources(HttpListener.class)
 public class HttpListenerConfig implements Initialisable {
