@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.internal.listener.intercepting.cors;
 
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.ACCEPTED;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.http.api.HttpHeaders.Names.ACCESS_CONTROL_ALLOW_ORIGIN;
 
 import org.mule.extension.http.internal.listener.intercepting.Interception;
@@ -20,7 +20,6 @@ import org.mule.modules.cors.response.PreflightAction;
 import org.mule.modules.cors.response.visitor.CorsResponseVisitor;
 import org.mule.runtime.api.util.MultiMap;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -34,7 +33,7 @@ public class CorsInterceptionFactory implements CorsResponseVisitor<Interception
 
   @Override
   public Interception visit(BlockRequest blockRequest) {
-    throw new RequestInterruptedException(ACCEPTED, new MultiMap<>());
+    throw new RequestInterruptedException(OK, new MultiMap<>());
   }
 
   @Override
@@ -51,6 +50,6 @@ public class CorsInterceptionFactory implements CorsResponseVisitor<Interception
   public Interception visit(PreflightAction preflightAction) {
     Map<String, String> headers = preflightAction.headers();
     headers.put(ACCESS_CONTROL_ALLOW_ORIGIN, preflightAction.origin());
-    throw new RequestInterruptedException(ACCEPTED, new MultiMap<>(headers));
+    throw new RequestInterruptedException(OK, new MultiMap<>(headers));
   }
 }

@@ -60,6 +60,11 @@ public class CorsHttpTestResult implements KernelTestResult {
         .orElse(null);
   }
 
+  @Override
+  public int statusCode() {
+    return response.getStatusLine().getStatusCode();
+  }
+
   private Stream<Header> headersStream() {
     return newArrayList(response.getAllHeaders()).stream();
   }
