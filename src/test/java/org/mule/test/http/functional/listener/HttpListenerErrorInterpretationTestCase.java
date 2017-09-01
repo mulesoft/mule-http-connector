@@ -253,7 +253,7 @@ public class HttpListenerErrorInterpretationTestCase extends AbstractHttpTestCas
 
   }
 
-  public static class InnerErrorMessageException extends IOException implements ErrorMessageAwareException {
+  private static class InnerErrorMessageException extends IOException implements ErrorMessageAwareException {
 
     public InnerErrorMessageException(String message) {
       super(message);
