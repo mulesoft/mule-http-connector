@@ -43,9 +43,4 @@ public class ResponseValidatorException extends MuleRuntimeException implements 
     return errorMessage;
   }
 
-  @Override
-  public Throwable getRootCause() {
-    return this;
-  }
-
 }

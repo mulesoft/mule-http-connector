@@ -36,9 +36,4 @@ public class BasicUnauthorisedException extends UnauthorisedException implements
     return errorMessage;
   }
 
-  @Override
-  public Throwable getRootCause() {
-    return this;
-  }
-
 }
