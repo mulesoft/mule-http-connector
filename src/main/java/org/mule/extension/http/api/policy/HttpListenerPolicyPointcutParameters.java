@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.api.policy;
 
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.http.policy.api.HttpPolicyPointcutParameters;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 
@@ -24,7 +24,7 @@ public class HttpListenerPolicyPointcutParameters extends HttpPolicyPointcutPara
    * @param path the target path of the incoming request
    * @param method the HTTP method of the incoming request
    */
-  public HttpListenerPolicyPointcutParameters(AnnotatedObject component, String path, String method) {
+  public HttpListenerPolicyPointcutParameters(Component component, String path, String method) {
     super(component, path, method);
   }
 

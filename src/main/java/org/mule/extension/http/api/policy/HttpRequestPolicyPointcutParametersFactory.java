@@ -10,7 +10,7 @@ package org.mule.extension.http.api.policy;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.policy.api.OperationPolicyPointcutParametersFactory;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 
@@ -34,7 +34,7 @@ public class HttpRequestPolicyPointcutParametersFactory implements OperationPoli
   }
 
   @Override
-  public PolicyPointcutParameters createPolicyPointcutParameters(AnnotatedObject requester,
+  public PolicyPointcutParameters createPolicyPointcutParameters(Component requester,
                                                                  Map<String, Object> operationParameters) {
     checkNotNull(requester, "Cannot create a policy pointcut parameter instance without a valid component");
     String pathParameter = (String) operationParameters.get(PATH_PARAMETER_NAME);
