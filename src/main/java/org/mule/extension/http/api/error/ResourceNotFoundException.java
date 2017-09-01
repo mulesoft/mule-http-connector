@@ -40,8 +40,4 @@ public class ResourceNotFoundException extends ModuleException implements ErrorM
         .build();
   }
 
-  @Override
-  public Throwable getRootCause() {
-    return this;
-  }
 }

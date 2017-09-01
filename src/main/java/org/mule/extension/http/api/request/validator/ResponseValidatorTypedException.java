@@ -43,9 +43,4 @@ public class ResponseValidatorTypedException extends ModuleException implements 
     return errorMessage;
   }
 
-  @Override
-  public Throwable getRootCause() {
-    return this;
-  }
-
 }

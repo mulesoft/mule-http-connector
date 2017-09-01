@@ -38,12 +38,12 @@ import static org.mule.test.http.functional.matcher.HttpResponseStatusCodeMatche
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.functional.junit4.rules.HttpServerRule;
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.exception.ErrorMessageAwareException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
 import org.mule.runtime.core.api.exception.TypedException;
-import org.mule.runtime.core.api.exception.WrapperErrorMessageAwareException;
 import org.mule.runtime.http.api.HttpConstants.HttpStatus;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
@@ -248,10 +248,20 @@ public class HttpListenerErrorInterpretationTestCase extends AbstractHttpTestCas
   public static class ErrorMessageException extends TypedException {
 
     public ErrorMessageException() {
-      super(new WrapperErrorMessageAwareException(Message.builder()
-          .value(ERROR)
-          .attributesValue(attributesToSend)
-          .build(), new IOException(OOPS)), errorToThrow);
+      super(new InnerErrorMessageException(OOPS), errorToThrow);
+    }
+
+  }
+
+  private static class InnerErrorMessageException extends IOException implements ErrorMessageAwareException {
+
+    public InnerErrorMessageException(String message) {
+      super(message);
+    }
+
+    @Override
+    public Message getErrorMessage() {
+      return Message.builder().value(ERROR).attributesValue(attributesToSend).build();
     }
 
   }
