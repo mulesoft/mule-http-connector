@@ -17,7 +17,7 @@ import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import org.mule.extension.http.api.policy.HttpRequestPolicyPointcutParameters;
 import org.mule.extension.http.api.policy.HttpRequestPolicyPointcutParametersFactory;
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.meta.AnnotatedObject;
+import org.mule.runtime.api.component.Component;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import com.google.common.collect.ImmutableMap;
@@ -58,7 +58,7 @@ public class HttpRequestPolicyPointcutParametersFactoryTestCase extends Abstract
 
   @Test
   public void policyPointcutParameters() {
-    AnnotatedObject component = mock(AnnotatedObject.class);
+    Component component = mock(Component.class);
     Map<String, Object> parametersMap =
         ImmutableMap.<String, Object>builder().put(HttpRequestPolicyPointcutParametersFactory.METHOD_PARAMETER_NAME, TEST_METHOD)
             .put(PATH_PARAMETER_NAME, TEST_REQUEST_PATH).build();
