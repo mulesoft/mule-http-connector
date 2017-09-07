@@ -21,7 +21,7 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.HOST;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import org.mule.functional.junit4.rules.ExpectedError;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -47,7 +47,7 @@ public class HttpRequestDynamicConfigTestCase extends AbstractHttpRequestTestCas
 
   @Test
   public void requestsGoThroughClient1() throws Exception {
-    InternalEvent result = flowRunner("client1")
+    BaseEvent result = flowRunner("client1")
         .withVariable("basePath", "api/v1")
         .withVariable("follow", true)
         .withVariable("send", "AUTO")
@@ -82,7 +82,7 @@ public class HttpRequestDynamicConfigTestCase extends AbstractHttpRequestTestCas
 
   @Test
   public void requestsGoThroughClient2() throws Exception {
-    InternalEvent result = flowRunner("client2")
+    BaseEvent result = flowRunner("client2")
         .withVariable("parse", false)
         .withVariable("stream", "AUTO")
         .withVariable("timeout", 20000)
@@ -113,7 +113,7 @@ public class HttpRequestDynamicConfigTestCase extends AbstractHttpRequestTestCas
 
   @Test
   public void requestWithDynamicConnectionParamUsesDifferentConfigs() throws Exception {
-    InternalEvent result = flowRunner("client2")
+    BaseEvent result = flowRunner("client2")
         .withVariable("parse", false)
         .withVariable("stream", "AUTO")
         .withVariable("timeout", 20000)

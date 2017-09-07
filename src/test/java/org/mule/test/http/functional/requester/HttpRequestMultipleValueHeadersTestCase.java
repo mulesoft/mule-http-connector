@@ -16,7 +16,7 @@ import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.MULTI_MAP;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.util.CaseInsensitiveMapWrapper;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
@@ -66,7 +66,7 @@ public class HttpRequestMultipleValueHeadersTestCase extends AbstractHttpRequest
   @Test
   @Description("Verifies that multiple valued headers received preserve order and format.")
   public void receivesMultipleValuedHeader() throws Exception {
-    InternalEvent event = runFlow("in");
+    BaseEvent event = runFlow("in");
 
     HttpResponseAttributes attributes = (HttpResponseAttributes) event.getMessage().getAttributes().getValue();
     List<String> headers = attributes.getHeaders().getAll("multipleheader");

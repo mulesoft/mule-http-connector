@@ -16,7 +16,8 @@ import static org.mule.runtime.api.metadata.MediaType.MULTIPART_FORM_DATA;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.MULTIPART;
-import org.mule.runtime.core.api.InternalEvent;
+
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.http.api.HttpHeaders;
 
 import java.io.IOException;
@@ -43,7 +44,7 @@ public class HttpRequestInboundPartsTestCase extends AbstractHttpRequestTestCase
   @Test
   @Description("Verifies that parts are received, even considering an unknown type (HTML) and a custom header.")
   public void processInboundAttachments() throws Exception {
-    InternalEvent event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
+    BaseEvent event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
     String contentType = event.getMessage().getPayload().getDataType().getMediaType().toRfcString();
 
     assertThat(contentType, startsWith(MULTIPART_FORM_DATA.withCharset(ISO_8859_1).toRfcString()));

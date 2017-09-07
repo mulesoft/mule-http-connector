@@ -14,7 +14,8 @@ import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.runtime.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.URL_ENCODED;
-import org.mule.runtime.core.api.InternalEvent;
+
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.http.api.HttpHeaders;
 
 import java.io.IOException;
@@ -48,7 +49,7 @@ public class HttpRequestUrlEncodedTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void receivesUrlEncodedBody() throws Exception {
-    InternalEvent event = flowRunner("formParamInbound").withPayload(TEST_MESSAGE).run();
+    BaseEvent event = flowRunner("formParamInbound").withPayload(TEST_MESSAGE).run();
 
     assertThat(event.getMessage(), hasPayload(equalTo("testValue1testValue2")));
   }

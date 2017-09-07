@@ -12,16 +12,17 @@ import static org.junit.Assert.assertThat;
 import static org.mule.functional.api.component.FunctionalTestProcessor.getFromFlow;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
-
-import java.io.ByteArrayInputStream;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.InputStreamEntity;
 import org.junit.Rule;
 import org.junit.Test;
+
+import java.io.ByteArrayInputStream;
 
 import io.qameta.allure.Feature;
 
@@ -43,7 +44,8 @@ public class HttpListenerRequestStreamingTestCase extends AbstractHttpTestCase {
   public void listenerReceivedChunkedRequest() throws Exception {
     String url = format("http://localhost:%s/", listenPort.getNumber());
     getFromFlow(muleContext, "defaultFlow")
-        .setEventCallback((context, component, muleContext) -> flowReceivedMessage = context.getMessageAsString(muleContext));
+        .setEventCallback((context, component, muleContext) -> flowReceivedMessage = muleContext.getTransformationService()
+            .transform(context.getMessage(), DataType.STRING).getPayload().getValue().toString());
     testChunkedRequestContentAndResponse(url);
     // We check twice to verify that the chunked request is consumed completely. Otherwise second request would fail
     testChunkedRequestContentAndResponse(url);

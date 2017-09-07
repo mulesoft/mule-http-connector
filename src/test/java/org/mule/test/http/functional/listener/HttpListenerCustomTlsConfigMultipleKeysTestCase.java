@@ -10,8 +10,9 @@ package org.mule.test.http.functional.listener;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
+
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.InternalEvent;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -32,7 +33,7 @@ public class HttpListenerCustomTlsConfigMultipleKeysTestCase extends AbstractHtt
 
   @Test
   public void acceptsConnectionWithValidCertificate() throws Exception {
-    InternalEvent event = flowRunner("testFlowClientWithCertificate").withPayload(TEST_MESSAGE).run();
+    BaseEvent event = flowRunner("testFlowClientWithCertificate").withPayload(TEST_MESSAGE).run();
     assertThat(event.getMessage().getPayload().getValue(), equalTo(TEST_MESSAGE));
   }
 

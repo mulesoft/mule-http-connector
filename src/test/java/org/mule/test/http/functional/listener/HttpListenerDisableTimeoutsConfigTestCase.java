@@ -8,7 +8,7 @@ package org.mule.test.http.functional.listener;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.mule.runtime.core.api.InternalEvent;
+
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;
@@ -16,6 +16,8 @@ import org.mule.test.http.functional.AbstractHttpTestCase;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_DISABLE_RESPONSE_TIMEOUT;
+
+import org.mule.runtime.core.api.event.BaseEvent;
 
 public class HttpListenerDisableTimeoutsConfigTestCase extends AbstractHttpTestCase {
 
@@ -32,7 +34,7 @@ public class HttpListenerDisableTimeoutsConfigTestCase extends AbstractHttpTestC
 
   @Test
   public void httpListenerDefaultResponseTimeout() throws Exception {
-    final InternalEvent res = flowRunner("httpFlowWithDefaultResponseTimeout")
+    final BaseEvent res = flowRunner("httpFlowWithDefaultResponseTimeout")
         .withVariable("port", port.getNumber())
         .withPayload("hi")
         .run();
@@ -42,7 +44,7 @@ public class HttpListenerDisableTimeoutsConfigTestCase extends AbstractHttpTestC
 
   @Test
   public void httpListenerCustomResponseTimeout() throws Exception {
-    final InternalEvent res = flowRunner("httpFlowWithCustomResponseTimeout")
+    final BaseEvent res = flowRunner("httpFlowWithCustomResponseTimeout")
         .withVariable("port", port.getNumber())
         .withPayload("hi")
         .run();
