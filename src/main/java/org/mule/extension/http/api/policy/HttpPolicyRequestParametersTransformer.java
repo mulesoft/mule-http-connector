@@ -17,6 +17,7 @@ import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 
 import com.google.common.collect.ImmutableMap;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -43,8 +44,8 @@ public class HttpPolicyRequestParametersTransformer implements OperationPolicyPa
     TypedValue<Object> body = (TypedValue<Object>) parameters.getOrDefault(BODY, TypedValue.of(null));
 
     return Message.builder().value(body.getValue())
-        .attributesValue(new HttpPolicyRequestAttributes(getMap(parameters, HEADERS),
-                                                         getMap(parameters, QUERY_PARAMS),
+        .attributesValue(new HttpPolicyRequestAttributes(getMultiMap(parameters, HEADERS),
+                                                         getMultiMap(parameters, QUERY_PARAMS),
                                                          getMap(parameters, URI_PARAMS),
                                                          path))
         .mediaType(body.getDataType().getMediaType())
@@ -75,7 +76,11 @@ public class HttpPolicyRequestParametersTransformer implements OperationPolicyPa
     }
   }
 
-  private MultiMap<String, String> getMap(Map<String, Object> parameters, String key) {
+  private MultiMap<String, String> getMultiMap(Map<String, Object> parameters, String key) {
     return (MultiMap<String, String>) parameters.getOrDefault(key, new MultiMap<String, String>());
+  }
+
+  private Map<String, String> getMap(Map<String, Object> parameters, String key) {
+    return (Map<String, String>) parameters.getOrDefault(key, new HashMap<String, String>());
   }
 }

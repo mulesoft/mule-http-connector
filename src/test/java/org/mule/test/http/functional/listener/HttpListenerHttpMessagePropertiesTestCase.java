@@ -170,7 +170,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
                                      SECOND_URI_PARAM_VALUE, THIRD_URI_PARAM_VALUE);
     Post(url).connectTimeout(RECEIVE_TIMEOUT).execute();
     final Message message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
-    MultiMap<String, String> uriParams = getAttributes(message).getUriParams();
+    Map<String, String> uriParams = getAttributes(message).getUriParams();
     assertThat(uriParams, notNullValue());
     assertThat(uriParams.size(), is(3));
     assertThat(uriParams.get(FIRST_URI_PARAM_NAME), is(FIRST_URI_PARAM));
@@ -183,7 +183,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
     final String url = String.format("http://localhost:%s/some-path/%s/some-other-path", listenPort.getNumber(), FIRST_URI_PARAM);
     Post(url).connectTimeout(RECEIVE_TIMEOUT).execute();
     final Message message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
-    MultiMap<String, String> uriParams = getAttributes(message).getUriParams();
+    Map<String, String> uriParams = getAttributes(message).getUriParams();
     assertThat(uriParams, notNullValue());
     assertThat(uriParams.size(), is(1));
     assertThat(uriParams.get(FIRST_URI_PARAM_NAME), is(FIRST_URI_PARAM));
@@ -197,7 +197,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
         String.format("http://localhost:%s/some-path/%s/some-other-path", listenPort.getNumber(), uriParamValueEncoded);
     Post(url).connectTimeout(RECEIVE_TIMEOUT).execute();
     final Message message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
-    MultiMap<String, String> uriParams = getAttributes(message).getUriParams();
+    Map<String, String> uriParams = getAttributes(message).getUriParams();
     assertThat(uriParams, notNullValue());
     assertThat(uriParams.size(), is(1));
     assertThat(uriParams.get(FIRST_URI_PARAM_NAME), is(uriParamValue));
@@ -229,7 +229,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
     assertThat(attributes.getListenerPath(), is("/api/*"));
     assertThat(attributes.getRequestPath(), is(API_CONTEXT_PATH));
     assertThat(attributes.getRelativePath(), is(CONTEXT_PATH));
-    MultiMap<String, String> uriParams = attributes.getUriParams();
+    Map<String, String> uriParams = attributes.getUriParams();
     assertThat(uriParams, notNullValue());
     assertThat(uriParams.isEmpty(), is(true));
   }
