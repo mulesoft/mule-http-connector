@@ -11,7 +11,8 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
-import org.mule.runtime.core.api.InternalEvent;
+
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 
@@ -62,7 +63,7 @@ public class HttpRequestConnectionsPersistenceTestCase extends AbstractHttpReque
 
   @Test
   public void nonPersistentConnections() throws Exception {
-    InternalEvent response = flowRunner("nonPersistent").keepStreamsOpen().run();
+    BaseEvent response = flowRunner("nonPersistent").keepStreamsOpen().run();
     // verify that the connection is released shortly
     new PollingProber(SMALL_TIMEOUT_MILLIS, SMALL_POLL_DELAY_MILLIS).check(probe);
     // verify the stream is still available

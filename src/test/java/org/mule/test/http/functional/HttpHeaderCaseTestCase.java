@@ -14,7 +14,7 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.runtime.core.api.InternalEvent;
+import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
@@ -44,7 +44,7 @@ public class HttpHeaderCaseTestCase extends AbstractHttpTestCase {
   @Description("Sets up a listener that returns form data and a requester that triggers it, all while preserving the headers name case. That way "
       + "we make sure the Host, Content-Type and other headers are handled correctly by both listener and requester.")
   public void worksPreservingHeaders() throws Exception {
-    InternalEvent response = runFlow("client");
+    BaseEvent response = runFlow("client");
     assertThat(response.getMessage(), hasPayload(equalTo("CustomValue=value")));
     HttpResponseAttributes attributes = (HttpResponseAttributes) response.getMessage().getAttributes().getValue();
     assertThat(attributes.getHeaders().get(CONTENT_TYPE), is(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString()));
