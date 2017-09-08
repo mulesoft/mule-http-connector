@@ -7,6 +7,8 @@
 package org.mule.extension.http.api.policy;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
+
+import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.listener.builder.HttpListenerErrorResponseBuilder;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
@@ -91,6 +93,7 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
       httpListenerResponseBuilder.setReasonPhrase(httpResponseAttributes.getReasonPhrase());
       return mapBuilder.build();
     } else {
+      httpListenerResponseBuilder.setBody(message.getPayload());
       return mapBuilder.build();
     }
   }
