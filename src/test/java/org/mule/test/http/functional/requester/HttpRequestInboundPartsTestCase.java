@@ -44,7 +44,7 @@ public class HttpRequestInboundPartsTestCase extends AbstractHttpRequestTestCase
   @Test
   @Description("Verifies that parts are received, even considering an unknown type (HTML) and a custom header.")
   public void processInboundAttachments() throws Exception {
-    BaseEvent event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
+    BaseEvent event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).runAndVerify("requestFlow");
     String contentType = event.getMessage().getPayload().getDataType().getMediaType().toRfcString();
 
     assertThat(contentType, startsWith(MULTIPART_FORM_DATA.withCharset(ISO_8859_1).toRfcString()));
