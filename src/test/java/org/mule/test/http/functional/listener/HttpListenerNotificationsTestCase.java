@@ -6,16 +6,15 @@
  */
 package org.mule.test.http.functional.listener;
 
+import static org.hamcrest.Matchers.contains;
+import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.context.notification.AbstractServerNotification.getActionName;
 import static org.mule.runtime.core.api.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.runtime.core.api.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
+import static org.mule.runtime.core.api.context.notification.ServerNotificationManager.createDefaultNotificationManager;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.functional.TestConnectorMessageNotificationListener.register;
-import static org.hamcrest.Matchers.contains;
-import static org.junit.Assert.assertThat;
-
 import org.mule.runtime.core.api.context.MuleContextBuilder;
-import org.mule.runtime.core.api.context.DefaultMuleContextBuilder;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;
@@ -24,10 +23,10 @@ import org.mule.test.http.functional.TestConnectorMessageNotificationListener;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import io.qameta.allure.Feature;
 import org.apache.http.client.fluent.Request;
 import org.junit.Rule;
 import org.junit.Test;
-import io.qameta.allure.Feature;
 
 @Feature(HTTP_EXTENSION)
 public class HttpListenerNotificationsTestCase extends AbstractHttpTestCase {
@@ -39,7 +38,7 @@ public class HttpListenerNotificationsTestCase extends AbstractHttpTestCase {
 
   @Override
   protected void configureMuleContext(MuleContextBuilder contextBuilder) {
-    contextBuilder.setNotificationManager(register(DefaultMuleContextBuilder.createDefaultNotificationManager()));
+    contextBuilder.setNotificationManager(register(createDefaultNotificationManager()));
     super.configureMuleContext(contextBuilder);
   }
 

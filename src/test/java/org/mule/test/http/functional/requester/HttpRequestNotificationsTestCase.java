@@ -6,29 +6,28 @@
  */
 package org.mule.test.http.functional.requester;
 
-import static org.mule.runtime.core.api.context.notification.AbstractServerNotification.getActionName;
-import static org.mule.runtime.core.api.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
-import static org.mule.runtime.core.api.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_END;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
-import static org.mule.test.http.functional.TestConnectorMessageNotificationListener.register;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
-
+import static org.mule.runtime.core.api.context.notification.AbstractServerNotification.getActionName;
+import static org.mule.runtime.core.api.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
+import static org.mule.runtime.core.api.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_END;
+import static org.mule.runtime.core.api.context.notification.ServerNotificationManager.createDefaultNotificationManager;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.http.functional.TestConnectorMessageNotificationListener.register;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
-import org.mule.runtime.core.api.context.DefaultMuleContextBuilder;
-import org.mule.test.http.functional.matcher.HttpMessageAttributesMatchers;
 import org.mule.test.http.functional.TestConnectorMessageNotificationListener;
+import org.mule.test.http.functional.matcher.HttpMessageAttributesMatchers;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import io.qameta.allure.Feature;
 import org.junit.Ignore;
 import org.junit.Test;
-import io.qameta.allure.Feature;
 
 //TODO: MULE-10340 - Add notifications to HTTP request
 @Ignore("MULE-10340: Add notifications to HTTP request")
@@ -42,7 +41,7 @@ public class HttpRequestNotificationsTestCase extends AbstractHttpRequestTestCas
 
   @Override
   protected void configureMuleContext(MuleContextBuilder contextBuilder) {
-    contextBuilder.setNotificationManager(register(DefaultMuleContextBuilder.createDefaultNotificationManager()));
+    contextBuilder.setNotificationManager(register(createDefaultNotificationManager()));
     super.configureMuleContext(contextBuilder);
   }
 
