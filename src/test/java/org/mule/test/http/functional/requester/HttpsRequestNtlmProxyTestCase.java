@@ -27,6 +27,7 @@ import org.eclipse.jetty.proxy.ConnectHandler;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.junit.Before;
 import org.junit.Test;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.message.Message;
@@ -42,55 +43,19 @@ import io.qameta.allure.junit4.DisplayName;
 @DisplayName("HTTPS server behind NTLM HTTP proxy. Authentication is required.")
 public class HttpsRequestNtlmProxyTestCase extends AbstractNtlmTestCase {
 
-  private static final String TARGET_RESPONSE = "Response";
-
   @Override
   protected AbstractHandler createHandler(Server server) {
-    return new ConnectHandler() {
-
-      boolean authenticated = false;
-
-      @Override
-      public void handle(String target, Request baseRequest, HttpServletRequest request,
-                         HttpServletResponse response)
-          throws ServletException, IOException {
-        if (request.isSecure()) {
-          // if the request is secure, the response
-          // from the https target is being handled
-          simpleResponseFromTarget(response);
-        } else {
-          super.handle(target, baseRequest, request, response);
-        }
-      }
-
-      @Override
-      protected void handleConnect(org.eclipse.jetty.server.Request baseRequest, HttpServletRequest request,
-                                   HttpServletResponse response, String serverAddress) {
-        super.handleConnect(baseRequest, request, response, serverAddress);
-        if (!authenticated) {
-          try {
-            response.getOutputStream().flush();
-          } catch (IOException e) {
-            // Do nothing
-          }
-        }
-      }
-
-      @Override
-      protected boolean handleAuthentication(HttpServletRequest request, HttpServletResponse response,
-                                             String address) {
-        try {
-          authenticated = authorizeRequest(address, request, response, false);
-          return authenticated;
-        } catch (IOException e) {
-          return false;
-        }
-      }
-    };
+    try {
+      setupTestAuthorizer(PROXY_AUTHORIZATION, PROXY_AUTHENTICATE, SC_PROXY_AUTHENTICATION_REQUIRED);
+      return new NtlmConnectHandler(getAuthorizer());
+    } catch (Exception e) {
+      throw new RuntimeException("Error creating testAuthorizer");
+    }
   }
 
-  public HttpsRequestNtlmProxyTestCase() {
-    super(PROXY_AUTHORIZATION, PROXY_AUTHENTICATE, SC_PROXY_AUTHENTICATION_REQUIRED);
+  @Before
+  public void setup() {
+    setupTestAuthorizer(PROXY_AUTHORIZATION, PROXY_AUTHENTICATE, SC_PROXY_AUTHENTICATION_REQUIRED);
   }
 
   @Override
@@ -104,15 +69,6 @@ public class HttpsRequestNtlmProxyTestCase extends AbstractNtlmTestCase {
     Message response = runFlow(getFlowName()).getMessage();
 
     assertThat((HttpResponseAttributes) response.getAttributes().getValue(), HttpMessageAttributesMatchers.hasStatusCode(SC_OK));
-    assertThat(getPayloadAsString(response), equalTo(TARGET_RESPONSE));
-  }
-
-  private void simpleResponseFromTarget(HttpServletResponse response) throws IOException {
-    response.setHeader(CONNECTION, CLOSE);
-    response.getOutputStream().print(TARGET_RESPONSE);
-    response.setStatus(SC_OK);
-    response.getOutputStream().flush();
-    response.getOutputStream().close();
   }
 
   protected boolean enableHttps() {
