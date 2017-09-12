@@ -22,7 +22,7 @@
         <commonsCollectionsVersion>3.2.2</commonsCollectionsVersion>
         <fluentHcVersion>4.5.2</fluentHcVersion>
         <grizzlyVersion>2.3.33</grizzlyVersion>
-        <grizzlyAhcVersion>1.13</grizzlyAhcVersion>
+        <grizzlyAhcVersion>1.14</grizzlyAhcVersion>
         <javaxMailVersion>1.4.3</javaxMailVersion>
         <jettyVersion>9.0.7.v20131107</jettyVersion>
         <projectReactorVersion>3.0.7.RELEASE</projectReactorVersion>

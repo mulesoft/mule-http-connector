@@ -14,6 +14,8 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.PROXY_AUTHORIZATION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.NTLM;
 
+import org.junit.Before;
+
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -22,8 +24,9 @@ import io.qameta.allure.Story;
 @Story(NTLM)
 public class HttpRequestNtlmProxyTestCase extends AbstractNtlmTestCase {
 
-  public HttpRequestNtlmProxyTestCase() {
-    super(PROXY_AUTHORIZATION, PROXY_AUTHENTICATE, SC_PROXY_AUTHENTICATION_REQUIRED);
+  @Before
+  public void setup() {
+    setupTestAuthorizer(PROXY_AUTHORIZATION, PROXY_AUTHENTICATE, SC_PROXY_AUTHENTICATION_REQUIRED);
   }
 
   @Override

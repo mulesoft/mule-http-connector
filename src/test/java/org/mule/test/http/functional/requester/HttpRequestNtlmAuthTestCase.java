@@ -17,6 +17,7 @@ import org.mule.test.runner.RunnerDelegateTo;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.Before;
 import org.junit.runners.Parameterized;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -35,8 +36,9 @@ public class HttpRequestNtlmAuthTestCase extends AbstractNtlmTestCase {
   @Parameterized.Parameter(2)
   public String workstation;
 
-  public HttpRequestNtlmAuthTestCase() {
-    super(AUTHORIZATION, WWW_AUTHENTICATE, SC_UNAUTHORIZED);
+  @Before
+  public void setup() {
+    setupTestAuthorizer(AUTHORIZATION, WWW_AUTHENTICATE, SC_UNAUTHORIZED);
   }
 
   @Parameterized.Parameters(name = "{0}")
