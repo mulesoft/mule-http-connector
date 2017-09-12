@@ -6,9 +6,11 @@
  */
 package org.mule.extension.http.api;
 
-import org.mule.runtime.api.util.MultiMap;
-
 import java.security.cert.Certificate;
+
+import javax.net.ssl.SSLSession;
+
+import org.mule.runtime.api.util.MultiMap;
 
 /**
  * Representation of an HTTP request message attributes.
@@ -56,10 +58,12 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
    */
   private final Certificate clientCertificate;
 
+  private final SSLSession sslSession;
+
   public HttpRequestAttributes(MultiMap<String, String> headers, String listenerPath, String relativePath, String version,
                                String scheme, String method, String requestPath, String requestUri, String queryString,
                                MultiMap<String, String> queryParams, MultiMap<String, String> uriParams,
-                               String remoteAddress, Certificate clientCertificate) {
+                               String remoteAddress, Certificate clientCertificate, SSLSession sslSession) {
     super(headers, queryParams, uriParams, requestPath);
     this.listenerPath = listenerPath;
     this.relativePath = relativePath;
@@ -70,6 +74,7 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
     this.queryString = queryString;
     this.remoteAddress = remoteAddress;
     this.clientCertificate = clientCertificate;
+    this.sslSession = sslSession;
   }
 
   public String getListenerPath() {
@@ -106,6 +111,10 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
 
   public Certificate getClientCertificate() {
     return clientCertificate;
+  }
+
+  public SSLSession getSslSession() {
+    return sslSession;
   }
 
 }
