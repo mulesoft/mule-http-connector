@@ -22,7 +22,7 @@ public class HttpPolicyRequestAttributes extends BaseHttpRequestAttributes {
   private static final long serialVersionUID = 7856582596752161400L;
 
   public HttpPolicyRequestAttributes(MultiMap<String, String> headers, MultiMap<String, String> queryParams,
-                                     MultiMap<String, String> uriParams, String requestPath) {
+                                     Map<String, String> uriParams, String requestPath) {
     super(headers, queryParams, uriParams, requestPath);
   }
 
