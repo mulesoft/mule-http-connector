@@ -50,7 +50,7 @@ public class DefaultProxyConfig implements ProxyConfig {
   private String password;
 
   /**
-   * List of hosts separated by ",", which specifies that the proxy must not be used against those
+   * A list of comma separated hosts against which the proxy should not be used
    */
   @Parameter
   @Optional
