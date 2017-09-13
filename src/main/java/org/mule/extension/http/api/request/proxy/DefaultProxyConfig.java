@@ -49,6 +49,13 @@ public class DefaultProxyConfig implements ProxyConfig {
   @Password
   private String password;
 
+  /**
+   * A list of comma separated hosts against which the proxy should not be used
+   */
+  @Parameter
+  @Optional
+  String nonProxyHosts;
+
   public String getHost() {
     return host;
   }
@@ -64,6 +71,10 @@ public class DefaultProxyConfig implements ProxyConfig {
 
   public String getPassword() {
     return password;
+  }
+
+  public String getNonProxyHosts() {
+    return nonProxyHosts;
   }
 
 }
