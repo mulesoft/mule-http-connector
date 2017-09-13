@@ -20,8 +20,7 @@
         <test:assert expression="payload.parts.partName1.content == 'Test part 1'"/>
         <test:assert expression="payload.parts[1].headers.'Content-Type' == 'text/html'"/>
         <test:assert expression="payload.parts[1].headers.'Content-Disposition'.filename == 'a.html'"/>
-        <!--TODO: MULE-13401 - Adapt multipart test once DW bugs are fixed-->
-        <!--<set-payload value="#[payload.parts.partName2.content]"/>-->
+        <set-payload value="#[payload.parts[1].content]"/>
     </flow>
 
 </mule>

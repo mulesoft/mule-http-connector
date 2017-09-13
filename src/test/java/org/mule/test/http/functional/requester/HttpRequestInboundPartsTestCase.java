@@ -6,17 +6,15 @@
  */
 package org.mule.test.http.functional.requester;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
+import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.runtime.api.metadata.MediaType.HTML;
-import static org.mule.runtime.api.metadata.MediaType.MULTIPART_FORM_DATA;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.MULTIPART;
-
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.http.api.HttpHeaders;
 
@@ -36,6 +34,8 @@ import org.junit.Test;
 @Story(MULTIPART)
 public class HttpRequestInboundPartsTestCase extends AbstractHttpRequestTestCase {
 
+  private static final String HTML_CONTENT = "Test part 2";
+
   @Override
   protected String getConfigFile() {
     return "http-request-inbound-attachments-config.xml";
@@ -47,8 +47,8 @@ public class HttpRequestInboundPartsTestCase extends AbstractHttpRequestTestCase
     BaseEvent event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).runAndVerify("requestFlow");
     String contentType = event.getMessage().getPayload().getDataType().getMediaType().toRfcString();
 
-    assertThat(contentType, startsWith(MULTIPART_FORM_DATA.withCharset(ISO_8859_1).toRfcString()));
-    assertThat(contentType, containsString(" boundary="));
+    assertThat(contentType, startsWith(HTML.toRfcString()));
+    assertThat(event.getMessage(), hasPayload(equalTo(HTML_CONTENT)));
   }
 
   @Override
@@ -64,7 +64,7 @@ public class HttpRequestInboundPartsTestCase extends AbstractHttpRequestTestCase
     multiPartWriter.endPart();
 
     multiPartWriter.startPart(HTML.toRfcString(), new String[] {"Content-Disposition: form-data; filename=\"a.html\""});
-    multiPartWriter.write("Test part 2");
+    multiPartWriter.write(HTML_CONTENT);
     multiPartWriter.endPart();
 
     multiPartWriter.close();
