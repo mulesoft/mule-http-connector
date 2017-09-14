@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.extension.http.internal.request.RequestConnectionParams.DEFAULT_CONNECTION_IDLE_TIMEOUT;
 import static org.mule.extension.http.internal.request.RequestConnectionParams.DEFAULT_MAX_CONNECTIONS;
 import static org.mule.extension.http.internal.request.RequestConnectionParams.DEFAULT_RESPONSE_BUFFER_SIZE;
-import static org.mule.runtime.core.api.connection.ConnectionProviderUtils.unwrapProviderWrapper;
+import static org.mule.runtime.module.extension.api.util.ConnectionProviderUtils.unwrapProviderWrapper;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTP;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
