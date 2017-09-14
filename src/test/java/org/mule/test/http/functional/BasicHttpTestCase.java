@@ -6,13 +6,13 @@
  */
 package org.mule.test.http.functional;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.runtime.api.exception.MuleException;
@@ -23,13 +23,13 @@ import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.requester.AbstractHttpRequestTestCase;
 
+import io.qameta.allure.Feature;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.junit.Rule;
 import org.junit.Test;
-import io.qameta.allure.Feature;
 
 @Feature(HTTP_EXTENSION)
 public class BasicHttpTestCase extends AbstractHttpRequestTestCase {
@@ -70,7 +70,8 @@ public class BasicHttpTestCase extends AbstractHttpRequestTestCase {
       try (CloseableHttpResponse response = httpClient.execute(getRequest)) {
         assertThat(response.getStatusLine().getStatusCode(), is(500));
         assertThat(response.getStatusLine().getReasonPhrase(), is("Server Error"));
-        assertThat(IOUtils.toString(response.getEntity().getContent()), is(containsString("ExpressionRuntimeException")));
+        assertThat(IOUtils.toString(response.getEntity().getContent()),
+                   is(containsString("Script \'error.description ++ \' has errors")));
       }
     }
   }
