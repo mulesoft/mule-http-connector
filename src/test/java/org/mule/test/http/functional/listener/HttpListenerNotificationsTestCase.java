@@ -8,9 +8,9 @@ package org.mule.test.http.functional.listener;
 
 import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.api.context.notification.AbstractServerNotification.getActionName;
-import static org.mule.runtime.core.api.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
-import static org.mule.runtime.core.api.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
+import static org.mule.runtime.api.notification.AbstractServerNotification.getActionName;
+import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
+import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
 import static org.mule.runtime.core.api.context.notification.ServerNotificationManager.createDefaultNotificationManager;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.functional.TestConnectorMessageNotificationListener.register;
