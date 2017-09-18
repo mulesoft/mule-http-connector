@@ -68,7 +68,7 @@ public class HttpListenerMethodRoutingTestCase extends AbstractHttpTestCase {
   @Test
   public void callWithMethod() throws Exception {
     sendRequestAndAssertMethod(TEST_MESSAGE);
-    assertThat(getPayloadAsString(queueHandler.read("out",RECEIVE_TIMEOUT).getMessage()),
+    assertThat(getPayloadAsString(queueHandler.read("out", RECEIVE_TIMEOUT).getMessage()),
                equalTo(TEST_MESSAGE));
   }
 

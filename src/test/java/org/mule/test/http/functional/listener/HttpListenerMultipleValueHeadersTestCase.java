@@ -80,7 +80,7 @@ public class HttpListenerMultipleValueHeadersTestCase extends AbstractHttpTestCa
 
     assertThat(httpResponse.getStatusLine().getStatusCode(), is(OK.getStatusCode()));
 
-    Message message = queueHandler.read("out",RECEIVE_TIMEOUT).getMessage();
+    Message message = queueHandler.read("out", RECEIVE_TIMEOUT).getMessage();
 
     assertThat(message.getAttributes().getValue(), instanceOf(HttpRequestAttributes.class));
     List<String> headers = ((HttpRequestAttributes) message.getAttributes().getValue()).getHeaders().getAll(HEADER);
