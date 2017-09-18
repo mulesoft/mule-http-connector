@@ -6,6 +6,7 @@
  */
 package org.mule.test.http.functional;
 
+import static org.hamcrest.Matchers.both;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasEntry;
@@ -70,7 +71,8 @@ public class BasicHttpTestCase extends AbstractHttpRequestTestCase {
       try (CloseableHttpResponse response = httpClient.execute(getRequest)) {
         assertThat(response.getStatusLine().getStatusCode(), is(500));
         assertThat(response.getStatusLine().getReasonPhrase(), is("Server Error"));
-        assertThat(IOUtils.toString(response.getEntity().getContent()), is(containsString("ExpressionRuntimeException")));
+        assertThat(IOUtils.toString(response.getEntity().getContent()),
+                   both(containsString("Script")).and(containsString("has errors")));
       }
     }
   }
