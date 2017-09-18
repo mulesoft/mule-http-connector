@@ -14,20 +14,23 @@ import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
+import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.test.http.functional.matcher.HttpMessageAttributesMatchers;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 import org.mule.test.http.functional.TestProxyServer;
+import org.mule.test.http.functional.matcher.HttpMessageAttributesMatchers;
 import org.mule.test.runner.RunnerDelegateTo;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import javax.inject.Inject;
 
 import io.qameta.allure.Feature;
 
@@ -50,6 +53,9 @@ public class HttpRequestProxyTlsTestCase extends AbstractHttpTestCase {
 
   @Rule
   public SystemProperty trustStorePathProperty;
+
+  @Inject
+  private ConfigurationComponentLocator locator;
 
   private TestProxyServer proxyServer = new TestProxyServer(proxyPort.getNumber(), httpPort.getNumber());
 
@@ -80,9 +86,14 @@ public class HttpRequestProxyTlsTestCase extends AbstractHttpTestCase {
     return "http-request-proxy-tls-config.xml";
   }
 
+  @Override
+  protected boolean doTestClassInjection() {
+    return true;
+  }
+
   @Test
   public void requestIsSentCorrectlyThroughHttpsProxy() throws Exception {
-    getFromFlow(muleContext, "serverFlow").setEventCallback((context, component, muleContext) -> {
+    getFromFlow(locator, "serverFlow").setEventCallback((context, component, muleContext) -> {
       requestPayload = getPayloadAsString(context.getMessage());
       requestURI = ((HttpRequestAttributes) context.getMessage().getAttributes().getValue()).getRequestUri();
     });

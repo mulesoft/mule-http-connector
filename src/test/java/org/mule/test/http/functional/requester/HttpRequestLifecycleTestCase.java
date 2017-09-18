@@ -12,14 +12,18 @@ import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.construct.Flow;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import io.qameta.allure.Feature;
 
 @Feature(HTTP_EXTENSION)
@@ -28,48 +32,63 @@ public class HttpRequestLifecycleTestCase extends AbstractHttpRequestTestCase {
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
+  @Inject
+  private Registry registry;
+
+  //  @Inject
+  //  @Named("requestConfig")
+  //  private Stoppable requestConfig;
+
+  @Inject
+  @Named("simpleRequest")
+  private Flow simpleRequestFlow;
+
   @Override
   protected String getConfigFile() {
     return "http-request-lifecycle-config.xml";
   }
 
+  @Override
+  protected boolean doTestClassInjection() {
+    return true;
+  }
+
   @Test
   public void stoppedConfigMakesRequesterFail() throws Exception {
     verifyRequest();
-    Stoppable requestConfig = muleContext.getRegistry().lookupObject("requestConfig");
+    Lifecycle requestConfig = registry.<Lifecycle>lookupByName("requestConfig").get();
     requestConfig.stop();
     try {
       expectedException.expectCause(isA(ConnectionException.class));
       runFlow("simpleRequest");
     } finally {
-      ((Startable) requestConfig).start();
+      requestConfig.start();
     }
   }
 
   @Test
   public void stoppedConfigDoesNotAffectAnother() throws Exception {
     verifyRequest();
-    Stoppable requestConfig = muleContext.getRegistry().lookupObject("requestConfig");
+    Lifecycle requestConfig = registry.<Lifecycle>lookupByName("requestConfig").get();
     requestConfig.stop();
     verifyRequest("otherRequest");
-    ((Startable) requestConfig).start();
+    requestConfig.start();
   }
 
   @Test
   public void restartConfig() throws Exception {
     verifyRequest();
-    Object requestConfig = muleContext.getRegistry().lookupObject("requestConfig");
-    ((Stoppable) requestConfig).stop();
-    ((Startable) requestConfig).start();
+    Lifecycle requestConfig = registry.<Lifecycle>lookupByName("requestConfig").get();
+    requestConfig.stop();
+    requestConfig.start();
     verifyRequest();
   }
 
   @Test
   public void restartFlow() throws Exception {
     verifyRequest();
-    Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("simpleRequest");
-    flow.stop();
-    flow.start();
+    simpleRequestFlow.stop();
+    simpleRequestFlow.start();
     verifyRequest();
   }
 

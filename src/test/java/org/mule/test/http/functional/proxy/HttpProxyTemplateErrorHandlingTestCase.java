@@ -25,6 +25,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 
@@ -32,12 +36,25 @@ import io.qameta.allure.Story;
 @Story(PROXY)
 public class HttpProxyTemplateErrorHandlingTestCase extends AbstractHttpRequestTestCase {
 
-  public static String SERVICE_DOWN_MESSAGE = "Service Down";
-  public static String CATCH_SENSING_PROCESSOR_NAME = "catchSensingMessageProcessor";
-  public static String ROLLBACK_SENSING_PROCESSOR_NAME = "rollbackSensingMessageProcessor";
+  public static final String SERVICE_DOWN_MESSAGE = "Service Down";
+  public static final String CATCH_SENSING_PROCESSOR_NAME = "catchSensingMessageProcessor";
+  public static final String ROLLBACK_SENSING_PROCESSOR_NAME = "rollbackSensingMessageProcessor";
 
   @Rule
   public DynamicPort proxyPort = new DynamicPort("proxyPort");
+
+  @Inject
+  @Named(CATCH_SENSING_PROCESSOR_NAME)
+  private SensingNullMessageProcessor catchSensingProcessor;
+
+  @Inject
+  @Named(ROLLBACK_SENSING_PROCESSOR_NAME)
+  private SensingNullMessageProcessor rollbackSensingProcessor;
+
+  @Override
+  protected boolean doTestClassInjection() {
+    return true;
+  }
 
   @Override
   protected String getConfigFile() {
@@ -72,8 +89,7 @@ public class HttpProxyTemplateErrorHandlingTestCase extends AbstractHttpRequestT
     assertThat(response.getStatusLine().getStatusCode(), is(200));
     assertThat(IOUtils.toString(response.getEntity().getContent()), equalTo(SERVICE_DOWN_MESSAGE));
 
-    SensingNullMessageProcessor processor = muleContext.getRegistry().lookupObject(CATCH_SENSING_PROCESSOR_NAME);
-    assertThat(processor.event, is(notNullValue()));
+    assertThat(catchSensingProcessor.event, is(notNullValue()));
   }
 
   @Test
@@ -84,8 +100,7 @@ public class HttpProxyTemplateErrorHandlingTestCase extends AbstractHttpRequestT
     assertThat(response.getStatusLine().getStatusCode(), is(500));
     assertThat(IOUtils.toString(response.getEntity().getContent()), not(equalTo(SERVICE_DOWN_MESSAGE)));
 
-    SensingNullMessageProcessor processor = muleContext.getRegistry().lookupObject(ROLLBACK_SENSING_PROCESSOR_NAME);
-    assertThat(processor.event, is(notNullValue()));
+    assertThat(rollbackSensingProcessor.event, is(notNullValue()));
   }
 
   private String getProxyUrl(String path) {

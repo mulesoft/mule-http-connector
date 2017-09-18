@@ -12,6 +12,7 @@ import static org.hamcrest.core.Is.is;
 import static org.mule.runtime.api.component.location.Location.builder;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.METADATA;
+
 import org.mule.metadata.api.model.BinaryType;
 import org.mule.runtime.api.meta.model.OutputModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -19,12 +20,13 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
-import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.tck.junit4.rule.DynamicPort;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
+import javax.inject.Inject;
+
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 
@@ -32,7 +34,13 @@ import io.qameta.allure.Story;
 @Story(METADATA)
 public class HttpMetadataResolverTestCase extends AbstractHttpTestCase {
 
+  @Inject
   private MetadataService service;
+
+  @Override
+  protected boolean doTestClassInjection() {
+    return true;
+  }
 
   @Rule
   public DynamicPort serverPort = new DynamicPort("serverPort");
@@ -40,11 +48,6 @@ public class HttpMetadataResolverTestCase extends AbstractHttpTestCase {
   @Override
   protected String getConfigFile() {
     return "http-metadata-config.xml";
-  }
-
-  @Before
-  public void setupManager() throws RegistrationException {
-    service = muleContext.getRegistry().lookupObject(MetadataService.class);
   }
 
   @Test
