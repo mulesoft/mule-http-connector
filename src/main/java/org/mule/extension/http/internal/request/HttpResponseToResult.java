@@ -39,7 +39,6 @@ import java.util.Map;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import reactor.core.publisher.Mono;
 
 /**
  * Component that transforms an HTTP response to a proper {@link Result}.
@@ -69,8 +68,6 @@ public class HttpResponseToResult {
     HttpEntity entity = response.getEntity();
     Charset encoding = responseMediaType.getCharset().get();
 
-    Mono<InputStream> payload = just(entity.getContent());
-
     if (config.isEnableCookies()) {
       processCookies(response, uri);
     }
@@ -79,15 +76,17 @@ public class HttpResponseToResult {
 
     mediaType = DataType.builder().mediaType(mediaType).charset(encoding).build().getMediaType();
 
-    final Result.Builder builder = Result.builder();
+    final Result.Builder<InputStream, HttpResponseAttributes> builder = Result.builder();
     if (isEmpty(responseContentType)) {
       builder.mediaType(mediaType);
     } else {
       builder.mediaType(responseMediaType);
     }
-    builder.attributes(responseAttributes);
+    if (entity.getLength().isPresent()) {
+      builder.length(entity.getLength().get());
+    }
 
-    return payload.map(p -> builder.output(p).build());
+    return just(builder.output(entity.getContent()).attributes(responseAttributes).build());
   }
 
   private HttpResponseAttributes createAttributes(HttpResponse response) {

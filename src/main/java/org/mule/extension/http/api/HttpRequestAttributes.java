@@ -9,6 +9,7 @@ package org.mule.extension.http.api;
 import org.mule.runtime.api.util.MultiMap;
 
 import java.security.cert.Certificate;
+import java.util.Map;
 
 /**
  * Representation of an HTTP request message attributes.
@@ -58,8 +59,8 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
 
   public HttpRequestAttributes(MultiMap<String, String> headers, String listenerPath, String relativePath, String version,
                                String scheme, String method, String requestPath, String requestUri, String queryString,
-                               MultiMap<String, String> queryParams, MultiMap<String, String> uriParams,
-                               String remoteAddress, Certificate clientCertificate) {
+                               MultiMap<String, String> queryParams, Map<String, String> uriParams, String remoteAddress,
+                               Certificate clientCertificate) {
     super(headers, queryParams, uriParams, requestPath);
     this.listenerPath = listenerPath;
     this.relativePath = relativePath;

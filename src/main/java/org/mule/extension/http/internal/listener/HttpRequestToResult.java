@@ -47,8 +47,12 @@ public class HttpRequestToResult {
     HttpRequestAttributes attributes =
         new HttpRequestAttributesBuilder().setRequestContext(requestContext).setListenerPath(listenerPath).build();
 
-    return Result.<InputStream, HttpRequestAttributes>builder().output(payload).mediaType(mediaType).attributes(attributes)
-        .build();
+    Result.Builder<InputStream, HttpRequestAttributes> resultBuilder = Result.builder();
+    if (entity.getLength().isPresent()) {
+      resultBuilder.length(entity.getLength().get());
+    }
+
+    return resultBuilder.output(payload).mediaType(mediaType).attributes(attributes).build();
   }
 
   /**
