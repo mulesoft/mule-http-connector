@@ -17,7 +17,7 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.X_FORWARDED_FOR;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.PROXY;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.core.api.util.concurrent.Latch;
+import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.http.api.HttpHeaders;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.TestInputStream;

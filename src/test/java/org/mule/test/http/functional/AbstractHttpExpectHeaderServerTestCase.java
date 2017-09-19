@@ -7,7 +7,7 @@
 package org.mule.test.http.functional;
 
 import static org.apache.commons.io.IOUtils.read;
-import org.mule.runtime.core.api.util.concurrent.Latch;
+import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.BufferedReader;
