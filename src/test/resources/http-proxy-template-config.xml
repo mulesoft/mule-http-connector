@@ -18,7 +18,7 @@
     <flow name="proxyPolicyTemplate">
         <http:listener config-ref="proxyConfig" path="/policy" responseStreamingMode="AUTO">
             <http:response statusCode="#[attributes.statusCode]" reasonPhrase="#[attributes.reasonPhrase]" >
-                <http:headers>#[attributes.headers - 'Transfer-Encoding']</http:headers>
+                <http:headers>#[attributes.headers]</http:headers>
             </http:response>
         </http:listener>
 
@@ -28,7 +28,7 @@
         <custom-processor class="org.mule.test.http.functional.proxy.HttpProxyTemplateTestCase$ProxyPolicyProcessor"/>
 
         <http:request config-ref="requestConfig" method="#[attributes.method]" path="#[attributes.requestPath]">
-            <http:headers>#[attributes.headers ++ {'X-Forwarded-For':attributes.remoteAddress} - 'Transfer-Encoding']</http:headers>
+            <http:headers>#[attributes.headers ++ {'X-Forwarded-For':attributes.remoteAddress}]</http:headers>
             <http:query-params>#[attributes.queryParams]</http:query-params>
         </http:request>
         <test:assert count="1" expression="#[mel:Thread.currentThread().getName().startsWith('[MuleRuntime].io')]"/>
@@ -39,7 +39,7 @@
     <flow name="proxyTemplate">
         <http:listener config-ref="proxyConfig" path="/*" responseStreamingMode="AUTO">
             <http:response statusCode="#[attributes.statusCode]" reasonPhrase="#[attributes.reasonPhrase]" >
-                <http:headers>#[attributes.headers - 'Transfer-Encoding']</http:headers>
+                <http:headers>#[attributes.headers]</http:headers>
             </http:response>
         </http:listener>
 
@@ -49,7 +49,7 @@
         <custom-processor class="org.mule.test.http.functional.proxy.HttpProxyTemplateTestCase$ProxyProcessor"/>
 
         <http:request config-ref="requestConfig" method="#[attributes.method]" path="#[attributes.requestPath]">
-            <http:headers>#[attributes.headers ++ {'X-Forwarded-For':attributes.remoteAddress} - 'Transfer-Encoding']</http:headers>
+            <http:headers>#[attributes.headers ++ {'X-Forwarded-For':attributes.remoteAddress}]</http:headers>
             <http:query-params>#[attributes.queryParams]</http:query-params>
         </http:request>
         <test:assert count="1" expression="#[mel:Thread.currentThread().getName().startsWith('[MuleRuntime].io')]"/>
