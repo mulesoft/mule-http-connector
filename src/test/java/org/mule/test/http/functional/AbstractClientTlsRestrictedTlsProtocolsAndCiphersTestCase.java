@@ -10,8 +10,9 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mule.test.http.functional.TlsConstants.DEFAULT_SECURITY_MODEL;
+import static org.mule.test.http.functional.TlsConstants.PROPERTIES_FILE_PATTERN;
 import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.security.tls.TlsConfiguration;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.api.util.IOUtils;
@@ -65,7 +66,7 @@ public abstract class AbstractClientTlsRestrictedTlsProtocolsAndCiphersTestCase
 
   private static File getTlsPropertiesFile() {
     String path = ClassUtils.getClassPathRoot(AbstractClientTlsRestrictedTlsProtocolsAndCiphersTestCase.class).getPath();
-    return new File(path, String.format(TlsConfiguration.PROPERTIES_FILE_PATTERN, TlsConfiguration.DEFAULT_SECURITY_MODEL));
+    return new File(path, String.format(PROPERTIES_FILE_PATTERN, DEFAULT_SECURITY_MODEL));
   }
 
   @Test

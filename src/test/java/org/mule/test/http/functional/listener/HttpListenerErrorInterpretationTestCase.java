@@ -43,7 +43,7 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.exception.ErrorTypeRepository;
-import org.mule.runtime.core.api.exception.TypedException;
+import org.mule.runtime.api.exception.TypedException;
 import org.mule.runtime.http.api.HttpConstants.HttpStatus;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;

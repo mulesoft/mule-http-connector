@@ -14,7 +14,7 @@ import static org.junit.Assert.assertThat;
 import org.mule.extension.http.api.error.HttpRequestFailedException;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.runtime.core.api.util.concurrent.Latch;
+import org.mule.runtime.api.util.concurrent.Latch;
 
 import java.io.IOException;
 

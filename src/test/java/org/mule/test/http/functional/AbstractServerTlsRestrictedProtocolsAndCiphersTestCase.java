@@ -8,8 +8,9 @@ package org.mule.test.http.functional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mule.test.http.functional.TlsConstants.DEFAULT_SECURITY_MODEL;
+import static org.mule.test.http.functional.TlsConstants.PROPERTIES_FILE_PATTERN;
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.api.security.tls.TlsConfiguration;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -55,7 +56,7 @@ public abstract class AbstractServerTlsRestrictedProtocolsAndCiphersTestCase
 
   private static File getTlsPropertiesFile() {
     String path = ClassUtils.getClassPathRoot(AbstractServerTlsRestrictedProtocolsAndCiphersTestCase.class).getPath();
-    return new File(path, String.format(TlsConfiguration.PROPERTIES_FILE_PATTERN, TlsConfiguration.DEFAULT_SECURITY_MODEL));
+    return new File(path, String.format(PROPERTIES_FILE_PATTERN, DEFAULT_SECURITY_MODEL));
   }
 
   @Test

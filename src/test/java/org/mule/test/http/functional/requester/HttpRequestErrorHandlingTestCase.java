@@ -33,7 +33,7 @@ import io.qameta.allure.Stories;
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.functional.junit4.rules.ExpectedError;
 import org.mule.runtime.core.api.event.BaseEvent;
-import org.mule.runtime.core.api.util.concurrent.Latch;
+import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.http.api.HttpConstants.HttpStatus;
 import org.mule.tck.junit4.rule.DynamicPort;
 
