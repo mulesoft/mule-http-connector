@@ -9,23 +9,24 @@ package org.mule.test.http.functional.listener;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
+
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
-import java.io.IOException;
-import java.net.ConnectException;
-
-import io.qameta.allure.Feature;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import java.io.IOException;
+import java.net.ConnectException;
+
+import io.qameta.allure.Feature;
 
 @Feature(HTTP_EXTENSION)
 public class HttpListenerLifecycleTestCase extends AbstractHttpTestCase {
@@ -44,7 +45,8 @@ public class HttpListenerLifecycleTestCase extends AbstractHttpTestCase {
 
   @Test
   public void stopOneListenerDoesNotAffectAnother() throws Exception {
-    Lifecycle httpListener = (Lifecycle) ((Flow) getFlowConstruct("testPathFlow")).getSource();
+    Lifecycle httpListener =
+        (Lifecycle) locator.find(Location.builderFromStringRepresentation("testPathFlow/source").build()).get();
     httpListener.stop();
     callAndAssertResponseFromUnaffectedListener(getLifecycleConfigUrl("/path/catch"), "catchAll");
     httpListener.start();
@@ -52,7 +54,8 @@ public class HttpListenerLifecycleTestCase extends AbstractHttpTestCase {
 
   @Test
   public void restartListener() throws Exception {
-    Lifecycle httpListener = (Lifecycle) ((Flow) getFlowConstruct("testPathFlow")).getSource();
+    Lifecycle httpListener =
+        (Lifecycle) locator.find(Location.builderFromStringRepresentation("testPathFlow/source").build()).get();
     httpListener.stop();
     httpListener.start();
     final Response response = Request.Get(getLifecycleConfigUrl("/path/subpath")).execute();
@@ -63,7 +66,8 @@ public class HttpListenerLifecycleTestCase extends AbstractHttpTestCase {
 
   @Test
   public void stopListenerReturns404() throws Exception {
-    Stoppable httpListener = (Stoppable) ((Flow) getFlowConstruct("catchAllWithinTestPathFlow")).getSource();
+    Lifecycle httpListener =
+        (Lifecycle) locator.find(Location.builderFromStringRepresentation("catchAllWithinTestPathFlow/source").build()).get();
     httpListener.stop();
     final Response response = Request.Get(getLifecycleConfigUrl("/path/somepath")).execute();
     final HttpResponse httpResponse = response.returnResponse();
@@ -72,7 +76,7 @@ public class HttpListenerLifecycleTestCase extends AbstractHttpTestCase {
 
   @Test
   public void stoppedListenerConfigDoNotListen() throws Exception {
-    Lifecycle httpListenerConfig = muleContext.getRegistry().get("testLifecycleListenerConfig");
+    Lifecycle httpListenerConfig = registry.<Lifecycle>lookupByName("testLifecycleListenerConfig").get();
     httpListenerConfig.stop();
     try {
       expectedException.expect(ConnectException.class);
@@ -84,7 +88,7 @@ public class HttpListenerLifecycleTestCase extends AbstractHttpTestCase {
 
   @Test
   public void stopOneListenerConfigDoesNotAffectAnother() throws Exception {
-    Lifecycle httpListenerConfig = muleContext.getRegistry().get("testLifecycleListenerConfig");
+    Lifecycle httpListenerConfig = registry.<Lifecycle>lookupByName("testLifecycleListenerConfig").get();
     httpListenerConfig.stop();
     callAndAssertResponseFromUnaffectedListener(getUnchangedConfigUrl(), "works");
     httpListenerConfig.start();
@@ -92,7 +96,7 @@ public class HttpListenerLifecycleTestCase extends AbstractHttpTestCase {
 
   @Test
   public void restartListenerConfig() throws Exception {
-    Lifecycle httpListenerConfig = muleContext.getRegistry().get("testLifecycleListenerConfig");
+    Lifecycle httpListenerConfig = registry.<Lifecycle>lookupByName("testLifecycleListenerConfig").get();
     httpListenerConfig.stop();
     httpListenerConfig.start();
     final Response response = Request.Get(getLifecycleConfigUrl("/path/anotherPath")).execute();

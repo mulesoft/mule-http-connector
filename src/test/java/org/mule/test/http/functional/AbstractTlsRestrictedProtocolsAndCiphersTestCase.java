@@ -6,6 +6,7 @@
  */
 package org.mule.test.http.functional;
 
+import static java.util.Collections.singletonMap;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 
@@ -13,15 +14,14 @@ import org.mule.extension.http.internal.temporary.HttpConnector;
 import org.mule.extension.socket.api.SocketsExtension;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.api.scheduler.SchedulerService;
-import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.service.http.impl.service.HttpServiceImplementation;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Needs to access resources for validating different TLS scenarios and it cannot be done with
@@ -39,6 +39,11 @@ public abstract class AbstractTlsRestrictedProtocolsAndCiphersTestCase extends E
   private HttpService httpService = new HttpServiceImplementation(schedulerService);
 
   @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    return singletonMap(httpService.getName(), httpService);
+  }
+
+  @Override
   protected void addBuilders(List<ConfigurationBuilder> builders) {
     super.addBuilders(builders);
     try {
@@ -46,13 +51,6 @@ public abstract class AbstractTlsRestrictedProtocolsAndCiphersTestCase extends E
     } catch (MuleException e) {
       // do nothing
     }
-    builders.add(new AbstractConfigurationBuilder() {
-
-      @Override
-      protected void doConfigure(MuleContext muleContext) throws Exception {
-        muleContext.getRegistry().registerObject(httpService.getName(), httpService);
-      }
-    });
   }
 
   @Override

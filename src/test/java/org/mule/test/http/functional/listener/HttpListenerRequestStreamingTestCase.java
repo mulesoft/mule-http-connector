@@ -43,7 +43,7 @@ public class HttpListenerRequestStreamingTestCase extends AbstractHttpTestCase {
   @Test
   public void listenerReceivedChunkedRequest() throws Exception {
     String url = format("http://localhost:%s/", listenPort.getNumber());
-    getFromFlow(muleContext, "defaultFlow")
+    getFromFlow(locator, "defaultFlow")
         .setEventCallback((context, component, muleContext) -> flowReceivedMessage = muleContext.getTransformationService()
             .transform(context.getMessage(), DataType.STRING).getPayload().getValue().toString());
     testChunkedRequestContentAndResponse(url);

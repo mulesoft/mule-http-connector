@@ -7,22 +7,25 @@
 package org.mule.test.http.functional.requester;
 
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
+import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
 import org.mule.extension.http.api.error.HttpRequestFailedException;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.api.util.concurrent.Latch;
 
+import org.eclipse.jetty.server.Request;
+import org.junit.Test;
+
 import java.io.IOException;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.jetty.server.Request;
-import org.junit.Test;
 import io.qameta.allure.Feature;
 
 @Feature(HTTP_EXTENSION)
@@ -31,6 +34,10 @@ public class HttpRequestMaxConnectionsTestCase extends AbstractHttpRequestTestCa
   private Latch messageArrived = new Latch();
   private Latch messageHold = new Latch();
 
+  @Inject
+  @Named("limitedConnections")
+  private Flow limitedConnectionsFlow;
+
   @Override
   protected String getConfigFile() {
     return "http-request-max-connections-config.xml";
@@ -38,8 +45,7 @@ public class HttpRequestMaxConnectionsTestCase extends AbstractHttpRequestTestCa
 
   @Test
   public void maxConnections() throws Exception {
-    Flow flow = (Flow) getFlowConstruct("limitedConnections");
-    Thread t1 = processAsynchronously(flow);
+    Thread t1 = processAsynchronously(limitedConnectionsFlow);
     messageArrived.await();
 
     MessagingException e = flowRunner("limitedConnections").runExpectingException();
