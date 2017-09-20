@@ -7,6 +7,7 @@
 package org.mule.test.http.functional.proxy;
 
 import static java.lang.String.valueOf;
+import static java.util.Optional.of;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.endsWith;
@@ -15,6 +16,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.api.metadata.DataType.fromObject;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
@@ -27,11 +29,11 @@ import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.http.api.HttpHeaders;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.TestInputStream;
@@ -48,6 +50,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Function;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -78,7 +81,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
   private RequestHandlerExtender handlerExtender;
   private boolean consumeAllRequest = true;
   private static String IO_THREAD_PREFIX = "[MuleRuntime].io";
-  private static Object policyPayload;
+  private static Function<Message.Builder, Message.Builder> policy;
 
   @Override
   protected String getConfigFile() {
@@ -197,8 +200,8 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
   }
 
   @Test
-  public void doesNotProxyChunkedWhenPayloadIsModified() throws Exception {
-    policyPayload = TEST_PAYLOAD;
+  public void doesNotProxyChunkedWhenModifiedWithString() throws Exception {
+    policy = builder -> builder.value(TEST_PAYLOAD);
 
     Response response = Request.Post(getProxyUrl("policy"))
         .body(new InputStreamEntity(new ByteArrayInputStream(TEST_MESSAGE.getBytes())))
@@ -213,8 +216,8 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
   }
 
   @Test
-  public void doesNotProxyContentLengthWhenPayloadIsModified() throws Exception {
-    policyPayload = new ByteArrayInputStream(TEST_PAYLOAD.getBytes());
+  public void doesNotProxyContentLengthWhenModifiedWithStream() throws Exception {
+    policy = builder -> builder.value(new ByteArrayInputStream(TEST_PAYLOAD.getBytes()));
 
     Response response = Request.Post(getProxyUrl("policy"))
         .body(new StringEntity(TEST_MESSAGE))
@@ -225,6 +228,26 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
     assertThat(httpResponse.getStatusLine().getStatusCode(), is(SC_OK));
     assertThat(httpResponse.getFirstHeader(TRANSFER_ENCODING).getValue(), is(CHUNKED));
     assertThat(getFirstReceivedHeader(TRANSFER_ENCODING), is(CHUNKED));
+  }
+
+  @Test
+  public void usesContentLengthWhenModifiedWithStreamAndLength() throws Exception {
+    long length = (long) TEST_PAYLOAD.length();
+
+    policy = builder -> {
+      ByteArrayInputStream stream = new ByteArrayInputStream(TEST_PAYLOAD.getBytes());
+      return builder.payload(new TypedValue<Object>(stream, fromObject(stream), of(length)));
+    };
+
+    Response response = Request.Post(getProxyUrl("policy"))
+        .body(new StringEntity(TEST_MESSAGE))
+        .connectTimeout(RECEIVE_TIMEOUT)
+        .execute();
+    HttpResponse httpResponse = response.returnResponse();
+
+    assertThat(httpResponse.getStatusLine().getStatusCode(), is(SC_OK));
+    assertThat(httpResponse.getFirstHeader(CONTENT_LENGTH).getValue(), is(valueOf(length)));
+    assertThat(getFirstReceivedHeader(CONTENT_LENGTH), is(valueOf(length)));
   }
 
   @Test
@@ -416,7 +439,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
 
     @Override
     protected Message.Builder getBuilder(BaseEvent event) {
-      return super.getBuilder(event).value(policyPayload);
+      return policy.apply(super.getBuilder(event));
     }
   }
 
