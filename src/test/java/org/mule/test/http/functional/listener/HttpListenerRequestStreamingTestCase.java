@@ -12,7 +12,6 @@ import static org.junit.Assert.assertThat;
 import static org.mule.functional.api.component.FunctionalTestProcessor.getFromFlow;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
-import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
@@ -25,8 +24,6 @@ import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 
-import javax.inject.Inject;
-
 import io.qameta.allure.Feature;
 
 @Feature(HTTP_EXTENSION)
@@ -38,17 +35,9 @@ public class HttpListenerRequestStreamingTestCase extends AbstractHttpTestCase {
   public DynamicPort listenPort = new DynamicPort("port");
   private String flowReceivedMessage;
 
-  @Inject
-  private ConfigurationComponentLocator locator;
-
   @Override
   protected String getConfigFile() {
     return "http-listener-request-streaming-config.xml";
-  }
-
-  @Override
-  protected boolean doTestClassInjection() {
-    return true;
   }
 
   @Test

@@ -37,11 +37,6 @@ public class HttpMetadataResolverTestCase extends AbstractHttpTestCase {
   @Inject
   private MetadataService service;
 
-  @Override
-  protected boolean doTestClassInjection() {
-    return true;
-  }
-
   @Rule
   public DynamicPort serverPort = new DynamicPort("serverPort");
 

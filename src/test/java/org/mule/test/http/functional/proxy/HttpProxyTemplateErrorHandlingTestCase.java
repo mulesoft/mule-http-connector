@@ -52,11 +52,6 @@ public class HttpProxyTemplateErrorHandlingTestCase extends AbstractHttpRequestT
   private SensingNullMessageProcessor rollbackSensingProcessor;
 
   @Override
-  protected boolean doTestClassInjection() {
-    return true;
-  }
-
-  @Override
   protected String getConfigFile() {
     return "http-proxy-template-error-handling-config.xml";
   }

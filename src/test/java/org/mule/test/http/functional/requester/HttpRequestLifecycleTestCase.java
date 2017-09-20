@@ -12,7 +12,6 @@ import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
-import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.construct.Flow;
@@ -33,24 +32,12 @@ public class HttpRequestLifecycleTestCase extends AbstractHttpRequestTestCase {
   public ExpectedException expectedException = ExpectedException.none();
 
   @Inject
-  private Registry registry;
-
-  //  @Inject
-  //  @Named("requestConfig")
-  //  private Stoppable requestConfig;
-
-  @Inject
   @Named("simpleRequest")
   private Flow simpleRequestFlow;
 
   @Override
   protected String getConfigFile() {
     return "http-request-lifecycle-config.xml";
-  }
-
-  @Override
-  protected boolean doTestClassInjection() {
-    return true;
   }
 
   @Test

@@ -14,7 +14,6 @@ import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.core.api.event.BaseEvent;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -29,8 +28,6 @@ import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
 import java.util.Collection;
-
-import javax.inject.Inject;
 
 import io.qameta.allure.Feature;
 
@@ -53,9 +50,6 @@ public class HttpRequestProxyTlsTestCase extends AbstractHttpTestCase {
 
   @Rule
   public SystemProperty trustStorePathProperty;
-
-  @Inject
-  private ConfigurationComponentLocator locator;
 
   private TestProxyServer proxyServer = new TestProxyServer(proxyPort.getNumber(), httpPort.getNumber());
 
@@ -84,11 +78,6 @@ public class HttpRequestProxyTlsTestCase extends AbstractHttpTestCase {
   @Override
   protected String getConfigFile() {
     return "http-request-proxy-tls-config.xml";
-  }
-
-  @Override
-  protected boolean doTestClassInjection() {
-    return true;
   }
 
   @Test

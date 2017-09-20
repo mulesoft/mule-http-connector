@@ -10,8 +10,6 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
-import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.util.IOUtils;
@@ -28,8 +26,6 @@ import org.junit.rules.ExpectedException;
 import java.io.IOException;
 import java.net.ConnectException;
 
-import javax.inject.Inject;
-
 import io.qameta.allure.Feature;
 
 @Feature(HTTP_EXTENSION)
@@ -41,17 +37,6 @@ public class HttpListenerLifecycleTestCase extends AbstractHttpTestCase {
   public DynamicPort port2 = new DynamicPort("port2");
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
-
-  @Inject
-  private Registry registry;
-
-  @Inject
-  protected ConfigurationComponentLocator locator;
-
-  @Override
-  protected boolean doTestClassInjection() {
-    return true;
-  }
 
   @Override
   protected String getConfigFile() {
