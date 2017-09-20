@@ -6,8 +6,12 @@
  */
 package org.mule.extension.http.internal.request;
 
+import static java.lang.String.valueOf;
 import static org.mule.extension.http.api.error.HttpError.SECURITY;
 import static org.mule.extension.http.api.error.HttpError.TRANSFORMATION;
+import static org.mule.extension.http.internal.HttpStreamingType.ALWAYS;
+import static org.mule.extension.http.internal.HttpStreamingType.AUTO;
+import static org.mule.extension.http.internal.HttpStreamingType.NEVER;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
@@ -20,6 +24,8 @@ import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.internal.HttpStreamingType;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
@@ -51,7 +57,13 @@ import org.slf4j.LoggerFactory;
 public class HttpRequestFactory {
 
   private static final Logger logger = LoggerFactory.getLogger(HttpRequestFactory.class);
-  public static final List<String> DEFAULT_EMPTY_BODY_METHODS = Lists.newArrayList("GET", "HEAD", "OPTIONS");
+  private static final List<String> DEFAULT_EMPTY_BODY_METHODS = Lists.newArrayList("GET", "HEAD", "OPTIONS");
+  private static final String BOTH_TRANSFER_HEADERS_SET_MESSAGE =
+      "Cannot send both Transfer-Encoding and Content-Length headers. Transfer-Encoding will not be sent.";
+  private static final String TRANSFER_ENCODING_NOT_ALLOWED_WHEN_NEVER_MESSAGE =
+      "Transfer-Encoding header will not be sent, as the configured requestStreamingMode is NEVER.";
+  private static final String INVALID_TRANSFER_ENCODING_HEADER_MESSAGE =
+      "Transfer-Encoding header value was invalid and will not be sent.";
 
   private final String uri;
   private final String method;
@@ -112,7 +124,7 @@ public class HttpRequestFactory {
     }
 
     try {
-      builder.entity(createRequestEntity(builder, this.method, requestBuilder.getBody().getValue()));
+      builder.entity(createRequestEntity(builder, this.method, requestBuilder.getBody()));
     } catch (Exception e) {
       throw new ModuleException(TRANSFORMATION, e);
     }
@@ -128,13 +140,52 @@ public class HttpRequestFactory {
     return builder.build();
   }
 
-  private HttpEntity createRequestEntity(HttpRequestBuilder requestBuilder, String resolvedMethod, Object body) {
+  private HttpEntity createRequestEntity(HttpRequestBuilder requestBuilder, String resolvedMethod, TypedValue<?> body) {
     HttpEntity entity;
 
-    if (isEmptyBody(body, resolvedMethod)) {
+    Object payload = body.getValue();
+    Optional<Long> length = body.getLength();
+    Optional<String> transferEncoding = requestBuilder.getHeaderValue(TRANSFER_ENCODING);
+    Optional<String> contentLength = requestBuilder.getHeaderValue(CONTENT_LENGTH);
+
+    if (isEmptyBody(payload, resolvedMethod)) {
       entity = new EmptyHttpEntity();
+    } else if (payload instanceof InputStream || payload instanceof CursorStreamProvider) {
+      payload = payload instanceof CursorStreamProvider ? ((CursorStreamProvider) payload).openCursor() : payload;
+      if (streamingMode == ALWAYS) {
+        entity = guaranteeStreaming(requestBuilder, transferEncoding, contentLength, (InputStream) payload);
+      } else if (streamingMode == AUTO) {
+        if (contentLength.isPresent()) {
+          sanitizeForContentLength(requestBuilder, transferEncoding, BOTH_TRANSFER_HEADERS_SET_MESSAGE);
+          entity = new ByteArrayHttpEntity(getPayloadAsBytes(payload));
+        } else if ((transferEncoding.isPresent() && CHUNKED.equalsIgnoreCase(transferEncoding.get())) || !length.isPresent()) {
+          entity = new InputStreamHttpEntity((InputStream) payload);
+        } else {
+          sanitizeForContentLength(requestBuilder, transferEncoding, INVALID_TRANSFER_ENCODING_HEADER_MESSAGE);
+          entity = avoidConsumingPayload(requestBuilder, (InputStream) payload, length);
+        }
+      } else {
+        sanitizeForContentLength(requestBuilder, transferEncoding, TRANSFER_ENCODING_NOT_ALLOWED_WHEN_NEVER_MESSAGE);
+        if (length.isPresent()) {
+          entity = avoidConsumingPayload(requestBuilder, (InputStream) payload, length);
+        } else {
+          entity = new ByteArrayHttpEntity(getPayloadAsBytes(payload));
+        }
+      }
     } else {
-      entity = createRequestEntityFromPayload(requestBuilder, body);
+      byte[] payloadAsBytes = getPayloadAsBytes(payload);
+      if (streamingMode == ALWAYS) {
+        entity = guaranteeStreaming(requestBuilder, transferEncoding, contentLength, new ByteArrayInputStream(payloadAsBytes));
+      } else if (streamingMode == NEVER) {
+        sanitizeForContentLength(requestBuilder, transferEncoding, TRANSFER_ENCODING_NOT_ALLOWED_WHEN_NEVER_MESSAGE);
+        entity = new ByteArrayHttpEntity(payloadAsBytes);
+      } else {
+        // AUTO is defined so we'll let the headers define the transfer type
+        if (contentLength.isPresent() && transferEncoding.isPresent()) {
+          sanitizeForContentLength(requestBuilder, transferEncoding, BOTH_TRANSFER_HEADERS_SET_MESSAGE);
+        }
+        entity = new InputStreamHttpEntity(new ByteArrayInputStream(payloadAsBytes), (long) payloadAsBytes.length);
+      }
     }
 
     return entity;
@@ -143,7 +194,6 @@ public class HttpRequestFactory {
   private boolean isEmptyBody(Object body, String method) {
     boolean emptyBody;
 
-    // TODO MULE-9986 Use multi-part payload
     if (body == null) {
       emptyBody = true;
     } else {
@@ -157,74 +207,55 @@ public class HttpRequestFactory {
     return emptyBody;
   }
 
-  private HttpEntity createRequestEntityFromPayload(HttpRequestBuilder requestBuilder, Object payload) {
-
-    if (doStreaming(requestBuilder, payload)) {
-
-      if (payload instanceof InputStream) {
-        return new InputStreamHttpEntity((InputStream) payload);
-      } else {
-        return new InputStreamHttpEntity(new ByteArrayInputStream(getMessageAsBytes(payload)));
-      }
-
-    } else {
-      return new ByteArrayHttpEntity(getMessageAsBytes(payload));
-    }
+  /**
+   * Generates an {@link InputStreamHttpEntity} with no length and sanitizes the headers for chunking
+   */
+  private HttpEntity guaranteeStreaming(HttpRequestBuilder requestBuilder, Optional<String> transferEncoding,
+                                        Optional<String> contentLength, InputStream stream) {
+    sanitizeForStreaming(requestBuilder, transferEncoding, contentLength);
+    return new InputStreamHttpEntity(stream);
   }
 
-  private byte[] getMessageAsBytes(Object payload) {
+  /**
+   * Generates an {@link InputStreamHttpEntity} with a length and sets the Content-Length header with it as well
+   */
+  private HttpEntity avoidConsumingPayload(HttpRequestBuilder requestBuilder, InputStream payload, Optional<Long> length) {
+    requestBuilder.addHeader(CONTENT_LENGTH, valueOf(length.get()));
+    return new InputStreamHttpEntity(payload, length.get());
+  }
+
+  private byte[] getPayloadAsBytes(Object payload) {
     return (byte[]) transformationService.transform(of(payload), BYTE_ARRAY).getPayload().getValue();
   }
 
-  private boolean doStreaming(HttpRequestBuilder requestBuilder, Object payload) {
-    Optional<String> transferEncodingHeader = requestBuilder.getHeaderValue(TRANSFER_ENCODING);
-    Optional<String> contentLengthHeader = requestBuilder.getHeaderValue(CONTENT_LENGTH);
+  private void sanitizeForStreaming(HttpRequestBuilder requestBuilder, Optional<String> transferEncodingHeader,
+                                    Optional<String> contentLengthHeader) {
+    if (contentLengthHeader != null) {
+      requestBuilder.removeHeader(CONTENT_LENGTH);
 
-    if (streamingMode == HttpStreamingType.AUTO) {
-      if (contentLengthHeader.isPresent()) {
-        if (transferEncodingHeader.isPresent()) {
-          requestBuilder.removeHeader(TRANSFER_ENCODING);
+      if (logger.isDebugEnabled()) {
+        logger.debug("Content-Length header will not be sent, as the configured requestStreamingMode is ALWAYS.");
+      }
+    }
 
-          if (logger.isDebugEnabled()) {
-            logger.debug("Cannot send both Transfer-Encoding and Content-Length headers. Transfer-Encoding will not be sent.");
-          }
-        }
-        return false;
+    if (transferEncodingHeader.isPresent() && !transferEncodingHeader.get().equalsIgnoreCase(CHUNKED)) {
+      requestBuilder.removeHeader(TRANSFER_ENCODING);
+
+      if (logger.isDebugEnabled()) {
+        logger.debug("Transfer-Encoding header will be sent with value 'chunked' instead of {}, as the configured "
+            + "requestStreamingMode is ALWAYS", transferEncodingHeader);
       }
 
-      if (!transferEncodingHeader.isPresent() || !transferEncodingHeader.get().equalsIgnoreCase(CHUNKED)) {
-        return payload instanceof InputStream;
-      } else {
-        return true;
+    }
+  }
+
+  private void sanitizeForContentLength(HttpRequestBuilder requestBuilder, Optional<String> transferEncoding, String reason) {
+    if (transferEncoding.isPresent()) {
+      requestBuilder.removeHeader(TRANSFER_ENCODING);
+
+      if (logger.isDebugEnabled()) {
+        logger.debug(reason);
       }
-    } else if (streamingMode == HttpStreamingType.ALWAYS) {
-      if (contentLengthHeader != null) {
-        requestBuilder.removeHeader(CONTENT_LENGTH);
-
-        if (logger.isDebugEnabled()) {
-          logger.debug("Content-Length header will not be sent, as the configured requestStreamingMode is ALWAYS");
-        }
-      }
-
-      if (transferEncodingHeader.isPresent() && !transferEncodingHeader.get().equalsIgnoreCase(CHUNKED)) {
-        requestBuilder.removeHeader(TRANSFER_ENCODING);
-
-        if (logger.isDebugEnabled()) {
-          logger.debug("Transfer-Encoding header will be sent with value 'chunked' instead of {}, as the configured "
-              + "requestStreamingMode is NEVER", transferEncodingHeader);
-        }
-
-      }
-      return true;
-    } else {
-      if (transferEncodingHeader != null) {
-        requestBuilder.removeHeader(TRANSFER_ENCODING);
-
-        if (logger.isDebugEnabled()) {
-          logger.debug("Transfer-Encoding header will not be sent, as the configured requestStreamingMode is NEVER");
-        }
-      }
-      return false;
     }
   }
 }

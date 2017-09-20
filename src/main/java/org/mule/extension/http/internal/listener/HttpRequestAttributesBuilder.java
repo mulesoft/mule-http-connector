@@ -10,7 +10,6 @@ import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.decodeQuer
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.decodeUriParams;
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.extractPath;
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.extractQueryParams;
-
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
@@ -19,6 +18,7 @@ import org.mule.runtime.http.api.domain.request.HttpRequestContext;
 
 import java.security.cert.Certificate;
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * Creates {@link HttpRequestAttributes} based on an {@link HttpRequestContext}, it's parts and a {@link ListenerPath}.
@@ -48,7 +48,7 @@ public class HttpRequestAttributesBuilder {
     String path = extractPath(uri);
     String queryString = extractQueryParams(uri);
     MultiMap<String, String> queryParams = decodeQueryString(queryString);
-    MultiMap<String, String> uriParams = decodeUriParams(listenerPath, path);
+    Map<String, String> uriParams = decodeUriParams(listenerPath, path);
     ClientConnection clientConnection = requestContext.getClientConnection();
     String remoteHostAddress = clientConnection.getRemoteHostAddress().toString();
     Certificate clientCertificate = clientConnection.getClientCertificate();

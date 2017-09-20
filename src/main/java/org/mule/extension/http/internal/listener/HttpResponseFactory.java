@@ -89,6 +89,7 @@ public class HttpResponseFactory {
 
     final String existingTransferEncoding = httpResponseHeaderBuilder.getTransferEncoding();
     final String existingContentLength = httpResponseHeaderBuilder.getContentLength();
+    final boolean hasLength = body.getLength().isPresent();
 
     HttpEntity httpEntity;
     Object payload = body.getValue();
@@ -98,15 +99,26 @@ public class HttpResponseFactory {
       httpEntity = new EmptyHttpEntity();
     } else if (payload instanceof CursorStreamProvider || payload instanceof InputStream) {
       payload = payload instanceof CursorStreamProvider ? ((CursorStreamProvider) payload).openCursor() : payload;
-      if (responseStreaming == ALWAYS || (responseStreaming == AUTO && existingContentLength == null)) {
-        if (supportsTransferEncoding) {
-          setupChunkedEncoding(httpResponseHeaderBuilder);
+      if (responseStreaming == ALWAYS) {
+        httpEntity = guaranteeStreamingIfPossible(supportsTransferEncoding, httpResponseHeaderBuilder, payload);
+      } else if (responseStreaming == AUTO) {
+        if (existingContentLength != null) {
+          // We can't guarantee the length is right, but we know that was desired
+          httpEntity = consumePayload(httpResponseHeaderBuilder, payload);
+        } else if (CHUNKED.equals(existingTransferEncoding) || !hasLength) {
+          // Either chunking was explicit or we have no choice
+          httpEntity = guaranteeStreamingIfPossible(supportsTransferEncoding, httpResponseHeaderBuilder, payload);
+        } else {
+          // No explicit desire but we have a length to take advantage of
+          httpEntity = avoidConsumingPayload(httpResponseHeaderBuilder, payload, body.getLength().get());
         }
-        httpEntity = new InputStreamHttpEntity((InputStream) payload);
       } else {
-        ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(IOUtils.toByteArray(((InputStream) payload)));
-        setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getBytes().length);
-        httpEntity = byteArrayHttpEntity;
+        // NEVER was selected but we could take advantage of the length
+        if (hasLength) {
+          httpEntity = avoidConsumingPayload(httpResponseHeaderBuilder, payload, body.getLength().get());
+        } else {
+          httpEntity = consumePayload(httpResponseHeaderBuilder, payload);
+        }
       }
     } else {
       ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(getMessageAsBytes(payload));
@@ -173,6 +185,33 @@ public class HttpResponseFactory {
     return reasonPhrase;
   }
 
+  /**
+   * Generates an {@link InputStreamHttpEntity} without length and makes chunking explicit if supported
+   */
+  private HttpEntity guaranteeStreamingIfPossible(boolean possible, HttpResponseHeaderBuilder headerBuilder, Object stream) {
+    if (possible) {
+      setupChunkedEncoding(headerBuilder);
+    }
+    return new InputStreamHttpEntity((InputStream) stream);
+  }
+
+  /**
+   * Generates an {@link InputStreamHttpEntity} with the body's length and the content length explicit with it
+   */
+  private HttpEntity avoidConsumingPayload(HttpResponseHeaderBuilder httpResponseHeaderBuilder, Object payload, Long length) {
+    setupContentLengthEncoding(httpResponseHeaderBuilder, length);
+    return new InputStreamHttpEntity((InputStream) payload, length);
+  }
+
+  /**
+   * Generates a {@link ByteArrayHttpEntity} and makes the content length explicit with it
+   */
+  private HttpEntity consumePayload(HttpResponseHeaderBuilder httpResponseHeaderBuilder, Object stream) {
+    ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(IOUtils.toByteArray((InputStream) stream));
+    setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getBytes().length);
+    return byteArrayHttpEntity;
+  }
+
   private void resolveEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder, String existingTransferEncoding,
                                String existingContentLength, boolean supportsTransferEncoding,
                                ByteArrayHttpEntity byteArrayHttpEntity) {
@@ -187,7 +226,7 @@ public class HttpResponseFactory {
     }
   }
 
-  private void setupContentLengthEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder, int contentLength) {
+  private void setupContentLengthEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder, long contentLength) {
     if (httpResponseHeaderBuilder.getTransferEncoding() != null) {
       logger.debug("Content-Length encoding is being used so the 'Transfer-Encoding' header has been removed");
       httpResponseHeaderBuilder.removeHeader(TRANSFER_ENCODING);
