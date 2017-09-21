@@ -49,7 +49,7 @@ public class HttpListenerMultipleValueHeadersTestCase extends AbstractHttpTestCa
   @Override
   protected void doSetUp() throws Exception {
     super.doSetUp();
-    queueHandler = new TestConnectorQueueHandler(muleContext);
+    queueHandler = new TestConnectorQueueHandler(registry);
   }
 
   @Override
