@@ -38,7 +38,7 @@
                                 },
                             "Content-Type" : payload.^mimeType
                             },
-                        content : payload as Binary
+                        content : payload
                         }
                     }
                 }]
