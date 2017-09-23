@@ -21,4 +21,9 @@ public class HttpRequesterTlsRestrictedProtocolsAndCiphersTestCase
   protected String getConfigFile() {
     return "http-request-restricted-protocols-ciphers-config.xml";
   }
+
+  @Override
+  protected boolean doTestClassInjection() {
+    return true;
+  }
 }
