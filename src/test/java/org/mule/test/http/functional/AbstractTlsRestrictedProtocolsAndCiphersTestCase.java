@@ -39,6 +39,11 @@ public abstract class AbstractTlsRestrictedProtocolsAndCiphersTestCase extends E
   private HttpService httpService = new HttpServiceImplementation(schedulerService);
 
   @Override
+  protected boolean doTestClassInjection() {
+    return true;
+  }
+
+  @Override
   protected Map<String, Object> getStartUpRegistryObjects() {
     return singletonMap(httpService.getName(), httpService);
   }

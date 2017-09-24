@@ -6,10 +6,12 @@
  */
 package org.mule.test.http.functional.requester;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.STREAMING;
 
 import org.junit.Test;
+
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 
@@ -24,7 +26,8 @@ public class HttpRequestResponseStreamingTestCase extends AbstractHttpRequestRes
 
   @Test
   public void executionIsExpeditedWhenStreaming() throws Exception {
-    flowRunner("client").dispatchAsync();
+    flowRunner("client").dispatchAsync(muleContext.getSchedulerService()
+        .ioScheduler(muleContext.getSchedulerBaseConfig().withShutdownTimeout(0, SECONDS)));
     pollingProber.check(processorExecuted);
     latch.release();
   }
