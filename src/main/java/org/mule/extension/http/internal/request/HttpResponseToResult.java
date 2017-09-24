@@ -9,7 +9,7 @@ package org.mule.extension.http.internal.request;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
 import static java.nio.charset.Charset.defaultCharset;
-import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.api.metadata.MediaType.BINARY;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
@@ -19,7 +19,6 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.SET_COOKIE2;
 import static reactor.core.publisher.Mono.just;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.internal.request.builder.HttpResponseAttributesBuilder;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -48,7 +47,6 @@ import org.slf4j.LoggerFactory;
 public class HttpResponseToResult {
 
   private static final Logger logger = LoggerFactory.getLogger(HttpResponseToResult.class);
-  private static final String MULTI_PART_PREFIX = "multipart/";
 
   private final HttpRequesterCookieConfig config;
   private final MuleContext muleContext;
@@ -58,15 +56,16 @@ public class HttpResponseToResult {
     this.muleContext = muleContext;
   }
 
-  public Publisher<Result<InputStream, HttpResponseAttributes>> convert(MediaType mediaType, HttpResponse response, String uri) {
+  public Publisher<Result<InputStream, HttpResponseAttributes>> convert(HttpResponse response, String uri) {
     String responseContentType = response.getHeaderValueIgnoreCase(CONTENT_TYPE);
-    if (isEmpty(responseContentType) && !ANY.matches(mediaType)) {
-      responseContentType = mediaType.toRfcString();
-    }
-    MediaType responseMediaType = getMediaType(responseContentType, getDefaultEncoding(muleContext));
 
     HttpEntity entity = response.getEntity();
-    Charset encoding = responseMediaType.getCharset().get();
+
+    if (isEmpty(responseContentType) && notEmpty(entity)) {
+      // RFC-2616 specifies application/octet-stream as default when none is received
+      responseContentType = BINARY.toRfcString();
+    }
+    MediaType responseMediaType = getMediaType(responseContentType, getDefaultEncoding(muleContext));
 
     if (config.isEnableCookies()) {
       processCookies(response, uri);
@@ -74,19 +73,17 @@ public class HttpResponseToResult {
 
     HttpResponseAttributes responseAttributes = createAttributes(response);
 
-    mediaType = DataType.builder().mediaType(mediaType).charset(encoding).build().getMediaType();
-
     final Result.Builder<InputStream, HttpResponseAttributes> builder = Result.builder();
-    if (isEmpty(responseContentType)) {
-      builder.mediaType(mediaType);
-    } else {
-      builder.mediaType(responseMediaType);
-    }
+    builder.mediaType(responseMediaType);
     if (entity.getLength().isPresent()) {
       builder.length(entity.getLength().get());
     }
 
     return just(builder.output(entity.getContent()).attributes(responseAttributes).build());
+  }
+
+  private boolean notEmpty(HttpEntity entity) {
+    return entity.getLength().map(length -> length > 0).orElse(true);
   }
 
   private HttpResponseAttributes createAttributes(HttpResponse response) {

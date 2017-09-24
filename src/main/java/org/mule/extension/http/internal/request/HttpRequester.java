@@ -25,7 +25,6 @@ import org.mule.extension.http.internal.HttpStreamingType;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
@@ -91,8 +90,7 @@ public class HttpRequester {
                       (response, exception) -> {
                         if (response != null) {
                           HttpResponseToResult httpResponseToResult = new HttpResponseToResult(config, muleContext);
-                          MediaType mediaType = requestBuilder.getBody().getDataType().getMediaType();
-                          from(httpResponseToResult.convert(mediaType, response, httpRequest.getUri()))
+                          from(httpResponseToResult.convert(response, httpRequest.getUri()))
                               .doOnNext(result -> {
                                 // TODO: MULE-10340 - Add notifications to HTTP request
                                 // notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct, MESSAGE_REQUEST_END);

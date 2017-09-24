@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PR
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.CONTENT;
 
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -25,6 +26,7 @@ import org.mule.test.http.functional.AbstractHttpTestCase;
 
 import java.io.IOException;
 
+import io.qameta.allure.Story;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.fluent.Request;
@@ -34,6 +36,7 @@ import org.junit.Test;
 import io.qameta.allure.Feature;
 
 @Feature(HTTP_EXTENSION)
+@Story(CONTENT)
 public class HttpListenerContentTypeTestCase extends AbstractHttpTestCase {
 
   private static final String EXPECTED_CONTENT_TYPE = "application/json; charset=UTF-8";

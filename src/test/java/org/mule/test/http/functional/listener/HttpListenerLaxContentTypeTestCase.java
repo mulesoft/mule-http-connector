@@ -14,6 +14,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.CONTENT;
 
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -21,6 +22,7 @@ import org.mule.test.http.functional.AbstractHttpTestCase;
 
 import java.io.IOException;
 
+import io.qameta.allure.Story;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -30,6 +32,7 @@ import org.junit.Test;
 import io.qameta.allure.Feature;
 
 @Feature(HTTP_EXTENSION)
+@Story(CONTENT)
 public class HttpListenerLaxContentTypeTestCase extends AbstractHttpTestCase {
 
   @Rule
