@@ -14,7 +14,7 @@ import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;
@@ -89,7 +89,7 @@ public class HttpRequestProxyTlsTestCase extends AbstractHttpTestCase {
 
     proxyServer.start();
 
-    BaseEvent event = flowRunner("clientFlow").withPayload(TEST_MESSAGE).withVariable("host", requestHost)
+    CoreEvent event = flowRunner("clientFlow").withPayload(TEST_MESSAGE).withVariable("host", requestHost)
         .withVariable("path", PATH).run();
 
     assertThat(requestPayload, equalTo(TEST_MESSAGE));

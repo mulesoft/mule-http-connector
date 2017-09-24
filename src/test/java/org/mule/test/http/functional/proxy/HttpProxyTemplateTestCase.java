@@ -31,7 +31,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.MultiMap;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.api.util.concurrent.Latch;
@@ -396,7 +396,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
   private static class ProxyProcessor implements Processor {
 
     @Override
-    public BaseEvent process(BaseEvent event) throws MuleException {
+    public CoreEvent process(CoreEvent event) throws MuleException {
       HttpAttributes attributes = (HttpAttributes) event.getMessage().getAttributes().getValue();
       MultiMap<String, String> headers = new MultiMap<>(attributes.getHeaders());
 
@@ -423,10 +423,10 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
                                       attributesFromRequest.getClientCertificate());
       }
 
-      return BaseEvent.builder(event).message(getBuilder(event).attributesValue(attributesToSend).build()).build();
+      return CoreEvent.builder(event).message(getBuilder(event).attributesValue(attributesToSend).build()).build();
     }
 
-    protected Message.Builder getBuilder(BaseEvent event) {
+    protected Message.Builder getBuilder(CoreEvent event) {
       return Message.builder(event.getMessage());
     }
   }
@@ -438,7 +438,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
   private static class ProxyPolicyProcessor extends ProxyProcessor {
 
     @Override
-    protected Message.Builder getBuilder(BaseEvent event) {
+    protected Message.Builder getBuilder(CoreEvent event) {
       return policy.apply(super.getBuilder(event));
     }
   }

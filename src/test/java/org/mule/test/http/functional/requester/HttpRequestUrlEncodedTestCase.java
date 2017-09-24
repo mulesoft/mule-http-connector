@@ -15,7 +15,7 @@ import static org.mule.runtime.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FOR
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.URL_ENCODED;
 
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.http.api.HttpHeaders;
 
 import java.io.IOException;
@@ -49,7 +49,7 @@ public class HttpRequestUrlEncodedTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void receivesUrlEncodedBody() throws Exception {
-    BaseEvent event = flowRunner("formParamInbound").withPayload(TEST_MESSAGE).run();
+    CoreEvent event = flowRunner("formParamInbound").withPayload(TEST_MESSAGE).run();
 
     assertThat(event.getMessage(), hasPayload(equalTo("testValue1testValue2")));
   }

@@ -10,7 +10,7 @@ import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.http.api.HttpHeaders;
 import org.mule.test.runner.RunnerDelegateTo;
 
@@ -63,7 +63,7 @@ public class HttpRequestEncodingTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void testEncoding() throws Exception {
-    BaseEvent result = flowRunner("encodingTest").withPayload(TEST_MESSAGE).run();
+    CoreEvent result = flowRunner("encodingTest").withPayload(TEST_MESSAGE).run();
     assertThat(getPayloadAsString(result.getMessage()), is(testMessage));
   }
 

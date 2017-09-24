@@ -13,7 +13,7 @@ import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;
@@ -70,7 +70,7 @@ public class HttpListenerMethodRoutingTestCase extends AbstractHttpTestCase {
   }
 
   private void sendRequestAndAssertMethod(String payload) throws Exception {
-    BaseEvent event = flowRunner("requestFlow").withPayload(payload).withVariable("method", method).run();
+    CoreEvent event = flowRunner("requestFlow").withPayload(payload).withVariable("method", method).run();
 
     HttpResponseAttributes attributes = (HttpResponseAttributes) event.getMessage().getAttributes().getValue();
     assertThat(attributes.getStatusCode(), is(OK.getStatusCode()));

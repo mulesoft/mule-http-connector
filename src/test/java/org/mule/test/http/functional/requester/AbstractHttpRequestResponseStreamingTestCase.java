@@ -9,7 +9,7 @@ package org.mule.test.http.functional.requester;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.message.Message.of;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -73,7 +73,7 @@ public abstract class AbstractHttpRequestResponseStreamingTestCase extends Abstr
 
 
     @Override
-    public BaseEvent process(BaseEvent event) throws MuleException {
+    public CoreEvent process(CoreEvent event) throws MuleException {
       executed.set(true);
       return event;
     }
@@ -85,7 +85,7 @@ public abstract class AbstractHttpRequestResponseStreamingTestCase extends Abstr
     private static final int LISTENER_BUFFER = 8 * 1024;
 
     @Override
-    public BaseEvent process(BaseEvent event) throws MuleException {
+    public CoreEvent process(CoreEvent event) throws MuleException {
       InputStream inputStream = new InputStream() {
 
         private int sent = 0;
@@ -105,7 +105,7 @@ public abstract class AbstractHttpRequestResponseStreamingTestCase extends Abstr
           }
         }
       };
-      return BaseEvent.builder(event).message(of(inputStream)).build();
+      return CoreEvent.builder(event).message(of(inputStream)).build();
     }
 
   }

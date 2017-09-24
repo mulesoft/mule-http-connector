@@ -17,7 +17,7 @@ import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.error.HttpRequestFailedException;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.requester.AbstractHttpRequestTestCase;
 
@@ -40,21 +40,21 @@ public class HttpProxyParamsTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void proxyWithNonProxyHostsParam() throws Exception {
-    final BaseEvent event = runFlow("nonProxyParamProxy");
+    final CoreEvent event = runFlow("nonProxyParamProxy");
     assertThat(((HttpResponseAttributes) event.getMessage().getAttributes().getValue()).getStatusCode(), is(OK.getStatusCode()));
     assertThat(event.getMessage(), hasPayload(equalTo((DEFAULT_RESPONSE))));
   }
 
   @Test
   public void innerProxyWithNonProxyHostsParam() throws Exception {
-    final BaseEvent event = runFlow("innerNonProxyParamProxy");
+    final CoreEvent event = runFlow("innerNonProxyParamProxy");
     assertThat(((HttpResponseAttributes) event.getMessage().getAttributes().getValue()).getStatusCode(), is(OK.getStatusCode()));
     assertThat(event.getMessage(), hasPayload(equalTo((DEFAULT_RESPONSE))));
   }
 
   @Test
   public void proxyWithMultipleHostsNonProxyHostsParam() throws Exception {
-    final BaseEvent event = runFlow("innerNonProxyParamProxyMultipleHosts");
+    final CoreEvent event = runFlow("innerNonProxyParamProxyMultipleHosts");
     assertThat(((HttpResponseAttributes) event.getMessage().getAttributes().getValue()).getStatusCode(), is(OK.getStatusCode()));
     assertThat(event.getMessage(), hasPayload(equalTo((DEFAULT_RESPONSE))));
   }
@@ -77,7 +77,7 @@ public class HttpProxyParamsTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void noProxy() throws Exception {
-    final BaseEvent event = runFlow("noProxy");
+    final CoreEvent event = runFlow("noProxy");
     assertThat(((HttpResponseAttributes) event.getMessage().getAttributes().getValue()).getStatusCode(), is(OK.getStatusCode()));
     assertThat(event.getMessage(), hasPayload(equalTo((DEFAULT_RESPONSE))));
   }

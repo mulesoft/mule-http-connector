@@ -13,7 +13,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import org.mule.functional.junit4.rules.ExpectedError;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
@@ -46,7 +46,7 @@ public class HttpListenerTlsInsecureTestCase extends AbstractHttpTestCase {
 
   @Test
   public void acceptsInvalidCertificateIfInsecure() throws Exception {
-    final BaseEvent res = flowRunner("testRequestToInsecure")
+    final CoreEvent res = flowRunner("testRequestToInsecure")
         .withPayload(TEST_PAYLOAD)
         .withVariable("port", port1.getNumber())
         .run();

@@ -17,7 +17,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_DISABLE_RESPONSE_TIMEOUT;
 
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 
 public class HttpListenerDisableTimeoutsConfigTestCase extends AbstractHttpTestCase {
 
@@ -34,7 +34,7 @@ public class HttpListenerDisableTimeoutsConfigTestCase extends AbstractHttpTestC
 
   @Test
   public void httpListenerDefaultResponseTimeout() throws Exception {
-    final BaseEvent res = flowRunner("httpFlowWithDefaultResponseTimeout")
+    final CoreEvent res = flowRunner("httpFlowWithDefaultResponseTimeout")
         .withVariable("port", port.getNumber())
         .withPayload("hi")
         .run();
@@ -44,7 +44,7 @@ public class HttpListenerDisableTimeoutsConfigTestCase extends AbstractHttpTestC
 
   @Test
   public void httpListenerCustomResponseTimeout() throws Exception {
-    final BaseEvent res = flowRunner("httpFlowWithCustomResponseTimeout")
+    final CoreEvent res = flowRunner("httpFlowWithCustomResponseTimeout")
         .withVariable("port", port.getNumber())
         .withPayload("hi")
         .run();
