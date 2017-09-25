@@ -14,7 +14,7 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CLOSE;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;
@@ -45,7 +45,7 @@ public class HttpRequestTlsConnectionCloseTestCase extends AbstractHttpRequestTe
 
   @Test
   public void handlesRequest() throws Exception {
-    BaseEvent response = flowRunner("testFlowHttps").withPayload(AbstractMuleTestCase.TEST_PAYLOAD).run();
+    CoreEvent response = flowRunner("testFlowHttps").withPayload(AbstractMuleTestCase.TEST_PAYLOAD).run();
     assertThat(response.getMessage(), hasPayload(equalTo((DEFAULT_RESPONSE))));
   }
 }

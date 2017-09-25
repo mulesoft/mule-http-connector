@@ -10,7 +10,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -38,7 +38,7 @@ public class HttpRequestRecipientListTestCase extends AbstractHttpTestCase {
 
   @Test
   public void recipientListWithHttpUrlsWithResponse() throws Exception {
-    final BaseEvent response = flowRunner("recipientListFlow").withPayload(TEST_MESSAGE)
+    final CoreEvent response = flowRunner("recipientListFlow").withPayload(TEST_MESSAGE)
         .withInboundProperty("urls", new String[] {getUrlForPort(port1), getUrlForPort(port2), getUrlForPort(port3)}).run();
 
     assertThat(response, notNullValue());

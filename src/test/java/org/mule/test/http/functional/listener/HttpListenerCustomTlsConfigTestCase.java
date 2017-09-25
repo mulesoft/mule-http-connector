@@ -11,7 +11,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.HTTPS;
 
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -40,7 +40,7 @@ public class HttpListenerCustomTlsConfigTestCase extends AbstractHttpTestCase {
 
   @Test
   public void customTlsGlobalContext() throws Exception {
-    final BaseEvent res = flowRunner("testFlowGlobalContextClient")
+    final CoreEvent res = flowRunner("testFlowGlobalContextClient")
         .withVariable("port", port1.getNumber())
         .withPayload("data")
         .run();
@@ -49,7 +49,7 @@ public class HttpListenerCustomTlsConfigTestCase extends AbstractHttpTestCase {
 
   @Test
   public void customTlsNestedContext() throws Exception {
-    final BaseEvent res = flowRunner("testFlowNestedContextClient")
+    final CoreEvent res = flowRunner("testFlowNestedContextClient")
         .withVariable("port", port2.getNumber())
         .withPayload("data")
         .run();

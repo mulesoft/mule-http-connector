@@ -18,7 +18,7 @@ import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.event.BaseEvent;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -45,7 +45,7 @@ public class BasicHttpTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void sendsRequest() throws Exception {
-    BaseEvent response = flowRunner("client").withPayload("PEPE").run();
+    CoreEvent response = flowRunner("client").withPayload("PEPE").run();
     assertThat(response.getMessage().getPayload().getValue(), is(DEFAULT_RESPONSE));
     assertThat(method, is("GET"));
     assertThat(headers.get("X-Custom"), contains("custom-value"));
@@ -80,7 +80,7 @@ public class BasicHttpTestCase extends AbstractHttpRequestTestCase {
   protected static class RequestCheckerMessageProcessor implements Processor {
 
     @Override
-    public BaseEvent process(BaseEvent event) throws MuleException {
+    public CoreEvent process(CoreEvent event) throws MuleException {
       Message message = event.getMessage();
       Object payload = message.getPayload().getValue();
       assertThat(payload, is(notNullValue()));
