@@ -21,10 +21,10 @@
 
     <flow name="simpleMapping">
         <http:request config-ref="simpleConfig" path="testPath">
-            <error-mapping targetType="MY_REQUESTER"/>
+            <error-mapping targetType="APP:MY_REQUESTER"/>
         </http:request>
         <error-handler>
-            <on-error-continue type="MY_REQUESTER">
+            <on-error-continue type="APP:MY_REQUESTER">
                 <set-payload value="Could not connect."/>
             </on-error-continue>
             <on-error-continue>
@@ -35,11 +35,11 @@
 
     <flow name="complexMapping">
         <http:request config-ref="simpleConfig" path="testPath">
-            <error-mapping sourceType="CONNECTIVITY" targetType="MY_REQUESTER"/>
+            <error-mapping sourceType="CONNECTIVITY" targetType="APP:MY_REQUESTER"/>
             <http:headers>#[vars.headers]</http:headers>
         </http:request>
         <error-handler>
-            <on-error-continue type="MY_REQUESTER">
+            <on-error-continue type="APP:MY_REQUESTER">
                 <set-payload value="Could not connect."/>
             </on-error-continue>
             <on-error-continue>
@@ -50,15 +50,15 @@
 
     <flow name="multipleMappings">
         <http:request config-ref="simpleConfig" path="testPath">
-            <error-mapping sourceType="CONNECTIVITY" targetType="MY_REQUESTER"/>
-            <error-mapping sourceType="EXPRESSION" targetType="MY_OTHER_ERROR"/>
+            <error-mapping sourceType="CONNECTIVITY" targetType="APP:MY_REQUESTER"/>
+            <error-mapping sourceType="EXPRESSION" targetType="APP:MY_OTHER_ERROR"/>
             <http:headers>#[vars.headers]</http:headers>
         </http:request>
         <error-handler>
-            <on-error-continue type="MY_REQUESTER">
+            <on-error-continue type="APP:MY_REQUESTER">
                 <set-payload value="Could not connect."/>
             </on-error-continue>
-            <on-error-continue type="MY_OTHER_ERROR">
+            <on-error-continue type="APP:MY_OTHER_ERROR">
                 <set-payload value="Bad expression."/>
             </on-error-continue>
             <on-error-continue>
