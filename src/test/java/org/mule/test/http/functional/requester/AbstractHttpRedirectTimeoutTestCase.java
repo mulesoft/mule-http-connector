@@ -9,17 +9,20 @@ package org.mule.test.http.functional.requester;
 
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
+import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.TIMEOUT;
 
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import io.qameta.allure.Feature;
 import org.eclipse.jetty.server.Request;
 import org.junit.Rule;
 
 import org.mule.tck.junit4.rule.SystemProperty;
 
+@Feature(TIMEOUT)
 public abstract class AbstractHttpRedirectTimeoutTestCase extends AbstractHttpRequestTestCase {
 
   private String REDIRECT_URL = format("http://localhost:%s/%s", httpPort.getNumber(), "secondPath");
