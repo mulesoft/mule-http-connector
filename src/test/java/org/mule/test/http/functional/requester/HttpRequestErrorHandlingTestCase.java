@@ -132,7 +132,9 @@ public class HttpRequestErrorHandlingTestCase extends AbstractHttpRequestTestCas
   @Test
   public void connectivity() throws Exception {
     CoreEvent result = getFlowRunner("handled", unusedPort.getNumber()).run();
-    assertThat(result.getMessage(), hasPayload(equalTo(getErrorMessage(": Connection refused", unusedPort) + " connectivity")));
+    assertThat(result.getMessage(),
+               hasPayload(equalTo(getErrorMessage(": Connection refused: no further information", unusedPort)
+                   + " connectivity")));
   }
 
   private String getErrorMessage(String customMessage, DynamicPort port) {
