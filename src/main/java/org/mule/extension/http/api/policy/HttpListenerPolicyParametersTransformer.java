@@ -38,8 +38,9 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
 
   @Override
   public Message fromSuccessResponseParametersToMessage(Map<String, Object> parameters) {
-    HttpListenerResponseBuilder responseBuilder = (HttpListenerResponseBuilder) parameters.get("response");
-    return responseParametersToMessage(responseBuilder, 200);
+    HttpListenerResponseBuilder responseBuilder =
+        (HttpListenerResponseBuilder) parameters.get(ResponseType.SUCCESS.getResponseBuilderParameterName());
+    return responseParametersToMessage(responseBuilder, ResponseType.SUCCESS.getStatusCode());
   }
 
   private Message responseParametersToMessage(HttpListenerResponseBuilder responseBuilder, int defaultStatusCode) {
@@ -60,46 +61,82 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
 
   @Override
   public Message fromFailureResponseParametersToMessage(Map<String, Object> parameters) {
-    HttpListenerResponseBuilder responseBuilder = (HttpListenerResponseBuilder) parameters.get("errorResponse");
-    return responseParametersToMessage(responseBuilder, 500);
+    HttpListenerResponseBuilder responseBuilder =
+        (HttpListenerResponseBuilder) parameters.get(ResponseType.FAILURE.getResponseBuilderParameterName());
+    return responseParametersToMessage(responseBuilder, ResponseType.FAILURE.getStatusCode());
   }
 
   @Override
   public Map<String, Object> fromMessageToSuccessResponseParameters(Message message) {
-    return messageToResponseParameters(new HttpListenerSuccessResponseBuilder(), "response", message, 200);
+    return messageToResponseParameters(new HttpListenerSuccessResponseBuilder(), message,
+                                       ResponseType.SUCCESS);
   }
 
   @Override
   public Map<String, Object> fromMessageToErrorResponseParameters(Message message) {
-    return messageToResponseParameters(new HttpListenerErrorResponseBuilder(), "errorResponse", message, 500);
+    return messageToResponseParameters(new HttpListenerErrorResponseBuilder(), message,
+                                       ResponseType.FAILURE);
   }
 
   private Map<String, Object> messageToResponseParameters(HttpListenerResponseBuilder httpListenerResponseBuilder,
-                                                          String responseBuilderParameterName, Message message,
-                                                          int defaultStatusCode) {
+                                                          Message message,
+                                                          ResponseType responseType) {
     ImmutableMap.Builder<String, Object> mapBuilder =
-        ImmutableMap.<String, Object>builder().put(responseBuilderParameterName, httpListenerResponseBuilder);
+        ImmutableMap.<String, Object>builder().put(responseType.getResponseBuilderParameterName(), httpListenerResponseBuilder);
     if (message.getAttributes().getValue() instanceof HttpResponseAttributes) {
       HttpResponseAttributes httpResponseAttributes = (HttpResponseAttributes) message.getAttributes().getValue();
-      httpListenerResponseBuilder.setBody(message.getPayload());
+      if (ResponseType.SUCCESS.equals(responseType)) {
+        httpListenerResponseBuilder.setBody(message.getPayload());
+        httpListenerResponseBuilder.setStatusCode(httpResponseAttributes.getStatusCode() == 0 ? responseType.getStatusCode()
+            : httpResponseAttributes.getStatusCode());
+      } else {
+        httpListenerResponseBuilder.setStatusCode(responseType.getStatusCode());
+
+      }
       httpListenerResponseBuilder.setHeaders(httpResponseAttributes.getHeaders());
-      httpListenerResponseBuilder.setStatusCode(httpResponseAttributes.getStatusCode() == 0 ? defaultStatusCode
-          : httpResponseAttributes.getStatusCode());
       httpListenerResponseBuilder.setReasonPhrase(httpResponseAttributes.getReasonPhrase());
       return mapBuilder.build();
     } else if (message.getAttributes().getValue() instanceof HttpPolicyResponseAttributes) {
       HttpPolicyResponseAttributes httpResponseAttributes = (HttpPolicyResponseAttributes) message.getAttributes().getValue();
-      httpListenerResponseBuilder.setBody(message.getPayload());
+      if (ResponseType.SUCCESS.equals(responseType)) {
+        httpListenerResponseBuilder.setBody(message.getPayload());
+      }
       httpListenerResponseBuilder.setHeaders(httpResponseAttributes.getHeaders());
-      httpListenerResponseBuilder.setStatusCode(httpResponseAttributes.getStatusCode() == 0 ? defaultStatusCode
+      httpListenerResponseBuilder.setStatusCode(httpResponseAttributes.getStatusCode() == 0 ? responseType.getStatusCode()
           : httpResponseAttributes.getStatusCode());
       httpListenerResponseBuilder.setReasonPhrase(httpResponseAttributes.getReasonPhrase());
       return mapBuilder.build();
     } else {
-      httpListenerResponseBuilder.setStatusCode(defaultStatusCode);
-      httpListenerResponseBuilder.setBody(message.getPayload());
+      if (ResponseType.SUCCESS.equals(responseType)) {
+        httpListenerResponseBuilder.setBody(message.getPayload());
+        httpListenerResponseBuilder
+            .setStatusCode(httpListenerResponseBuilder.getStatusCode() == null ? responseType.getStatusCode()
+                : httpListenerResponseBuilder.getStatusCode());
+      } else {
+        httpListenerResponseBuilder.setStatusCode(responseType.getStatusCode());
+      }
       return mapBuilder.build();
     }
   }
+}
 
+
+enum ResponseType {
+  SUCCESS(200, "response"), FAILURE(500, "errorResponse");
+
+  private int statusCode;
+  private String responseBuilderParameterName;
+
+  ResponseType(int statusCode, String responseBuilderParameterName) {
+    this.statusCode = statusCode;
+    this.responseBuilderParameterName = responseBuilderParameterName;
+  }
+
+  public int getStatusCode() {
+    return statusCode;
+  }
+
+  public String getResponseBuilderParameterName() {
+    return responseBuilderParameterName;
+  }
 }
