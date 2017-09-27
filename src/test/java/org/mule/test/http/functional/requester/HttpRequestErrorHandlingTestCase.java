@@ -30,6 +30,7 @@ import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.ERROR_HAN
 
 import io.qameta.allure.Stories;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.functional.junit4.rules.ExpectedError;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -131,10 +132,17 @@ public class HttpRequestErrorHandlingTestCase extends AbstractHttpRequestTestCas
 
   @Test
   public void connectivity() throws Exception {
+
+    String customMessage = ": Connection refused";
+    if (SystemUtils.IS_OS_WINDOWS) {
+      customMessage = ": Connection refused: no further information";
+    }
+
     CoreEvent result = getFlowRunner("handled", unusedPort.getNumber()).run();
     assertThat(result.getMessage(),
-               hasPayload(equalTo(getErrorMessage(": Connection refused: no further information", unusedPort)
+               hasPayload(equalTo(getErrorMessage(customMessage, unusedPort)
                    + " connectivity")));
+
   }
 
   private String getErrorMessage(String customMessage, DynamicPort port) {
