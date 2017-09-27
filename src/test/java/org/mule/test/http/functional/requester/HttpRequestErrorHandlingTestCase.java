@@ -135,7 +135,7 @@ public class HttpRequestErrorHandlingTestCase extends AbstractHttpRequestTestCas
 
     String customMessage = ": Connection refused";
     if (SystemUtils.IS_OS_WINDOWS) {
-      customMessage = ": Connection refused: no further information";
+      customMessage = customMessage.concat(": no further information");
     }
 
     CoreEvent result = getFlowRunner("handled", unusedPort.getNumber()).run();
