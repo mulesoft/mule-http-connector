@@ -13,6 +13,7 @@ import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
+import org.mule.functional.api.component.TestConnectorQueueHandler;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -40,6 +41,7 @@ public class HttpListenerMethodRoutingTestCase extends AbstractHttpTestCase {
 
   private final String method;
   private final String expectedContent;
+  private TestConnectorQueueHandler queueHandler;
 
   @Parameterized.Parameters
   public static Collection<Object[]> data() {
@@ -53,6 +55,12 @@ public class HttpListenerMethodRoutingTestCase extends AbstractHttpTestCase {
   }
 
   @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+    queueHandler = new TestConnectorQueueHandler(registry);
+  }
+
+  @Override
   protected String getConfigFile() {
     return "http-listener-method-routing-config.xml";
   }
@@ -60,7 +68,7 @@ public class HttpListenerMethodRoutingTestCase extends AbstractHttpTestCase {
   @Test
   public void callWithMethod() throws Exception {
     sendRequestAndAssertMethod(TEST_MESSAGE);
-    assertThat(getPayloadAsString(muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get()),
+    assertThat(getPayloadAsString(queueHandler.read("out", RECEIVE_TIMEOUT).getMessage()),
                equalTo(TEST_MESSAGE));
   }
 

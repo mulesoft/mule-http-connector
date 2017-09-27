@@ -19,6 +19,7 @@ import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.MULTI_MAP;
 import org.mule.extension.http.api.HttpRequestAttributes;
+import org.mule.functional.api.component.TestConnectorQueueHandler;
 import org.mule.runtime.api.message.Message;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
@@ -43,6 +44,13 @@ public class HttpListenerMultipleValueHeadersTestCase extends AbstractHttpTestCa
   public DynamicPort port = new DynamicPort("port");
 
   private static final String HEADER = "multipleheader";
+  private TestConnectorQueueHandler queueHandler;
+
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+    queueHandler = new TestConnectorQueueHandler(registry);
+  }
 
   @Override
   protected String getConfigFile() {
@@ -72,7 +80,7 @@ public class HttpListenerMultipleValueHeadersTestCase extends AbstractHttpTestCa
 
     assertThat(httpResponse.getStatusLine().getStatusCode(), is(OK.getStatusCode()));
 
-    Message message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
+    Message message = queueHandler.read("out", RECEIVE_TIMEOUT).getMessage();
 
     assertThat(message.getAttributes().getValue(), instanceOf(HttpRequestAttributes.class));
     List<String> headers = ((HttpRequestAttributes) message.getAttributes().getValue()).getHeaders().getAll(HEADER);

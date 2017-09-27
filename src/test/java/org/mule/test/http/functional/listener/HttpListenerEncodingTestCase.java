@@ -9,6 +9,7 @@ package org.mule.test.http.functional.listener;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import org.mule.functional.api.component.TestConnectorQueueHandler;
 import org.mule.runtime.api.message.Message;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
@@ -37,6 +38,8 @@ public class HttpListenerEncodingTestCase extends AbstractHttpTestCase {
   private static final String CYRILLIC_MESSAGE = "\u0416";
   private static final String SIMPLE_MESSAGE = "A";
 
+  private TestConnectorQueueHandler queueHandler;
+
   @Parameterized.Parameter(0)
   public String encoding;
 
@@ -52,6 +55,12 @@ public class HttpListenerEncodingTestCase extends AbstractHttpTestCase {
   }
 
   @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+    queueHandler = new TestConnectorQueueHandler(registry);
+  }
+
+  @Override
   protected String getConfigFile() {
     return "http-listener-encoding-config.xml";
   }
@@ -61,8 +70,8 @@ public class HttpListenerEncodingTestCase extends AbstractHttpTestCase {
     final String url = String.format("http://localhost:%s/test", port.getNumber());
     Request request = Request.Post(url).bodyString(testMessage, ContentType.create("text/plain", Charset.forName(encoding)));
     request.execute();
-    Message result = muleContext.getClient().request("test://out", 2000).getRight().get();
-    assertThat(getPayloadAsString(result), is(testMessage));
+    Message message = queueHandler.read("out", 2000).getMessage();
+    assertThat(getPayloadAsString(message), is(testMessage));
   }
 
 }
