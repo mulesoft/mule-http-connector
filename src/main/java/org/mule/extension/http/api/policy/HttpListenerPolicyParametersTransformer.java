@@ -87,12 +87,8 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
       HttpResponseAttributes httpResponseAttributes = (HttpResponseAttributes) message.getAttributes().getValue();
       if (ResponseType.SUCCESS.equals(responseType)) {
         httpListenerResponseBuilder.setBody(message.getPayload());
-        httpListenerResponseBuilder.setStatusCode(httpResponseAttributes.getStatusCode() == 0 ? responseType.getStatusCode()
-            : httpResponseAttributes.getStatusCode());
-      } else {
-        httpListenerResponseBuilder.setStatusCode(responseType.getStatusCode());
-
       }
+      httpListenerResponseBuilder.setStatusCode(httpResponseAttributes.getStatusCode());
       httpListenerResponseBuilder.setHeaders(httpResponseAttributes.getHeaders());
       httpListenerResponseBuilder.setReasonPhrase(httpResponseAttributes.getReasonPhrase());
       return mapBuilder.build();
@@ -102,7 +98,7 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
         httpListenerResponseBuilder.setBody(message.getPayload());
       }
       httpListenerResponseBuilder.setHeaders(httpResponseAttributes.getHeaders());
-      httpListenerResponseBuilder.setStatusCode(httpResponseAttributes.getStatusCode() == 0 ? responseType.getStatusCode()
+      httpListenerResponseBuilder.setStatusCode(httpResponseAttributes.getStatusCode() == null ? responseType.getStatusCode()
           : httpResponseAttributes.getStatusCode());
       httpListenerResponseBuilder.setReasonPhrase(httpResponseAttributes.getReasonPhrase());
       return mapBuilder.build();
@@ -118,25 +114,26 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
       return mapBuilder.build();
     }
   }
+
+  enum ResponseType {
+    SUCCESS(200, "response"), FAILURE(500, "errorResponse");
+
+    private int statusCode;
+    private String responseBuilderParameterName;
+
+    ResponseType(int statusCode, String responseBuilderParameterName) {
+      this.statusCode = statusCode;
+      this.responseBuilderParameterName = responseBuilderParameterName;
+    }
+
+    public int getStatusCode() {
+      return statusCode;
+    }
+
+    public String getResponseBuilderParameterName() {
+      return responseBuilderParameterName;
+    }
+  }
 }
 
 
-enum ResponseType {
-  SUCCESS(200, "response"), FAILURE(500, "errorResponse");
-
-  private int statusCode;
-  private String responseBuilderParameterName;
-
-  ResponseType(int statusCode, String responseBuilderParameterName) {
-    this.statusCode = statusCode;
-    this.responseBuilderParameterName = responseBuilderParameterName;
-  }
-
-  public int getStatusCode() {
-    return statusCode;
-  }
-
-  public String getResponseBuilderParameterName() {
-    return responseBuilderParameterName;
-  }
-}
