@@ -62,7 +62,7 @@ public class HttpProxyParamsTestCase extends AbstractHttpRequestTestCase {
   @Test
   public void proxyWithoutNonProxyHostsParam() throws Exception {
     expectedException.expectCause(isA(HttpRequestFailedException.class));
-    expectedException.expectMessage(containsString("Connection refused."));
+    expectedException.expectMessage(containsString("Connection refused"));
     runFlow("refAnonymousProxy");
     fail("Request should fail as there is no proxy configured");
   }
@@ -70,7 +70,7 @@ public class HttpProxyParamsTestCase extends AbstractHttpRequestTestCase {
   @Test
   public void proxyWithAnotherHostNonProxyHostsParam() throws Exception {
     expectedException.expectCause(isA(HttpRequestFailedException.class));
-    expectedException.expectMessage(containsString("Connection refused."));
+    expectedException.expectMessage(containsString("Connection refused"));
     runFlow("innerNonProxyParamProxyAnotherHost");
     fail("Request should fail as there is no proxy configured");
   }

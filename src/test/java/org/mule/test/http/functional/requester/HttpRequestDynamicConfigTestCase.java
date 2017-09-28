@@ -129,7 +129,7 @@ public class HttpRequestDynamicConfigTestCase extends AbstractHttpRequestTestCas
 
 
     expectedError.expectErrorType(HTTP_NAMESPACE.toUpperCase(), CONNECTIVITY.name());
-    expectedError.expectMessage(containsString("Connection refused."));
+    expectedError.expectMessage(containsString("Connection refused"));
     flowRunner("client2")
         .withVariable("parse", false)
         .withVariable("stream", "AUTO")
