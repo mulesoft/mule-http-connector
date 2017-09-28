@@ -11,6 +11,7 @@ import static java.lang.String.format;
 import static org.mule.extension.http.internal.HttpConnectorConstants.CONNECTOR_OVERRIDES;
 import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST;
 import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE;
+import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.encodeSpaces;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
@@ -31,6 +32,7 @@ import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
@@ -70,6 +72,7 @@ public class HttpRequestOperations implements Initialisable, Disposable {
   @OutputResolver(output = HttpMetadataResolver.class)
   @Throws(RequestErrorTypeProvider.class)
   @Streaming
+  @MediaType(value = ANY, strict = false)
   public void request(@Placement(order = 1) @ParameterGroup(name = "URI Settings") UriSettings uriSettings,
                       @Placement(order = 2) @Optional(defaultValue = "GET") String method,
                       @ParameterGroup(name = CONNECTOR_OVERRIDES) ConfigurationOverrides overrides,
