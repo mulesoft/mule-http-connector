@@ -27,7 +27,6 @@ import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.getReasonPhraseForStatusCode;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
@@ -40,6 +39,7 @@ import org.mule.extension.http.internal.listener.intercepting.InterceptingExcept
 import org.mule.extension.http.internal.listener.server.ModuleRequestHandler;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -87,14 +87,14 @@ import org.mule.runtime.http.api.server.RequestHandlerManager;
 import org.mule.runtime.http.api.server.async.HttpResponseReadyCallback;
 import org.mule.runtime.http.api.server.async.ResponseStatusCallback;
 
-import org.slf4j.Logger;
-
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
 
 /**
  * Represents a listener for HTTP requests.
@@ -468,15 +468,14 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
     return normalizedValues;
   }
 
-  private void validatePath() {
+  private void validatePath() throws MuleException {
     final String[] pathParts = this.path.split("/");
     List<String> uriParamNames = new ArrayList<>();
     for (String pathPart : pathParts) {
       if (pathPart.startsWith("{") && pathPart.endsWith("}")) {
         String uriParamName = pathPart.substring(1, pathPart.length() - 1);
         if (uriParamNames.contains(uriParamName)) {
-          // TODO: MULE-8946 This should throw a MuleException
-          throw new MuleRuntimeException(
+          throw new DefaultMuleException(
                                          createStaticMessage(format(
                                                                     "Http Listener with path %s contains duplicated uri param names",
                                                                     this.path)));
@@ -484,8 +483,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
         uriParamNames.add(uriParamName);
       } else {
         if (pathPart.contains("*") && pathPart.length() > 1) {
-          // TODO: MULE-8946 This should throw a MuleException
-          throw new MuleRuntimeException(createStaticMessage(format(
+          throw new DefaultMuleException(createStaticMessage(format(
                                                                     "Http Listener with path %s contains an invalid use of a wildcard. Wildcards can only be used at the end of the path (i.e.: /path/*) or between / characters (.i.e.: /path/*/anotherPath))",
                                                                     this.path)));
         }
