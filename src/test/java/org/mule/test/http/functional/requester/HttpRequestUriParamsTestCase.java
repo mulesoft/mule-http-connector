@@ -6,23 +6,26 @@
  */
 package org.mule.test.http.functional.requester;
 
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
-
-import org.mule.runtime.core.api.exception.MessagingException;
+import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Test;
 import io.qameta.allure.Feature;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 @Feature(HTTP_EXTENSION)
 public class HttpRequestUriParamsTestCase extends AbstractHttpRequestTestCase {
+
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
   @Override
   protected String getConfigFile() {
@@ -58,9 +61,9 @@ public class HttpRequestUriParamsTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void sendsUriParamsIfNull() throws Exception {
-    MessagingException expectedException = flowRunner("uriParamNull").runExpectingException();
-    assertThat(expectedException.getCause(), instanceOf(NullPointerException.class));
-    assertThat(expectedException.getMessage(), containsString("Expression {testParam2} evaluated to null."));
+    expectedException.expectCause(instanceOf(NullPointerException.class));
+    expectedException.expectMessage(containsString("Expression {testParam2} evaluated to null."));
+    flowRunner("uriParamNull").run();
   }
 
 }
