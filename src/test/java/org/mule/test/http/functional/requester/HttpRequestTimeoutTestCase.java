@@ -7,29 +7,27 @@
 package org.mule.test.http.functional.requester;
 
 
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
-import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-
-import org.mule.runtime.core.api.exception.MessagingException;
+import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import org.mule.runtime.api.util.concurrent.Latch;
+import org.mule.runtime.core.api.exception.EventProcessingException;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import io.qameta.allure.Feature;
 import org.eclipse.jetty.server.Request;
 import org.junit.Test;
-import io.qameta.allure.Feature;
 
 @Feature(HTTP_EXTENSION)
 public class HttpRequestTimeoutTestCase extends AbstractHttpRequestTestCase {
 
-  private static int TEST_TIMEOUT = 2000;
+  private static int TEST_TIMEOUT = 5000;
 
   private Latch serverLatch = new Latch();
 
@@ -40,15 +38,10 @@ public class HttpRequestTimeoutTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void throwsExceptionWhenRequesterTimeoutIsExceeded() throws Exception {
-    assertTimeout("requestFlow", 1, -1);
+    assertTimeout("requestFlow", 1);
   }
 
-  @Test
-  public void requesterTimeoutOverridesEventTimeout() throws Exception {
-    assertTimeout("requestFlow", 1, TEST_TIMEOUT * 2);
-  }
-
-  private void assertTimeout(final String flowName, final int responseTimeoutRequester, final int responseTimeoutEvent)
+  private void assertTimeout(final String flowName, final int responseTimeoutRequester)
       throws Exception {
     final Latch requestTimeoutLatch = new Latch();
 
@@ -57,10 +50,10 @@ public class HttpRequestTimeoutTestCase extends AbstractHttpRequestTestCase {
       @Override
       public void run() {
         try {
-          MessagingException e = flowRunner(flowName).withPayload(TEST_MESSAGE)
+          EventProcessingException e = flowRunner(flowName).withPayload(TEST_MESSAGE)
               .withVariable("timeout", responseTimeoutRequester).runExpectingException();
 
-          assertThat(e.getRootCause(), instanceOf(TimeoutException.class));
+          assertThat(e.getCause().getMessage(), containsString("Timeout exceeded"));
           requestTimeoutLatch.release();
         } catch (Exception e) {
           throw new RuntimeException(e);

@@ -7,21 +7,24 @@
 package org.mule.test.http.functional.listener;
 
 
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-
+import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.MessagingException;
-import org.mule.test.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.test.http.functional.AbstractHttpTestCase;
 
+import io.qameta.allure.Feature;
 import org.junit.Rule;
 import org.junit.Test;
-import io.qameta.allure.Feature;
+import org.junit.rules.ExpectedException;
 
 @Feature(HTTP_EXTENSION)
 public class HttpListenerCustomTlsConfigMultipleKeysTestCase extends AbstractHttpTestCase {
+
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
   @Rule
   public DynamicPort port = new DynamicPort("port");
@@ -37,8 +40,9 @@ public class HttpListenerCustomTlsConfigMultipleKeysTestCase extends AbstractHtt
     assertThat(event.getMessage().getPayload().getValue(), equalTo(TEST_MESSAGE));
   }
 
-  @Test(expected = MessagingException.class)
+  @Test
   public void rejectsConnectionWithInvalidCertificate() throws Exception {
+    expectedException.expectMessage(containsString("General SSLEngine problem"));
     flowRunner("testFlowClientWithoutCertificate").withPayload(TEST_MESSAGE).run();
   }
 

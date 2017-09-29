@@ -7,6 +7,7 @@
 package org.mule.test.http.functional.requester;
 
 import static java.lang.String.format;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -14,7 +15,6 @@ import static org.junit.Assume.assumeThat;
 import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.DEFAULT_SECURITY_MODEL;
 import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.PROPERTIES_FILE_PATTERN;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
@@ -46,6 +46,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 @Feature(HTTP_EXTENSION)
 public class HttpsRequesterSniTestCase extends AbstractHttpTestCase {
@@ -53,6 +54,9 @@ public class HttpsRequesterSniTestCase extends AbstractHttpTestCase {
   private static final String FQDN = "localhost.localdomain";
 
   private static final String SERVER_PROTOCOL_ENABLED = "SSLv3,TLSv1,TLSv1.1,TLSv1.2";
+
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
   @Rule
   public DynamicPort httpsPort = new DynamicPort("httpsPort");
@@ -97,8 +101,9 @@ public class HttpsRequesterSniTestCase extends AbstractHttpTestCase {
     }
   }
 
-  @Test(expected = MessagingException.class)
+  @Test
   public void testClientSNINotSentOnNonFQDN() throws Exception {
+    expectedException.expectMessage(containsString("Remotely closed"));
     flowRunner("requestFlowLocalhost").withPayload(TEST_MESSAGE).run();
   }
 

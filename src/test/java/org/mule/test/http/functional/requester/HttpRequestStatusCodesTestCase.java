@@ -12,7 +12,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import org.mule.extension.http.api.request.validator.ResponseValidatorException;
 import org.mule.extension.http.api.request.validator.ResponseValidatorTypedException;
-import org.mule.runtime.core.api.exception.MessagingException;
+import org.mule.runtime.core.api.exception.EventProcessingException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.IOException;
@@ -20,9 +20,9 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import io.qameta.allure.Feature;
 import org.eclipse.jetty.server.Request;
 import org.junit.Test;
-import io.qameta.allure.Feature;
 
 @Feature(HTTP_EXTENSION)
 public class HttpRequestStatusCodesTestCase extends AbstractHttpRequestTestCase {
@@ -71,7 +71,7 @@ public class HttpRequestStatusCodesTestCase extends AbstractHttpRequestTestCase 
   }
 
   private void assertFailure(int statusCode, String flowName) throws Exception {
-    MessagingException e =
+    EventProcessingException e =
         flowRunner(flowName).withPayload(AbstractMuleContextTestCase.TEST_MESSAGE).withVariable("code", toString(statusCode))
             .runExpectingException();
 
