@@ -8,12 +8,16 @@ package org.mule.test.http.functional.requester;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.Matchers.allOf;
+import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
+
 import org.mule.extension.http.api.error.HttpRequestFailedException;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.exception.EventProcessingException;
+
+import org.eclipse.jetty.server.Request;
+import org.junit.Test;
 
 import java.io.IOException;
 
@@ -23,8 +27,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import io.qameta.allure.Feature;
-import org.eclipse.jetty.server.Request;
-import org.junit.Test;
 
 @Feature(HTTP_EXTENSION)
 public class HttpRequestMaxConnectionsTestCase extends AbstractHttpRequestTestCase {
@@ -46,11 +48,9 @@ public class HttpRequestMaxConnectionsTestCase extends AbstractHttpRequestTestCa
     Thread t1 = processAsynchronously(limitedConnectionsFlow);
     messageArrived.await();
 
-    EventProcessingException e = flowRunner("limitedConnections").runExpectingException();
     // Max connections should be reached
-    Throwable cause = e.getEvent().getError().get().getCause();
-    assertThat(cause, instanceOf(HttpRequestFailedException.class));
-    assertThat(cause.getMessage(), containsString("No slot available"));
+    flowRunner("limitedConnections").runExpectingException(allOf(instanceOf(HttpRequestFailedException.class),
+                                                                 hasMessage(containsString("No slot available"))));
 
     messageHold.release();
     t1.join();

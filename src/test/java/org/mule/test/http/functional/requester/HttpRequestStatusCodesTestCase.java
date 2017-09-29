@@ -8,12 +8,14 @@ package org.mule.test.http.functional.requester;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.core.AnyOf.anyOf;
-import static org.junit.Assert.assertThat;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
+
 import org.mule.extension.http.api.request.validator.ResponseValidatorException;
 import org.mule.extension.http.api.request.validator.ResponseValidatorTypedException;
-import org.mule.runtime.core.api.exception.EventProcessingException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import org.eclipse.jetty.server.Request;
+import org.junit.Test;
 
 import java.io.IOException;
 
@@ -21,8 +23,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import io.qameta.allure.Feature;
-import org.eclipse.jetty.server.Request;
-import org.junit.Test;
 
 @Feature(HTTP_EXTENSION)
 public class HttpRequestStatusCodesTestCase extends AbstractHttpRequestTestCase {
@@ -71,12 +71,9 @@ public class HttpRequestStatusCodesTestCase extends AbstractHttpRequestTestCase 
   }
 
   private void assertFailure(int statusCode, String flowName) throws Exception {
-    EventProcessingException e =
-        flowRunner(flowName).withPayload(AbstractMuleContextTestCase.TEST_MESSAGE).withVariable("code", toString(statusCode))
-            .runExpectingException();
-
-    assertThat(e.getEvent().getError().get().getCause(),
-               anyOf(instanceOf(ResponseValidatorException.class), instanceOf(ResponseValidatorTypedException.class)));
+    flowRunner(flowName).withPayload(AbstractMuleContextTestCase.TEST_MESSAGE).withVariable("code", toString(statusCode))
+        .runExpectingException(anyOf(instanceOf(ResponseValidatorException.class),
+                                     instanceOf(ResponseValidatorTypedException.class)));
   }
 
   @Override

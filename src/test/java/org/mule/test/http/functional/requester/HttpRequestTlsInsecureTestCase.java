@@ -7,13 +7,15 @@
 package org.mule.test.http.functional.requester;
 
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
+
+import org.mule.functional.api.exception.ExpectedError;
+
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 
-import org.mule.functional.junit4.rules.ExpectedError;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;

@@ -17,7 +17,7 @@ import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.HTTPS;
 
 import io.qameta.allure.junit4.DisplayName;
 import org.mule.extension.http.api.error.HttpRequestFailedException;
-import org.mule.functional.junit4.rules.ExpectedError;
+import org.mule.functional.api.exception.ExpectedError;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
 import org.mule.runtime.core.api.event.CoreEvent;
