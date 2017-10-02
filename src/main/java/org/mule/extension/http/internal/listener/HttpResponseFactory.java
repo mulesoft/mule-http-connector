@@ -19,6 +19,7 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
+
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.internal.HttpStreamingType;
 import org.mule.extension.http.internal.listener.intercepting.Interception;
@@ -26,7 +27,6 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.api.util.MultiMap;
-import org.mule.runtime.core.api.exception.MessagingException;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.runtime.http.api.domain.entity.EmptyHttpEntity;
@@ -35,12 +35,12 @@ import org.mule.runtime.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.mule.runtime.http.api.domain.message.response.HttpResponseBuilder;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Component that creates {@link HttpResponse HttpResponses}.
@@ -69,7 +69,7 @@ public class HttpResponseFactory {
    * @param listenerResponseBuilder the generic {@HttpListenerResponseBuilder} configured for this listener.
    * @param supportsTransferEncoding boolean that determines whether the HTTP protocol of the response supports streaming.
    * @return an {@HttpResponse} configured based on the parameters.
-   * @throws MessagingException if the response creation fails.
+   * @throws IOException if the response creation fails.
    */
   public HttpResponse create(HttpResponseBuilder responseBuilder,
                              Interception interception,

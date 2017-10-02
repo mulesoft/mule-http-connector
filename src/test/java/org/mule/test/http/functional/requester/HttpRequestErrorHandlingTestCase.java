@@ -31,8 +31,9 @@ import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.ERROR_HAN
 import io.qameta.allure.Stories;
 
 import org.apache.commons.lang3.SystemUtils;
+
+import org.mule.functional.api.exception.ExpectedError;
 import org.mule.functional.api.flow.FlowRunner;
-import org.mule.functional.junit4.rules.ExpectedError;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.http.api.HttpConstants.HttpStatus;

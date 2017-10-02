@@ -10,18 +10,27 @@
 package org.mule.test.http.functional.requester;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.Matchers.allOf;
+import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.extension.http.api.error.HttpRequestFailedException;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.util.concurrent.Latch;
-import org.mule.runtime.core.api.exception.EventProcessingException;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.runner.RunnerDelegateTo;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
+import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -32,14 +41,6 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import io.qameta.allure.Feature;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
-import org.slf4j.Logger;
 
 @Feature(HTTP_EXTENSION)
 @RunnerDelegateTo(Parameterized.class)
@@ -95,10 +96,9 @@ public class HttpRequestProxyConfigTestCase extends MuleArtifactFunctionalTestCa
   }
 
   private void ensureRequestGoesThroughProxy(String flowName) throws Exception {
-    EventProcessingException e = flowRunner(flowName).withPayload(TEST_MESSAGE).runExpectingException();
     // Request should go through the proxy.
-    assertThat(e.getCause(), is(instanceOf(HttpRequestFailedException.class)));
-    assertThat(e.getCause().getMessage(), containsString("Remotely closed"));
+    flowRunner(flowName).withPayload(TEST_MESSAGE).runExpectingException(allOf(instanceOf(HttpRequestFailedException.class),
+                                                                               hasMessage(containsString("Remotely closed"))));
     latch.await(1, SECONDS);
   }
 

@@ -8,11 +8,14 @@ package org.mule.test.http.functional.requester;
 
 
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
+
 import org.mule.runtime.api.util.concurrent.Latch;
-import org.mule.runtime.core.api.exception.EventProcessingException;
+
+import org.eclipse.jetty.server.Request;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -21,8 +24,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import io.qameta.allure.Feature;
-import org.eclipse.jetty.server.Request;
-import org.junit.Test;
 
 @Feature(HTTP_EXTENSION)
 public class HttpRequestTimeoutTestCase extends AbstractHttpRequestTestCase {
@@ -50,10 +51,8 @@ public class HttpRequestTimeoutTestCase extends AbstractHttpRequestTestCase {
       @Override
       public void run() {
         try {
-          EventProcessingException e = flowRunner(flowName).withPayload(TEST_MESSAGE)
-              .withVariable("timeout", responseTimeoutRequester).runExpectingException();
-
-          assertThat(e.getCause().getMessage(), containsString("Timeout exceeded"));
+          flowRunner(flowName).withPayload(TEST_MESSAGE).withVariable("timeout", responseTimeoutRequester)
+              .runExpectingException(hasMessage(containsString("Timeout exceeded")));
           requestTimeoutLatch.release();
         } catch (Exception e) {
           throw new RuntimeException(e);
