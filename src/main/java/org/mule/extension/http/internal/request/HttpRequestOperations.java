@@ -18,18 +18,16 @@ import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.request.validator.SuccessStatusCodeValidator;
-import org.mule.extension.http.internal.HttpMetadataResolver;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
+import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.api.exception.DefaultMuleException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.error.Throws;
-import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
@@ -69,7 +67,6 @@ public class HttpRequestOperations implements Initialisable, Disposable {
    * @return an {@link Result} with {@link HttpResponseAttributes}
    */
   @Summary("Executes a HTTP Request")
-  @OutputResolver(output = HttpMetadataResolver.class)
   @Throws(RequestErrorTypeProvider.class)
   @Streaming
   @MediaType(value = ANY, strict = false)
