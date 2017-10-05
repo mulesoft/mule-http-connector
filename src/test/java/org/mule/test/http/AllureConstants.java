@@ -32,6 +32,7 @@ public interface AllureConstants {
       String PROXY = "Proxy";
       String NTLM = "NTLM";
       String CORS = "Cross Origin Resource Sharing";
+      String TIMEOUT = "Timeout";
     }
 
   }
