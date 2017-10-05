@@ -85,26 +85,22 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
         ImmutableMap.<String, Object>builder().put(responseType.getResponseBuilderParameterName(), httpListenerResponseBuilder);
     if (message.getAttributes().getValue() instanceof HttpResponseAttributes) {
       HttpResponseAttributes httpResponseAttributes = (HttpResponseAttributes) message.getAttributes().getValue();
-      if (ResponseType.SUCCESS.equals(responseType)) {
-        httpListenerResponseBuilder.setBody(message.getPayload());
-      }
+      httpListenerResponseBuilder.setBody(message.getPayload());
       httpListenerResponseBuilder.setStatusCode(httpResponseAttributes.getStatusCode());
       httpListenerResponseBuilder.setHeaders(httpResponseAttributes.getHeaders());
       httpListenerResponseBuilder.setReasonPhrase(httpResponseAttributes.getReasonPhrase());
       return mapBuilder.build();
     } else if (message.getAttributes().getValue() instanceof HttpPolicyResponseAttributes) {
       HttpPolicyResponseAttributes httpResponseAttributes = (HttpPolicyResponseAttributes) message.getAttributes().getValue();
-      if (ResponseType.SUCCESS.equals(responseType)) {
-        httpListenerResponseBuilder.setBody(message.getPayload());
-      }
+      httpListenerResponseBuilder.setBody(message.getPayload());
       httpListenerResponseBuilder.setHeaders(httpResponseAttributes.getHeaders());
       httpListenerResponseBuilder.setStatusCode(httpResponseAttributes.getStatusCode() == null ? responseType.getStatusCode()
           : httpResponseAttributes.getStatusCode());
       httpListenerResponseBuilder.setReasonPhrase(httpResponseAttributes.getReasonPhrase());
       return mapBuilder.build();
     } else {
+      httpListenerResponseBuilder.setBody(message.getPayload());
       if (ResponseType.SUCCESS.equals(responseType)) {
-        httpListenerResponseBuilder.setBody(message.getPayload());
         httpListenerResponseBuilder
             .setStatusCode(httpListenerResponseBuilder.getStatusCode() == null ? responseType.getStatusCode()
                 : httpListenerResponseBuilder.getStatusCode());
