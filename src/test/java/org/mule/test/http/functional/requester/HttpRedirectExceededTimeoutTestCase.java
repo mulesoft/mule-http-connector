@@ -11,7 +11,7 @@ import static org.mule.extension.http.internal.listener.HttpListener.HTTP_NAMESP
 import static org.mule.extension.http.api.error.HttpError.TIMEOUT;
 
 import org.mule.extension.http.api.error.HttpRequestFailedException;
-import org.mule.functional.junit4.rules.ExpectedError;
+import org.mule.functional.api.exception.ExpectedError;
 
 import org.junit.Rule;
 import org.junit.Test;
