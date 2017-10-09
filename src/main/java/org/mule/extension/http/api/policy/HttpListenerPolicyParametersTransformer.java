@@ -6,6 +6,8 @@
  */
 package org.mule.extension.http.api.policy;
 
+import static org.mule.extension.http.api.policy.HttpListenerPolicyParametersTransformer.ResponseType.FAILURE;
+import static org.mule.extension.http.api.policy.HttpListenerPolicyParametersTransformer.ResponseType.SUCCESS;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
@@ -39,8 +41,8 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
   @Override
   public Message fromSuccessResponseParametersToMessage(Map<String, Object> parameters) {
     HttpListenerResponseBuilder responseBuilder =
-        (HttpListenerResponseBuilder) parameters.get(ResponseType.SUCCESS.getResponseBuilderParameterName());
-    return responseParametersToMessage(responseBuilder, ResponseType.SUCCESS.getStatusCode());
+        (HttpListenerResponseBuilder) parameters.get(SUCCESS.getResponseBuilderParameterName());
+    return responseParametersToMessage(responseBuilder, SUCCESS.getStatusCode());
   }
 
   private Message responseParametersToMessage(HttpListenerResponseBuilder responseBuilder, int defaultStatusCode) {
@@ -62,20 +64,20 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
   @Override
   public Message fromFailureResponseParametersToMessage(Map<String, Object> parameters) {
     HttpListenerResponseBuilder responseBuilder =
-        (HttpListenerResponseBuilder) parameters.get(ResponseType.FAILURE.getResponseBuilderParameterName());
-    return responseParametersToMessage(responseBuilder, ResponseType.FAILURE.getStatusCode());
+        (HttpListenerResponseBuilder) parameters.get(FAILURE.getResponseBuilderParameterName());
+    return responseParametersToMessage(responseBuilder, FAILURE.getStatusCode());
   }
 
   @Override
   public Map<String, Object> fromMessageToSuccessResponseParameters(Message message) {
     return messageToResponseParameters(new HttpListenerSuccessResponseBuilder(), message,
-                                       ResponseType.SUCCESS);
+                                       SUCCESS);
   }
 
   @Override
   public Map<String, Object> fromMessageToErrorResponseParameters(Message message) {
     return messageToResponseParameters(new HttpListenerErrorResponseBuilder(), message,
-                                       ResponseType.FAILURE);
+                                       FAILURE);
   }
 
   private Map<String, Object> messageToResponseParameters(HttpListenerResponseBuilder httpListenerResponseBuilder,
@@ -100,13 +102,9 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
       return mapBuilder.build();
     } else {
       httpListenerResponseBuilder.setBody(message.getPayload());
-      if (ResponseType.SUCCESS.equals(responseType)) {
-        httpListenerResponseBuilder
-            .setStatusCode(httpListenerResponseBuilder.getStatusCode() == null ? responseType.getStatusCode()
-                : httpListenerResponseBuilder.getStatusCode());
-      } else {
-        httpListenerResponseBuilder.setStatusCode(responseType.getStatusCode());
-      }
+      httpListenerResponseBuilder.setStatusCode(httpListenerResponseBuilder.getStatusCode() == null ? responseType.getStatusCode()
+          : httpListenerResponseBuilder.getStatusCode());
+
       return mapBuilder.build();
     }
   }
