@@ -22,7 +22,7 @@ public class HttpPolicyResponseAttributes implements Serializable {
   /**
    * HTTP status code of the response. Former 'http.status'.
    */
-  private int statusCode;
+  private Integer statusCode;
   /**
    * HTTP reason phrase of the response. Former 'http.reason'.
    */
@@ -33,7 +33,7 @@ public class HttpPolicyResponseAttributes implements Serializable {
    */
   private MultiMap<String, String> headers = new MultiMap<>();
 
-  public int getStatusCode() {
+  public Integer getStatusCode() {
     return statusCode;
   }
 
@@ -41,7 +41,7 @@ public class HttpPolicyResponseAttributes implements Serializable {
     return reasonPhrase;
   }
 
-  public void setStatusCode(int statusCode) {
+  public void setStatusCode(Integer statusCode) {
     this.statusCode = statusCode;
   }
 
