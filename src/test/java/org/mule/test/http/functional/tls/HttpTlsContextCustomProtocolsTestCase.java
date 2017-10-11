@@ -8,6 +8,7 @@ package org.mule.test.http.functional.tls;
 
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_OK;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.test.http.functional.matcher.HttpResponseContentStringMatcher.body;
@@ -17,7 +18,6 @@ import org.mule.test.http.functional.matcher.HttpResponseStatusCodeMatcher;
 
 import org.apache.http.HttpResponse;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class HttpTlsContextCustomProtocolsTestCase extends AbstractHttpTlsContextTestCase {
@@ -44,7 +44,7 @@ public class HttpTlsContextCustomProtocolsTestCase extends AbstractHttpTlsContex
   private static final String customValidProtocolsUrl = urlPrefix + "/test/customValid";
   private static final String customProtocolsPropertyUrl = urlPrefix + "/test/property";
   private static final String OK_RESPONSE = "ok";
-  private static final String ERROR_RESPONSE = "Error sending HTTP request.";
+  private static final String ERROR_RESPONSE = "failed";
 
   @Override
   protected String getConfigFile() {
@@ -68,12 +68,11 @@ public class HttpTlsContextCustomProtocolsTestCase extends AbstractHttpTlsContex
   }
 
   @Test
-  @Ignore("MULE-10752: when the requester and the listener use different protocols it gives a timeout")
   public void testGlobalTlsContextCustomProtocolsRestrictive() throws Exception {
     HttpResponse response = executeGetRequest(customInvalidProtocolsUrl);
 
     assertThat(response, HttpResponseStatusCodeMatcher.hasStatusCode(SC_INTERNAL_SERVER_ERROR));
-    assertThat(response, body(is(ERROR_RESPONSE)));
+    assertThat(response, body(containsString(ERROR_RESPONSE)));
   }
 
   @Test
