@@ -24,11 +24,12 @@ import org.mule.test.http.functional.matcher.HttpMessageAttributesMatchers;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import io.qameta.allure.Issue;
 import org.junit.Ignore;
 import org.junit.Test;
 
-//TODO: MULE-10340 - Add notifications to HTTP request
-@Ignore("MULE-10340: Add notifications to HTTP request")
+@Ignore("MULE-13774: Add notifications to HTTP request")
+@Issue("MULE-13774")
 public class HttpRequestNotificationsTestCase extends AbstractHttpRequestTestCase {
 
   @Override
