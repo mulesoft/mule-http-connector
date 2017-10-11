@@ -93,7 +93,7 @@
     </flow>
     <flow name="testFlowGlobalContextCustomProtocolsInvalid">
         <http:listener config-ref="mainListenerConfig" path="/customInvalid" allowedMethods="GET"/>
-        <http:request config-ref="clientGlobalConfigTLSv1.1" path="/" method="GET" />
+        <http:request config-ref="clientGlobalConfigTLSv1.1" path="/" method="GET" responseTimeout="5000"/>
     </flow>
     <flow name="testFlowGlobalContextCustomProtocolsValid">
         <http:listener config-ref="mainListenerConfig" path="/customValid" allowedMethods="GET"/>
