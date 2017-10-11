@@ -27,4 +27,9 @@
 
         <set-payload value="{ &quot;key1&quot; : &quot;value, &quot;key2&quot; : 2 }" mimeType="application/json" encoding="UTF-8"/>
     </flow>
+
+    <flow name="listenerEmptyResponse">
+        <http:listener config-ref="httpConf" path="testEmpty"/>
+        <custom-processor class="org.mule.test.http.functional.listener.HttpListenerContentTypeTestCase$NullifyingProcessor"/>
+    </flow>
 </mule>

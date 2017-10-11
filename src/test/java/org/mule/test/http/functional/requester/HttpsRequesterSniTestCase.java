@@ -14,7 +14,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
 import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.DEFAULT_SECURITY_MODEL;
 import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.PROPERTIES_FILE_PATTERN;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
@@ -27,7 +26,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.concurrent.atomic.AtomicReference;
 
-import io.qameta.allure.Feature;
 import org.apache.commons.lang3.StringUtils;
 import org.glassfish.grizzly.Grizzly;
 import org.glassfish.grizzly.attributes.Attribute;
@@ -48,7 +46,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-@Feature(HTTP_EXTENSION)
 public class HttpsRequesterSniTestCase extends AbstractHttpTestCase {
 
   private static final String FQDN = "localhost.localdomain";

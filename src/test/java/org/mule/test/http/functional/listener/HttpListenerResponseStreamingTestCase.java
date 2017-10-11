@@ -15,7 +15,6 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -23,7 +22,6 @@ import org.mule.test.http.functional.AbstractHttpTestCase;
 
 import java.io.IOException;
 
-import io.qameta.allure.Feature;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -31,7 +29,6 @@ import org.apache.http.HttpVersion;
 import org.apache.http.client.fluent.Response;
 import org.junit.Rule;
 
-@Feature(HTTP_EXTENSION)
 public abstract class HttpListenerResponseStreamingTestCase extends AbstractHttpTestCase {
 
   private static final int DEFAULT_TIMEOUT = 5000;

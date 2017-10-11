@@ -10,9 +10,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.mule.runtime.api.component.location.Location.builder;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.METADATA;
-
 import org.mule.metadata.api.model.BinaryType;
 import org.mule.runtime.api.meta.model.OutputModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -22,15 +20,12 @@ import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import javax.inject.Inject;
+
+import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.junit.Test;
 
-import javax.inject.Inject;
-
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-
-@Feature(HTTP_EXTENSION)
 @Story(METADATA)
 public class HttpMetadataResolverTestCase extends AbstractHttpTestCase {
 

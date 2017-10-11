@@ -7,12 +7,10 @@
 
 package org.mule.test.http.functional.requester;
 
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
-import static org.mule.test.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-
+import static org.mule.test.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.message.Message;
 
@@ -27,9 +25,7 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.junit.Test;
-import io.qameta.allure.Feature;
 
-@Feature(HTTP_EXTENSION)
 public class BasicHttpProxyToHttpsTestCase extends AbstractHttpRequestTestCase {
 
   private static final String AUTHORIZED = "Authorized";

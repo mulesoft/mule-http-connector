@@ -7,18 +7,15 @@
 package org.mule.test.http.functional.listener;
 
 import static org.apache.http.client.fluent.Request.Get;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.ERROR_HANDLING;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.STREAMING;
 
 import io.qameta.allure.Stories;
+import io.qameta.allure.Story;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Response;
 import org.junit.Test;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 
-@Feature(HTTP_EXTENSION)
 @Stories({@Story(ERROR_HANDLING), @Story(STREAMING)})
 public class HttpListenerResponseStreamingErrorHandlingTestCase extends AbstractHttpListenerErrorHandlingTestCase {
 

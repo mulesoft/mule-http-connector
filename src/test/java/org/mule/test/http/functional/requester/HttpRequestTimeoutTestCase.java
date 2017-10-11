@@ -10,12 +10,7 @@ package org.mule.test.http.functional.requester;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertTrue;
 import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
-
 import org.mule.runtime.api.util.concurrent.Latch;
-
-import org.eclipse.jetty.server.Request;
-import org.junit.Test;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -23,9 +18,9 @@ import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import io.qameta.allure.Feature;
+import org.eclipse.jetty.server.Request;
+import org.junit.Test;
 
-@Feature(HTTP_EXTENSION)
 public class HttpRequestTimeoutTestCase extends AbstractHttpRequestTestCase {
 
   private static int TEST_TIMEOUT = 5000;

@@ -10,8 +10,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.http.api.HttpConstants.Method.POST;
 import static org.mule.tck.processor.FlowAssert.verify;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
-
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
 import org.mule.runtime.core.api.util.IOUtils;
@@ -31,9 +29,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import io.qameta.allure.Feature;
-
-@Feature(HTTP_EXTENSION)
 public class HttpListenerValidateCertificateTestCase extends AbstractHttpTestCase {
 
   @Rule

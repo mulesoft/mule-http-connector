@@ -83,7 +83,7 @@ public class HttpRequester {
                         CompletionCallback<InputStream, HttpResponseAttributes> callback) {
     HttpRequest httpRequest = eventToHttpRequest.create(requestBuilder, authentication);
 
-    // TODO: MULE-10340 - Add notifications to HTTP request
+    // TODO: MULE-13774 - Add notifications to HTTP request
     // notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct, MESSAGE_REQUEST_BEGIN);
     client.send(httpRequest, responseTimeout, followRedirects, resolveAuthentication(authentication))
         .whenComplete(
@@ -92,7 +92,7 @@ public class HttpRequester {
                           HttpResponseToResult httpResponseToResult = new HttpResponseToResult(config, muleContext);
                           from(httpResponseToResult.convert(response, httpRequest.getUri()))
                               .doOnNext(result -> {
-                                // TODO: MULE-10340 - Add notifications to HTTP request
+                                // TODO: MULE-13774 - Add notifications to HTTP request
                                 // notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct, MESSAGE_REQUEST_END);
                                 try {
                                   if (resendRequest(result, checkRetry, authentication)) {

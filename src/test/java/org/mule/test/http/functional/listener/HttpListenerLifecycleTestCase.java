@@ -8,13 +8,14 @@ package org.mule.test.http.functional.listener;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
-
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
+
+import java.io.IOException;
+import java.net.ConnectException;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
@@ -23,12 +24,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.io.IOException;
-import java.net.ConnectException;
-
-import io.qameta.allure.Feature;
-
-@Feature(HTTP_EXTENSION)
 public class HttpListenerLifecycleTestCase extends AbstractHttpTestCase {
 
   @Rule

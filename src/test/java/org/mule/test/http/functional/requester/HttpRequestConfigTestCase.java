@@ -16,7 +16,6 @@ import static org.mule.extension.http.internal.request.RequestConnectionParams.D
 import static org.mule.runtime.core.api.connection.util.ConnectionProviderUtils.unwrapProviderWrapper;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTP;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationInstanceFromRegistry;
 import org.mule.extension.http.internal.request.HttpRequesterProvider;
 import org.mule.extension.http.internal.request.RequestConnectionParams;
@@ -24,11 +23,9 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
-import io.qameta.allure.Feature;
 import org.junit.Rule;
 import org.junit.Test;
 
-@Feature(HTTP_EXTENSION)
 public class HttpRequestConfigTestCase extends AbstractHttpTestCase {
 
   private static final String DEFAULT_HTTP_REQUEST_CONFIG_NAME = "requestConfig";

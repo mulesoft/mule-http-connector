@@ -8,8 +8,6 @@ package org.mule.test.http.functional.listener;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
-
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;
@@ -24,10 +22,8 @@ import org.apache.http.entity.StringEntity;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
-import io.qameta.allure.Feature;
 
 @RunnerDelegateTo(Parameterized.class)
-@Feature(HTTP_EXTENSION)
 public class HttpListenerPathLeadingSlashesTestCase extends AbstractHttpTestCase {
 
   @ClassRule

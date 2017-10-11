@@ -6,11 +6,9 @@
  */
 package org.mule.test.http.functional.requester;
 
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.FileUtils;
 
@@ -34,9 +32,7 @@ import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.util.security.Constraint;
 import org.junit.Test;
-import io.qameta.allure.Feature;
 
-@Feature(HTTP_EXTENSION)
 public class HttpRequestAuthTestCase extends AbstractHttpRequestTestCase {
 
   private int requestCount = 0;

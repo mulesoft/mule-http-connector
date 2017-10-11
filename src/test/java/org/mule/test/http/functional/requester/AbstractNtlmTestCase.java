@@ -9,20 +9,22 @@ package org.mule.test.http.functional.requester;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
+import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.NTLM;
+import org.mule.extension.http.api.HttpResponseAttributes;
+import org.mule.runtime.api.message.Message;
+import org.mule.test.http.functional.matcher.HttpMessageAttributesMatchers;
 
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Story;
 import org.eclipse.jetty.server.Request;
 import org.junit.Test;
-import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.runtime.api.message.Message;
-import org.mule.test.http.functional.matcher.HttpMessageAttributesMatchers;
 
-import io.qameta.allure.Description;
-
+@Story(NTLM)
 public abstract class AbstractNtlmTestCase extends AbstractHttpRequestTestCase {
 
   protected static final String USER = "Zaphod";

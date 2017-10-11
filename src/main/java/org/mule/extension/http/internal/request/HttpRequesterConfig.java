@@ -7,7 +7,6 @@
 package org.mule.extension.http.internal.request;
 
 import static org.mule.extension.http.internal.HttpConnectorConstants.URL_CONFIGURATION;
-import org.mule.extension.http.api.request.RamlApiConfiguration;
 import org.mule.extension.http.internal.HttpStreamingType;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -44,15 +43,6 @@ public class HttpRequesterConfig implements Initialisable, HttpRequesterCookieCo
   @Placement(order = 3)
   private ResponseSettings responseSettings;
 
-  /**
-   * Specifies a RAML configuration file for the I that is being consumed.
-   */
-  //  @Parameter
-  //  @Optional
-  //  @Expression(NOT_SUPPORTED)
-  //  @Placement(order = 4)
-  private RamlApiConfiguration apiConfiguration;
-
   @Inject
   private MuleContext muleContext;
   private CookieManager cookieManager;
@@ -87,10 +77,6 @@ public class HttpRequesterConfig implements Initialisable, HttpRequesterCookieCo
   @Override
   public boolean isEnableCookies() {
     return requestSettings.isEnableCookies();
-  }
-
-  public RamlApiConfiguration getApiConfiguration() {
-    return apiConfiguration;
   }
 
   @Override

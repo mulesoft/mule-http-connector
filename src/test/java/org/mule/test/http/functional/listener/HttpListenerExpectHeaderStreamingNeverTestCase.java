@@ -16,7 +16,6 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.http.api.HttpHeaders.Names.EXPECT;
 import static org.mule.runtime.http.api.HttpHeaders.Names.HOST;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CONTINUE;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;
@@ -37,10 +36,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
-import io.qameta.allure.Feature;
 
 @RunnerDelegateTo(Parameterized.class)
-@Feature(HTTP_EXTENSION)
 public class HttpListenerExpectHeaderStreamingNeverTestCase extends AbstractHttpTestCase {
 
   private static final String HTTP_11 = "HTTP/1.1";

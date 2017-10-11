@@ -6,14 +6,6 @@
  */
 package org.mule.test.http.functional;
 
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
-import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.HTTPS;
-
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-
-@Feature(HTTP_EXTENSION)
-@Story(HTTPS)
 public class HttpListenerTlsRestrictedProtocolsAndCiphersTestCase extends AbstractServerTlsRestrictedProtocolsAndCiphersTestCase {
 
   @Override

@@ -6,10 +6,8 @@
  */
 package org.mule.test.http.functional.requester;
 
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.http.api.HttpHeaders;
 import org.mule.test.runner.RunnerDelegateTo;
@@ -24,10 +22,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.Request;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
-import io.qameta.allure.Feature;
 
 @RunnerDelegateTo(Parameterized.class)
-@Feature(HTTP_EXTENSION)
 public class HttpRequestEncodingTestCase extends AbstractHttpRequestTestCase {
 
   private static final String JAPANESE_MESSAGE = "\u3042";

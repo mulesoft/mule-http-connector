@@ -24,18 +24,12 @@ import static org.mule.runtime.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAIL
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.TOO_MANY_REQUESTS;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.UNSUPPORTED_MEDIA_TYPE;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.ERRORS;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.ERROR_HANDLING;
-
-import io.qameta.allure.Stories;
-
-import org.apache.commons.lang3.SystemUtils;
-
 import org.mule.functional.api.exception.ExpectedError;
 import org.mule.functional.api.flow.FlowRunner;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.api.util.concurrent.Latch;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.http.api.HttpConstants.HttpStatus;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -43,12 +37,12 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 
+import io.qameta.allure.Stories;
+import io.qameta.allure.Story;
+import org.apache.commons.lang3.SystemUtils;
 import org.junit.Rule;
 import org.junit.Test;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 
-@Feature(HTTP_EXTENSION)
 @Stories({@Story(ERROR_HANDLING), @Story(ERRORS)})
 public class HttpRequestErrorHandlingTestCase extends AbstractHttpRequestTestCase {
 

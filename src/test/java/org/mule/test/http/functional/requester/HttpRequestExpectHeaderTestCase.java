@@ -6,11 +6,9 @@
  */
 package org.mule.test.http.functional.requester;
 
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.EXPECTATION_FAILED;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.EXPECTATION_FAILED;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.test.http.functional.AbstractHttpExpectHeaderServerTestCase;
@@ -20,9 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.junit.Test;
-import io.qameta.allure.Feature;
 
-@Feature(HTTP_EXTENSION)
 public class HttpRequestExpectHeaderTestCase extends AbstractHttpExpectHeaderServerTestCase {
 
   private static final String REQUEST_FLOW_NAME = "requestFlow";

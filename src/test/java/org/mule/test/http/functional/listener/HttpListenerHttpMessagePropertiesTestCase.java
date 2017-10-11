@@ -15,12 +15,11 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.http.api.HttpHeaders.Names.X_FORWARDED_FOR;
 import static org.mule.runtime.http.api.domain.HttpProtocol.HTTP_1_1;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.functional.api.component.TestConnectorQueueHandler;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.http.api.domain.HttpProtocol;
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.http.api.domain.HttpProtocol;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
@@ -39,9 +38,7 @@ import org.apache.http.client.fluent.Request;
 import org.hamcrest.Matchers;
 import org.junit.Rule;
 import org.junit.Test;
-import io.qameta.allure.Feature;
 
-@Feature(HTTP_EXTENSION)
 public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestCase {
 
   public static final String QUERY_PARAM_NAME = "queryParam";

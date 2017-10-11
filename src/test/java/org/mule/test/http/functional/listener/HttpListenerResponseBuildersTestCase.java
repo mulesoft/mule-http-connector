@@ -12,7 +12,6 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.CREATED;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.functional.matcher.HttpResponseContentStringMatcher.body;
 import static org.mule.test.http.functional.matcher.HttpResponseReasonPhraseMatcher.hasReasonPhrase;
 import org.mule.runtime.http.api.HttpHeaders;
@@ -25,7 +24,6 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import io.qameta.allure.Feature;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
@@ -34,7 +32,6 @@ import org.hamcrest.TypeSafeMatcher;
 import org.junit.Rule;
 import org.junit.Test;
 
-@Feature(HTTP_EXTENSION)
 public class HttpListenerResponseBuildersTestCase extends AbstractHttpTestCase {
 
   private static final String FAIL = "fail";

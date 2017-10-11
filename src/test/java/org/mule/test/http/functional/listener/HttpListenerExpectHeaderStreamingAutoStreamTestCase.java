@@ -7,14 +7,11 @@
 package org.mule.test.http.functional.listener;
 
 
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import org.mule.test.runner.RunnerDelegateTo;
 
 import org.junit.runners.Parameterized;
-import io.qameta.allure.Feature;
 
 @RunnerDelegateTo(Parameterized.class)
-@Feature(HTTP_EXTENSION)
 public class HttpListenerExpectHeaderStreamingAutoStreamTestCase extends HttpListenerExpectHeaderStreamingAlwaysTestCase {
 
   @Override

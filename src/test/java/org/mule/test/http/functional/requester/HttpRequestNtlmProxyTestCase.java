@@ -11,17 +11,10 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.http.api.HttpHeaders.Names.PROXY_AUTHENTICATE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.PROXY_AUTHORIZATION;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
-import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.NTLM;
-
-import org.junit.Before;
 
 import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
+import org.junit.Before;
 
-@Feature(HTTP_EXTENSION)
-@Story(NTLM)
 public class HttpRequestNtlmProxyTestCase extends AbstractNtlmTestCase {
 
   @Before

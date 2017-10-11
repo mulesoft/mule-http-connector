@@ -6,15 +6,13 @@
  */
 package org.mule.test.http.functional.listener;
 
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static java.lang.String.format;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
@@ -23,11 +21,10 @@ import com.ning.http.client.AsyncHttpClientConfig;
 import com.ning.http.client.ListenableFuture;
 import com.ning.http.client.Response;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
+
 import org.junit.Rule;
 import org.junit.Test;
-import io.qameta.allure.Feature;
 
-@Feature(HTTP_EXTENSION)
 public class HttpListenerUriEncodingErrorTestCase extends AbstractHttpTestCase {
 
   @Rule

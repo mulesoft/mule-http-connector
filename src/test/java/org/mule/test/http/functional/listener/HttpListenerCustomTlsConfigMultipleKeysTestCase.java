@@ -10,17 +10,14 @@ package org.mule.test.http.functional.listener;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
-import io.qameta.allure.Feature;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-@Feature(HTTP_EXTENSION)
 public class HttpListenerCustomTlsConfigMultipleKeysTestCase extends AbstractHttpTestCase {
 
   @Rule

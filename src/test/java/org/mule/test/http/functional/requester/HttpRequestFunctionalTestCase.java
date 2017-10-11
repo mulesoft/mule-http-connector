@@ -14,7 +14,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.functional.junit4.TestLegacyMessageUtils.getInboundProperty;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -29,9 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.Request;
 import org.junit.Rule;
 import org.junit.Test;
-import io.qameta.allure.Feature;
 
-@Feature(HTTP_EXTENSION)
 public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase {
 
   private static final String TEST_HEADER_NAME = "TestHeaderName";

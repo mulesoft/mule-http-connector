@@ -11,14 +11,16 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.PROXY;
-
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.requester.AbstractHttpRequestTestCase;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import io.qameta.allure.Story;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.junit.After;
@@ -26,13 +28,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-
-@Feature(HTTP_EXTENSION)
 @Story(PROXY)
 public class HttpProxyTemplateErrorHandlingTestCase extends AbstractHttpRequestTestCase {
 

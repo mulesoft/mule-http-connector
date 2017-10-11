@@ -6,13 +6,9 @@
  */
 package org.mule.test.http.functional.listener;
 
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
-
 import org.apache.http.HttpVersion;
 import org.junit.Test;
-import io.qameta.allure.Feature;
 
-@Feature(HTTP_EXTENSION)
 public class HttpListenerResponseStreaming11TestCase extends HttpListenerResponseStreamingTestCase {
 
   @Override

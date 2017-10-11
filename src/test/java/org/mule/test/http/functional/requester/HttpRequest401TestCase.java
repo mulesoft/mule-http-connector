@@ -6,11 +6,9 @@
  */
 package org.mule.test.http.functional.requester;
 
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.test.http.functional.matcher.HttpMessageAttributesMatchers;
@@ -22,9 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.server.Request;
 import org.junit.Test;
-import io.qameta.allure.Feature;
 
-@Feature(HTTP_EXTENSION)
 public class HttpRequest401TestCase extends AbstractHttpRequestTestCase {
 
   private static final String UNAUTHORIZED_MESSAGE = "Unauthorized: check credetials.";

@@ -9,22 +9,18 @@ package org.mule.test.http.functional.requester;
 
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.TIMEOUT;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.eclipse.jetty.server.Request;
 import org.junit.Rule;
 
-import org.mule.tck.junit4.rule.SystemProperty;
-
-@Feature(HTTP_EXTENSION)
 @Story(TIMEOUT)
 public abstract class AbstractHttpRedirectTimeoutTestCase extends AbstractHttpRequestTestCase {
 

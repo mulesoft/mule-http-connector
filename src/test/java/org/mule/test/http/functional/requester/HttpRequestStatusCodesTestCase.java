@@ -8,23 +8,18 @@ package org.mule.test.http.functional.requester;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.core.AnyOf.anyOf;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
-
 import org.mule.extension.http.api.request.validator.ResponseValidatorException;
 import org.mule.extension.http.api.request.validator.ResponseValidatorTypedException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import org.eclipse.jetty.server.Request;
-import org.junit.Test;
 
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import io.qameta.allure.Feature;
+import org.eclipse.jetty.server.Request;
+import org.junit.Test;
 
-@Feature(HTTP_EXTENSION)
 public class HttpRequestStatusCodesTestCase extends AbstractHttpRequestTestCase {
 
   @Override

@@ -11,20 +11,17 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.functional.junit4.matchers.ThatMatcher.that;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.ERROR_HANDLING;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.ERROR_MAPPINGS;
-
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
+
 import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
 import io.qameta.allure.Stories;
 import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.junit.Test;
 
-@Feature(HTTP_EXTENSION)
 @Stories({@Story(ERROR_HANDLING), @Story(ERROR_MAPPINGS)})
 public class HttpRequestErrorMappingsTestCase extends AbstractHttpTestCase {
 

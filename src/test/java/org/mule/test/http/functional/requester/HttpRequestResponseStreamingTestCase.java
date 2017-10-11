@@ -7,16 +7,9 @@
 package org.mule.test.http.functional.requester;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
-import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.STREAMING;
 
 import org.junit.Test;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-
-@Feature(HTTP_EXTENSION)
-@Story(STREAMING)
 public class HttpRequestResponseStreamingTestCase extends AbstractHttpRequestResponseStreamingTestCase {
 
   @Override

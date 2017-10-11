@@ -18,7 +18,6 @@ import static org.mule.runtime.api.metadata.MediaType.BINARY;
 import static org.mule.runtime.api.metadata.MediaType.HTML;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.CONTENT;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
@@ -28,13 +27,11 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 
-import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-@Feature(HTTP_EXTENSION)
 @Story(CONTENT)
 public class HttpRequestContentTypeTestCase extends AbstractHttpRequestTestCase {
 

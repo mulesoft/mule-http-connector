@@ -11,8 +11,6 @@ import static org.apache.http.HttpStatus.SC_OK;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
-import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.HTTPS;
 import static org.mule.test.http.functional.matcher.HttpResponseContentStringMatcher.body;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -21,11 +19,7 @@ import org.mule.test.http.functional.matcher.HttpResponseStatusCodeMatcher;
 import org.apache.http.HttpResponse;
 import org.junit.ClassRule;
 import org.junit.Test;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 
-@Feature(HTTP_EXTENSION)
-@Story(HTTPS)
 public class HttpTlsContextCustomCiphersTestCase extends AbstractHttpTlsContextTestCase {
 
   @ClassRule

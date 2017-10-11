@@ -11,21 +11,18 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.PROXY;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpExpectHeaderServerTestCase;
 
 import java.io.IOException;
 
+import io.qameta.allure.Story;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 import org.junit.Rule;
 import org.junit.Test;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 
-@Feature(HTTP_EXTENSION)
 @Story(PROXY)
 public class HttpProxyExpectHeaderTestCase extends AbstractHttpExpectHeaderServerTestCase {
 

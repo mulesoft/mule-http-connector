@@ -9,6 +9,8 @@ package org.mule.test.http.functional;
 import static java.util.Collections.singletonMap;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.HTTPS;
 
 import org.mule.extension.http.internal.temporary.HttpConnector;
 import org.mule.extension.socket.api.SocketsExtension;
@@ -23,6 +25,9 @@ import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import java.util.List;
 import java.util.Map;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
 /**
  * Needs to access resources for validating different TLS scenarios and it cannot be done with
  * {@link org.mule.functional.junit4.MuleArtifactFunctionalTestCase}. Therefore this one has to be a
@@ -32,6 +37,8 @@ import java.util.Map;
  * isolated class loader.
  */
 // TODO(pablo.kraan): MULE-12188 - migrate subclasses to use the isolated test runner
+@Feature(HTTP_EXTENSION)
+@Story(HTTPS)
 public abstract class AbstractTlsRestrictedProtocolsAndCiphersTestCase extends ExtensionFunctionalTestCase {
 
   // TODO - MULE-11119: Remove once the service is injected higher up on the hierarchy
