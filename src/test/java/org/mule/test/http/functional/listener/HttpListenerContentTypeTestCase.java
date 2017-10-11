@@ -13,12 +13,17 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.CONTENT;
-
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -33,9 +38,8 @@ import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.StringEntity;
 import org.junit.Rule;
 import org.junit.Test;
-import io.qameta.allure.Feature;
 
-@Feature(HTTP_EXTENSION)
+
 @Story(CONTENT)
 public class HttpListenerContentTypeTestCase extends AbstractHttpTestCase {
 
@@ -66,6 +70,15 @@ public class HttpListenerContentTypeTestCase extends AbstractHttpTestCase {
         Request.Post(getUrl("testBuilder")).body(new StringEntity(TEST_MESSAGE, TEXT_PLAIN)).execute().returnResponse();
 
     assertContentTypeProperty(response, "text/plain");
+  }
+
+  @Test
+  public void returnsNoContentTypeWhenPayloadEmpty() throws Exception {
+    HttpResponse response =
+        Request.Post(getUrl("testEmpty")).body(new StringEntity(TEST_MESSAGE, TEXT_PLAIN)).execute().returnResponse();
+
+    assertThat(response.getStatusLine().getStatusCode(), is(OK.getStatusCode()));
+    assertThat(response.getFirstHeader(CONTENT_TYPE), is(nullValue()));
   }
 
   @Test
@@ -101,5 +114,14 @@ public class HttpListenerContentTypeTestCase extends AbstractHttpTestCase {
     String contentType = response.getFirstHeader(CONTENT_TYPE).getValue();
     assertThat(contentType, notNullValue());
     assertThat(contentType, equalTo(expectedContentType));
+  }
+
+  private static class NullifyingProcessor implements Processor {
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      return CoreEvent.builder(event).message(Message.builder(event.getMessage()).nullValue().mediaType(ANY).build()).build();
+    }
+
   }
 }
