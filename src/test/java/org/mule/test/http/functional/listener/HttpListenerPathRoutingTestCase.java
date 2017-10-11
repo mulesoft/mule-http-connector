@@ -6,7 +6,6 @@
  */
 package org.mule.test.http.functional.listener;
 
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -23,10 +22,8 @@ import org.apache.http.entity.StringEntity;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
-import io.qameta.allure.Feature;
 
 @RunnerDelegateTo(Parameterized.class)
-@Feature(HTTP_EXTENSION)
 public class HttpListenerPathRoutingTestCase extends AbstractHttpTestCase {
 
   @Rule

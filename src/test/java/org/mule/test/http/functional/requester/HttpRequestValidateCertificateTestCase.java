@@ -10,15 +10,15 @@ package org.mule.test.http.functional.requester;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.HTTPS;
 import org.mule.runtime.core.api.event.CoreEvent;
 
-import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-@Feature(HTTP_EXTENSION)
+@Story(HTTPS)
 public class HttpRequestValidateCertificateTestCase extends AbstractHttpRequestTestCase {
 
   @Rule

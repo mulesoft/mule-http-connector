@@ -10,11 +10,11 @@ import static java.lang.String.format;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.api.component.FunctionalTestProcessor.getFromFlow;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
-
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
+
+import java.io.ByteArrayInputStream;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.client.fluent.Request;
@@ -22,11 +22,6 @@ import org.apache.http.entity.InputStreamEntity;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
-
-import io.qameta.allure.Feature;
-
-@Feature(HTTP_EXTENSION)
 public class HttpListenerRequestStreamingTestCase extends AbstractHttpTestCase {
 
   private static final String LARGE_MESSAGE = RandomStringUtils.randomAlphanumeric(100 * 1024);

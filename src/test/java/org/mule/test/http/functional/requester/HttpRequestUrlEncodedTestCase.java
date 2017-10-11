@@ -12,9 +12,7 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.runtime.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.URL_ENCODED;
-
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.http.api.HttpHeaders;
 
@@ -22,11 +20,9 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.junit.Test;
-import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Test;
 
-@Feature(HTTP_EXTENSION)
 @Story(URL_ENCODED)
 public class HttpRequestUrlEncodedTestCase extends AbstractHttpRequestTestCase {
 

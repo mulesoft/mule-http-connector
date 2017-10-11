@@ -19,7 +19,6 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.HOST;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CLOSE;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -32,9 +31,7 @@ import java.util.Map;
 import org.hamcrest.Matchers;
 import org.junit.Rule;
 import org.junit.Test;
-import io.qameta.allure.Feature;
 
-@Feature(HTTP_EXTENSION)
 public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase {
 
   @Rule

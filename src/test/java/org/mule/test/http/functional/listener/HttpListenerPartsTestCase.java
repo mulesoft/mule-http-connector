@@ -26,7 +26,6 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.runtime.http.api.HttpHeaders.Values.MULTIPART_FORM_DATA;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.MULTIPART;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.MediaType;
@@ -43,7 +42,6 @@ import java.util.Iterator;
 import javax.servlet.ServletException;
 import javax.servlet.http.Part;
 
-import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -59,7 +57,6 @@ import org.eclipse.jetty.util.MultiPartInputStreamParser;
 import org.junit.Rule;
 import org.junit.Test;
 
-@Feature(HTTP_EXTENSION)
 @Story(MULTIPART)
 public class HttpListenerPartsTestCase extends AbstractHttpTestCase {
 

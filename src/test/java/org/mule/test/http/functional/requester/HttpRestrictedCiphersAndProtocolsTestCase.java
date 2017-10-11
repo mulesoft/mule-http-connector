@@ -12,10 +12,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.http.api.HttpConstants.Method.POST;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.HTTPS;
-
-import io.qameta.allure.junit4.DisplayName;
 import org.mule.extension.http.api.error.HttpRequestFailedException;
 import org.mule.functional.api.exception.ExpectedError;
 import org.mule.runtime.api.tls.TlsContextFactory;
@@ -32,14 +29,13 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
+import io.qameta.allure.Story;
+import io.qameta.allure.junit4.DisplayName;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 
-@Feature(HTTP_EXTENSION)
 @Story(HTTPS)
 @DisplayName("HTTPS Restricted Ciphers and Protocols")
 public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestCase {

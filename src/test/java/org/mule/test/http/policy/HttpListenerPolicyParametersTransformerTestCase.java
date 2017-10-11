@@ -10,14 +10,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
-import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.ERROR_HANDLING;
-
+import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.POLICY_SUPPORT;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.listener.builder.HttpListenerErrorResponseBuilder;
 import org.mule.extension.http.api.policy.HttpListenerPolicyParametersTransformer;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.security.cert.Certificate;
 import java.util.Map;
@@ -27,8 +27,8 @@ import io.qameta.allure.Story;
 import org.junit.Test;
 
 @Feature(HTTP_EXTENSION)
-@Story(ERROR_HANDLING)
-public class HttpListenerPolicyParametersTransformerTestCase {
+@Story(POLICY_SUPPORT)
+public class HttpListenerPolicyParametersTransformerTestCase extends AbstractMuleTestCase {
 
   private final String EXPECTED_PAYLOAD = "{'message': 'this is the payload'}";
   private final MediaType EXPECTED_MEDIA_TYPE = MediaType.APPLICATION_JSON;

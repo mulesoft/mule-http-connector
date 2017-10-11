@@ -15,14 +15,15 @@ import static org.mule.runtime.core.api.util.ClassUtils.getClassPathRoot;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.NOT_FOUND;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
-
-import io.qameta.allure.Issue;
+import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.STATIC_RESOURCE_LOADER;
 import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -32,6 +33,7 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
+@Story(STATIC_RESOURCE_LOADER)
 public class HttpListenerStaticResourcesTestCase extends AbstractHttpTestCase {
 
   public static final String INDEX_HTML_CONTENT = "Test index.html";

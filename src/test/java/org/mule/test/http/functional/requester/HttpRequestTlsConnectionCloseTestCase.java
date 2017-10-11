@@ -12,8 +12,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CLOSE;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
-
+import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.HTTPS;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -21,10 +20,10 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 
+import io.qameta.allure.Story;
 import org.junit.Test;
-import io.qameta.allure.Feature;
 
-@Feature(HTTP_EXTENSION)
+@Story(HTTPS)
 public class HttpRequestTlsConnectionCloseTestCase extends AbstractHttpRequestTestCase {
 
   @Override

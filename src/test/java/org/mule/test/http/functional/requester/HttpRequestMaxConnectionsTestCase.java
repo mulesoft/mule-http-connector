@@ -10,14 +10,9 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.Matchers.allOf;
 import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
-
 import org.mule.extension.http.api.error.HttpRequestFailedException;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.construct.Flow;
-
-import org.eclipse.jetty.server.Request;
-import org.junit.Test;
 
 import java.io.IOException;
 
@@ -26,9 +21,9 @@ import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import io.qameta.allure.Feature;
+import org.eclipse.jetty.server.Request;
+import org.junit.Test;
 
-@Feature(HTTP_EXTENSION)
 public class HttpRequestMaxConnectionsTestCase extends AbstractHttpRequestTestCase {
 
   private Latch messageArrived = new Latch();

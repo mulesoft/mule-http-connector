@@ -9,16 +9,13 @@ package org.mule.test.http.functional.requester;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationFromRegistry;
 import org.mule.extension.http.internal.request.HttpRequesterConfig;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import io.qameta.allure.Feature;
 
-@Feature(HTTP_EXTENSION)
 @Ignore("MULE-9782: Add RAML metadata support to HTTP extension.")
 public class HttpRequestApiConfigurationTestCase extends AbstractHttpTestCase {
 

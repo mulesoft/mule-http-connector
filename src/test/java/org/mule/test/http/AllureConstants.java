@@ -33,6 +33,8 @@ public interface AllureConstants {
       String NTLM = "NTLM";
       String CORS = "Cross Origin Resource Sharing";
       String TIMEOUT = "Timeout";
+      String STATIC_RESOURCE_LOADER = "Static Resource Loader";
+      String POLICY_SUPPORT = "Policy Support";
     }
 
   }

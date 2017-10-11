@@ -12,7 +12,6 @@ import static org.junit.Assert.assertThat;
 import static org.mule.extension.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.NOT_MODIFIED;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.NO_CONTENT;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -35,9 +34,7 @@ import org.junit.Test;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
-import io.qameta.allure.Feature;
 
-@Feature(HTTP_EXTENSION)
 @RunnerDelegateTo(Parameterized.class)
 public class HttpListenerNoBodyStatusTestCase extends AbstractHttpTestCase {
 

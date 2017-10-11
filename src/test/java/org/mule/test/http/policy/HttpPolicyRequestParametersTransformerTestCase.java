@@ -21,13 +21,14 @@ import org.mule.extension.http.api.policy.HttpPolicyResponseAttributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
 
-public class HttpPolicyRequestParametersTransformerTestCase {
+public class HttpPolicyRequestParametersTransformerTestCase extends AbstractMuleTestCase {
 
   private static final MultiMap<String, String> HEADERS = new MultiMap<>(of("header", "headerValue"));
   private static final MultiMap<String, String> QUERY_PARAMS = new MultiMap<>(of("queryParam", "queryParamValue"));

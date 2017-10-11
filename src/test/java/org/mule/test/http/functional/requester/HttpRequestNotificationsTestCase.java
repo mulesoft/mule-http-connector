@@ -14,7 +14,6 @@ import static org.mule.runtime.api.notification.ConnectorMessageNotification.MES
 import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_REQUEST_END;
 import static org.mule.runtime.core.api.context.notification.ServerNotificationManager.createDefaultNotificationManager;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.functional.TestConnectorMessageNotificationListener.register;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.message.Message;
@@ -25,13 +24,11 @@ import org.mule.test.http.functional.matcher.HttpMessageAttributesMatchers;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import io.qameta.allure.Feature;
 import org.junit.Ignore;
 import org.junit.Test;
 
 //TODO: MULE-10340 - Add notifications to HTTP request
 @Ignore("MULE-10340: Add notifications to HTTP request")
-@Feature(HTTP_EXTENSION)
 public class HttpRequestNotificationsTestCase extends AbstractHttpRequestTestCase {
 
   @Override

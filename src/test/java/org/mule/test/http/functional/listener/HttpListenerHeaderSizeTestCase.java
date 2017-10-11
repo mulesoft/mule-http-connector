@@ -6,15 +6,13 @@
  */
 package org.mule.test.http.functional.listener;
 
+import static java.lang.String.format;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.appendQueryParam;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
-import static java.lang.String.format;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;
@@ -25,9 +23,7 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.fluent.Request;
 import org.junit.Rule;
 import org.junit.Test;
-import io.qameta.allure.Feature;
 
-@Feature(HTTP_EXTENSION)
 public class HttpListenerHeaderSizeTestCase extends AbstractHttpTestCase {
 
   private static final int SIZE_DELTA = 1000;

@@ -7,6 +7,7 @@
 package org.mule.test.http.functional.tls;
 
 import static org.apache.commons.io.FileUtils.getFile;
+import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.HTTPS;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
@@ -16,13 +17,14 @@ import java.security.GeneralSecurityException;
 
 import javax.net.ssl.SSLContext;
 
+import io.qameta.allure.Story;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
 
-
+@Story(HTTPS)
 public abstract class AbstractHttpTlsContextTestCase extends AbstractHttpTestCase {
 
   private static final String keyStorePath = "tls/ssltest-keystore.jks";

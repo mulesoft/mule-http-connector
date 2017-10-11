@@ -13,6 +13,7 @@ import static org.mockito.Mockito.mock;
 import static org.mule.extension.http.api.policy.HttpRequestPolicyPointcutParametersFactory.PATH_PARAMETER_NAME;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.POLICY_SUPPORT;
 
 import org.mule.extension.http.api.policy.HttpRequestPolicyPointcutParameters;
 import org.mule.extension.http.api.policy.HttpRequestPolicyPointcutParametersFactory;
@@ -24,10 +25,12 @@ import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
 
+import io.qameta.allure.Story;
 import org.junit.Test;
 import io.qameta.allure.Feature;
 
 @Feature(HTTP_EXTENSION)
+@Story(POLICY_SUPPORT)
 public class HttpRequestPolicyPointcutParametersFactoryTestCase extends AbstractMuleTestCase {
 
   private static final ComponentIdentifier HTTP_REQUEST_COMPONENT_IDENTIFIER =

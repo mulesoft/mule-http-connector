@@ -12,7 +12,6 @@ import static org.mule.runtime.api.notification.AbstractServerNotification.getAc
 import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
 import static org.mule.runtime.core.api.context.notification.ServerNotificationManager.createDefaultNotificationManager;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.functional.TestConnectorMessageNotificationListener.register;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -23,12 +22,10 @@ import org.mule.test.http.functional.TestConnectorMessageNotificationListener;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import io.qameta.allure.Feature;
 import org.apache.http.client.fluent.Request;
 import org.junit.Rule;
 import org.junit.Test;
 
-@Feature(HTTP_EXTENSION)
 public class HttpListenerNotificationsTestCase extends AbstractHttpTestCase {
 
   @Rule

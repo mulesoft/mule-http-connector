@@ -28,14 +28,12 @@ import static org.mule.runtime.http.api.HttpConstants.HttpStatus.TOO_MANY_REQUES
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.UNSUPPORTED_MEDIA_TYPE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.ERRORS;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.ERROR_HANDLING;
 import static org.mule.test.http.functional.matcher.HttpResponseContentStringMatcher.body;
 import static org.mule.test.http.functional.matcher.HttpResponseHeaderStringMatcher.header;
 import static org.mule.test.http.functional.matcher.HttpResponseReasonPhraseMatcher.hasReasonPhrase;
 import static org.mule.test.http.functional.matcher.HttpResponseStatusCodeMatcher.hasStatusCode;
-
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.functional.junit4.rules.HttpServerRule;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -49,6 +47,10 @@ import org.mule.runtime.http.api.HttpConstants.HttpStatus;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
+import java.io.IOException;
+
+import io.qameta.allure.Stories;
+import io.qameta.allure.Story;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Response;
 import org.hamcrest.Matcher;
@@ -56,13 +58,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.io.IOException;
-
-import io.qameta.allure.Feature;
-import io.qameta.allure.Stories;
-import io.qameta.allure.Story;
-
-@Feature(HTTP_EXTENSION)
 @Stories({@Story(ERROR_HANDLING), @Story(ERRORS)})
 public class HttpListenerErrorInterpretationTestCase extends AbstractHttpTestCase {
 

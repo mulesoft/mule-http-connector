@@ -10,8 +10,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.api.component.FunctionalTestProcessor.getFromFlow;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
-
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -22,18 +20,15 @@ import org.mule.test.http.functional.TestProxyServer;
 import org.mule.test.http.functional.matcher.HttpMessageAttributesMatchers;
 import org.mule.test.runner.RunnerDelegateTo;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-import java.util.Arrays;
-import java.util.Collection;
-
-import io.qameta.allure.Feature;
-
 
 @RunnerDelegateTo(Parameterized.class)
-@Feature(HTTP_EXTENSION)
 public class HttpRequestProxyTlsTestCase extends AbstractHttpTestCase {
 
   private static final String OK_RESPONSE = "OK";

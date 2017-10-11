@@ -6,16 +6,13 @@
  */
 package org.mule.test.http.functional.requester;
 
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
-
-import org.mule.functional.api.exception.ExpectedError;
-
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
-
+import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.HTTPS;
+import org.mule.functional.api.exception.ExpectedError;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -26,10 +23,10 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
+import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
-import io.qameta.allure.Feature;
 
 /**
  * Sets up two HTTPS clients using a regular trust-store, but one of them insecure. Then two HTTPS servers: one will return a
@@ -37,7 +34,7 @@ import io.qameta.allure.Feature;
  * trust-store. Verifies that only the insecure client is successful.
  */
 @RunnerDelegateTo(Parameterized.class)
-@Feature(HTTP_EXTENSION)
+@Story(HTTPS)
 public class HttpRequestTlsInsecureTestCase extends AbstractHttpTestCase {
 
   @Parameterized.Parameter

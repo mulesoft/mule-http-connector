@@ -6,13 +6,9 @@
  */
 package org.mule.test.http.functional.requester;
 
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
-
-import org.mule.functional.api.flow.FlowRunner;
-
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-
+import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
 
@@ -25,9 +21,7 @@ import org.eclipse.jetty.server.Request;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import io.qameta.allure.Feature;
 
-@Feature(HTTP_EXTENSION)
 public class HttpRequestFollowRedirectsTestCase extends AbstractHttpRequestTestCase {
 
   @Rule

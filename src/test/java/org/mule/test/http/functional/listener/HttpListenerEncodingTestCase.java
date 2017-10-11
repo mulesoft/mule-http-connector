@@ -6,7 +6,6 @@
  */
 package org.mule.test.http.functional.listener;
 
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.api.component.TestConnectorQueueHandler;
@@ -24,10 +23,8 @@ import org.apache.http.entity.ContentType;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
-import io.qameta.allure.Feature;
 
 @RunnerDelegateTo(Parameterized.class)
-@Feature(HTTP_EXTENSION)
 public class HttpListenerEncodingTestCase extends AbstractHttpTestCase {
 
   @Rule

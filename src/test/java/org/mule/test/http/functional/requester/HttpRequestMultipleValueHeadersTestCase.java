@@ -12,7 +12,6 @@ import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.http.api.HttpHeaders.Values.CHUNKED;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.MULTI_MAP;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.util.CaseInsensitiveMapWrapper;
@@ -26,13 +25,11 @@ import com.google.common.collect.Multimaps;
 import java.util.Collection;
 import java.util.List;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.junit.Test;
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 
-@Feature(HTTP_EXTENSION)
 @Story(MULTI_MAP)
 public class HttpRequestMultipleValueHeadersTestCase extends AbstractHttpRequestTestCase {
 

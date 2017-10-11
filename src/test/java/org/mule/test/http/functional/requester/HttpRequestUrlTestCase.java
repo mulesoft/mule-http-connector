@@ -6,25 +6,22 @@
  */
 package org.mule.test.http.functional.requester;
 
-import static org.mule.runtime.http.api.HttpConstants.Method.DELETE;
-import static org.mule.runtime.http.api.HttpConstants.Method.GET;
-import static org.mule.runtime.http.api.HttpConstants.Method.POST;
-import static org.mule.runtime.http.api.HttpConstants.Method.PUT;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
-import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.REQUEST_URL;
 import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.http.api.HttpConstants.Method.DELETE;
+import static org.mule.runtime.http.api.HttpConstants.Method.GET;
+import static org.mule.runtime.http.api.HttpConstants.Method.POST;
+import static org.mule.runtime.http.api.HttpConstants.Method.PUT;
+import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.REQUEST_URL;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Test;
-import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Test;
 
-@Feature(HTTP_EXTENSION)
 @Story(REQUEST_URL)
 public class HttpRequestUrlTestCase extends AbstractHttpRequestTestCase {
 

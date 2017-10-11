@@ -8,6 +8,7 @@ package org.mule.test.http.functional.requester;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.STREAMING;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
@@ -21,9 +22,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 
+@Story(STREAMING)
 public abstract class AbstractHttpRequestResponseStreamingTestCase extends AbstractHttpTestCase {
 
   private static final int POLL_TIMEOUT = 2000;

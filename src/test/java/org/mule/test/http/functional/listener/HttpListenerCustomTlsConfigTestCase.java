@@ -8,19 +8,15 @@ package org.mule.test.http.functional.listener;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.HTTPS;
-
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.test.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.test.http.functional.AbstractHttpTestCase;
 
+import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.junit.Test;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 
-@Feature(HTTP_EXTENSION)
 @Story(HTTPS)
 public class HttpListenerCustomTlsConfigTestCase extends AbstractHttpTestCase {
 

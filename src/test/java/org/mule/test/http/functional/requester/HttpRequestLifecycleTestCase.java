@@ -10,22 +10,17 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.isA;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
-
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.construct.Flow;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
-import io.qameta.allure.Feature;
-
-@Feature(HTTP_EXTENSION)
 public class HttpRequestLifecycleTestCase extends AbstractHttpRequestTestCase {
 
   @Rule

@@ -10,7 +10,6 @@ package org.mule.test.http.functional.requester;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mule.runtime.http.api.HttpConstants.Method.GET;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.CONTENT;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
@@ -22,9 +21,7 @@ import org.mule.test.http.functional.AbstractHttpTestCase;
 import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.junit.Test;
-import io.qameta.allure.Feature;
 
-@Feature(HTTP_EXTENSION)
 @Story(CONTENT)
 public class HttpRequestLaxContentTypeTestCase extends AbstractHttpTestCase {
 
