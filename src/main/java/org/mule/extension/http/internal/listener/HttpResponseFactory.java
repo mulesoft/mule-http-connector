@@ -131,9 +131,9 @@ public class HttpResponseFactory {
     Integer statusCode = listenerResponseBuilder.getStatusCode();
     if (statusCode != null) {
       if (statusCode < 200) {
-        logger.warn(format("Response status code '%s' cannot be sent as a final response since it's smaller than 200.",
+        logger.warn(format("Response status code '%s' cannot be sent as a final response since it's lower than 200.",
                            statusCode));
-        throw new IllegalArgumentException("Cannot send a status code smaller than 200");
+        throw new IllegalArgumentException("Cannot send a status code lower than 200");
       } else {
         responseBuilder.statusCode(statusCode);
         if (statusCode == NO_CONTENT.getStatusCode() || statusCode == NOT_MODIFIED.getStatusCode()) {
