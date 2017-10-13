@@ -7,6 +7,7 @@
 
 package org.mule.extension.http.internal.listener;
 
+import static java.lang.String.format;
 import static org.mule.extension.http.internal.HttpStreamingType.ALWAYS;
 import static org.mule.extension.http.internal.HttpStreamingType.AUTO;
 import static org.mule.runtime.api.message.Message.of;
@@ -19,7 +20,6 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
-
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.internal.HttpStreamingType;
 import org.mule.extension.http.internal.listener.intercepting.Interception;
@@ -35,12 +35,12 @@ import org.mule.runtime.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.mule.runtime.http.api.domain.message.response.HttpResponseBuilder;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Component that creates {@link HttpResponse HttpResponses}.
@@ -130,10 +130,16 @@ public class HttpResponseFactory {
 
     Integer statusCode = listenerResponseBuilder.getStatusCode();
     if (statusCode != null) {
-      responseBuilder.statusCode(statusCode);
-      if (statusCode == NO_CONTENT.getStatusCode() || statusCode == NOT_MODIFIED.getStatusCode()) {
-        httpEntity = new EmptyHttpEntity();
-        httpResponseHeaderBuilder.removeHeader(TRANSFER_ENCODING);
+      if (statusCode < 200) {
+        logger.warn(format("Response status code '%s' cannot be sent as a final response since it's smaller than 200.",
+                           statusCode));
+        throw new IllegalArgumentException("Cannot send a status code smaller than 200");
+      } else {
+        responseBuilder.statusCode(statusCode);
+        if (statusCode == NO_CONTENT.getStatusCode() || statusCode == NOT_MODIFIED.getStatusCode()) {
+          httpEntity = new EmptyHttpEntity();
+          httpResponseHeaderBuilder.removeHeader(TRANSFER_ENCODING);
+        }
       }
     }
     String reasonPhrase = resolveReasonPhrase(listenerResponseBuilder.getReasonPhrase(), statusCode);

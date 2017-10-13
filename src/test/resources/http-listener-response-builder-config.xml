@@ -37,6 +37,13 @@
         <logger level="ERROR" message="#[payload]"/>
     </flow>
 
+    <flow name="invalidStatusResponseBuilderFlow">
+        <http:listener config-ref="listenerConfig" path="${invalidStatusResponseBuilderPath}">
+            <http:response statusCode="150" reasonPhrase="everything works!"/>
+        </http:listener>
+        <logger level="ERROR" message="#[payload]"/>
+    </flow>
+
     <flow name="headerResponseBuilderFlow">
         <http:listener config-ref="listenerConfig" path="${headerResponseBuilderPath}">
             <http:response>
@@ -92,6 +99,14 @@
     <flow name="errorStatusResponseBuilderFlow">
         <http:listener config-ref="listenerConfig" path="${errorStatusResponseBuilderPath}">
             <http:error-response statusCode="201" reasonPhrase="everything works!"/>
+        </http:listener>
+        <logger level="ERROR" message="#[payload]"/>
+        <test:processor throwException="true"/>
+    </flow>
+
+    <flow name="invalidErrorStatusResponseBuilderFlow">
+        <http:listener config-ref="listenerConfig" path="${invalidErrorStatusResponseBuilderPath}">
+            <http:error-response statusCode="35" reasonPhrase="everything works!"/>
         </http:listener>
         <logger level="ERROR" message="#[payload]"/>
         <test:processor throwException="true"/>

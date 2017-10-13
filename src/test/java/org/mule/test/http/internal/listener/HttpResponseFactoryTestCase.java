@@ -47,6 +47,7 @@ public class HttpResponseFactoryTestCase extends AbstractMuleTestCase {
     MultiMap<String, String> headers = new MultiMap<>();
     headers.put(CONTENT_LENGTH, WRONG_CONTENT_LENGTH);
     when(listenerResponseBuilder.getHeaders()).thenReturn(headers);
+    when(listenerResponseBuilder.getStatusCode()).thenReturn(200);
     HttpResponseFactory httpResponseBuilder = new HttpResponseFactory(AUTO, mock(TransformationService.class));
 
     HttpResponse httpResponse =

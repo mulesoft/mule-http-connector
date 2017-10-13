@@ -6,8 +6,10 @@
  */
 package org.mule.test.http.functional.listener;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import org.mule.functional.api.component.TestConnectorQueueHandler;
 import org.mule.runtime.api.message.Message;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -19,6 +21,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.apache.http.client.fluent.Request;
+import org.apache.http.client.fluent.Response;
 import org.apache.http.entity.ContentType;
 import org.junit.Rule;
 import org.junit.Test;
@@ -65,10 +68,14 @@ public class HttpListenerEncodingTestCase extends AbstractHttpTestCase {
   @Test
   public void testEncoding() throws Exception {
     final String url = String.format("http://localhost:%s/test", port.getNumber());
-    Request request = Request.Post(url).bodyString(testMessage, ContentType.create("text/plain", Charset.forName(encoding)));
-    request.execute();
+    Charset charset = Charset.forName(encoding);
+    Request request = Request.Post(url).bodyString(testMessage, ContentType.create("text/plain", charset));
+    Response response = request.execute();
+    assertThat(response.returnResponse().getFirstHeader(CONTENT_TYPE).getValue(),
+               containsString("charset=" + charset.displayName()));
     Message message = queueHandler.read("out", 2000).getMessage();
     assertThat(getPayloadAsString(message), is(testMessage));
+    assertThat(message.getPayload().getDataType().getMediaType().getCharset().get(), is(charset));
   }
 
 }
