@@ -44,6 +44,9 @@ public class HttpListenerResponseBuildersTestCase extends AbstractHttpTestCase {
   @Rule
   public SystemProperty statusResponseBuilderPath = new SystemProperty("statusResponseBuilderPath", "statusResponseBuilderPath");
   @Rule
+  public SystemProperty invalidStatusResponseBuilderPath =
+      new SystemProperty("invalidStatusResponseBuilderPath", "invalidStatusResponseBuilderPath");
+  @Rule
   public SystemProperty headerResponseBuilderPath = new SystemProperty("headerResponseBuilderPath", "headerResponseBuilderPath");
   @Rule
   public SystemProperty headersResponseBuilderPath =
@@ -64,6 +67,9 @@ public class HttpListenerResponseBuildersTestCase extends AbstractHttpTestCase {
   @Rule
   public SystemProperty errorStatusResponseBuilderPath =
       new SystemProperty("errorStatusResponseBuilderPath", "errorStatusResponseBuilderPath");
+  @Rule
+  public SystemProperty invalidErrorStatusResponseBuilderPath =
+      new SystemProperty("invalidErrorStatusResponseBuilderPath", "invalidErrorStatusResponseBuilderPath");
   @Rule
   public SystemProperty errorHeaderResponseBuilderPath =
       new SystemProperty("errorHeaderResponseBuilderPath", "errorHeaderResponseBuilderPath");
@@ -97,6 +103,12 @@ public class HttpListenerResponseBuildersTestCase extends AbstractHttpTestCase {
   public void statusLineResponseBuilder() throws Exception {
     final String url = getUrl(statusResponseBuilderPath);
     statusLineResponseBuilderTest(url, CREATED.getStatusCode());
+  }
+
+  @Test
+  public void invalidStatusLineResponseBuilder() throws Exception {
+    final String url = getUrl(invalidStatusResponseBuilderPath);
+    statusLineResponseBuilderTest(url, INTERNAL_SERVER_ERROR.getStatusCode(), INTERNAL_SERVER_ERROR.getReasonPhrase());
   }
 
   @Test
@@ -150,6 +162,12 @@ public class HttpListenerResponseBuildersTestCase extends AbstractHttpTestCase {
   public void errorStatusLineResponseBuilder() throws Exception {
     final String url = getUrl(errorStatusResponseBuilderPath);
     statusLineResponseBuilderTest(url, CREATED.getStatusCode());
+  }
+
+  @Test
+  public void invalidErrorStatusLineResponseBuilder() throws Exception {
+    final String url = getUrl(invalidErrorStatusResponseBuilderPath);
+    statusLineResponseBuilderTest(url, INTERNAL_SERVER_ERROR.getStatusCode(), INTERNAL_SERVER_ERROR.getReasonPhrase());
   }
 
   @Test

@@ -6,20 +6,22 @@
  */
 package org.mule.test.http.functional.requester;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.api.metadata.MediaType.TEXT;
+import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.http.api.HttpHeaders;
 import org.mule.test.runner.RunnerDelegateTo;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collection;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.jetty.server.Request;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
@@ -51,16 +53,24 @@ public class HttpRequestEncodingTestCase extends AbstractHttpRequestTestCase {
   }
 
   @Override
-  protected void handleRequest(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
-    response.setHeader(HttpHeaders.Names.CONTENT_TYPE, String.format("text/plain; charset=%s", encoding));
+  protected void writeResponse(HttpServletResponse response) throws IOException {
+    response.setHeader(CONTENT_TYPE, String.format("text/plain; charset=%s", encoding));
     response.setStatus(HttpServletResponse.SC_OK);
     response.getWriter().print(testMessage);
   }
 
   @Test
   public void testEncoding() throws Exception {
-    CoreEvent result = flowRunner("encodingTest").withPayload(TEST_MESSAGE).run();
+    Charset charset = Charset.forName(encoding);
+    MediaType mediaType = TEXT.withCharset(charset);
+    CoreEvent result = flowRunner("encodingTest")
+        .withPayload(testMessage)
+        .withMediaType(mediaType)
+        .run();
     assertThat(getPayloadAsString(result.getMessage()), is(testMessage));
+    assertThat(result.getMessage().getPayload().getDataType().getMediaType(), is(mediaType));
+    assertThat(body, is(testMessage));
+    assertThat(getFirstReceivedHeader(CONTENT_TYPE), containsString("charset=" + charset.displayName()));
   }
 
 }
