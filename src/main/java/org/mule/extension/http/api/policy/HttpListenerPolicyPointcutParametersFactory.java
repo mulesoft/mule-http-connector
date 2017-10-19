@@ -37,9 +37,10 @@ public class HttpListenerPolicyPointcutParametersFactory implements SourcePolicy
   public <T> PolicyPointcutParameters createPolicyPointcutParameters(Component component,
                                                                      TypedValue<T> attributes) {
     checkNotNull(component, "Cannot create a policy pointcut parameter instance without a component");
-    checkArgument(attributes.getValue() instanceof HttpRequestAttributes, () ->
-            format("Cannot create a policy pointcut parameter instance from a message which attributes is not an instance of %s, the current attribute instance type is: %s",
-                HttpRequestAttributes.class.getName(), attributes != null ? attributes.getClass().getName() : "null"));
+    checkArgument(attributes.getValue() instanceof HttpRequestAttributes,
+                  () -> format("Cannot create a policy pointcut parameter instance from a message which attributes is not an instance of %s, the current attribute instance type is: %s",
+                               HttpRequestAttributes.class.getName(),
+                               attributes != null ? attributes.getClass().getName() : "null"));
 
     HttpRequestAttributes httpRequestAttributes = (HttpRequestAttributes) attributes.getValue();
     return new HttpListenerPolicyPointcutParameters(component, httpRequestAttributes.getRequestPath(),
