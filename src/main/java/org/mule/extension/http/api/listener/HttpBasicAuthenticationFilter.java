@@ -20,19 +20,19 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.security.Credentials;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
-import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.api.security.UnauthorisedException;
+import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.api.security.UnsupportedAuthenticationSchemeException;
+import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
-import org.mule.runtime.api.util.MultiMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Filter for basic authentication over an HTTP request.
@@ -41,7 +41,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class HttpBasicAuthenticationFilter {
 
-  protected static final Log logger = LogFactory.getLog(HttpBasicAuthenticationFilter.class);
+  protected static final Logger logger = LoggerFactory.getLogger(HttpBasicAuthenticationFilter.class);
 
   /**
    * Authentication realm.
