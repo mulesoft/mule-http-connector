@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.api.policy;
 
+import static java.lang.String.format;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
@@ -36,8 +37,8 @@ public class HttpListenerPolicyPointcutParametersFactory implements SourcePolicy
   public <T> PolicyPointcutParameters createPolicyPointcutParameters(Component component,
                                                                      TypedValue<T> attributes) {
     checkNotNull(component, "Cannot create a policy pointcut parameter instance without a component");
-    checkArgument(attributes.getValue() instanceof HttpRequestAttributes, String
-        .format("Cannot create a policy pointcut parameter instance from a message which attributes is not an instance of %s, the current attribute instance type is: %s",
+    checkArgument(attributes.getValue() instanceof HttpRequestAttributes, () ->
+            format("Cannot create a policy pointcut parameter instance from a message which attributes is not an instance of %s, the current attribute instance type is: %s",
                 HttpRequestAttributes.class.getName(), attributes != null ? attributes.getClass().getName() : "null"));
 
     HttpRequestAttributes httpRequestAttributes = (HttpRequestAttributes) attributes.getValue();
