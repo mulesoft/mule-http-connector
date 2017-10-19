@@ -19,12 +19,14 @@ import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SECURITY;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.getReasonPhraseForStatusCode;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
@@ -44,6 +46,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.transformation.TransformationService;
@@ -158,6 +161,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   private RequestHandlerManager requestHandlerManager;
   private HttpResponseFactory responseFactory;
   private ErrorTypeMatcher knownErrors;
+  private ErrorType overloadErrorType;
   private Class interpretedAttributes;
 
   // TODO: MULE-10900 figure out a way to have a shared group between callbacks and possibly regular params
@@ -238,7 +242,11 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
           .reasonPhrase(attributes.getReasonPhrase());
       attributes.getHeaders().forEach(failureResponseBuilder::addHeader);
     } else if (error != null) {
-      failureResponseBuilder = createDefaultFailureResponseBuilder(error);
+      if (error.getErrorType().equals(overloadErrorType)) {
+        failureResponseBuilder = createDefaultFailureResponseBuilder(error, SERVICE_UNAVAILABLE);
+      } else {
+        failureResponseBuilder = createDefaultFailureResponseBuilder(error, INTERNAL_SERVER_ERROR);
+      }
     } else {
       failureResponseBuilder = HttpResponse.builder();
     }
@@ -270,6 +278,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
       throw new MuleRuntimeException(e);
     }
     knownErrors = new DisjunctiveErrorTypeMatcher(createErrorMatcherList(muleContext.getErrorTypeRepository()));
+    overloadErrorType = muleContext.getErrorTypeRepository().getErrorType(OVERLOAD).get();
     requestHandlerManager.start();
   }
 
@@ -401,12 +410,12 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
         && interpretedAttributes.isInstance(error.get().getErrorMessage().getAttributes().getValue());
   }
 
-  private HttpResponseBuilder createDefaultFailureResponseBuilder(Error error) {
+  private HttpResponseBuilder createDefaultFailureResponseBuilder(Error error, HttpStatus httpStatus) {
     // Default to the HTTP transport exception mapping for compatibility
     Throwable throwable = error.getCause();
-    String reasonPhraseFromException = getReasonPhraseForStatusCode(INTERNAL_SERVER_ERROR.getStatusCode());
+    String reasonPhraseFromException = getReasonPhraseForStatusCode(httpStatus.getStatusCode());
     return HttpResponse.builder()
-        .statusCode(INTERNAL_SERVER_ERROR.getStatusCode())
+        .statusCode(httpStatus.getStatusCode())
         .reasonPhrase(reasonPhraseFromException != null ? reasonPhraseFromException : throwable.getMessage());
   }
 
