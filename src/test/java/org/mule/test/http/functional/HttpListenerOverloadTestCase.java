@@ -109,7 +109,8 @@ public class HttpListenerOverloadTestCase extends AbstractHttpTestCase {
   private Thread executeRequestInAnotherThread(final String url) {
     Thread task = new Thread(() -> {
       try {
-        HttpResponse response = httpClientExecutor.execute(Request.Get(url).connectTimeout(RECEIVE_TIMEOUT).socketTimeout(RECEIVE_TIMEOUT)).returnResponse();
+        HttpResponse response = httpClientExecutor
+            .execute(Request.Get(url).connectTimeout(RECEIVE_TIMEOUT).socketTimeout(RECEIVE_TIMEOUT)).returnResponse();
         int statusCode = response.getStatusLine().getStatusCode();
 
         if (statusCode == SERVICE_UNAVAILABLE.getStatusCode()) {
