@@ -8,25 +8,27 @@ package org.mule.test.http.functional;
 
 import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.functional.api.component.FunctionalTestProcessor.getFromFlow;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
 import org.mule.functional.api.component.FunctionalTestProcessor;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Executor;
 import org.apache.http.client.fluent.Request;
@@ -36,21 +38,21 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-@Feature(HTTP_EXTENSION)
+@Story("Worker overload handling")
 public class HttpListenerOverloadTestCase extends AbstractHttpTestCase {
 
-  // This must match the default pool size in ContainerThreadPoolsConfig
-  private static final int MAX_CONNECTIONS = 256;
+  // This must be at least the default pool size in ContainerThreadPoolsConfig
+  private static final int MAX_CONNECTIONS = 512;
 
   @Rule
   public DynamicPort listenPort = new DynamicPort("port");
 
-  private CountDownLatch activeProcessorsStarted;
-  private CountDownLatch activeProcessorsFinished;
-  private Latch keepProcessorsActive = new Latch();
-  private AtomicInteger numberOfRequest = new AtomicInteger();
   private Executor httpClientExecutor;
-  private ConcurrentLinkedQueue<Throwable> accumulatedErrors = new ConcurrentLinkedQueue<>();
+  private Latch keepProcessorsActive;
+  private AtomicInteger numProcessedRequests;
+  private AtomicInteger numServiceBusy;
+  private ConcurrentLinkedQueue<Throwable> accumulatedErrors;
+  private Semaphore waitForNextRequester;
 
   @Override
   protected String getConfigFile() {
@@ -65,81 +67,85 @@ public class HttpListenerOverloadTestCase extends AbstractHttpTestCase {
     mgr.setDefaultMaxPerRoute(MAX_CONNECTIONS);
     mgr.setMaxTotal(MAX_CONNECTIONS);
     httpClientExecutor = Executor.newInstance(HttpClientBuilder.create().setConnectionManager(mgr).build());
+
+    keepProcessorsActive = new Latch();
+    numProcessedRequests = new AtomicInteger(0);
+    numServiceBusy = new AtomicInteger(0);
+    accumulatedErrors = new ConcurrentLinkedQueue<>();
+    waitForNextRequester = new Semaphore(0);
   }
 
   /**
-   * Phase 1: Start N requests to the listener, which will use all workers from the pool to wait on a latch inside a message processor.
-   * Phase 2: Start a few requests to the listener, checking that they return "server busy" status code without getting into the flow message processors.
-   * Phase 3: Release the latch, allowing the N requests to continue and verifying they succeed.
+   * Phase 1: Start arbitrary requests to the listener, which will use all workers from the pool to wait on a latch inside a message processor.
+   * Phase 2: When we get at least 5 "server busy" responses (which didn't enter the flow), we stop creating requests.
+   * Phase 3: Release the latch, allowing the suspended flow executions to continue and verify they succeed.
    * Phase 4: Verify that all requests were processed and no errors were thrown.
    */
   @Test
   public void overloadScenario() throws Exception {
     final String url = format("http://localhost:%s/", listenPort.getNumber());
+    List<Thread> tasks = new ArrayList<>();
 
-    try {
-      sendRequestUntilNoMoreWorkers("testFlow", url, MAX_CONNECTIONS - 1);
+    configureTestComponent("testFlow");
 
-      for (int i = 0; i < 5; i++) {
-        final HttpResponse response = Request.Get(url).connectTimeout(RECEIVE_TIMEOUT).execute().returnResponse();
-        assertThat(response.getStatusLine().getStatusCode(), is(SERVICE_UNAVAILABLE.getStatusCode()));
-        assertThat(response.getStatusLine().getReasonPhrase(), is(SERVICE_UNAVAILABLE.getReasonPhrase()));
-        assertThat(IOUtils.toString(response.getEntity().getContent()), is("Scheduler unavailable"));
-      }
+    while (numServiceBusy.get() < 5) {
+      tasks.add(executeRequestInAnotherThread(url));
+      waitForNextRequester.acquire();
+    }
 
-    } finally {
-      keepProcessorsActive.release();
-      if (!activeProcessorsFinished.await(15, TimeUnit.SECONDS)) {
-        fail(format("%d message processor invocations didn't finish", activeProcessorsFinished.getCount()));
-      }
+    keepProcessorsActive.release();
+
+    for (Thread t : tasks) {
+      t.join();
     }
 
     if (accumulatedErrors.size() > 0) {
       fail(accumulatedErrors.stream().limit(10).collect(Collectors.toList()).toString());
     }
+
+    assertThat(numProcessedRequests.get(), greaterThan(tasks.size() / 2));
   }
 
-  private void sendRequestUntilNoMoreWorkers(String flowName, String url, int maxThreadsActive) throws Exception {
-    activeProcessorsStarted = new CountDownLatch(maxThreadsActive);
-    activeProcessorsFinished = new CountDownLatch(maxThreadsActive);
-    configureTestComponent(flowName, maxThreadsActive);
-
-    for (int i = 0; i < maxThreadsActive; i++) {
-      executeRequestInAnotherThread(url);
-    }
-
-    if (!activeProcessorsStarted.await(15, TimeUnit.SECONDS)) {
-      fail(format("%d message processor invocations weren't started", activeProcessorsStarted.getCount()));
-    }
-  }
-
-  private void executeRequestInAnotherThread(final String url) {
-    new Thread(() -> {
+  private Thread executeRequestInAnotherThread(final String url) {
+    Thread task = new Thread(() -> {
       try {
-        HttpResponse response = httpClientExecutor.execute(Request.Get(url).connectTimeout(RECEIVE_TIMEOUT)).returnResponse();
-        assertThat(response.getStatusLine().getStatusCode(), is(OK.getStatusCode()));
-        assertThat(IOUtils.toString(response.getEntity().getContent()), is("the result"));
+        HttpResponse response = httpClientExecutor.execute(Request.Get(url).connectTimeout(RECEIVE_TIMEOUT).socketTimeout(RECEIVE_TIMEOUT)).returnResponse();
+        int statusCode = response.getStatusLine().getStatusCode();
+
+        if (statusCode == SERVICE_UNAVAILABLE.getStatusCode()) {
+          assertThat(response.getStatusLine().getReasonPhrase(), is(SERVICE_UNAVAILABLE.getReasonPhrase()));
+          assertThat(IOUtils.toString(response.getEntity().getContent()), is("Scheduler unavailable"));
+
+          numServiceBusy.incrementAndGet();
+          waitForNextRequester.release();
+        } else if (statusCode == OK.getStatusCode()) {
+          assertThat(IOUtils.toString(response.getEntity().getContent()), is("the result"));
+        } else {
+          accumulatedErrors.add(new AssertionError("request returned invalid status code: " + statusCode));
+        }
+      } catch (SocketException e) {
+        // ignore possible "connection refused" due to temporary selector shortage
       } catch (Throwable e) {
         accumulatedErrors.add(e);
-      } finally {
-        activeProcessorsFinished.countDown();
       }
-    }).start();
+    });
+
+    task.start();
+
+    return task;
   }
 
   /**
    * Configures a test component in a specific flow to block until a specific number of concurrent requests are reached.
    */
-  private void configureTestComponent(String flowName, final int maxThreadsActive) throws Exception {
+  private void configureTestComponent(String flowName) throws Exception {
     FunctionalTestProcessor testProc = getFromFlow(locator, flowName);
     testProc.setEventCallback((event, component, muleContext) -> {
       try {
-        activeProcessorsStarted.countDown();
-        numberOfRequest.incrementAndGet();
-        if (numberOfRequest.get() <= maxThreadsActive) {
-          keepProcessorsActive.await();
-        }
-      } catch (InterruptedException e) {
+        numProcessedRequests.incrementAndGet();
+        waitForNextRequester.release();
+        keepProcessorsActive.await();
+      } catch (Throwable e) {
         accumulatedErrors.add(e);
       }
     });
