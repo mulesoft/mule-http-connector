@@ -14,7 +14,7 @@
 
     <flow name="testFlow">
         <http:listener path="/*" config-ref="listenerConfig"/>
-        <test:processor enableNotifications="false">
+        <test:processor>
             <test:return-data>the result</test:return-data>
         </test:processor>
     </flow>
