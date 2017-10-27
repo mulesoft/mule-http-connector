@@ -44,7 +44,7 @@ public class HttpRequestAttributesBuilder {
     String version = request.getProtocol().asString();
     String scheme = requestContext.getScheme();
     String method = request.getMethod();
-    String uri = request.getUri();
+    String uri = request.getUri().toString();
     String path = extractPath(uri);
     String queryString = extractQueryParams(uri);
     MultiMap<String, String> queryParams = decodeQueryString(queryString);

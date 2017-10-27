@@ -121,7 +121,7 @@ public class HttpRequestOperations implements Initialisable, Disposable {
 
   private String resolveUri(HttpConstants.Protocol scheme, String host, Integer port, String path) {
     // Encode spaces to generate a valid HTTP request.
-    return format("%s://%s:%s%s", scheme.getScheme(), host, port, encodeSpaces(path));
+    return scheme.getScheme() + "://" + host + ":" + port + encodeSpaces(path);
   }
 
   private int resolveResponseTimeout(Integer responseTimeout) {

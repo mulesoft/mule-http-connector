@@ -110,7 +110,7 @@ public class HttpRequestFactory {
     if (config.isEnableCookies()) {
       try {
         Map<String, List<String>> headers =
-            config.getCookieManager().get(URI.create(uri), Collections.<String, List<String>>emptyMap());
+            config.getCookieManager().get(builder.getUri(), Collections.<String, List<String>>emptyMap());
         List<String> cookies = headers.get(COOKIE);
         if (cookies != null) {
           for (String cookie : cookies) {

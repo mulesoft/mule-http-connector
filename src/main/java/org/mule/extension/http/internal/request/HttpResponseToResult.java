@@ -56,7 +56,7 @@ public class HttpResponseToResult {
     this.muleContext = muleContext;
   }
 
-  public Publisher<Result<InputStream, HttpResponseAttributes>> convert(HttpResponse response, String uri) {
+  public Publisher<Result<InputStream, HttpResponseAttributes>> convert(HttpResponse response, URI uri) {
     String responseContentType = response.getHeaderValueIgnoreCase(CONTENT_TYPE);
 
     HttpEntity entity = response.getEntity();
@@ -90,7 +90,7 @@ public class HttpResponseToResult {
     return new HttpResponseAttributesBuilder().setResponse(response).build();
   }
 
-  private void processCookies(HttpResponse response, String uri) {
+  private void processCookies(HttpResponse response, URI uri) {
     Collection<String> setCookieHeader = response.getHeaderValuesIgnoreCase(SET_COOKIE);
     Collection<String> setCookie2Header = response.getHeaderValuesIgnoreCase(SET_COOKIE2);
 
@@ -105,7 +105,7 @@ public class HttpResponseToResult {
     }
 
     try {
-      config.getCookieManager().put(URI.create(uri), cookieHeaders);
+      config.getCookieManager().put(uri, cookieHeaders);
     } catch (IOException e) {
       logger.warn("Error storing cookies for URI " + uri, e);
     }
