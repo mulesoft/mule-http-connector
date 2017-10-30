@@ -16,6 +16,7 @@ import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.request.ClientConnection;
 import org.mule.runtime.http.api.domain.request.HttpRequestContext;
 
+import java.net.URI;
 import java.security.cert.Certificate;
 import java.util.Collection;
 import java.util.Map;
@@ -44,9 +45,9 @@ public class HttpRequestAttributesBuilder {
     String version = request.getProtocol().asString();
     String scheme = requestContext.getScheme();
     String method = request.getMethod();
-    String uri = request.getUri().toString();
-    String path = extractPath(uri);
-    String queryString = extractQueryParams(uri);
+    URI uri = request.getUri();
+    String path = uri.getPath();
+    String queryString = uri.getQuery();
     MultiMap<String, String> queryParams = decodeQueryString(queryString);
     Map<String, String> uriParams = decodeUriParams(listenerPath, path);
     ClientConnection clientConnection = requestContext.getClientConnection();
@@ -59,7 +60,7 @@ public class HttpRequestAttributesBuilder {
     for (String headerName : headerNames) {
       headers.put(headerName, request.getHeaderValues(headerName));
     }
-    return new HttpRequestAttributes(headers, listenerPath, relativePath, version, scheme, method, path, uri, queryString,
+    return new HttpRequestAttributes(headers, listenerPath, relativePath, version, scheme, method, path, uri.toString(), queryString,
                                      queryParams, uriParams, remoteHostAddress, clientCertificate);
   }
 }
