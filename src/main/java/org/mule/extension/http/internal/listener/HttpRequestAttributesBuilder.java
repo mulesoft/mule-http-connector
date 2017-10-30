@@ -60,7 +60,8 @@ public class HttpRequestAttributesBuilder {
     for (String headerName : headerNames) {
       headers.put(headerName, request.getHeaderValues(headerName));
     }
-    return new HttpRequestAttributes(headers, listenerPath, relativePath, version, scheme, method, path, uri.toString(), queryString,
+    return new HttpRequestAttributes(headers, listenerPath, relativePath, version, scheme, method, path, uri.toString(),
+                                     queryString,
                                      queryParams, uriParams, remoteHostAddress, clientCertificate);
   }
 }
