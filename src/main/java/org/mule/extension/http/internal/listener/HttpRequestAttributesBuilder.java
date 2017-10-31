@@ -51,11 +51,12 @@ public class HttpRequestAttributesBuilder {
     URI uri = request.getUri();
     String path = uri.getPath();
     String uriString = path;
-    Optional<String> query = ofNullable(uri.getQuery());
-    if (query.isPresent()) {
-      uriString += "?" + query.get();
+    String queryString = uri.getQuery();
+    if (queryString != null) {
+      uriString += "?" + queryString;
+    } else {
+      queryString = "";
     }
-    String queryString = ofNullable(uri.getQuery()).orElse("");
     MultiMap<String, String> queryParams = decodeQueryString(queryString);
     Map<String, String> uriParams = decodeUriParams(listenerPath, path);
     ClientConnection clientConnection = requestContext.getClientConnection();

@@ -99,7 +99,7 @@ public class HttpListenerConfigFunctionalTestCase extends AbstractHttpTestCase {
   public void noListenerConfig() throws Exception {
     final String url = format("http://localhost:%s/noListener", noListenerConfigPort.getNumber());
     final HttpResponse httpResponse = callAndAssertStatus(url, NOT_FOUND);
-    assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(format(NO_LISTENER_ENTITY_FORMAT, url)));
+    assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(format(NO_LISTENER_ENTITY_FORMAT, "/noListener")));
   }
 
   @Test
