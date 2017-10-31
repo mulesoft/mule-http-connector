@@ -21,15 +21,16 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class HttpResponseHeaderBuilder {
 
-  private List<String> uniqueHeadersNames =
-      asList(TRANSFER_ENCODING.toLowerCase(),
-             CONTENT_LENGTH.toLowerCase(),
-             CONTENT_TYPE.toLowerCase(),
-             ACCESS_CONTROL_ALLOW_ORIGIN.toLowerCase());
+  private static final Set<String> uniqueHeadersNames =
+      new HashSet(asList(TRANSFER_ENCODING.toLowerCase(),
+                         CONTENT_LENGTH.toLowerCase(),
+                         CONTENT_TYPE.toLowerCase(),
+                         ACCESS_CONTROL_ALLOW_ORIGIN.toLowerCase()));
 
   Multimap<String, String> headers = newMultimap(new CaseInsensitiveMapWrapper<>(), Sets::newHashSet);
 

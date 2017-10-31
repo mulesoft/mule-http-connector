@@ -10,7 +10,6 @@ package org.mule.extension.http.internal.listener;
 import static java.lang.String.format;
 import static org.mule.extension.http.internal.HttpStreamingType.ALWAYS;
 import static org.mule.extension.http.internal.HttpStreamingType.AUTO;
-import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.NOT_MODIFIED;
@@ -20,9 +19,11 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
+
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.internal.HttpStreamingType;
 import org.mule.extension.http.internal.listener.intercepting.Interception;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.transformation.TransformationService;
@@ -35,12 +36,12 @@ import org.mule.runtime.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.mule.runtime.http.api.domain.message.response.HttpResponseBuilder;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Component that creates {@link HttpResponse HttpResponses}.
@@ -121,7 +122,7 @@ public class HttpResponseFactory {
         }
       }
     } else {
-      ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(getMessageAsBytes(payload));
+      ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(getMessageAsBytes(body));
 
       resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding,
                       byteArrayHttpEntity);
@@ -179,8 +180,9 @@ public class HttpResponseFactory {
     });
   }
 
-  private byte[] getMessageAsBytes(Object payload) {
-    return (byte[]) transformationService.transform(of(payload), BYTE_ARRAY).getPayload().getValue();
+  private byte[] getMessageAsBytes(TypedValue payload) {
+    return (byte[]) transformationService.transform(Message.builder().payload(payload).build(), BYTE_ARRAY).getPayload()
+        .getValue();
   }
 
   public String resolveReasonPhrase(String builderReasonPhrase, Integer statusCode) {
