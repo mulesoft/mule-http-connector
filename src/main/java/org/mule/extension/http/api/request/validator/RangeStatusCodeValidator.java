@@ -6,7 +6,10 @@
  */
 package org.mule.extension.http.api.request.validator;
 
+import static java.lang.Integer.parseInt;
 import static org.mule.extension.http.api.error.HttpError.getErrorByCode;
+import static org.mule.runtime.core.api.util.ClassUtils.memoize;
+
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.error.HttpError;
 import org.mule.extension.http.api.error.HttpErrorMessageGenerator;
@@ -16,6 +19,8 @@ import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 
 import java.io.InputStream;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 /**
  * Base status code validator that can be extended to create custom validations.
@@ -30,22 +35,20 @@ public abstract class RangeStatusCodeValidator implements ResponseValidator {
   @Parameter
   private String values;
 
-  private HttpErrorMessageGenerator errorMessageGenerator = new HttpErrorMessageGenerator();
-
-  protected boolean belongs(int value) {
+  private Function<Integer, Boolean> belongsFunction = memoize(value -> {
     String[] valueParts = values.split(",");
 
     for (String valuePart : valueParts) {
       if (valuePart.contains("..")) {
         String[] limits = valuePart.split("\\.\\.");
-        int lower = Integer.parseInt(limits[0]);
-        int upper = Integer.parseInt(limits[1]);
+        int lower = parseInt(limits[0]);
+        int upper = parseInt(limits[1]);
 
         if (value >= lower && value <= upper) {
           return true;
         }
       } else {
-        int code = Integer.parseInt(valuePart);
+        int code = parseInt(valuePart);
 
         if (code == value) {
           return true;
@@ -54,6 +57,12 @@ public abstract class RangeStatusCodeValidator implements ResponseValidator {
     }
 
     return false;
+  }, new ConcurrentHashMap<>());
+
+  private HttpErrorMessageGenerator errorMessageGenerator = new HttpErrorMessageGenerator();
+
+  protected boolean belongs(int value) {
+    return belongsFunction.apply(value);
   }
 
   public String getValues() {
@@ -66,7 +75,7 @@ public abstract class RangeStatusCodeValidator implements ResponseValidator {
 
   /**
    * Creates the exception to be thrown if the validation didn't pass.
-   * 
+   *
    * @param result the result of the request operation
    * @param request the HTTP request sent
    * @param status the HTTP response status code
