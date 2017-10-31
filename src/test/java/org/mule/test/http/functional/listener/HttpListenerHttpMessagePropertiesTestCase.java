@@ -83,7 +83,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
     Request.Get(url).connectTimeout(RECEIVE_TIMEOUT).execute();
     final Message message = queueHandler.read("out", RECEIVE_TIMEOUT).getMessage();
     HttpRequestAttributes attributes = getAttributes(message);
-    assertThat(attributes.getRequestUri(), is(url + BASE_PATH));
+    assertThat(attributes.getRequestUri(), is(BASE_PATH));
     assertThat(attributes.getRequestPath(), is(BASE_PATH));
     assertThat(attributes.getRelativePath(), is(BASE_PATH));
     assertThat(attributes.getQueryString(), is(""));
@@ -106,7 +106,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
     Request.Get(url).connectTimeout(RECEIVE_TIMEOUT).execute();
     final Message message = queueHandler.read("out", RECEIVE_TIMEOUT).getMessage();
     HttpRequestAttributes attributes = getAttributes(message);
-    assertThat(attributes.getRequestUri(), is(url));
+    assertThat(attributes.getRequestUri(), is(uri));
     assertThat(attributes.getRequestPath(), is(BASE_PATH));
     assertThat(attributes.getRelativePath(), is(BASE_PATH));
     Map<String, String> retrivedQueryParams = attributes.getQueryParams();
@@ -165,7 +165,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
     Request.Get(url).connectTimeout(RECEIVE_TIMEOUT).execute();
     final Message message = queueHandler.read("out", RECEIVE_TIMEOUT).getMessage();
     HttpRequestAttributes attributes = getAttributes(message);
-    assertThat(attributes.getRequestUri(), is(url));
+    assertThat(attributes.getRequestUri(), is(CONTEXT_PATH));
     assertThat(attributes.getRequestPath(), is(CONTEXT_PATH));
     assertThat(attributes.getRelativePath(), is(CONTEXT_PATH));
   }
