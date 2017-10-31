@@ -6,6 +6,7 @@
  */
 package org.mule.test.http.functional.requester;
 
+import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.api.component.FunctionalTestProcessor.getFromFlow;
@@ -88,7 +89,7 @@ public class HttpRequestProxyTlsTestCase extends AbstractHttpTestCase {
         .withVariable("path", PATH).run();
 
     assertThat(requestPayload, equalTo(TEST_MESSAGE));
-    assertThat(requestURI, equalTo(PATH));
+    assertThat(requestURI, equalTo(format("http://localhost:%s" + PATH, httpPort.getValue())));
     assertThat((HttpResponseAttributes) event.getMessage().getAttributes().getValue(), HttpMessageAttributesMatchers
         .hasStatusCode(OK.getStatusCode()));
     assertThat(event.getMessage().getPayload().getValue(), equalTo(OK_RESPONSE));

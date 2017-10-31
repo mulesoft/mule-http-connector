@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.internal.listener;
 
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.decodeQueryString;
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.decodeUriParams;
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.extractPath;
@@ -47,7 +48,7 @@ public class HttpRequestAttributesBuilder {
     String method = request.getMethod();
     URI uri = request.getUri();
     String path = uri.getPath();
-    String queryString = uri.getQuery();
+    String queryString = ofNullable(uri.getQuery()).orElse("");
     MultiMap<String, String> queryParams = decodeQueryString(queryString);
     Map<String, String> uriParams = decodeUriParams(listenerPath, path);
     ClientConnection clientConnection = requestContext.getClientConnection();
