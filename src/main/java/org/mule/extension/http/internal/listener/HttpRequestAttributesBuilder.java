@@ -21,6 +21,7 @@ import java.net.URI;
 import java.security.cert.Certificate;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Creates {@link HttpRequestAttributes} based on an {@link HttpRequestContext}, it's parts and a {@link ListenerPath}.
@@ -46,8 +47,14 @@ public class HttpRequestAttributesBuilder {
     String version = request.getProtocol().asString();
     String scheme = requestContext.getScheme();
     String method = request.getMethod();
+
     URI uri = request.getUri();
     String path = uri.getPath();
+    String uriString = path;
+    Optional<String> query = ofNullable(uri.getQuery());
+    if (query.isPresent()) {
+      uriString += "?" + query.get();
+    }
     String queryString = ofNullable(uri.getQuery()).orElse("");
     MultiMap<String, String> queryParams = decodeQueryString(queryString);
     Map<String, String> uriParams = decodeUriParams(listenerPath, path);
@@ -61,7 +68,7 @@ public class HttpRequestAttributesBuilder {
     for (String headerName : headerNames) {
       headers.put(headerName, request.getHeaderValues(headerName));
     }
-    return new HttpRequestAttributes(headers, listenerPath, relativePath, version, scheme, method, path, uri.toString(),
+    return new HttpRequestAttributes(headers, listenerPath, relativePath, version, scheme, method, path, uriString,
                                      queryString,
                                      queryParams, uriParams, remoteHostAddress, clientCertificate);
   }
