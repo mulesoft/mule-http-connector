@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.internal.listener;
 
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.decodeQueryString;
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.decodeUriParams;
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.extractPath;
@@ -16,9 +17,11 @@ import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.request.ClientConnection;
 import org.mule.runtime.http.api.domain.request.HttpRequestContext;
 
+import java.net.URI;
 import java.security.cert.Certificate;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Creates {@link HttpRequestAttributes} based on an {@link HttpRequestContext}, it's parts and a {@link ListenerPath}.
@@ -44,9 +47,16 @@ public class HttpRequestAttributesBuilder {
     String version = request.getProtocol().asString();
     String scheme = requestContext.getScheme();
     String method = request.getMethod();
-    String uri = request.getUri();
-    String path = extractPath(uri);
-    String queryString = extractQueryParams(uri);
+
+    URI uri = request.getUri();
+    String path = uri.getPath();
+    String uriString = path;
+    String queryString = uri.getQuery();
+    if (queryString != null) {
+      uriString += "?" + queryString;
+    } else {
+      queryString = "";
+    }
     MultiMap<String, String> queryParams = decodeQueryString(queryString);
     Map<String, String> uriParams = decodeUriParams(listenerPath, path);
     ClientConnection clientConnection = requestContext.getClientConnection();
@@ -59,7 +69,8 @@ public class HttpRequestAttributesBuilder {
     for (String headerName : headerNames) {
       headers.put(headerName, request.getHeaderValues(headerName));
     }
-    return new HttpRequestAttributes(headers, listenerPath, relativePath, version, scheme, method, path, uri, queryString,
+    return new HttpRequestAttributes(headers, listenerPath, relativePath, version, scheme, method, path, uriString,
+                                     queryString,
                                      queryParams, uriParams, remoteHostAddress, clientCertificate);
   }
 }
