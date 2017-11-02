@@ -79,6 +79,24 @@ public class HttpListenerPartsTestCase extends AbstractHttpTestCase {
           + "yes\r\n"
           + "--the-boundary--\r\n";
 
+  private static final String FILE1_FILENAME = "file1.txt";
+  private static final String FILE2_FILENAME = "file2.txt";
+  private static final String FILE1_VALUE = "first file";
+  private static final String FILE2_VALUE = "second file";
+
+  private static final String REPEATED_NAME =
+      "--the-boundary\r\n"
+          + "Content-Disposition: form-data; name=\"" + FILE_BODY_FIELD_NAME + "\"; filename=\"" + FILE1_FILENAME + "\"\r\n"
+          + "Content-Type: text/plain\r\n"
+          + "\r\n"
+          + FILE1_VALUE + "\r\n"
+          + "--the-boundary\r\n"
+          + "Content-Disposition: form-data; name=\"" + FILE_BODY_FIELD_NAME + "\"; filename=\"" + FILE2_FILENAME + "\"\r\n"
+          + "Content-Type: text/plain\r\n"
+          + "\r\n"
+          + FILE2_VALUE + "\r\n"
+          + "--the-boundary--\r\n";
+
   @Rule
   public DynamicPort listenPort = new DynamicPort("port");
   @Rule
@@ -161,6 +179,32 @@ public class HttpListenerPartsTestCase extends AbstractHttpTestCase {
     assertThat(part2.getHeader(CONTENT_DISPOSITION), containsString("; filename=\"" + FILE_BODY_FIELD_FILENAME + "\""));
     assertThat(part2.getContentType(), is(BINARY.toRfcString()));
     assertThat(IOUtils.toString(part2.getInputStream()), is(FILE_BODY_FIELD_VALUE));
+  }
+
+  @Test
+  public void respondWithSeveralAttachmentsWhenRepeated() throws Exception {
+    final Response response = Post(getUrl(formDataPath.getValue()))
+        .addHeader(CONTENT_TYPE, MULTIPART_FORM_DATA + "; boundary=\"the-boundary\"")
+        .body(new StringEntity(REPEATED_NAME))
+        .execute();
+    HttpEntity entity = response.returnResponse().getEntity();
+    Collection<Part> parts = parseParts(entity);
+
+    assertThat(parts, hasSize(2));
+
+    final Iterator<Part> responsePartsIterator = parts.iterator();
+
+    Part part1 = responsePartsIterator.next();
+    assertThat(part1.getName(), is(FILE_BODY_FIELD_NAME));
+    assertThat(part1.getHeader(CONTENT_DISPOSITION), containsString("; filename=\"" + FILE2_FILENAME + "\""));
+    assertThat(part1.getContentType(), is(TEXT.toRfcString()));
+    assertThat(IOUtils.toString(part1.getInputStream()), is(FILE2_VALUE));
+
+    Part part2 = responsePartsIterator.next();
+    assertThat(part2.getName(), is(FILE_BODY_FIELD_NAME));
+    assertThat(part2.getHeader(CONTENT_DISPOSITION), containsString("; filename=\"" + FILE1_FILENAME + "\""));
+    assertThat(part2.getContentType(), is(TEXT.toRfcString()));
+    assertThat(IOUtils.toString(part2.getInputStream()), is(FILE1_VALUE));
   }
 
   private Collection<Part> parseParts(HttpEntity entity) throws IOException {
