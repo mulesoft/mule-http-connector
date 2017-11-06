@@ -5,14 +5,14 @@
     <parent>
         <groupId>org.mule.extensions</groupId>
         <artifactId>mule-core-modules-parent</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.mule.connectors</groupId>
     <artifactId>mule-http-connector</artifactId>
     <packaging>mule-extension</packaging>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
 
     <name>HTTP Connector</name>
     <description>A Mule extension that provides HTTP server and client functionality</description>
@@ -32,7 +32,7 @@
         <guavaVersion>18.0</guavaVersion>
         <formatterConfigPath>formatter.xml</formatterConfigPath>
 
-        <muleSocketsConnectorVersion>1.0.0-SNAPSHOT</muleSocketsConnectorVersion>
+        <muleSocketsConnectorVersion>1.1.0-SNAPSHOT</muleSocketsConnectorVersion>
         <muleCorsKernelVersion>1.0.1-SNAPSHOT</muleCorsKernelVersion>
     </properties>
 
