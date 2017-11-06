@@ -64,9 +64,8 @@ public class HttpRequestAttributesBuilder {
     Certificate clientCertificate = clientConnection.getClientCertificate();
     String relativePath = this.listenerPath.getRelativePath(path);
 
-    final Collection<String> headerNames = request.getHeaderNames();
     MultiMap<String, String> headers = new MultiMap<>();
-    for (String headerName : headerNames) {
+    for (String headerName : request.getHeaderNames()) {
       headers.put(headerName, request.getHeaderValues(headerName));
     }
     return new HttpRequestAttributes(headers, listenerPath, relativePath, version, scheme, method, path, uriString,
