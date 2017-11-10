@@ -27,7 +27,7 @@ public final class RequestConnectionParams {
 
   public static final String DEFAULT_MAX_CONNECTIONS = "-1";
   public static final String DEFAULT_CONNECTION_IDLE_TIMEOUT = "30000";
-  public static final String DEFAULT_RESPONSE_BUFFER_SIZE = "10240";
+  public static final String DEFAULT_RESPONSE_BUFFER_SIZE = "-1";
   /**
    * Protocol to use for communication. Valid values are HTTP and HTTPS. Default value is HTTP. When using HTTPS the HTTP
    * communication is going to be secured using TLS / SSL. If HTTPS was configured as protocol then the user can customize the
