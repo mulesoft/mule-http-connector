@@ -19,6 +19,8 @@ import java.io.Serializable;
  */
 public class HttpPolicyResponseAttributes implements Serializable {
 
+  private static final long serialVersionUID = 2530600012948674328L;
+
   /**
    * HTTP status code of the response. Former 'http.status'.
    */
