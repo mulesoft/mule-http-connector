@@ -7,6 +7,8 @@
 package org.mule.test.http.functional;
 
 import static java.lang.String.format;
+import static java.lang.String.join;
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertThat;
@@ -26,7 +28,6 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import io.qameta.allure.Story;
 import org.apache.http.HttpResponse;
@@ -101,7 +102,7 @@ public class HttpListenerSourceOverloadTestCase extends AbstractHttpTestCase {
 
     if (accumulatedErrors.size() > 0) {
       String errorMessage =
-          String.join("\n", accumulatedErrors.stream().limit(10).map(x -> x.toString()).collect(Collectors.toList()));
+          join("\n", accumulatedErrors.stream().limit(10).map(x -> x.toString()).collect(toList()));
       fail("Errors encountered in test: \n" + errorMessage);
     }
 
