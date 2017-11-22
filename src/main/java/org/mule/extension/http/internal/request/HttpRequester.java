@@ -6,10 +6,13 @@
  */
 package org.mule.extension.http.internal.request;
 
+import static java.lang.Integer.getInteger;
 import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
 import static org.mule.extension.http.api.error.HttpError.CONNECTIVITY;
 import static org.mule.extension.http.api.error.HttpError.TIMEOUT;
+import static org.mule.extension.http.internal.HttpConnectorConstants.IDEMPOTENT_METHODS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
 import static reactor.core.publisher.Mono.from;
 import org.mule.extension.http.api.HttpResponseAttributes;
@@ -36,6 +39,7 @@ import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.TimeoutException;
 
@@ -50,7 +54,10 @@ import org.slf4j.LoggerFactory;
 public class HttpRequester {
 
   private static final Logger logger = LoggerFactory.getLogger(HttpRequester.class);
-  private static final String REMOTELY_CLOSED = "Remotely closed";
+  public static final String REMOTELY_CLOSED = "Remotely closed";
+  public static String RETRY_ATTEMPTS_PROPERTY = SYSTEM_PROPERTY_PREFIX + "http.client.maxRetries";
+  public static final int DEFAULT_RETRY_ATTEMPTS = 3;
+  private static final int RETRY_ATTEMPTS = getInteger(RETRY_ATTEMPTS_PROPERTY, DEFAULT_RETRY_ATTEMPTS);
 
   private final boolean followRedirects;
   private final HttpRequestAuthentication authentication;
@@ -81,8 +88,14 @@ public class HttpRequester {
   public void doRequest(HttpExtensionClient client, HttpRequesterRequestBuilder requestBuilder,
                         boolean checkRetry, MuleContext muleContext,
                         CompletionCallback<InputStream, HttpResponseAttributes> callback) {
-    HttpRequest httpRequest = eventToHttpRequest.create(requestBuilder, authentication);
+    innerDoRequest(client, requestBuilder, checkRetry, muleContext, callback,
+                   eventToHttpRequest.create(requestBuilder, authentication), RETRY_ATTEMPTS);
+  }
 
+  private void innerDoRequest(HttpExtensionClient client, HttpRequesterRequestBuilder requestBuilder,
+                              boolean checkRetry, MuleContext muleContext,
+                              CompletionCallback<InputStream, HttpResponseAttributes> callback, HttpRequest httpRequest,
+                              int retryCount) {
     // TODO: MULE-13774 - Add notifications to HTTP request
     // notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct, MESSAGE_REQUEST_BEGIN);
     client.send(httpRequest, responseTimeout, followRedirects, resolveAuthentication(authentication))
@@ -93,7 +106,8 @@ public class HttpRequester {
                           from(httpResponseToResult.convert(response, httpRequest.getUri()))
                               .doOnNext(result -> {
                                 // TODO: MULE-13774 - Add notifications to HTTP request
-                                // notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct, MESSAGE_REQUEST_END);
+                                // notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct,
+                                // MESSAGE_REQUEST_END);
                                 try {
                                   if (resendRequest(result, checkRetry, authentication)) {
                                     scheduler.submit(() -> consumePayload(result));
@@ -110,6 +124,13 @@ public class HttpRequester {
                               .subscribe();
                         } else {
                           checkIfRemotelyClosed(exception, client.getDefaultUriParameters());
+
+                          if (shouldRetryRemotelyClosed(exception, retryCount, httpRequest.getMethod())) {
+                            innerDoRequest(client, requestBuilder, checkRetry, muleContext, callback, httpRequest,
+                                           retryCount - 1);
+                            return;
+                          }
+
                           logger.error(getErrorMessage(httpRequest));
                           HttpError error = exception instanceof TimeoutException ? TIMEOUT : CONNECTIVITY;
                           callback.error(new HttpRequestFailedException(
@@ -152,6 +173,16 @@ public class HttpRequester {
       logger
           .error("Remote host closed connection. Possible SSL/TLS handshake issue. Check protocols, cipher suites and certificate set up. Use -Djavax.net.debug=handshake for further debugging.");
     }
+  }
+
+  private boolean shouldRetryRemotelyClosed(Throwable exception, int retryCount, String httpMethod) {
+    boolean shouldRetry = IDEMPOTENT_METHODS.contains(httpMethod) && exception instanceof IOException
+        && containsIgnoreCase(exception.getMessage(), REMOTELY_CLOSED) && retryCount > 0;
+    if (shouldRetry) {
+      logger.warn("Sending HTTP message failed with `" + IOException.class.getCanonicalName() + ": " + REMOTELY_CLOSED
+          + "`. Request will be retried " + retryCount + " time(s) before failing.");
+    }
+    return shouldRetry;
   }
 
   public static class Builder {
