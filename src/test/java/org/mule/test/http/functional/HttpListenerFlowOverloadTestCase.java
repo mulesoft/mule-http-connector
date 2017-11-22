@@ -9,7 +9,7 @@ package org.mule.test.http.functional;
 import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -21,7 +21,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 @Story("Flow overload response status")
-public class HttpListenerServiceUnavailableTestCase extends AbstractHttpTestCase {
+public class HttpListenerFlowOverloadTestCase extends AbstractHttpTestCase {
 
   @Rule
   public DynamicPort listenPort = new DynamicPort("port");
@@ -36,8 +36,8 @@ public class HttpListenerServiceUnavailableTestCase extends AbstractHttpTestCase
     final String url = format("http://localhost:%s/", listenPort.getNumber());
     final HttpResponse response = Request.Get(url).connectTimeout(RECEIVE_TIMEOUT).execute().returnResponse();
 
-    assertThat(response.getStatusLine().getStatusCode(), is(SERVICE_UNAVAILABLE.getStatusCode()));
-    assertThat(response.getStatusLine().getReasonPhrase(), is(SERVICE_UNAVAILABLE.getReasonPhrase()));
+    assertThat(response.getStatusLine().getStatusCode(), is(INTERNAL_SERVER_ERROR.getStatusCode()));
+    assertThat(response.getStatusLine().getReasonPhrase(), is(INTERNAL_SERVER_ERROR.getReasonPhrase()));
     assertThat(IOUtils.toString(response.getEntity().getContent()), is("Scheduler unavailable"));
   }
 
