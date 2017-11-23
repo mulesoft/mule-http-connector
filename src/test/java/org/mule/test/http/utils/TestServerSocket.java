@@ -25,6 +25,7 @@ public class TestServerSocket extends Thread {
   private int numberOfExpectedConnections = 0;
   private int portNumber;
   private Latch serverConnectionLatch = new Latch();
+  private Latch disposeLatch = new Latch();
 
   public TestServerSocket(int portNumber, int numberOfExpectedConnections) {
     this.portNumber = portNumber;
@@ -64,12 +65,18 @@ public class TestServerSocket extends Thread {
         server.close();
       } catch (IOException e) {
         // Ignoring exception
+      } finally {
+        disposeLatch.countDown();
       }
     }
   }
 
   public int getConnectionCounter() {
     return connectionCounter;
+  }
+
+  public boolean dispose(int timeout) throws InterruptedException {
+    return disposeLatch.await(timeout, MILLISECONDS);
   }
 
 }

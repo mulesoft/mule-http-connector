@@ -10,12 +10,8 @@
         <http:request-connection host="localhost" port="${httpPort}" />
     </http:request-config>
 
-    <flow name="retryIdempotentMethod">
-        <http:request config-ref="requestConfig" method="GET"  path="test" />
-    </flow>
-
-    <flow name="retryNonIdempotentMethod">
-        <http:request config-ref="requestConfig" method="POST" path="test"/>
+    <flow name="retryFlow">
+        <http:request config-ref="requestConfig" method="#[vars.httpMethod]"  path="test" />
     </flow>
 
 </mule>

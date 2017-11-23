@@ -57,7 +57,6 @@ public class HttpRequester {
   public static final String REMOTELY_CLOSED = "Remotely closed";
   public static String RETRY_ATTEMPTS_PROPERTY = SYSTEM_PROPERTY_PREFIX + "http.client.maxRetries";
   public static final int DEFAULT_RETRY_ATTEMPTS = 3;
-  private static final int RETRY_ATTEMPTS = getInteger(RETRY_ATTEMPTS_PROPERTY, DEFAULT_RETRY_ATTEMPTS);
 
   private final boolean followRedirects;
   private final HttpRequestAuthentication authentication;
@@ -68,6 +67,7 @@ public class HttpRequester {
   private final NotificationHelper notificationHelper;
   private final HttpRequestFactory eventToHttpRequest;
   private final Scheduler scheduler;
+  private final int retryAttempts;
 
   private HttpErrorMessageGenerator errorMessageGenerator = new HttpErrorMessageGenerator();
 
@@ -83,19 +83,20 @@ public class HttpRequester {
     this.eventToHttpRequest = eventToHttpRequest;
     this.notificationHelper =
         new NotificationHelper(config.getMuleContext().getNotificationManager(), ConnectorMessageNotification.class, false);
+    retryAttempts = getInteger(RETRY_ATTEMPTS_PROPERTY, DEFAULT_RETRY_ATTEMPTS);
   }
 
   public void doRequest(HttpExtensionClient client, HttpRequesterRequestBuilder requestBuilder,
                         boolean checkRetry, MuleContext muleContext,
                         CompletionCallback<InputStream, HttpResponseAttributes> callback) {
-    innerDoRequest(client, requestBuilder, checkRetry, muleContext, callback,
-                   eventToHttpRequest.create(requestBuilder, authentication), RETRY_ATTEMPTS);
+    doRequestWithRetry(client, requestBuilder, checkRetry, muleContext, callback,
+                       eventToHttpRequest.create(requestBuilder, authentication), retryAttempts);
   }
 
-  private void innerDoRequest(HttpExtensionClient client, HttpRequesterRequestBuilder requestBuilder,
-                              boolean checkRetry, MuleContext muleContext,
-                              CompletionCallback<InputStream, HttpResponseAttributes> callback, HttpRequest httpRequest,
-                              int retryCount) {
+  private void doRequestWithRetry(HttpExtensionClient client, HttpRequesterRequestBuilder requestBuilder,
+                                  boolean checkRetry, MuleContext muleContext,
+                                  CompletionCallback<InputStream, HttpResponseAttributes> callback, HttpRequest httpRequest,
+                                  int retryCount) {
     // TODO: MULE-13774 - Add notifications to HTTP request
     // notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct, MESSAGE_REQUEST_BEGIN);
     client.send(httpRequest, responseTimeout, followRedirects, resolveAuthentication(authentication))
@@ -126,8 +127,8 @@ public class HttpRequester {
                           checkIfRemotelyClosed(exception, client.getDefaultUriParameters());
 
                           if (shouldRetryRemotelyClosed(exception, retryCount, httpRequest.getMethod())) {
-                            innerDoRequest(client, requestBuilder, checkRetry, muleContext, callback, httpRequest,
-                                           retryCount - 1);
+                            doRequestWithRetry(client, requestBuilder, checkRetry, muleContext, callback, httpRequest,
+                                               retryCount - 1);
                             return;
                           }
 
