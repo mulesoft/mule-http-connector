@@ -19,7 +19,7 @@ import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SECURITY;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.SOURCE_OVERLOAD;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
@@ -29,6 +29,7 @@ import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.getReasonPhraseForStatusCode;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
@@ -161,7 +162,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   private RequestHandlerManager requestHandlerManager;
   private HttpResponseFactory responseFactory;
   private ErrorTypeMatcher knownErrors;
-  private ErrorType overloadErrorType;
+  private ErrorType sourceOverloadErrorType;
   private Class interpretedAttributes;
 
   // TODO: MULE-10900 figure out a way to have a shared group between callbacks and possibly regular params
@@ -242,7 +243,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
           .reasonPhrase(attributes.getReasonPhrase());
       attributes.getHeaders().forEach(failureResponseBuilder::addHeader);
     } else if (error != null) {
-      if (error.getErrorType().equals(overloadErrorType)) {
+      if (error.getErrorType().equals(sourceOverloadErrorType)) {
         failureResponseBuilder = createDefaultFailureResponseBuilder(error, SERVICE_UNAVAILABLE);
       } else {
         failureResponseBuilder = createDefaultFailureResponseBuilder(error, INTERNAL_SERVER_ERROR);
@@ -278,7 +279,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
       throw new MuleRuntimeException(e);
     }
     knownErrors = new DisjunctiveErrorTypeMatcher(createErrorMatcherList(muleContext.getErrorTypeRepository()));
-    overloadErrorType = muleContext.getErrorTypeRepository().getErrorType(OVERLOAD).get();
+    sourceOverloadErrorType = muleContext.getErrorTypeRepository().getErrorType(SOURCE_OVERLOAD).get();
     requestHandlerManager.start();
   }
 

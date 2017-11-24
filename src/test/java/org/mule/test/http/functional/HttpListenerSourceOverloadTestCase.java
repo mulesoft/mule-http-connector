@@ -7,6 +7,8 @@
 package org.mule.test.http.functional;
 
 import static java.lang.String.format;
+import static java.lang.String.join;
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertThat;
@@ -26,7 +28,6 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import io.qameta.allure.Story;
 import org.apache.http.HttpResponse;
@@ -38,8 +39,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-@Story("Worker overload handling")
-public class HttpListenerOverloadTestCase extends AbstractHttpTestCase {
+@Story("Source overload handling")
+public class HttpListenerSourceOverloadTestCase extends AbstractHttpTestCase {
 
   // This must be at least the default pool size in ContainerThreadPoolsConfig
   private static final int MAX_CONNECTIONS = 512;
@@ -100,7 +101,9 @@ public class HttpListenerOverloadTestCase extends AbstractHttpTestCase {
     }
 
     if (accumulatedErrors.size() > 0) {
-      fail(accumulatedErrors.stream().limit(10).collect(Collectors.toList()).toString());
+      String errorMessage =
+          join("\n", accumulatedErrors.stream().limit(10).map(x -> x.toString()).collect(toList()));
+      fail("Errors encountered in test: \n" + errorMessage);
     }
 
     assertThat(numProcessedRequests.get(), greaterThan(tasks.size() / 2));
@@ -117,8 +120,7 @@ public class HttpListenerOverloadTestCase extends AbstractHttpTestCase {
           assertThat(response.getStatusLine().getReasonPhrase(), is(SERVICE_UNAVAILABLE.getReasonPhrase()));
           assertThat(IOUtils.toString(response.getEntity().getContent()), is("Scheduler unavailable"));
 
-          numServiceBusy.incrementAndGet();
-          waitForNextRequester.release();
+
         } else if (statusCode == OK.getStatusCode()) {
           assertThat(IOUtils.toString(response.getEntity().getContent()), is("the result"));
         } else {
@@ -128,6 +130,9 @@ public class HttpListenerOverloadTestCase extends AbstractHttpTestCase {
         // ignore possible "connection refused" due to temporary selector shortage
       } catch (Throwable e) {
         accumulatedErrors.add(e);
+      } finally {
+        numServiceBusy.incrementAndGet();
+        waitForNextRequester.release();
       }
     });
 
