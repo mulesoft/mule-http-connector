@@ -98,7 +98,7 @@ public class HttpRequestProxyConfigTestCase extends MuleArtifactFunctionalTestCa
   private void ensureRequestGoesThroughProxy(String flowName) throws Exception {
     // Request should go through the proxy.
     flowRunner(flowName).withPayload(TEST_MESSAGE).runExpectingException(allOf(instanceOf(HttpRequestFailedException.class),
-                                                                               hasMessage(containsString("Remotely closed"))));
+                                                                               hasMessage(containsString("Connection refused"))));
     latch.await(1, SECONDS);
   }
 

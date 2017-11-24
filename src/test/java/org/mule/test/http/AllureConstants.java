@@ -35,6 +35,7 @@ public interface AllureConstants {
       String TIMEOUT = "Timeout";
       String STATIC_RESOURCE_LOADER = "Static Resource Loader";
       String POLICY_SUPPORT = "Policy Support";
+      String RETRY_POLICY = "Retry Policy";
     }
 
   }
