@@ -17,13 +17,13 @@
 
     <flow name="generalFlow">
         <http:listener  path="/*" config-ref="listenerConfig"/>
-        <set-payload value="#[mel:message.getAttributes()]"/>
+        <set-payload value="#[attributes]"/>
         <test:queue name="out"/>
     </flow>
 
     <flow name="severalUriParameters">
         <http:listener config-ref="listenerConfig" path="/{uri-param1}/{uri-param2}/{uri-param3}" />
-        <set-payload value="#[mel:message.getAttributes()]"/>
+        <set-payload value="#[attributes]"/>
         <test:queue name="out"/>
     </flow>
 
@@ -35,7 +35,7 @@
 
     <flow name="basePathConfig">
         <http:listener config-ref="listenerBaseConfig" path="*" />
-        <set-payload value="#[mel:message.getAttributes()]"/>
+        <set-payload value="#[attributes]"/>
         <test:queue name="out"/>
     </flow>
 

@@ -416,7 +416,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
                                       attributesFromRequest.getRequestPath(), attributesFromRequest.getRequestUri(),
                                       attributesFromRequest.getQueryString(),
                                       attributesFromRequest.getQueryParams(), attributesFromRequest.getUriParams(),
-                                      attributesFromRequest.getRemoteAddress(),
+                                      attributesFromRequest.getLocalAddress(), attributesFromRequest.getRemoteAddress(),
                                       attributesFromRequest.getClientCertificate());
       }
 

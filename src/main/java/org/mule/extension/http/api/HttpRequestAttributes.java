@@ -49,6 +49,10 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
    */
   private final String queryString;
   /**
+   * Local host address from the server.
+   */
+  private final String localAddress;
+  /**
    * Remote host address from the sender. Former 'http.remote.address'.
    */
   private final String remoteAddress;
@@ -59,8 +63,8 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
 
   public HttpRequestAttributes(MultiMap<String, String> headers, String listenerPath, String relativePath, String version,
                                String scheme, String method, String requestPath, String requestUri, String queryString,
-                               MultiMap<String, String> queryParams, Map<String, String> uriParams, String remoteAddress,
-                               Certificate clientCertificate) {
+                               MultiMap<String, String> queryParams, Map<String, String> uriParams, String localAddress,
+                               String remoteAddress, Certificate clientCertificate) {
     super(headers, queryParams, uriParams, requestPath);
     this.listenerPath = listenerPath;
     this.relativePath = relativePath;
@@ -69,6 +73,7 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
     this.method = method;
     this.requestUri = requestUri;
     this.queryString = queryString;
+    this.localAddress = localAddress;
     this.remoteAddress = remoteAddress;
     this.clientCertificate = clientCertificate;
   }
@@ -99,6 +104,10 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
 
   public String getQueryString() {
     return queryString;
+  }
+
+  public String getLocalAddress() {
+    return localAddress;
   }
 
   public String getRemoteAddress() {

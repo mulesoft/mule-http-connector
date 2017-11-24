@@ -6,11 +6,8 @@
  */
 package org.mule.extension.http.internal.listener;
 
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.decodeQueryString;
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.decodeUriParams;
-import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.extractPath;
-import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.extractQueryParams;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
@@ -19,9 +16,7 @@ import org.mule.runtime.http.api.domain.request.HttpRequestContext;
 
 import java.net.URI;
 import java.security.cert.Certificate;
-import java.util.Collection;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * Creates {@link HttpRequestAttributes} based on an {@link HttpRequestContext}, it's parts and a {@link ListenerPath}.
@@ -63,6 +58,7 @@ public class HttpRequestAttributesBuilder {
     String remoteHostAddress = clientConnection.getRemoteHostAddress().toString();
     Certificate clientCertificate = clientConnection.getClientCertificate();
     String relativePath = this.listenerPath.getRelativePath(path);
+    String localHostAddress = requestContext.getServerConnection().getLocalHostAddress().toString();
 
     MultiMap<String, String> headers = new MultiMap<>();
     for (String headerName : request.getHeaderNames()) {
@@ -70,6 +66,6 @@ public class HttpRequestAttributesBuilder {
     }
     return new HttpRequestAttributes(headers, listenerPath, relativePath, version, scheme, method, path, uriString,
                                      queryString,
-                                     queryParams, uriParams, remoteHostAddress, clientCertificate);
+                                     queryParams, uriParams, localHostAddress, remoteHostAddress, clientCertificate);
   }
 }

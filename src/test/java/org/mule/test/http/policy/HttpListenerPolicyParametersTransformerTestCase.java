@@ -46,6 +46,7 @@ public class HttpListenerPolicyParametersTransformerTestCase extends AbstractMul
   private final MultiMap<String, String> QUERY_PARAMS = new MultiMap<>();
   private final MultiMap<String, String> URI_PARAMS = new MultiMap<>();
   private final String REMOTE_ADDRESS = "";
+  private final String LOCAL_ADDRESS = "";
   private final Certificate CLIENT_CERTIFICATE = null;
 
   @Test
@@ -54,8 +55,8 @@ public class HttpListenerPolicyParametersTransformerTestCase extends AbstractMul
     Message message = Message.builder().value(EXPECTED_PAYLOAD)
         .mediaType(EXPECTED_MEDIA_TYPE)
         .attributesValue(new HttpRequestAttributes(HEADERS, LISTENER_PATH, RELATIVE_PATH, VERSION, SCHEME, METHOD, REQUEST_PATH,
-                                                   REQUEST_URI, QUERY_STRING, QUERY_PARAMS, URI_PARAMS, REMOTE_ADDRESS,
-                                                   CLIENT_CERTIFICATE))
+                                                   REQUEST_URI, QUERY_STRING, QUERY_PARAMS, URI_PARAMS, LOCAL_ADDRESS,
+                                                   REMOTE_ADDRESS, CLIENT_CERTIFICATE))
         .build();
 
     Map<String, Object> result = transformer.fromMessageToErrorResponseParameters(message);
