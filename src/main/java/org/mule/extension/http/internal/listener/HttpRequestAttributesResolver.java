@@ -9,63 +9,71 @@ package org.mule.extension.http.internal.listener;
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.decodeQueryString;
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.decodeUriParams;
 import org.mule.extension.http.api.HttpRequestAttributes;
+import org.mule.extension.http.api.HttpRequestAttributesBuilder;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.request.ClientConnection;
 import org.mule.runtime.http.api.domain.request.HttpRequestContext;
 
 import java.net.URI;
-import java.security.cert.Certificate;
-import java.util.Map;
 
 /**
  * Creates {@link HttpRequestAttributes} based on an {@link HttpRequestContext}, it's parts and a {@link ListenerPath}.
  */
-public class HttpRequestAttributesBuilder {
+public class HttpRequestAttributesResolver {
 
   private HttpRequestContext requestContext;
   private ListenerPath listenerPath;
 
-  public HttpRequestAttributesBuilder setRequestContext(HttpRequestContext requestContext) {
+  public HttpRequestAttributesResolver setRequestContext(HttpRequestContext requestContext) {
     this.requestContext = requestContext;
     return this;
   }
 
-  public HttpRequestAttributesBuilder setListenerPath(ListenerPath listenerPath) {
+  public HttpRequestAttributesResolver setListenerPath(ListenerPath listenerPath) {
     this.listenerPath = listenerPath;
     return this;
   }
 
-  public HttpRequestAttributes build() {
+  public HttpRequestAttributes resolve() {
+
     String listenerPath = this.listenerPath.getResolvedPath();
     HttpRequest request = requestContext.getRequest();
-    String version = request.getProtocol().asString();
-    String scheme = requestContext.getScheme();
-    String method = request.getMethod();
 
     URI uri = request.getUri();
     String path = uri.getPath();
     String uriString = path;
+    String relativePath = this.listenerPath.getRelativePath(path);
+
+    ClientConnection clientConnection = requestContext.getClientConnection();
+
+    MultiMap<String, String> headers = new MultiMap<>();
+    for (String headerName : request.getHeaderNames()) {
+      headers.put(headerName, request.getHeaderValues(headerName));
+    }
+
     String queryString = uri.getQuery();
     if (queryString != null) {
       uriString += "?" + queryString;
     } else {
       queryString = "";
     }
-    MultiMap<String, String> queryParams = decodeQueryString(queryString);
-    Map<String, String> uriParams = decodeUriParams(listenerPath, path);
-    ClientConnection clientConnection = requestContext.getClientConnection();
-    String remoteHostAddress = clientConnection.getRemoteHostAddress().toString();
-    Certificate clientCertificate = clientConnection.getClientCertificate();
-    String relativePath = this.listenerPath.getRelativePath(path);
-    String localHostAddress = requestContext.getServerConnection().getLocalHostAddress().toString();
 
-    MultiMap<String, String> headers = new MultiMap<>();
-    for (String headerName : request.getHeaderNames()) {
-      headers.put(headerName, request.getHeaderValues(headerName));
-    }
-    return new HttpRequestAttributes(headers, listenerPath, relativePath, version, scheme, method, path, uriString,
-                                     queryString,
-                                     queryParams, uriParams, localHostAddress, remoteHostAddress, clientCertificate);
+    return new HttpRequestAttributesBuilder()
+        .listenerPath(listenerPath)
+        .relativePath(relativePath)
+        .requestPath(path)
+        .requestUri(uriString)
+        .method(request.getMethod())
+        .scheme(requestContext.getScheme())
+        .version(request.getProtocol().asString())
+        .headers(headers)
+        .uriParams(decodeUriParams(listenerPath, path))
+        .queryString(queryString)
+        .queryParams(decodeQueryString(queryString))
+        .localAddress(requestContext.getServerConnection().getLocalHostAddress().toString())
+        .remoteAddress(clientConnection.getRemoteHostAddress().toString())
+        .clientCertificate(clientConnection.getClientCertificate())
+        .build();
   }
 }

@@ -61,10 +61,22 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
    */
   private final Certificate clientCertificate;
 
+  /**
+   * @deprecated use {@link HttpRequestAttributesBuilder} instead
+   */
+  @Deprecated
   public HttpRequestAttributes(MultiMap<String, String> headers, String listenerPath, String relativePath, String version,
                                String scheme, String method, String requestPath, String requestUri, String queryString,
-                               MultiMap<String, String> queryParams, Map<String, String> uriParams, String localAddress,
-                               String remoteAddress, Certificate clientCertificate) {
+                               MultiMap<String, String> queryParams, Map<String, String> uriParams, String remoteAddress,
+                               Certificate clientCertificate) {
+    this(headers, listenerPath, relativePath, version, scheme, method, requestPath, requestUri, queryString, queryParams,
+         uriParams, "", remoteAddress, clientCertificate);
+  }
+
+  HttpRequestAttributes(MultiMap<String, String> headers, String listenerPath, String relativePath, String version,
+                        String scheme, String method, String requestPath, String requestUri, String queryString,
+                        MultiMap<String, String> queryParams, Map<String, String> uriParams, String localAddress,
+                        String remoteAddress, Certificate clientCertificate) {
     super(headers, queryParams, uriParams, requestPath);
     this.listenerPath = listenerPath;
     this.relativePath = relativePath;

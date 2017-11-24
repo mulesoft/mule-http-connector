@@ -45,7 +45,7 @@ public class HttpRequestToResult {
     InputStream payload = entity.getContent();
 
     HttpRequestAttributes attributes =
-        new HttpRequestAttributesBuilder().setRequestContext(requestContext).setListenerPath(listenerPath).build();
+        new HttpRequestAttributesResolver().setRequestContext(requestContext).setListenerPath(listenerPath).resolve();
 
     Result.Builder<InputStream, HttpRequestAttributes> resultBuilder = Result.builder();
     if (entity.getLength().isPresent()) {

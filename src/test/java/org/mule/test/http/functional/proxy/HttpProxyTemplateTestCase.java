@@ -25,6 +25,7 @@ import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.PROXY;
 import org.mule.extension.http.api.HttpAttributes;
 import org.mule.extension.http.api.HttpRequestAttributes;
+import org.mule.extension.http.api.HttpRequestAttributesBuilder;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -408,16 +409,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
                                                       attributesFromResponse.getReasonPhrase(),
                                                       headers);
       } else {
-        HttpRequestAttributes attributesFromRequest = (HttpRequestAttributes) attributes;
-        attributesToSend =
-            new HttpRequestAttributes(headers, attributesFromRequest.getListenerPath(), attributesFromRequest.getRelativePath(),
-                                      attributesFromRequest.getVersion(), attributesFromRequest.getScheme(),
-                                      attributesFromRequest.getMethod(),
-                                      attributesFromRequest.getRequestPath(), attributesFromRequest.getRequestUri(),
-                                      attributesFromRequest.getQueryString(),
-                                      attributesFromRequest.getQueryParams(), attributesFromRequest.getUriParams(),
-                                      attributesFromRequest.getLocalAddress(), attributesFromRequest.getRemoteAddress(),
-                                      attributesFromRequest.getClientCertificate());
+        attributesToSend = new HttpRequestAttributesBuilder((HttpRequestAttributes) attributes).headers(headers).build();
       }
 
       return CoreEvent.builder(event).message(getBuilder(event).attributesValue(attributesToSend).build()).build();
