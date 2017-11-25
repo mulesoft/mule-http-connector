@@ -11,7 +11,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.POLICY_SUPPORT;
-import org.mule.extension.http.api.HttpRequestAttributes;
+import org.mule.extension.http.api.HttpRequestAttributesBuilder;
 import org.mule.extension.http.api.listener.builder.HttpListenerErrorResponseBuilder;
 import org.mule.extension.http.api.policy.HttpListenerPolicyParametersTransformer;
 import org.mule.runtime.api.message.Message;
@@ -46,6 +46,7 @@ public class HttpListenerPolicyParametersTransformerTestCase extends AbstractMul
   private final MultiMap<String, String> QUERY_PARAMS = new MultiMap<>();
   private final MultiMap<String, String> URI_PARAMS = new MultiMap<>();
   private final String REMOTE_ADDRESS = "";
+  private final String LOCAL_ADDRESS = "";
   private final Certificate CLIENT_CERTIFICATE = null;
 
   @Test
@@ -53,9 +54,22 @@ public class HttpListenerPolicyParametersTransformerTestCase extends AbstractMul
     HttpListenerPolicyParametersTransformer transformer = new HttpListenerPolicyParametersTransformer();
     Message message = Message.builder().value(EXPECTED_PAYLOAD)
         .mediaType(EXPECTED_MEDIA_TYPE)
-        .attributesValue(new HttpRequestAttributes(HEADERS, LISTENER_PATH, RELATIVE_PATH, VERSION, SCHEME, METHOD, REQUEST_PATH,
-                                                   REQUEST_URI, QUERY_STRING, QUERY_PARAMS, URI_PARAMS, REMOTE_ADDRESS,
-                                                   CLIENT_CERTIFICATE))
+        .attributesValue(new HttpRequestAttributesBuilder()
+            .headers(HEADERS)
+            .listenerPath(LISTENER_PATH)
+            .relativePath(RELATIVE_PATH)
+            .version(VERSION)
+            .scheme(SCHEME)
+            .method(METHOD)
+            .requestPath(REQUEST_PATH)
+            .requestUri(REQUEST_URI)
+            .queryString(QUERY_STRING)
+            .queryParams(QUERY_PARAMS)
+            .uriParams(URI_PARAMS)
+            .localAddress(LOCAL_ADDRESS)
+            .remoteAddress(REMOTE_ADDRESS)
+            .clientCertificate(CLIENT_CERTIFICATE)
+            .build())
         .build();
 
     Map<String, Object> result = transformer.fromMessageToErrorResponseParameters(message);

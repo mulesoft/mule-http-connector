@@ -94,7 +94,8 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
     assertThat(queryParams.size(), is(0));
     assertThat(attributes.getMethod(), is("GET"));
     assertThat(attributes.getVersion(), is(HTTP_1_1.asString()));
-    assertThat(attributes.getRemoteAddress(), is(notNullValue()));
+    assertThat(attributes.getLocalAddress(), is(startsWith("localhost/127.0.0.1")));
+    assertThat(attributes.getRemoteAddress(), is(startsWith("/127.0.0.1")));
   }
 
   @Test
