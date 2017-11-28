@@ -29,6 +29,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
+import org.mule.runtime.extension.api.annotation.notification.EmitsNotifications;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
@@ -36,6 +37,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
+import org.mule.runtime.extension.api.notification.NotificationEmitter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
@@ -72,6 +74,7 @@ public class HttpRequestOperations implements Initialisable, Disposable {
    */
   @Summary("Executes a HTTP Request")
   @OutputResolver(output = HttpMetadataResolver.class)
+  @EmitsNotifications(RequestNotificationActionProvider.class)
   @Throws(RequestErrorTypeProvider.class)
   @Streaming
   @MediaType(value = ANY, strict = false)
@@ -83,6 +86,7 @@ public class HttpRequestOperations implements Initialisable, Disposable {
                       @Connection HttpExtensionClient client,
                       @Config HttpRequesterConfig config,
                       CorrelationInfo correlationInfo,
+                      NotificationEmitter notificationEmitter,
                       CompletionCallback<InputStream, HttpResponseAttributes> callback) {
     try {
       HttpRequesterRequestBuilder resolvedBuilder = requestBuilder != null ? requestBuilder : new HttpRequesterRequestBuilder();
@@ -113,7 +117,9 @@ public class HttpRequestOperations implements Initialisable, Disposable {
               .setAuthentication(client.getDefaultAuthentication())
               .setResponseTimeout(resolvedTimeout)
               .setResponseValidator(responseValidator)
-              .setTransformationService(muleContext.getTransformationService()).setScheduler(scheduler)
+              .setTransformationService(muleContext.getTransformationService())
+              .setScheduler(scheduler)
+              .setNotificationEmitter(notificationEmitter)
               .build();
 
       requester.doRequest(client, resolvedBuilder, true, muleContext, callback);

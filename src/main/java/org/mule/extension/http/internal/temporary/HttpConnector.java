@@ -7,9 +7,9 @@
 package org.mule.extension.http.internal.temporary;
 
 import static org.mule.extension.http.internal.listener.HttpListener.HTTP_NAMESPACE;
-
 import org.mule.extension.http.api.error.HttpError;
 import org.mule.extension.http.api.listener.server.HttpListenerConfig;
+import org.mule.extension.http.api.notification.HttpNotificationAction;
 import org.mule.extension.http.api.policy.HttpPolicyRequestAttributes;
 import org.mule.extension.http.api.request.authentication.BasicAuthentication;
 import org.mule.extension.http.api.request.authentication.DigestAuthentication;
@@ -37,6 +37,7 @@ import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
+import org.mule.runtime.extension.api.annotation.notification.NotificationActions;
 
 /**
  * HTTP connector used to handle and perform HTTP requests.
@@ -58,6 +59,7 @@ import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 @Import(type = TcpClientSocketProperties.class)
 @Import(type = TcpServerSocketProperties.class)
 @ErrorTypes(HttpError.class)
+@NotificationActions(HttpNotificationAction.class)
 @Xml(namespace = "http://www.mulesoft.org/schema/mule/http", prefix = HTTP_NAMESPACE)
 // TODO move back to package org.mule.extension.http.internal as part of MULE-10651. Now we are using this package
 // because it doesn't work in the former package since the classloader mechanism will try to load the class from another bundle.

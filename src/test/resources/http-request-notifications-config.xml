@@ -10,7 +10,10 @@
     </http:request-config>
 
     <flow name="requestFlow">
-        <http:request config-ref="requestConfig" method="POST" path="requestPath"/>
+        <http:request config-ref="requestConfig" method="POST" path="requestPath">
+            <http:headers>#[{'header' : 'value', 'header' : 'otherValue'}]</http:headers>
+            <http:query-params>#[{'query' : 'param', 'query' : 'otherParam'}]</http:query-params>
+        </http:request>
     </flow>
 
 </mule>
