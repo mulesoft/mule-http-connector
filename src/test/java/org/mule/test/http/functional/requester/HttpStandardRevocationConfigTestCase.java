@@ -52,7 +52,8 @@ public class HttpStandardRevocationConfigTestCase extends MuleArtifactFunctional
   @Test
   public void revocationWorksWithoutTrustStore() throws Exception {
     CoreEvent event = flowRunner("test").keepStreamsOpen().run();
-    MatcherAssert.assertThat(((HttpResponseAttributes) event.getMessage().getAttributes().getValue()).getStatusCode(), is(OK.getStatusCode()));
+    MatcherAssert.assertThat(((HttpResponseAttributes) event.getMessage().getAttributes().getValue()).getStatusCode(),
+                             is(OK.getStatusCode()));
     assertThat(event.getMessage(), hasPayload(containsString("webcache.googleusercontent.com")));
   }
 }
