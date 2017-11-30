@@ -14,7 +14,6 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 
-import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -22,9 +21,11 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import java.security.cert.CertPathValidatorException;
 import java.security.cert.CertificateRevokedException;
 
+import io.qameta.allure.Story;
 import org.junit.Rule;
 
-public abstract class AbstractHttpTlsRevocationTestCase extends MuleArtifactFunctionalTestCase {
+@Story("Certificate Revocation Check")
+public abstract class AbstractHttpTlsRevocationTestCase extends AbstractHttpTestCase {
 
   private static final String UNDETERMINED_REVOCATION_ERROR_MESSAGE = "Could not determine revocation status";
 
@@ -52,7 +53,6 @@ public abstract class AbstractHttpTlsRevocationTestCase extends MuleArtifactFunc
 
   protected static String ENTITY_CERTIFIED_REVOCATION_SUB_PATH = "entity3";
 
-
   @Rule
   public DynamicPort port = new DynamicPort("port");
 
@@ -63,7 +63,6 @@ public abstract class AbstractHttpTlsRevocationTestCase extends MuleArtifactFunc
   public SystemProperty entityCertifiedSubPathSystemProperty;
 
   public String configFile;
-
 
   public AbstractHttpTlsRevocationTestCase(String configFile, String crlPath, String entityCertified) {
     this.configFile = configFile;
@@ -76,12 +75,10 @@ public abstract class AbstractHttpTlsRevocationTestCase extends MuleArtifactFunc
     entityCertifiedSubPathSystemProperty = new SystemProperty("entityCertifiedSubPath", entityCertified);
   }
 
-
   @Override
   protected String getConfigFile() {
     return configFile;
   }
-
 
   protected CoreEvent runRevocationTestFlow() throws Exception {
     return flowRunner("testFlowRevoked").withPayload("data").keepStreamsOpen().run();
