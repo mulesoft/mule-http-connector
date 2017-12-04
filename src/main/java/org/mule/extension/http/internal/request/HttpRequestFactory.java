@@ -7,6 +7,7 @@
 package org.mule.extension.http.internal.request;
 
 import static java.lang.String.valueOf;
+import static java.util.Collections.emptyMap;
 import static org.mule.extension.http.api.error.HttpError.SECURITY;
 import static org.mule.extension.http.api.error.HttpError.TRANSFORMATION;
 import static org.mule.extension.http.internal.HttpStreamingType.ALWAYS;
@@ -40,8 +41,6 @@ import com.google.common.collect.Lists;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -67,14 +66,14 @@ public class HttpRequestFactory {
 
   private final String uri;
   private final String method;
-  private final HttpRequesterCookieConfig config;
+  private final HttpRequesterConfig config;
   private final HttpStreamingType streamingMode;
   private final HttpSendBodyMode sendBodyMode;
   private final TransformationService transformationService;
 
 
-  public HttpRequestFactory(HttpRequesterCookieConfig config, String uri, String method, HttpStreamingType streamingMode,
-                            HttpSendBodyMode sendBodyMode, TransformationService transformationService) {
+  HttpRequestFactory(HttpRequesterConfig config, String uri, String method, HttpStreamingType streamingMode,
+                     HttpSendBodyMode sendBodyMode, TransformationService transformationService) {
     this.config = config;
     this.uri = uri;
     this.method = method;
@@ -87,7 +86,7 @@ public class HttpRequestFactory {
    * Creates an {@HttpRequest}.
    *
    * @param requestBuilder The generic {@link HttpRequesterRequestBuilder} from the request component that should be used to
-   *        create the {@link HttpRequest}.
+   *                       create the {@link HttpRequest}.
    * @param authentication The {@link HttpRequestAuthentication} that should be used to create the {@link HttpRequest}.
    * @return an {@HttpRequest} configured based on the parameters.
    * @throws MuleException if the request creation fails.
@@ -100,6 +99,12 @@ public class HttpRequestFactory {
         .headers(requestBuilder.getHeaders())
         .queryParams(requestBuilder.getQueryParams());
 
+    config.getDefaultHeaders()
+        .forEach(header -> builder.addHeader(header.getKey(), header.getValue()));
+
+    config.getDefaultQueryParams()
+        .forEach(param -> builder.addQueryParam(param.getKey(), param.getValue()));
+
     MediaType mediaType = requestBuilder.getBody().getDataType().getMediaType();
     if (!builder.getHeaderValue(CONTENT_TYPE).isPresent()) {
       if (!MediaType.ANY.matches(mediaType)) {
@@ -110,7 +115,7 @@ public class HttpRequestFactory {
     if (config.isEnableCookies()) {
       try {
         Map<String, List<String>> headers =
-            config.getCookieManager().get(builder.getUri(), Collections.<String, List<String>>emptyMap());
+            config.getCookieManager().get(builder.getUri(), emptyMap());
         List<String> cookies = headers.get(COOKIE);
         if (cookies != null) {
           for (String cookie : cookies) {

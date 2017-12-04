@@ -7,6 +7,8 @@
 package org.mule.extension.http.internal.request;
 
 import static org.mule.extension.http.internal.HttpConnectorConstants.URL_CONFIGURATION;
+import org.mule.extension.http.api.request.builder.QueryParam;
+import org.mule.extension.http.api.request.builder.RequestHeader;
 import org.mule.extension.http.internal.HttpStreamingType;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -18,6 +20,7 @@ import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 import java.net.CookieManager;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -56,6 +59,14 @@ public class HttpRequesterConfig implements Initialisable, HttpRequesterCookieCo
 
   public String getBasePath() {
     return urlConfiguration.getBasePath();
+  }
+
+  public List<RequestHeader> getDefaultHeaders() {
+    return requestSettings.getDefaultHeaders();
+  }
+
+  public List<QueryParam> getDefaultQueryParams() {
+    return requestSettings.getDefaultQueryParams();
   }
 
   public boolean getFollowRedirects() {

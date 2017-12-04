@@ -10,6 +10,33 @@
         <http:request-connection host="localhost" port="${httpPort}"/>
     </http:request-config>
 
+    <http:request-config name="configWithDefaults">
+        <http:request-connection host="localhost" port="${httpPort}"/>
+        <http:default-headers>
+            <http:default-header key="testDefault" value="testDefaultValue"/>
+        </http:default-headers>
+    </http:request-config>
+
+    <flow name="headerDefaultsOnly">
+        <http:request config-ref="configWithDefaults" path="testPath"/>
+    </flow>
+
+    <flow name="headerAppendDefault">
+        <http:request config-ref="configWithDefaults" path="testPath">
+            <http:headers>
+                #[{'testName1' : 'testValue1'}]
+            </http:headers>
+        </http:request>
+    </flow>
+
+    <flow name="headerMultiKeyDefault">
+        <http:request config-ref="configWithDefaults" path="testPath">
+            <http:headers>
+                #[{'testDefault' : 'testValue2'}]
+            </http:headers>
+        </http:request>
+    </flow>
+
     <flow name="headerList">
         <http:request config-ref="config" path="testPath">
             <http:headers>

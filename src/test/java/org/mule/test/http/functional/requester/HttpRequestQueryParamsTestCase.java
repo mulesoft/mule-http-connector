@@ -54,4 +54,22 @@ public class HttpRequestQueryParamsTestCase extends AbstractHttpRequestTestCase 
     assertThat(uri, equalTo("/testPath?testName1&testName2"));
   }
 
+  @Test
+  public void queryParamDefaultsOnly() throws Exception {
+    flowRunner("queryParamDefaultsOnly").withPayload(TEST_MESSAGE).run();
+    assertThat(uri, equalTo("/testPath?filter=username%2Capps"));
+  }
+
+  @Test
+  public void queryParamAppendDefault() throws Exception {
+    flowRunner("queryParamAppendDefault").withPayload(TEST_MESSAGE).run();
+    assertThat(uri, equalTo("/testPath?filter=username%2Capps&testName1=testValue1"));
+  }
+
+  @Test
+  public void queryParamMultiKeyDefault() throws Exception {
+    flowRunner("queryParamMultiKeyDefault").withPayload(TEST_MESSAGE).run();
+    assertThat(uri, equalTo("/testPath?filter=level&filter=username%2Capps"));
+  }
+
 }

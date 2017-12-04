@@ -8,8 +8,10 @@ package org.mule.test.http.functional.requester;
 
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.iterableWithSize;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -42,6 +44,29 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase {
   @Override
   protected String getConfigFile() {
     return "http-request-headers-config.xml";
+  }
+
+  @Test
+  public void headerDefaultsOnly() throws Exception {
+    flowRunner("headerDefaultsOnly").withPayload(TEST_MESSAGE).run();
+
+    assertThat(getFirstReceivedHeader("testDefault"), equalTo("testDefaultValue"));
+  }
+
+  @Test
+  public void headerAppendDefault() throws Exception {
+    flowRunner("headerAppendDefault").withPayload(TEST_MESSAGE).run();
+
+    assertThat(getFirstReceivedHeader("testDefault"), equalTo("testDefaultValue"));
+    assertThat(getFirstReceivedHeader("testName1"), equalTo("testValue1"));
+  }
+
+  @Test
+  public void headerMultiKeyDefault() throws Exception {
+    flowRunner("headerMultiKeyDefault").withPayload(TEST_MESSAGE).run();
+    Collection<String> values = headers.get("testDefault");
+    assertThat(values, iterableWithSize(2));
+    assertThat(values, containsInAnyOrder("testDefaultValue", "testValue2"));
   }
 
   @Test

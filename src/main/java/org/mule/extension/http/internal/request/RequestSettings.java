@@ -7,12 +7,17 @@
 package org.mule.extension.http.internal.request;
 
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
-
+import org.mule.extension.http.api.request.builder.QueryParam;
+import org.mule.extension.http.api.request.builder.RequestHeader;
 import org.mule.extension.http.internal.HttpStreamingType;
 import org.mule.runtime.extension.api.annotation.Expression;
+import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
+
+import java.util.List;
 
 /**
  * Groups parameters which configure how a request is done
@@ -54,6 +59,31 @@ public final class RequestSettings {
   @Optional(defaultValue = "true")
   @Expression(NOT_SUPPORTED)
   private boolean enableCookies;
+
+  /**
+   * Default HTTP headers the message should include.
+   */
+  @Parameter
+  @Optional
+  @NullSafe
+  private List<RequestHeader> defaultHeaders;
+
+  /**
+   * Default Query parameters the request should include.
+   */
+  @Parameter
+  @Optional
+  @NullSafe
+  @DisplayName("Query Parameters")
+  private List<QueryParam> defaultQueryParams;
+
+  public List<RequestHeader> getDefaultHeaders() {
+    return defaultHeaders;
+  }
+
+  public List<QueryParam> getDefaultQueryParams() {
+    return defaultQueryParams;
+  }
 
   public boolean getFollowRedirects() {
     return followRedirects;
