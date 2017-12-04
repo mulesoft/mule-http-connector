@@ -17,6 +17,18 @@
         </http:default-query-params>
     </http:request-config>
 
+    <http:request-config name="configWithDuplicatedDefaults">
+        <http:request-connection host="localhost" port="${httpPort}"/>
+        <http:default-query-params>
+            <http:query-param key="filter" value="username"/>
+            <http:query-param key="filter" value="apps"/>
+        </http:default-query-params>
+    </http:request-config>
+
+    <flow name="queryParamsDuplicatedDefaults">
+        <http:request config-ref="configWithDuplicatedDefaults" path="testPath"/>
+    </flow>
+
     <flow name="queryParamList">
         <http:request config-ref="config" path="testPath" method="POST">
             <http:query-params>

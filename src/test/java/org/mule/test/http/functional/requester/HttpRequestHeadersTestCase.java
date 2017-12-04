@@ -54,6 +54,14 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase {
   }
 
   @Test
+  public void headerDuplicatedDefaults() throws Exception {
+    flowRunner("headerDuplicatedDefaults").withPayload(TEST_MESSAGE).run();
+    Collection<String> values = headers.get("testDefault");
+    assertThat(values, iterableWithSize(2));
+    assertThat(values, containsInAnyOrder("testDefaultValue", "otherDefaultValue"));
+  }
+
+  @Test
   public void headerAppendDefault() throws Exception {
     flowRunner("headerAppendDefault").withPayload(TEST_MESSAGE).run();
 

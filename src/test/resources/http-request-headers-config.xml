@@ -17,6 +17,18 @@
         </http:default-headers>
     </http:request-config>
 
+    <http:request-config name="configWithDuplicatedDefaults">
+        <http:request-connection host="localhost" port="${httpPort}"/>
+        <http:default-headers>
+            <http:default-header key="testDefault" value="testDefaultValue"/>
+            <http:default-header key="testDefault" value="otherDefaultValue"/>
+        </http:default-headers>
+    </http:request-config>
+
+    <flow name="headerDuplicatedDefaults">
+        <http:request config-ref="configWithDuplicatedDefaults" path="testPath"/>
+    </flow>
+
     <flow name="headerDefaultsOnly">
         <http:request config-ref="configWithDefaults" path="testPath"/>
     </flow>
