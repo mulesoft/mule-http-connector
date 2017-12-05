@@ -10,10 +10,49 @@
         <http:request-connection host="localhost" port="${httpPort}"/>
     </http:request-config>
 
+    <http:request-config name="configWithDefaults">
+        <http:request-connection host="localhost" port="${httpPort}"/>
+        <http:default-query-params>
+            <http:query-param key="filter" value="username,apps"/>
+        </http:default-query-params>
+    </http:request-config>
+
+    <http:request-config name="configWithDuplicatedDefaults">
+        <http:request-connection host="localhost" port="${httpPort}"/>
+        <http:default-query-params>
+            <http:query-param key="filter" value="username"/>
+            <http:query-param key="filter" value="apps"/>
+        </http:default-query-params>
+    </http:request-config>
+
+    <flow name="queryParamsDuplicatedDefaults">
+        <http:request config-ref="configWithDuplicatedDefaults" path="testPath"/>
+    </flow>
+
     <flow name="queryParamList">
         <http:request config-ref="config" path="testPath" method="POST">
             <http:query-params>
                 #[{'testName1' : 'testValue1', (vars.paramName) : vars.paramValue}]
+            </http:query-params>
+        </http:request>
+    </flow>
+
+    <flow name="queryParamDefaultsOnly">
+        <http:request config-ref="configWithDefaults" path="testPath"/>
+    </flow>
+
+    <flow name="queryParamAppendDefault">
+        <http:request config-ref="configWithDefaults" path="testPath">
+            <http:query-params>
+                #[{'testName1' : 'testValue1'}]
+            </http:query-params>
+        </http:request>
+    </flow>
+
+    <flow name="queryParamMultiKeyDefault">
+        <http:request config-ref="configWithDefaults" path="testPath">
+            <http:query-params>
+                #[{'filter' : 'level'}]
             </http:query-params>
         </http:request>
     </flow>
