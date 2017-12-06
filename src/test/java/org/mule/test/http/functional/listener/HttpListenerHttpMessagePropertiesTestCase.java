@@ -7,6 +7,8 @@
 package org.mule.test.http.functional.listener;
 
 import static org.apache.http.client.fluent.Request.Post;
+import static org.hamcrest.CoreMatchers.both;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -94,7 +96,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
     assertThat(queryParams.size(), is(0));
     assertThat(attributes.getMethod(), is("GET"));
     assertThat(attributes.getVersion(), is(HTTP_1_1.asString()));
-    assertThat(attributes.getLocalAddress(), is(startsWith("localhost/127.0.0.1")));
+    assertThat(attributes.getLocalAddress(), both(containsString("localhost")).and(containsString("/127.0.0.1")));
     assertThat(attributes.getRemoteAddress(), is(startsWith("/127.0.0.1")));
   }
 
