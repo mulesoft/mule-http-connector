@@ -7,8 +7,10 @@
 package org.mule.test.http.functional;
 
 import static org.apache.commons.io.IOUtils.read;
+import static java.lang.String.valueOf;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -34,17 +36,34 @@ public abstract class AbstractHttpExpectHeaderServerTestCase extends AbstractHtt
   @Rule
   public DynamicPort listenPort = new DynamicPort("httpPort");
 
+  @Rule
+  public SystemProperty persistentConnection;
+
   protected String requestBody;
 
   private AbstractMockServer server;
 
+  protected AbstractHttpExpectHeaderServerTestCase() {}
+
+  protected AbstractHttpExpectHeaderServerTestCase(boolean persistentConnection) {
+    this.persistentConnection = new SystemProperty("persistentConnection", valueOf(persistentConnection));
+  }
+
   protected void startExpectContinueServer() {
-    server = new ExpectContinueMockServer();
+    startExpectContinueServer(false);
+  }
+
+  protected void startExpectContinueServer(boolean persistent) {
+    server = new ExpectContinueMockServer(persistent);
     server.start();
   }
 
   protected void startExpectFailedServer() {
-    server = new ExpectFailedMockServer();
+    startExpectFailedServer(false);
+  }
+
+  protected void startExpectFailedServer(boolean persistent) {
+    server = new ExpectFailedMockServer(persistent);
     server.start();
   }
 
@@ -56,6 +75,11 @@ public abstract class AbstractHttpExpectHeaderServerTestCase extends AbstractHtt
 
     private Latch startedLatch = new Latch();
     private Latch finishedLatch = new Latch();
+    private boolean persistent = false;
+
+    public AbstractMockServer(boolean persistent) {
+      this.persistent = persistent;
+    }
 
     public void start() {
       try {
@@ -95,8 +119,10 @@ public abstract class AbstractHttpExpectHeaderServerTestCase extends AbstractHtt
 
         reader.close();
         writer.close();
-        socket.close();
-        serverSocket.close();
+        if (!persistent) {
+          socket.close();
+          serverSocket.close();
+        }
         finishedLatch.release();
       } catch (IOException e) {
         throw new RuntimeException(e);
@@ -106,8 +132,11 @@ public abstract class AbstractHttpExpectHeaderServerTestCase extends AbstractHtt
     protected abstract void process(BufferedReader reader, BufferedWriter writer) throws IOException;
   }
 
-
   private class ExpectContinueMockServer extends AbstractMockServer {
+
+    public ExpectContinueMockServer(boolean persistent) {
+      super(persistent);
+    }
 
     @Override
     protected void process(BufferedReader reader, BufferedWriter writer) throws IOException {
@@ -118,15 +147,19 @@ public abstract class AbstractHttpExpectHeaderServerTestCase extends AbstractHtt
       read(reader, body);
       requestBody = new String(body);
 
-      String response = String.format("HTTP/1.1 200 OK\nContent-Length: %d\n\n%s", TEST_MESSAGE.length(), TEST_MESSAGE);
+      String response = String.format("HTTP/1.1 200 OK\nContent-Length: %d\n\n%s", TEST_MESSAGE.length(),
+                                      TEST_MESSAGE);
 
       writer.write(response);
       writer.flush();
     }
   }
 
-
   private class ExpectFailedMockServer extends AbstractMockServer {
+
+    public ExpectFailedMockServer(boolean persistent) {
+      super(persistent);
+    }
 
     @Override
     protected void process(BufferedReader reader, BufferedWriter writer) throws IOException {
