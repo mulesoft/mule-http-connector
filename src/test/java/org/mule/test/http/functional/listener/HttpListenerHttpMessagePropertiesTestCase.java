@@ -15,12 +15,14 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.http.api.HttpHeaders.Names.X_CORRELATION_ID;
 import static org.mule.runtime.http.api.HttpHeaders.Names.X_FORWARDED_FOR;
 import static org.mule.runtime.http.api.domain.HttpProtocol.HTTP_1_1;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.functional.api.component.TestConnectorQueueHandler;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.http.api.domain.HttpProtocol;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
@@ -227,6 +229,18 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
     HttpRequestAttributes forwardedAttributes = getAttributes(forwardedMessage);
     assertThat(forwardedAttributes.getRemoteAddress(), startsWith("/127.0.0.1:"));
     assertThat(forwardedAttributes.getHeaders().get(X_FORWARDED_FOR.toLowerCase()), is("clientIp, proxy1Ip"));
+  }
+
+  @Test
+  public void xCorrelationIdHeader() throws Exception {
+    final String url = String.format("http://localhost:%s/some-path", listenPort.getNumber());
+
+    final String myCorrelationId = "myCorrelationId";
+    Post(url).addHeader(X_CORRELATION_ID, myCorrelationId).connectTimeout(RECEIVE_TIMEOUT).execute();
+    final CoreEvent event = queueHandler.read("out", RECEIVE_TIMEOUT);
+    assertThat(event.getCorrelationId(), is(myCorrelationId));
+    HttpRequestAttributes attributes = getAttributes(event.getMessage());
+    assertThat(attributes.getHeaders().get(X_CORRELATION_ID.toLowerCase()), is(myCorrelationId));
   }
 
   @Test

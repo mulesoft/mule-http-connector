@@ -8,19 +8,24 @@ package org.mule.test.http.functional.requester;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.functional.junit4.TestLegacyMessageUtils.getInboundProperty;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.runtime.http.api.HttpHeaders.Names.X_CORRELATION_ID;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.matcher.HttpMessageAttributesMatchers;
 
+import com.google.common.collect.Multimap;
+
 import java.io.IOException;
+import java.util.Collection;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,6 +38,8 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase {
 
   private static final String TEST_HEADER_NAME = "TestHeaderName";
   private static final String TEST_HEADER_VALUE = "TestHeaderValue";
+  private static final String DEFAULT_CORRELATION_ID = "defaultCorrelationId";
+  private static final String CUSTOM_CORRELATION_ID = "customCorrelationId";
 
   @Override
   protected String getConfigFile() {
@@ -49,6 +56,53 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase {
   public void responseBodyIsMappedToPayload() throws Exception {
     CoreEvent event = flowRunner("requestFlow").withPayload(AbstractMuleContextTestCase.TEST_MESSAGE).run();
     assertThat(event.getMessage().getPayload().getValue(), equalTo(DEFAULT_RESPONSE));
+  }
+
+  @Test
+  public void sendDefaultCorrelationId() throws Exception {
+    CoreEvent event = flowRunner("requestFlow")
+        .withSourceCorrelationId(DEFAULT_CORRELATION_ID)
+        .withPayload(AbstractMuleContextTestCase.TEST_MESSAGE)
+        .run();
+
+    assertThat(event.getMessage().getPayload().getValue(), equalTo(DEFAULT_RESPONSE));
+    assertCorrelationId(headers, DEFAULT_CORRELATION_ID);
+  }
+
+  @Test
+  public void requestFlowWithCustomCorrelationId() throws Exception {
+    CoreEvent event = flowRunner("requestFlowWithCustomCorrelationId")
+        .withPayload(AbstractMuleContextTestCase.TEST_MESSAGE)
+        .run();
+
+    assertThat(event.getMessage().getPayload().getValue(), equalTo(DEFAULT_RESPONSE));
+    assertCorrelationId(headers, CUSTOM_CORRELATION_ID);
+  }
+
+  @Test
+  public void clashingCorrelationIds() throws Exception {
+    CoreEvent event = flowRunner("clashingCorrelationIds")
+        .withPayload(AbstractMuleContextTestCase.TEST_MESSAGE)
+        .run();
+
+    assertThat(event.getMessage().getPayload().getValue(), equalTo(DEFAULT_RESPONSE));
+    assertCorrelationId(headers, CUSTOM_CORRELATION_ID);
+  }
+
+  @Test
+  public void neverSendCorrelationId() throws Exception {
+    CoreEvent event = flowRunner("neverSendCorrelationId")
+        .withPayload(AbstractMuleContextTestCase.TEST_MESSAGE)
+        .run();
+
+    assertThat(event.getMessage().getPayload().getValue(), equalTo(DEFAULT_RESPONSE));
+    assertThat(headers.containsKey(X_CORRELATION_ID), is(false));
+  }
+
+  private void assertCorrelationId(Multimap<String, String> headers, String expected) {
+    Collection<String> values = headers.get(X_CORRELATION_ID);
+    assertThat(values, hasSize(1));
+    assertThat(values.iterator().next(), equalTo(expected));
   }
 
   @Rule

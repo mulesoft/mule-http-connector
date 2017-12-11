@@ -7,13 +7,17 @@
 package org.mule.extension.http.api.request.builder;
 
 import static java.util.Collections.unmodifiableMap;
+import static org.mule.runtime.extension.api.runtime.parameter.OutboundCorrelationStrategy.AUTO;
 import org.mule.extension.http.api.HttpMessageBuilder;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
+import org.mule.runtime.extension.api.runtime.parameter.OutboundCorrelationStrategy;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -57,6 +61,22 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
   @Content
   @DisplayName("Query Parameters")
   private MultiMap<String, String> queryParams = new MultiMap<>();
+
+  /**
+   * Options on whether to include an outbound correlation id or not
+   */
+  @Parameter
+  @ConfigOverride
+  private OutboundCorrelationStrategy sendCorrelationId = AUTO;
+
+  /**
+   * Allows to set a custom correlation id
+   */
+  @Parameter
+  @Optional
+  private String correlationId;
+
+  private CorrelationInfo correlationInfo;
 
   @Override
   public TypedValue<Object> getBody() {
@@ -107,4 +127,19 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
     this.uriParams = uriParams;
   }
 
+  public CorrelationInfo getCorrelationInfo() {
+    return correlationInfo;
+  }
+
+  public void setCorrelationInfo(CorrelationInfo correlationInfo) {
+    this.correlationInfo = correlationInfo;
+  }
+
+  public OutboundCorrelationStrategy getSendCorrelationId() {
+    return sendCorrelationId;
+  }
+
+  public String getCorrelationId() {
+    return correlationId;
+  }
 }
