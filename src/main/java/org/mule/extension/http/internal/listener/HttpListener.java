@@ -28,8 +28,8 @@ import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.getReasonPhraseForStatusCode;
+import static org.mule.runtime.http.api.HttpHeaders.Names.X_CORRELATION_ID;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
@@ -327,11 +327,17 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
           responseContext.setHttpVersion(httpVersion);
           responseContext.setSupportStreaming(supportsTransferEncoding(httpVersion));
           responseContext.setResponseCallback(responseCallback);
+          MultiMap<String, String> headers = getHeaders(result);
           config.getInterceptor().ifPresent(interceptor -> responseContext
-              .setInterception(interceptor.request(getMethod(result), getHeaders(result))));
+              .setInterception(interceptor.request(getMethod(result), headers)));
 
           SourceCallbackContext context = sourceCallback.createContext();
           context.addVariable(RESPONSE_CONTEXT, responseContext);
+
+          String correlationId = headers.get(X_CORRELATION_ID.toLowerCase());
+          if (correlationId != null) {
+            context.setCorrelationId(correlationId);
+          }
 
           sourceCallback.handle(result, context);
         } catch (IllegalArgumentException e) {

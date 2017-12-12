@@ -19,6 +19,7 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.COOKIE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
+import static org.mule.runtime.http.api.HttpHeaders.Names.X_CORRELATION_ID;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
@@ -55,7 +56,7 @@ import org.slf4j.LoggerFactory;
  */
 public class HttpRequestFactory {
 
-  private static final Logger logger = LoggerFactory.getLogger(HttpRequestFactory.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(HttpRequestFactory.class);
   private static final List<String> DEFAULT_EMPTY_BODY_METHODS = Lists.newArrayList("GET", "HEAD", "OPTIONS");
   private static final String BOTH_TRANSFER_HEADERS_SET_MESSAGE =
       "Cannot send both Transfer-Encoding and Content-Length headers. Transfer-Encoding will not be sent.";
@@ -112,6 +113,21 @@ public class HttpRequestFactory {
       }
     }
 
+    requestBuilder.getSendCorrelationId()
+        .getOutboundCorrelationId(requestBuilder.getCorrelationInfo(), requestBuilder.getCorrelationId())
+        .ifPresent(correlationId -> {
+          if (builder.getHeaders().containsKey(X_CORRELATION_ID)) {
+            if (LOGGER.isDebugEnabled()) {
+              LOGGER.debug(
+                           X_CORRELATION_ID
+                               + " was specified both as explicit header and through the standard propagation of the mule "
+                               + "correlation ID. The explicit header will prevail.");
+            }
+          } else {
+            builder.addHeader(X_CORRELATION_ID, correlationId);
+          }
+        });
+
     if (config.isEnableCookies()) {
       try {
         Map<String, List<String>> headers =
@@ -123,7 +139,7 @@ public class HttpRequestFactory {
           }
         }
       } catch (IOException e) {
-        logger.warn("Error reading cookies for URI " + uri, e);
+        LOGGER.warn("Error reading cookies for URI " + uri, e);
       }
 
     }
@@ -238,16 +254,16 @@ public class HttpRequestFactory {
     if (contentLengthHeader != null) {
       requestBuilder.removeHeader(CONTENT_LENGTH);
 
-      if (logger.isDebugEnabled()) {
-        logger.debug("Content-Length header will not be sent, as the configured requestStreamingMode is ALWAYS.");
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Content-Length header will not be sent, as the configured requestStreamingMode is ALWAYS.");
       }
     }
 
     if (transferEncodingHeader.isPresent() && !transferEncodingHeader.get().equalsIgnoreCase(CHUNKED)) {
       requestBuilder.removeHeader(TRANSFER_ENCODING);
 
-      if (logger.isDebugEnabled()) {
-        logger.debug("Transfer-Encoding header will be sent with value 'chunked' instead of {}, as the configured "
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Transfer-Encoding header will be sent with value 'chunked' instead of {}, as the configured "
             + "requestStreamingMode is ALWAYS", transferEncodingHeader);
       }
 
@@ -258,8 +274,8 @@ public class HttpRequestFactory {
     if (transferEncoding.isPresent()) {
       requestBuilder.removeHeader(TRANSFER_ENCODING);
 
-      if (logger.isDebugEnabled()) {
-        logger.debug(reason);
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug(reason);
       }
     }
   }
