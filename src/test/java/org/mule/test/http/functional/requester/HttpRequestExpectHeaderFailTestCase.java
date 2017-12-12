@@ -19,23 +19,13 @@ import java.io.InputStream;
 
 import org.junit.Test;
 
-public class HttpRequestExpectHeaderTestCase extends AbstractHttpExpectHeaderServerTestCase {
+public class HttpRequestExpectHeaderFailTestCase extends AbstractHttpExpectHeaderServerTestCase {
 
   private static final String REQUEST_FLOW_NAME = "requestFlow";
 
   @Override
   protected String getConfigFile() {
-    return "http-request-expect-header-config.xml";
-  }
-
-  @Test
-  public void handlesContinueResponse() throws Exception {
-    startExpectContinueServer();
-
-    flowRunner(REQUEST_FLOW_NAME).withPayload(TEST_MESSAGE).run();
-    assertThat(requestBody, equalTo(TEST_MESSAGE));
-
-    stopServer();
+    return "http-request-expect-fail-header-config.xml";
   }
 
   @Test
