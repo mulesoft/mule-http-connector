@@ -24,9 +24,8 @@ import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.test.http.functional.AbstractHttpExpectHeaderServerTestCase;
 import org.mule.test.http.functional.matcher.HttpMessageAttributesMatchers;
-import org.mule.test.runner.RunnerDelegateTo;
 
-@RunnerDelegateTo(Parameterized.class)
+@RunWith(Parameterized.class)
 public class HttpRequestExpectHeaderSuccessServerTestCase extends AbstractHttpExpectHeaderServerTestCase {
 
   private static final String REQUEST_FLOW_NAME = "requestFlow";
@@ -67,6 +66,27 @@ public class HttpRequestExpectHeaderSuccessServerTestCase extends AbstractHttpEx
 
     flowRunner(flow).withAttributes(reqAttributes).withPayload(TEST_MESSAGE).run();
     assertThat(requestBody, equalTo(TEST_MESSAGE));
+
+    stopServer();
+  }
+
+  @Test
+  public void handlesExpectationFailedResponse() throws Exception {
+    startExpectFailedServer();
+
+    // Set a payload that will fail when consumed. As the server rejects the request
+    // after processing
+    // the header, the client should not send the body.
+    CoreEvent response = flowRunner(REQUEST_FLOW_NAME).withPayload(new InputStream() {
+
+      @Override
+      public int read() throws IOException {
+        throw new IOException("Payload should not be consumed");
+      }
+    }).run();
+
+    assertThat((HttpResponseAttributes) response.getMessage().getAttributes().getValue(),
+               HttpMessageAttributesMatchers.hasStatusCode(EXPECTATION_FAILED.getStatusCode()));
 
     stopServer();
   }

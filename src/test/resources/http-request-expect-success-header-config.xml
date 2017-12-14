@@ -7,7 +7,7 @@
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <http:request-config name="requestConfig">
-        <http:request-connection host="localhost" port="${httpPort}" usePersistentConnections="${persistentConnection}"/>
+        <http:request-connection host="localhost" port="${httpPort}" usePersistentConnections="${persistent}"/>
     </http:request-config>
 
     <flow name="requestFlow">
