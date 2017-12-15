@@ -118,7 +118,8 @@ public class HttpListenerSourceOverloadTestCase extends AbstractHttpTestCase {
 
         if (statusCode == SERVICE_UNAVAILABLE.getStatusCode()) {
           assertThat(response.getStatusLine().getReasonPhrase(), is(SERVICE_UNAVAILABLE.getReasonPhrase()));
-          assertThat(IOUtils.toString(response.getEntity().getContent()), is("Scheduler unavailable"));
+          assertThat(IOUtils.toString(response.getEntity().getContent()),
+                     is("Flow 'testFlow' is unable to accept new events at this time"));
 
 
         } else if (statusCode == OK.getStatusCode()) {
