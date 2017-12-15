@@ -12,7 +12,7 @@
         <http:listener-connection host="localhost" port="${port}"/>
     </http:listener-config>
 
-    <flow name="testFlow">
+    <flow name="testFlow" maxConcurrency="1">
         <http:listener path="/*" config-ref="listenerConfig"/>
         <test:processor>
             <test:return-data>the result</test:return-data>
