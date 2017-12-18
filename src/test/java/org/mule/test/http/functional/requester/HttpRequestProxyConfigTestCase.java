@@ -132,7 +132,6 @@ public class HttpRequestProxyConfigTestCase extends MuleArtifactFunctionalTestCa
           // Ignore exception
         }
 
-
         sc.close();
 
         latch.release();
