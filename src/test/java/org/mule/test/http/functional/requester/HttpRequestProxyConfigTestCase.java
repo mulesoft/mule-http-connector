@@ -11,13 +11,11 @@ package org.mule.test.http.functional.requester;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.anyOf;
 import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.extension.http.api.error.HttpRequestFailedException;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -97,8 +95,10 @@ public class HttpRequestProxyConfigTestCase extends MuleArtifactFunctionalTestCa
 
   private void ensureRequestGoesThroughProxy(String flowName) throws Exception {
     // Request should go through the proxy.
-    flowRunner(flowName).withPayload(TEST_MESSAGE).runExpectingException(allOf(instanceOf(HttpRequestFailedException.class),
-                                                                               hasMessage(containsString("Connection refused"))));
+    flowRunner(flowName).withPayload(TEST_MESSAGE)
+        .runExpectingException(anyOf(hasMessage(containsString("Connection reset by peer")),
+                                     hasMessage(containsString("Connection refused"))));
+
     latch.await(1, SECONDS);
   }
 
@@ -124,6 +124,12 @@ public class HttpRequestProxyConfigTestCase extends MuleArtifactFunctionalTestCa
         while (sc == null) {
           sc = ssc.accept();
           Thread.yield();
+        }
+
+        try {
+          sleep(100);
+        } catch (InterruptedException e) {
+          // Ignore exception
         }
 
         sc.close();
