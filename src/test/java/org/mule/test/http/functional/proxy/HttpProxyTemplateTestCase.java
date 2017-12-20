@@ -36,6 +36,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.TestInputStream;
 import org.mule.test.http.functional.requester.AbstractHttpRequestTestCase;
 
@@ -80,6 +81,9 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
   private boolean consumeAllRequest = true;
   private static String IO_THREAD_PREFIX = "[MuleRuntime].io";
   private static Function<Message.Builder, Message.Builder> policy;
+
+  @Rule
+  public SystemProperty sys = new SystemProperty("mule.connection.lazy", "true");
 
   @Override
   protected String getConfigFile() {
