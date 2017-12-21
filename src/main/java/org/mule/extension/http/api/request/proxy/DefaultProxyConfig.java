@@ -11,7 +11,6 @@ import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
-import org.mule.runtime.http.api.client.proxy.ProxyConfig;
 
 /**
  * Basic HTTP Proxy configuration based on host and port, and optionally a username and password for proxy authentication.
@@ -20,7 +19,7 @@ import org.mule.runtime.http.api.client.proxy.ProxyConfig;
  */
 @Alias("proxy")
 @TypeDsl(allowTopLevelDefinition = true)
-public class DefaultProxyConfig implements ProxyConfig {
+public class DefaultProxyConfig implements HttpProxyConfig {
 
   /**
    * Host where the proxy requests will be sent.
