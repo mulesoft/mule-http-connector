@@ -11,9 +11,6 @@ import static org.mule.runtime.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAIL
 import static org.mule.tck.probe.PollingProber.check;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.http.api.HttpConstants.HttpStatus;
-import org.mule.runtime.http.api.HttpService;
-import org.mule.runtime.http.api.client.HttpClient;
-import org.mule.runtime.http.api.client.HttpClientConfiguration;
 import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -21,8 +18,6 @@ import org.mule.test.http.functional.AbstractHttpTestCase;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import javax.inject.Inject;
 
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -33,11 +28,7 @@ public class HttpBackPressureTestCase extends AbstractHttpTestCase {
   @Rule
   public DynamicPort listenPort = new DynamicPort("port");
 
-  @Inject
-  private HttpService httpService;
-
   private AtomicBoolean stop;
-  private HttpClient client;
 
   @Override
   protected String getConfigFile() {
@@ -47,17 +38,11 @@ public class HttpBackPressureTestCase extends AbstractHttpTestCase {
   @Override
   protected void doSetUp() throws Exception {
     stop = new AtomicBoolean(false);
-    client = httpService.getClientFactory().create(new HttpClientConfiguration.Builder()
-        .setName("backPressure-test").build());
-    client.start();
   }
 
   @Override
   protected void doTearDown() throws Exception {
     stop.set(true);
-    if (client != null) {
-      client.stop();
-    }
   }
 
   @Test
@@ -83,7 +68,7 @@ public class HttpBackPressureTestCase extends AbstractHttpTestCase {
     new Thread((CheckedRunnable) () -> {
       while (!stop.get()) {
         semaphore.acquire();
-        client.sendAsync(post, 60000, false, null).whenComplete((response, e) -> {
+        httpClient.sendAsync(post, 60000, false, null).whenComplete((response, e) -> {
           try {
             if (response != null && response.getStatusCode() == expectedStatus.getStatusCode()
                 && response.getReasonPhrase().equals(expectedStatus.getReasonPhrase())) {
