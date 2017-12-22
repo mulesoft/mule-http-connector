@@ -282,7 +282,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
           .reasonPhrase(attributes.getReasonPhrase());
       attributes.getHeaders().forEach(failureResponseBuilder::addHeader);
     } else if (error != null) {
-        failureResponseBuilder = createDefaultFailureResponseBuilder(error, INTERNAL_SERVER_ERROR);
+      failureResponseBuilder = createDefaultFailureResponseBuilder(error, INTERNAL_SERVER_ERROR);
     } else {
       failureResponseBuilder = HttpResponse.builder();
     }
