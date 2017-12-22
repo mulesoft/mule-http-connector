@@ -285,11 +285,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
           .reasonPhrase(attributes.getReasonPhrase());
       attributes.getHeaders().forEach(failureResponseBuilder::addHeader);
     } else if (error != null) {
-      if (error.getErrorType().equals(sourceOverloadErrorType)) {
-        failureResponseBuilder = createDefaultFailureResponseBuilder(error, SERVICE_UNAVAILABLE);
-      } else {
         failureResponseBuilder = createDefaultFailureResponseBuilder(error, INTERNAL_SERVER_ERROR);
-      }
     } else {
       failureResponseBuilder = HttpResponse.builder();
     }
