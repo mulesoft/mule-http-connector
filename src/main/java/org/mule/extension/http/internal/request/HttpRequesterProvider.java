@@ -22,6 +22,7 @@ import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
 import org.mule.extension.http.api.request.client.UriParameters;
+import org.mule.extension.http.api.request.proxy.HttpProxyConfig;
 import org.mule.extension.http.internal.request.client.DefaultUriParameters;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
 import org.mule.extension.socket.api.socket.tcp.TcpClientSocketProperties;
@@ -95,7 +96,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
   @Optional
   @Summary("Reusable configuration element for outbound connections through a proxy")
   @Placement(tab = "Proxy")
-  private ProxyConfig proxyConfig;
+  private HttpProxyConfig proxyConfig;
 
   /**
    * Authentication method to use for the HTTP request.

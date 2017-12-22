@@ -17,6 +17,7 @@ import org.mule.extension.http.api.request.authentication.HttpRequestAuthenticat
 import org.mule.extension.http.api.request.authentication.NtlmAuthentication;
 import org.mule.extension.http.api.request.proxy.DefaultNtlmProxyConfig;
 import org.mule.extension.http.api.request.proxy.DefaultProxyConfig;
+import org.mule.extension.http.api.request.proxy.HttpProxyConfig;
 import org.mule.extension.http.api.request.validator.FailureStatusCodeValidator;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.request.validator.SuccessStatusCodeValidator;
@@ -36,13 +37,12 @@ import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
-import org.mule.runtime.http.api.client.proxy.ProxyConfig;
 
 /**
  * HTTP connector used to handle and perform HTTP requests.
  * <p>
- * This class only serves as an extension definition. It's configurations are divided on server ({@code <http:listener-config>}) and
- * client ({@code <http:requester-config>}) capabilities.
+ * This class only serves as an extension definition. It's configurations are divided on server ({@code <http:listener-config>})
+ * and client ({@code <http:requester-config>}) capabilities.
  *
  * @since 1.0
  */
@@ -51,7 +51,7 @@ import org.mule.runtime.http.api.client.proxy.ProxyConfig;
 @Operations(HttpOperations.class)
 @SubTypeMapping(baseType = HttpRequestAuthentication.class,
     subTypes = {BasicAuthentication.class, DigestAuthentication.class, NtlmAuthentication.class})
-@SubTypeMapping(baseType = ProxyConfig.class, subTypes = {DefaultProxyConfig.class, DefaultNtlmProxyConfig.class})
+@SubTypeMapping(baseType = HttpProxyConfig.class, subTypes = {DefaultProxyConfig.class, DefaultNtlmProxyConfig.class})
 @SubTypeMapping(baseType = ResponseValidator.class,
     subTypes = {SuccessStatusCodeValidator.class, FailureStatusCodeValidator.class})
 @SubTypeMapping(baseType = Origin.class, subTypes = {EveryOrigin.class, SingleOrigin.class})
@@ -61,7 +61,7 @@ import org.mule.runtime.http.api.client.proxy.ProxyConfig;
 @Xml(namespace = "http://www.mulesoft.org/schema/mule/http", prefix = HTTP_NAMESPACE)
 // TODO move back to package org.mule.extension.http.internal as part of MULE-10651. Now we are using this package
 // because it doesn't work in the former package since the classloader mechanism will try to load the class from another bundle.
-@Export(classes = {HttpListenerConfig.class, HttpExtensionClient.class, HttpPolicyRequestAttributes.class})
+@Export(classes = {HttpListenerConfig.class, HttpExtensionClient.class, HttpPolicyRequestAttributes.class, HttpProxyConfig.class})
 public class HttpConnector {
 
 }
