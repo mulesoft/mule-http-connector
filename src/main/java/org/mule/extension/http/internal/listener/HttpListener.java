@@ -19,7 +19,6 @@ import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SECURITY;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.SOURCE_OVERLOAD;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
@@ -49,7 +48,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.transformation.TransformationService;
@@ -170,7 +168,6 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   private RequestHandlerManager requestHandlerManager;
   private HttpResponseFactory responseFactory;
   private ErrorTypeMatcher knownErrors;
-  private ErrorType sourceOverloadErrorType;
   private Class interpretedAttributes;
 
   // TODO: MULE-10900 figure out a way to have a shared group between callbacks and possibly regular params
@@ -317,7 +314,6 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
       throw new MuleRuntimeException(e);
     }
     knownErrors = new DisjunctiveErrorTypeMatcher(createErrorMatcherList(muleContext.getErrorTypeRepository()));
-    sourceOverloadErrorType = muleContext.getErrorTypeRepository().getErrorType(SOURCE_OVERLOAD).get();
     requestHandlerManager.start();
   }
 
