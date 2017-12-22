@@ -24,7 +24,9 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
+import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.DROP;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.DROPPED;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.getReasonPhraseForStatusCode;
@@ -70,8 +72,13 @@ import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
+import org.mule.runtime.extension.api.annotation.source.BackPressure;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
+import org.mule.runtime.extension.api.annotation.source.OnBackPressure;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.source.BackPressureAction;
+import org.mule.runtime.extension.api.runtime.source.BackPressureContext;
+import org.mule.runtime.extension.api.runtime.source.BackPressureMode;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
@@ -107,6 +114,7 @@ import org.slf4j.Logger;
 @EmitsResponse
 @Streaming
 @MediaType(value = ANY, strict = false)
+@BackPressure(defaultMode = BackPressureMode.FAIL, supportedModes = {BackPressureMode.FAIL, DROP})
 public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
 
   private static final String RESPONSE_SEND_ATTEMPT = "responseSendAttempt";
@@ -193,6 +201,15 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
     }
   }
 
+  @OnBackPressure
+  public void onBackPressure(BackPressureContext ctx, SourceCompletionCallback completionCallback) {
+    try {
+      sendBackPressureResponse(ctx, completionCallback);
+    } catch (Throwable t) {
+      completionCallback.error(t);
+    }
+  }
+
   @OnTerminate
   public void onTerminate(SourceResult sourceResult) {
     Boolean sendingResponse = (Boolean) sourceResult.getSourceCallbackContext().getVariable(RESPONSE_SEND_ATTEMPT).orElse(false);
@@ -224,6 +241,31 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
     try {
       response = responseFactory
           .create(failureResponseBuilder, context.getInterception(), errorResponse, context.isSupportStreaming());
+    } catch (Exception e) {
+      response = buildErrorResponse();
+    }
+
+    final HttpResponseReadyCallback responseCallback = context.getResponseCallback();
+    callbackContext.addVariable(RESPONSE_SEND_ATTEMPT, true);
+    responseCallback.responseReady(response, getResponseFailureCallback(responseCallback, completionCallback));
+  }
+
+  private void sendBackPressureResponse(BackPressureContext ctx, SourceCompletionCallback completionCallback) {
+    final SourceCallbackContext callbackContext = ctx.getSourceCallbackContext();
+    final HttpResponseContext context = callbackContext.<HttpResponseContext>getVariable(RESPONSE_CONTEXT)
+        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(RESPONSE_CONTEXT_NOT_FOUND)));
+
+    HttpStatus responseStatus = ctx.getAction() == BackPressureAction.FAIL ? SERVICE_UNAVAILABLE : DROPPED;
+    HttpResponseBuilder responseBuilder = HttpResponse.builder().statusCode(responseStatus.getStatusCode());
+    HttpListenerErrorResponseBuilder errorResponseBuilder = new HttpListenerErrorResponseBuilder();
+    errorResponseBuilder.setBody(new TypedValue<>(null, STRING));
+    errorResponseBuilder.setStatusCode(responseStatus.getStatusCode());
+    errorResponseBuilder.setReasonPhrase(responseStatus.getReasonPhrase());
+
+    HttpResponse response;
+    try {
+      response = responseFactory
+          .create(responseBuilder, context.getInterception(), errorResponseBuilder, context.isSupportStreaming());
     } catch (Exception e) {
       response = buildErrorResponse();
     }
