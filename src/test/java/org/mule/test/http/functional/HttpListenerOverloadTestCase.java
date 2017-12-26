@@ -20,8 +20,8 @@ import org.apache.http.client.fluent.Request;
 import org.junit.Rule;
 import org.junit.Test;
 
-@Story("Flow overload response status")
-public class HttpListenerFlowOverloadTestCase extends AbstractHttpTestCase {
+@Story("Overload response status")
+public class HttpListenerOverloadTestCase extends AbstractHttpTestCase {
 
   @Rule
   public DynamicPort listenPort = new DynamicPort("port");
@@ -38,8 +38,7 @@ public class HttpListenerFlowOverloadTestCase extends AbstractHttpTestCase {
 
     assertThat(response.getStatusLine().getStatusCode(), is(INTERNAL_SERVER_ERROR.getStatusCode()));
     assertThat(response.getStatusLine().getReasonPhrase(), is(INTERNAL_SERVER_ERROR.getReasonPhrase()));
-    assertThat(IOUtils.toString(response.getEntity().getContent()),
-               is("org.mule.runtime.api.scheduler.SchedulerBusyException: Scheduler unavailable"));
+    assertThat(IOUtils.toString(response.getEntity().getContent()), is("Scheduler unavailable"));
   }
 
 }
