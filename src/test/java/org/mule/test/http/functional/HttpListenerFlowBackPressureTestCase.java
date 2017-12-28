@@ -22,7 +22,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -39,8 +38,7 @@ import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 import io.qameta.allure.Story;
 
 @Story("Source overload handling")
-@Ignore("MULE-14271 HTTP Connector should use FAIL BackpressueStrategy by default")
-public class HttpListenerSourceOverloadTestCase extends AbstractHttpTestCase {
+public class HttpListenerFlowBackPressureTestCase extends AbstractHttpTestCase {
 
   @Rule
   public DynamicPort listenPort = new DynamicPort("port");
@@ -61,7 +59,7 @@ public class HttpListenerSourceOverloadTestCase extends AbstractHttpTestCase {
 
   @Override
   protected String getConfigFile() {
-    return "http-listener-overload-config.xml";
+    return "http-listener-flow-backpressure-config.xml";
   }
 
   @Before
