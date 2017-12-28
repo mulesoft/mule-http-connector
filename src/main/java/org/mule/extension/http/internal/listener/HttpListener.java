@@ -13,8 +13,6 @@ import static java.util.Optional.ofNullable;
 import static org.mule.extension.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.extension.http.api.error.HttpError.BASIC_AUTHENTICATION;
 import static org.mule.extension.http.api.error.HttpError.NOT_FOUND;
-import static org.mule.extension.http.api.notification.HttpNotificationAction.REQUEST_RECEIVED;
-import static org.mule.extension.http.api.notification.HttpRequestData.from;
 import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE;
 import static org.mule.extension.http.internal.listener.HttpRequestToResult.transform;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
@@ -63,7 +61,6 @@ import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
 import org.mule.runtime.extension.api.annotation.execution.OnTerminate;
-import org.mule.runtime.extension.api.annotation.notification.EmitsNotifications;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
@@ -113,7 +110,6 @@ import org.slf4j.Logger;
  */
 @Alias("listener")
 @EmitsResponse
-@EmitsNotifications(HttpListenerNotificationActionProvider.class)
 @Streaming
 @MediaType(value = ANY, strict = false)
 @BackPressure(defaultMode = BackPressureMode.FAIL, supportedModes = {BackPressureMode.FAIL, DROP})
@@ -371,7 +367,6 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
 
           SourceCallbackContext context = sourceCallback.createContext();
           context.addVariable(RESPONSE_CONTEXT, responseContext);
-          context.fire(REQUEST_RECEIVED, TypedValue.of(from(requestContext.getRequest())));
 
           String correlationId = headers.get(X_CORRELATION_ID.toLowerCase());
           if (correlationId != null) {

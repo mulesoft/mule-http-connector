@@ -13,16 +13,22 @@ import org.mule.runtime.http.api.domain.message.response.HttpResponse;
  *
  * @since 1.1
  */
-public class HttpResponseData extends HttpData {
+public class HttpResponseNotificationData extends HttpNotificationData {
 
   private final int statusCode;
   private final String reasonPhrase;
 
-  public static HttpResponseData from(HttpResponse response) {
-    return new HttpResponseData(response);
+  /**
+   * Creates an {@link HttpResponseNotificationData} based on an {@link HttpResponse}
+   *
+   * @param response {@link HttpResponse} to use as template
+   * @return an equivalent {@link HttpResponseNotificationData}
+   */
+  public static HttpResponseNotificationData from(HttpResponse response) {
+    return new HttpResponseNotificationData(response);
   }
 
-  HttpResponseData(HttpResponse response) {
+  HttpResponseNotificationData(HttpResponse response) {
     super(response);
     this.statusCode = response.getStatusCode();
     this.reasonPhrase = response.getReasonPhrase();

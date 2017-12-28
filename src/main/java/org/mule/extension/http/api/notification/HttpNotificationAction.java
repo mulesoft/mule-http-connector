@@ -6,6 +6,8 @@
  */
 package org.mule.extension.http.api.notification;
 
+import static org.mule.runtime.api.metadata.DataType.fromType;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.extension.api.notification.NotificationActionDefinition;
 
 /**
@@ -15,16 +17,23 @@ import org.mule.runtime.extension.api.notification.NotificationActionDefinition;
  */
 public enum HttpNotificationAction implements NotificationActionDefinition<HttpNotificationAction> {
 
-  REQUEST_RECEIVED(HttpRequestData.class), REQUEST_START(HttpRequestData.class), REQUEST_COMPLETE(HttpResponseData.class);
+  /**
+   * An outgoing HTTP request has been sent.
+   */
+  REQUEST_START(fromType(HttpRequestNotificationData.class)),
+  /**
+   * An incoming HTTP response has been received and the triggering request is complete.
+   */
+  REQUEST_COMPLETE(fromType(HttpResponseNotificationData.class));
 
-  private final Class<?> dataType;
+  private final DataType dataType;
 
-  HttpNotificationAction(Class<?> dataType) {
+  HttpNotificationAction(DataType dataType) {
     this.dataType = dataType;
   }
 
   @Override
-  public Class<?> getDataType() {
+  public DataType getDataType() {
     return dataType;
   }
 

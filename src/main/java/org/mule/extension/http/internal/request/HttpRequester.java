@@ -22,8 +22,8 @@ import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.error.HttpError;
 import org.mule.extension.http.api.error.HttpErrorMessageGenerator;
 import org.mule.extension.http.api.error.HttpRequestFailedException;
-import org.mule.extension.http.api.notification.HttpRequestData;
-import org.mule.extension.http.api.notification.HttpResponseData;
+import org.mule.extension.http.api.notification.HttpRequestNotificationData;
+import org.mule.extension.http.api.notification.HttpResponseNotificationData;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
 import org.mule.extension.http.api.request.authentication.UsernamePasswordAuthentication;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
@@ -100,12 +100,12 @@ public class HttpRequester {
                                   boolean checkRetry, MuleContext muleContext,
                                   CompletionCallback<InputStream, HttpResponseAttributes> callback, HttpRequest httpRequest,
                                   int retryCount) {
-    notificationEmitter.fire(REQUEST_START, of(HttpRequestData.from(httpRequest)));
+    notificationEmitter.fire(REQUEST_START, of(HttpRequestNotificationData.from(httpRequest)));
     client.send(httpRequest, responseTimeout, followRedirects, resolveAuthentication(authentication))
         .whenComplete(
                       (response, exception) -> {
                         if (response != null) {
-                          notificationEmitter.fire(REQUEST_COMPLETE, of(HttpResponseData.from(response)));
+                          notificationEmitter.fire(REQUEST_COMPLETE, of(HttpResponseNotificationData.from(response)));
                           HttpResponseToResult httpResponseToResult = new HttpResponseToResult(config, muleContext);
                           from(httpResponseToResult.convert(response, httpRequest.getUri()))
                               .doOnNext(result -> {

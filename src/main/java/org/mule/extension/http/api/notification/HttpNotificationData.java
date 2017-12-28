@@ -14,11 +14,11 @@ import org.mule.runtime.http.api.domain.message.HttpMessage;
  *
  * @since 1.1
  */
-public abstract class HttpData {
+public abstract class HttpNotificationData {
 
   private final MultiMap<String, String> headers;
 
-  <T extends HttpMessage> HttpData(T message) {
+  <T extends HttpMessage> HttpNotificationData(T message) {
     this.headers = createHeadersMultiMap(message);
   }
 

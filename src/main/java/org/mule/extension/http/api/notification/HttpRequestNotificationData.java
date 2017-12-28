@@ -9,27 +9,31 @@ package org.mule.extension.http.api.notification;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 
-import java.net.URI;
-
 /**
  * HTTP notification data regarding requests.
  *
  * @since 1.1
  */
-public class HttpRequestData extends HttpData {
+public class HttpRequestNotificationData extends HttpNotificationData {
 
   private final String method;
-  private final URI uri;
+  private final String uri;
   private final MultiMap<String, String> queryParams;
 
-  public static HttpRequestData from(HttpRequest request) {
-    return new HttpRequestData(request);
+  /**
+   * Creates an {@link HttpRequestNotificationData} based on an {@link HttpRequest}
+   *
+   * @param request {@link HttpRequest} to use as template
+   * @return an equivalent {@link HttpRequestNotificationData}
+   */
+  public static HttpRequestNotificationData from(HttpRequest request) {
+    return new HttpRequestNotificationData(request);
   }
 
-  HttpRequestData(HttpRequest request) {
+  HttpRequestNotificationData(HttpRequest request) {
     super(request);
     this.method = request.getMethod();
-    this.uri = request.getUri();
+    this.uri = request.getUri().toString();
     this.queryParams = request.getQueryParams().toImmutableMultiMap();
   }
 
@@ -37,7 +41,7 @@ public class HttpRequestData extends HttpData {
     return method;
   }
 
-  public URI getUri() {
+  public String getUri() {
     return uri;
   }
 

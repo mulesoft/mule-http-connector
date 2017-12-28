@@ -14,8 +14,8 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.http.api.HttpConstants.Method.POST;
-import org.mule.extension.http.api.notification.HttpRequestData;
-import org.mule.extension.http.api.notification.HttpResponseData;
+import org.mule.extension.http.api.notification.HttpRequestNotificationData;
+import org.mule.extension.http.api.notification.HttpResponseNotificationData;
 import org.mule.runtime.api.notification.ExtensionNotification;
 import org.mule.runtime.api.notification.ExtensionNotificationListener;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
@@ -49,21 +49,21 @@ public class HttpRequestNotificationsTestCase extends AbstractHttpRequestTestCas
 
     latch.await(1000, MILLISECONDS);
 
-    assertThat(listener.getNotifications().stream().map(n -> n.getAction().getId()).collect(toList()),
+    assertThat(listener.getNotifications().stream().map(n -> n.getAction().getIdentifier()).collect(toList()),
                containsInAnyOrder("REQUEST_START", "REQUEST_COMPLETE"));
 
     // verify that request data was collected
     ExtensionNotification extensionNotification1 = listener.getNotifications().get(0);
-    assertThat(extensionNotification1.getData().getValue(), is(instanceOf(HttpRequestData.class)));
-    HttpRequestData requestData = (HttpRequestData) extensionNotification1.getData().getValue();
+    assertThat(extensionNotification1.getData().getValue(), is(instanceOf(HttpRequestNotificationData.class)));
+    HttpRequestNotificationData requestData = (HttpRequestNotificationData) extensionNotification1.getData().getValue();
     assertThat(requestData.getMethod(), is(POST.name()));
     assertThat(requestData.getQueryParams().getAll("query"), containsInAnyOrder("param", "otherParam"));
     assertThat(requestData.getHeaders().getAll("header"), containsInAnyOrder("value", "otherValue"));
 
     // verify that response data was collected
     ExtensionNotification extensionNotification2 = listener.getNotifications().get(1);
-    assertThat(extensionNotification2.getData().getValue(), is(instanceOf(HttpResponseData.class)));
-    HttpResponseData responseData = (HttpResponseData) extensionNotification2.getData().getValue();
+    assertThat(extensionNotification2.getData().getValue(), is(instanceOf(HttpResponseNotificationData.class)));
+    HttpResponseNotificationData responseData = (HttpResponseNotificationData) extensionNotification2.getData().getValue();
     assertThat(responseData.getStatusCode(), is(OK.getStatusCode()));
     assertThat(responseData.getReasonPhrase(), is(OK.getReasonPhrase()));
   }
