@@ -6,67 +6,86 @@
  */
 package org.mule.test.http.functional.requester;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.core.IsEqual.equalTo;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.stream.Collectors.toList;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.api.notification.AbstractServerNotification.getActionName;
-import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
-import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_REQUEST_END;
-import static org.mule.runtime.core.api.context.notification.ServerNotificationManager.createDefaultNotificationManager;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.test.http.functional.TestConnectorMessageNotificationListener.register;
-import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.context.MuleContextBuilder;
-import org.mule.test.http.functional.TestConnectorMessageNotificationListener;
-import org.mule.test.http.functional.matcher.HttpMessageAttributesMatchers;
+import static org.mule.runtime.http.api.HttpConstants.Method.POST;
+import org.mule.extension.http.api.notification.HttpRequestNotificationData;
+import org.mule.extension.http.api.notification.HttpResponseNotificationData;
+import org.mule.runtime.api.notification.ExtensionNotification;
+import org.mule.runtime.api.notification.ExtensionNotificationListener;
+import org.mule.runtime.api.notification.NotificationListenerRegistry;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
-import io.qameta.allure.Issue;
-import org.junit.Ignore;
+import javax.inject.Inject;
+
 import org.junit.Test;
 
-@Ignore("MULE-13774: Add notifications to HTTP request")
-@Issue("MULE-13774")
 public class HttpRequestNotificationsTestCase extends AbstractHttpRequestTestCase {
+
+  @Inject
+  private NotificationListenerRegistry notificationListenerRegistry;
 
   @Override
   protected String getConfigFile() {
     return "http-request-notifications-config.xml";
   }
 
-  @Override
-  protected void configureMuleContext(MuleContextBuilder contextBuilder) {
-    contextBuilder.setNotificationManager(register(createDefaultNotificationManager()));
-    super.configureMuleContext(contextBuilder);
-  }
-
   @Test
   public void receiveNotification() throws Exception {
     CountDownLatch latch = new CountDownLatch(2);
-    TestConnectorMessageNotificationListener listener =
-        new TestConnectorMessageNotificationListener(latch, "http://localhost:" + httpPort.getValue() + "/basePath/requestPath");
-    muleContext.getNotificationManager().addListener(listener);
 
-    Message response = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run().getMessage();
+    TestExtensionNotificationListener listener = new TestExtensionNotificationListener(latch);
+    notificationListenerRegistry.registerListener(listener);
 
-    latch.await(1000, TimeUnit.MILLISECONDS);
+    flowRunner("requestFlow").withPayload(TEST_MESSAGE).run().getMessage();
 
-    assertThat(listener.getNotificationActionNames(),
-               contains(getActionName(MESSAGE_REQUEST_BEGIN), getActionName(MESSAGE_REQUEST_END)));
+    latch.await(1000, MILLISECONDS);
 
-    // End event should have appended http.status and http.reason as inbound properties
-    Message message = listener.getNotifications(getActionName(MESSAGE_REQUEST_END)).get(0).getEvent().getMessage();
-    // For now, check the response, since we no longer have control over the MuleEvent generated, only the Message
-    assertThat((HttpResponseAttributes) response.getAttributes().getValue(),
-               HttpMessageAttributesMatchers.hasStatusCode(OK.getStatusCode()));
-    assertThat((HttpResponseAttributes) response.getAttributes().getValue(),
-               HttpMessageAttributesMatchers.hasReasonPhrase(OK.getReasonPhrase()));
+    assertThat(listener.getNotifications().stream().map(n -> n.getAction().getIdentifier()).collect(toList()),
+               containsInAnyOrder("REQUEST_START", "REQUEST_COMPLETE"));
 
-    Message requestMessage = listener.getNotifications(getActionName(MESSAGE_REQUEST_BEGIN)).get(0).getEvent().getMessage();
-    assertThat(requestMessage, equalTo(message));
+    // verify that request data was collected
+    ExtensionNotification extensionNotification1 = listener.getNotifications().get(0);
+    assertThat(extensionNotification1.getData().getValue(), is(instanceOf(HttpRequestNotificationData.class)));
+    HttpRequestNotificationData requestData = (HttpRequestNotificationData) extensionNotification1.getData().getValue();
+    assertThat(requestData.getMethod(), is(POST.name()));
+    assertThat(requestData.getQueryParams().getAll("query"), containsInAnyOrder("param", "otherParam"));
+    assertThat(requestData.getHeaders().getAll("header"), containsInAnyOrder("value", "otherValue"));
+
+    // verify that response data was collected
+    ExtensionNotification extensionNotification2 = listener.getNotifications().get(1);
+    assertThat(extensionNotification2.getData().getValue(), is(instanceOf(HttpResponseNotificationData.class)));
+    HttpResponseNotificationData responseData = (HttpResponseNotificationData) extensionNotification2.getData().getValue();
+    assertThat(responseData.getStatusCode(), is(OK.getStatusCode()));
+    assertThat(responseData.getReasonPhrase(), is(OK.getReasonPhrase()));
+  }
+
+  private class TestExtensionNotificationListener implements ExtensionNotificationListener {
+
+    private CountDownLatch latch;
+    private List<ExtensionNotification> notifications = new LinkedList<>();
+
+    public TestExtensionNotificationListener(CountDownLatch latch) {
+      this.latch = latch;
+    }
+
+    @Override
+    public void onNotification(ExtensionNotification notification) {
+      notifications.add(notification);
+      latch.countDown();
+    }
+
+    public List<ExtensionNotification> getNotifications() {
+      return notifications;
+    }
   }
 
 }

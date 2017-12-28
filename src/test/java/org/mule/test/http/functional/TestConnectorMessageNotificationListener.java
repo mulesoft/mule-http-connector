@@ -10,7 +10,6 @@ import static org.apache.commons.collections.CollectionUtils.collect;
 import static org.apache.commons.collections.CollectionUtils.select;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-
 import org.mule.runtime.api.notification.ConnectorMessageNotification;
 import org.mule.runtime.api.notification.ConnectorMessageNotificationListener;
 import org.mule.runtime.api.notification.Notification;
