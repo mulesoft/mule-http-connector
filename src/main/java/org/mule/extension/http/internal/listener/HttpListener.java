@@ -23,9 +23,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
-import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.DROP;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.DROPPED;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.getReasonPhraseForStatusCode;
@@ -74,7 +72,6 @@ import org.mule.runtime.extension.api.annotation.source.BackPressure;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.annotation.source.OnBackPressure;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.extension.api.runtime.source.BackPressureAction;
 import org.mule.runtime.extension.api.runtime.source.BackPressureContext;
 import org.mule.runtime.extension.api.runtime.source.BackPressureMode;
 import org.mule.runtime.extension.api.runtime.source.Source;
@@ -112,7 +109,7 @@ import org.slf4j.Logger;
 @EmitsResponse
 @Streaming
 @MediaType(value = ANY, strict = false)
-@BackPressure(defaultMode = BackPressureMode.FAIL, supportedModes = {BackPressureMode.FAIL, DROP})
+@BackPressure(defaultMode = BackPressureMode.FAIL, supportedModes = {BackPressureMode.FAIL})
 public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
 
   private static final String RESPONSE_SEND_ATTEMPT = "responseSendAttempt";
@@ -252,12 +249,11 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
     final HttpResponseContext context = callbackContext.<HttpResponseContext>getVariable(RESPONSE_CONTEXT)
         .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(RESPONSE_CONTEXT_NOT_FOUND)));
 
-    HttpStatus responseStatus = ctx.getAction() == BackPressureAction.FAIL ? SERVICE_UNAVAILABLE : DROPPED;
-    HttpResponseBuilder responseBuilder = HttpResponse.builder().statusCode(responseStatus.getStatusCode());
+    HttpResponseBuilder responseBuilder = HttpResponse.builder().statusCode(SERVICE_UNAVAILABLE.getStatusCode());
     HttpListenerErrorResponseBuilder errorResponseBuilder = new HttpListenerErrorResponseBuilder();
     errorResponseBuilder.setBody(new TypedValue<>(null, STRING));
-    errorResponseBuilder.setStatusCode(responseStatus.getStatusCode());
-    errorResponseBuilder.setReasonPhrase(responseStatus.getReasonPhrase());
+    errorResponseBuilder.setStatusCode(SERVICE_UNAVAILABLE.getStatusCode());
+    errorResponseBuilder.setReasonPhrase(SERVICE_UNAVAILABLE.getReasonPhrase());
 
     HttpResponse response;
     try {

@@ -6,7 +6,6 @@
  */
 package org.mule.test.http.functional.listener;
 
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.DROPPED;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
 import static org.mule.tck.probe.PollingProber.check;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
@@ -19,7 +18,6 @@ import org.mule.test.http.functional.AbstractHttpTestCase;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -48,12 +46,6 @@ public class HttpBackPressureTestCase extends AbstractHttpTestCase {
   @Test
   public void backPressureWithFailStrategy() throws Exception {
     assertBackPressure("fail", SERVICE_UNAVAILABLE);
-  }
-
-  @Test
-  @Ignore("MULE-14284 - Runtime should notify if FAIL or DROP")
-  public void backPressureWithDropStrategy() throws Exception {
-    assertBackPressure("drop", DROPPED);
   }
 
   private void assertBackPressure(String path, HttpStatus expectedStatus) throws Exception {

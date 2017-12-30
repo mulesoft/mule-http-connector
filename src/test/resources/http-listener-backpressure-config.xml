@@ -18,10 +18,4 @@
         <set-payload value="FAIL"/>
     </flow>
 
-    <flow name="drop" maxConcurrency="1">
-        <http:listener path="drop" backPressureStrategy="DROP" config-ref="listenerConfig"/>
-        <test:processor waitTime="120000" />
-        <set-payload value="DROP"/>
-    </flow>
-
 </mule>
