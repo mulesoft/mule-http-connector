@@ -28,7 +28,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
-public class HttpPolicyRequestParametersTransformerTestCase extends AbstractMuleTestCase {
+public class HttpRequestPolicyParametersTransformerTestCase extends AbstractMuleTestCase {
 
   private static final MultiMap<String, String> HEADERS = new MultiMap<>(of("header", "headerValue"));
   private static final MultiMap<String, String> QUERY_PARAMS = new MultiMap<>(of("queryParam", "queryParamValue"));

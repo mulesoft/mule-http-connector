@@ -30,16 +30,16 @@ public class HttpPolicyRequestAttributes extends BaseHttpRequestAttributes {
     super(new MultiMap<>(), new MultiMap<>(), new MultiMap<>(), "");
   }
 
-  public void setHeaders(Map<String, String> headers) {
-    this.headers = new MultiMap<>(headers);
+  public void setHeaders(MultiMap<String, String> headers) {
+    this.headers = headers;
   }
 
-  public void setQueryParams(Map<String, String> queryParams) {
-    this.queryParams = new MultiMap<>(queryParams);
+  public void setQueryParams(MultiMap<String, String> queryParams) {
+    this.queryParams = queryParams;
   }
 
   public void setUriParams(Map<String, String> uriParams) {
-    this.uriParams = new MultiMap<>(uriParams);
+    this.uriParams = uriParams;
   }
 
 }
