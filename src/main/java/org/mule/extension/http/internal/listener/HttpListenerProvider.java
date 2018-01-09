@@ -191,7 +191,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
     try {
       server.start();
     } catch (IOException e) {
-      throw new DefaultMuleException(new ConnectionException("Could not start HTTP server", e));
+      throw new DefaultMuleException(new ConnectionException("Could not start HTTP server for " + configName + " on port " + connectionParams.port, e));
     }
   }
 
