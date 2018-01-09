@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+
+    <flow name="multi-value-headers">
+        <set-payload
+                value="#[{ headers: vars.headers} as Object {class: 'org.mule.extension.http.api.policy.HttpPolicyRequestAttributes'}]"/>
+    </flow>
+
+    <flow name="multi-value-query-params">
+        <set-payload
+                value="#[{ queryParams: vars.queryParams} as Object {class: 'org.mule.extension.http.api.policy.HttpPolicyRequestAttributes'}]"/>
+    </flow>
+
+</mule>
