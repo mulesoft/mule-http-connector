@@ -177,8 +177,8 @@ public class HttpRequester {
   }
 
   private boolean shouldRetryRemotelyClosed(Throwable exception, int retryCount, String httpMethod) {
-    boolean shouldRetry = IDEMPOTENT_METHODS.contains(httpMethod) && exception instanceof IOException
-        && containsIgnoreCase(exception.getMessage(), REMOTELY_CLOSED) && retryCount > 0;
+    boolean shouldRetry = exception instanceof IOException && containsIgnoreCase(exception.getMessage(), REMOTELY_CLOSED)
+        && IDEMPOTENT_METHODS.contains(httpMethod) && retryCount > 0;
     if (shouldRetry) {
       logger.warn("Sending HTTP message failed with `" + IOException.class.getCanonicalName() + ": " + REMOTELY_CLOSED
           + "`. Request will be retried " + retryCount + " time(s) before failing.");
