@@ -6,10 +6,9 @@
  */
 package org.mule.extension.http.internal;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableList;
+import static com.google.common.collect.ImmutableSet.of;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * Constants of the HTTP Connector.
@@ -26,6 +25,6 @@ public interface HttpConnectorConstants {
   String TLS_CONFIGURATION = "TLS Configuration";
   String AUTHENTICATION = "Authentication";
   String DISABLE_RESPONSE_STREAMING_PROPERTY = "mule.http.disableResponseStreaming";
-  List<String> IDEMPOTENT_METHODS = unmodifiableList(asList("GET", "PUT", "DELETE", "HEAD", "OPTIONS", "TRACE"));
+  Set<String> IDEMPOTENT_METHODS = of("GET", "PUT", "DELETE", "HEAD", "OPTIONS", "TRACE");
 
 }

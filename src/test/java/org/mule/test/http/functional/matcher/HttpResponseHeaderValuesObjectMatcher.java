@@ -6,10 +6,11 @@
  */
 package org.mule.test.http.functional.matcher;
 
+import static java.util.stream.Collectors.toList;
+
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.hamcrest.Description;
@@ -34,10 +35,7 @@ public class HttpResponseHeaderValuesObjectMatcher extends TypeSafeMatcher<HttpR
   @Override
   public boolean matchesSafely(HttpResponse response) {
     Header[] headerValuesInArray = response.getHeaders(headerName);
-    headerValuesInCollection = CollectionUtils.collect(Arrays.asList(headerValuesInArray), input -> {
-      Header header = (Header) input;
-      return header.getValue();
-    });
+    headerValuesInCollection = Arrays.stream(headerValuesInArray).map(Header::getValue).collect(toList());
     return matcher.matches(headerValuesInCollection);
   }
 

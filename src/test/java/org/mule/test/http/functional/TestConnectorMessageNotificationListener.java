@@ -6,10 +6,10 @@
  */
 package org.mule.test.http.functional;
 
-import static org.apache.commons.collections.CollectionUtils.collect;
-import static org.apache.commons.collections.CollectionUtils.select;
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import org.mule.runtime.api.notification.AbstractServerNotification;
 import org.mule.runtime.api.notification.ConnectorMessageNotification;
 import org.mule.runtime.api.notification.ConnectorMessageNotificationListener;
 import org.mule.runtime.api.notification.Notification;
@@ -21,8 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
-
-import org.apache.commons.collections.Transformer;
 
 public class TestConnectorMessageNotificationListener
     implements ConnectorMessageNotificationListener<ConnectorMessageNotification> {
@@ -58,7 +56,7 @@ public class TestConnectorMessageNotificationListener
   }
 
   public List<String> getNotificationActionNames() {
-    return (List<String>) collect(notifications, (Transformer) input -> ((ConnectorMessageNotification) input).getActionName());
+    return notifications.stream().map(AbstractServerNotification::getActionName).collect(toList());
   }
 
   /**
@@ -68,8 +66,7 @@ public class TestConnectorMessageNotificationListener
    * @return The notifications sent for the given action.
    */
   public List<ConnectorMessageNotification> getNotifications(final String actionName) {
-    return (List<ConnectorMessageNotification>) select(notifications, object -> ((ConnectorMessageNotification) object)
-        .getActionName().equals(actionName));
+    return notifications.stream().filter(n -> n.getActionName().equals(actionName)).collect(toList());
   }
 
   public static ServerNotificationManager register(ServerNotificationManager serverNotificationManager) {
