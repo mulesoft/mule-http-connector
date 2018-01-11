@@ -8,9 +8,15 @@ package org.mule.test.http.functional.requester;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+import org.mule.tck.junit4.rule.SystemProperty;
+
+import org.junit.Rule;
 import org.junit.Test;
 
 public class HttpRequestResponseStreamingTestCase extends AbstractHttpRequestResponseStreamingTestCase {
+
+  @Rule
+  public SystemProperty streamingProperty = new SystemProperty("streaming", "true");
 
   @Override
   protected String getConfigFile() {

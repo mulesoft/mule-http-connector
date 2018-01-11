@@ -7,7 +7,7 @@
 package org.mule.test.http.functional.requester;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.mule.extension.http.internal.HttpConnectorConstants.DISABLE_RESPONSE_STREAMING_PROPERTY;
+
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.junit.Rule;
@@ -16,7 +16,7 @@ import org.junit.Test;
 public class HttpRequestResponseNoStreamingTestCase extends AbstractHttpRequestResponseStreamingTestCase {
 
   @Rule
-  public SystemProperty noStreaming = new SystemProperty(DISABLE_RESPONSE_STREAMING_PROPERTY, "true");
+  public SystemProperty streamingProperty = new SystemProperty("streaming", "false");
 
   @Override
   protected String getConfigFile() {
