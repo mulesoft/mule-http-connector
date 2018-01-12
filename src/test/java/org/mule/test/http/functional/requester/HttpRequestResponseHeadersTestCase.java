@@ -54,7 +54,8 @@ public class HttpRequestResponseHeadersTestCase extends AbstractHttpRequestTestC
       response.addHeader(header.getValue(), "custom2");
     } else if ("responseWithUpgradeToHttp2Header".equals(path)) {
       response.addHeader(UPGRADE, "h2,h2c");
-      response.addHeader(CONNECTION, "Upgrade, close");
+      //TODO - MULE-14439: Connection close header causes failure with non blocking non streaming handler
+      response.addHeader(CONNECTION, "Upgrade");
       super.writeResponse(response);
     }
     super.writeResponse(response);
