@@ -130,4 +130,17 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
     return clientCertificate;
   }
 
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("The requester has these values:\n");
+    builder.append("Request Headers:\n");
+    headers.entrySet().stream().forEach(header -> builder.append("   " + header.getKey() + ": " + header.getValue() + "\n"));
+    builder.append("Query Parameters:\n");
+    queryParams.entrySet().stream()
+        .forEach(queryParam -> builder.append("   " + queryParam.getKey() + ": " + queryParam.getValue() + "\n"));
+    builder.append("URI Parameters:\n");
+    uriParams.entrySet().stream()
+        .forEach(uriParam -> builder.append("   " + uriParam.getKey() + ": " + uriParam.getValue() + "\n"));
+    return builder.toString();
+  }
 }

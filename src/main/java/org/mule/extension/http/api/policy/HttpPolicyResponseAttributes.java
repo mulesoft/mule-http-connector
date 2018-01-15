@@ -59,4 +59,20 @@ public class HttpPolicyResponseAttributes implements Serializable {
     this.headers = headers;
   }
 
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("The response has these values\n");
+    builder.append("Status Code: ").append(statusCode);
+    builder.append("\n");
+
+    builder.append("Reason Phrase: ").append(reasonPhrase);
+    builder.append("\n");
+
+    builder.append("Headers:");
+    builder.append("\n");
+
+    headers.entrySet().stream()
+        .forEach(header -> builder.append("   ").append(header.getKey()).append(": ").append(header.getValue()).append("\n"));
+    return builder.toString();
+  }
 }
