@@ -47,34 +47,13 @@ public class HttpPolicyRequestAttributes extends BaseHttpRequestAttributes {
   public String toString() {
 
     StringBuilder builder = new StringBuilder();
-    String tab = "   ";
-    String doubleTab = tab + tab;
-    builder.append(this.getClass().getName()).append(lineSeparator()).append("{").append(lineSeparator())
-        .append(tab).append("Request path=").append(requestPath).append(lineSeparator())
-        .append(tab).append("Headers=[").append(lineSeparator());
+    builder.append(this.getClass().getName()).append(lineSeparator()).append("{")
+        .append(lineSeparator()).append(tab).append("Request path=").append(requestPath)
+        .append(lineSeparator());
 
-    headers.entrySet().stream()
-        .forEach(header -> builder.append(doubleTab).append(header.getKey()).append("=").append(header.getValue())
-            .append(lineSeparator()));
-
-    builder.append(tab).append("]");
-
-    if (queryParams != null) {
-      builder.append(lineSeparator()).append(tab).append("Query Parameters=[").append(lineSeparator());
-      queryParams.entrySet().stream()
-          .forEach(queryParam -> builder.append(doubleTab).append(queryParam.getKey()).append("=").append(queryParam.getValue())
-              .append(lineSeparator()));
-      builder.append(tab).append("]");
-    }
-    if (uriParams != null) {
-      builder.append(lineSeparator()).append(tab).append("URI Parameters=[").append(lineSeparator());
-      uriParams.entrySet().stream()
-          .forEach(uriParam -> builder.append(doubleTab).append(uriParam.getKey()).append("=").append(uriParam.getValue())
-              .append(lineSeparator()));
-      builder.append(tab).append("]");
-    }
-
-    builder.append(lineSeparator());
+    buildMapToString(headers, "Headers", headers == null ? null : headers.entryList().stream(), builder);
+    buildMapToString(queryParams, "Query Parameters", queryParams == null ? null : queryParams.entryList().stream(), builder);
+    buildMapToString(uriParams, "URI Parameters", uriParams == null ? null : uriParams.entrySet().stream(), builder);
     builder.append("}");
 
     return builder.toString();

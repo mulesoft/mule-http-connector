@@ -44,19 +44,14 @@ public class HttpResponseAttributes extends HttpAttributes {
 
   public String toString() {
     StringBuilder builder = new StringBuilder();
-    String tab = "   ";
-    String doubleTab = tab + tab;
 
     builder.append(this.getClass().getName()).append(lineSeparator()).append("{").append(lineSeparator())
         .append(tab).append("Status Code=").append(statusCode).append(lineSeparator())
-        .append(tab).append("Reason Phrase=").append(reasonPhrase).append(lineSeparator())
-        .append(tab).append("Headers=[").append(lineSeparator());
+        .append(tab).append("Reason Phrase=").append(reasonPhrase).append(lineSeparator());
 
-    headers.entrySet().stream()
-        .forEach(header -> builder.append(doubleTab).append(header.getKey()).append("=").append(header.getValue())
-            .append(lineSeparator()));
+    buildMapToString(headers, "Headers", headers == null ? null : headers.entryList().stream(), builder);
 
-    builder.append(tab).append("]").append(lineSeparator()).append("}");
+    builder.append("}");
 
     return builder.toString();
   }

@@ -11,11 +11,12 @@ import static org.hamcrest.core.Is.is;
 
 import org.mule.extension.http.api.policy.HttpPolicyResponseAttributes;
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;
 import org.junit.Test;
 
-public class HttpPolicyResponseAttributesTestCase {
+public class HttpPolicyResponseAttributesTestCase extends AbstractMuleTestCase {
 
   private static final String COMPLETE_TO_STRING = "org.mule.extension.http.api.policy.HttpPolicyResponseAttributes\n" +
       "{\n" +
@@ -42,8 +43,7 @@ public class HttpPolicyResponseAttributesTestCase {
       "{\n" +
       "   Status Code=401\n" +
       "   Reason Phrase=Some Reason Phrase\n" +
-      "   Headers=[\n" +
-      "   ]\n" +
+      "   Headers=[]\n" +
       "}";
 
   private static final String TO_STRING_WITHOUT_REASON_PHRASE =

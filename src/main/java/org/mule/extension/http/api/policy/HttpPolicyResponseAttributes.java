@@ -21,6 +21,9 @@ import java.io.Serializable;
  */
 public class HttpPolicyResponseAttributes implements Serializable {
 
+  protected static final String tab = "   ";
+  protected static final String doubleTab = tab + tab;
+
   private static final long serialVersionUID = 2530600012948674328L;
 
   /**
@@ -63,19 +66,23 @@ public class HttpPolicyResponseAttributes implements Serializable {
 
   public String toString() {
     StringBuilder builder = new StringBuilder();
-    String tab = "   ";
-    String doubleTab = tab + tab;
 
-    builder.append(this.getClass().getName()).append(lineSeparator()).append("{").append(lineSeparator())
-        .append(tab).append("Status Code=").append(statusCode).append(lineSeparator())
-        .append(tab).append("Reason Phrase=").append(reasonPhrase).append(lineSeparator())
-        .append(tab).append("Headers=[").append(lineSeparator());
+    builder.append(this.getClass().getName())
+        .append(lineSeparator()).append("{")
+        .append(lineSeparator()).append(tab).append("Status Code=").append(statusCode)
+        .append(lineSeparator()).append(tab).append("Reason Phrase=").append(reasonPhrase)
+        .append(lineSeparator()).append(tab).append("Headers=[");
 
-    headers.entrySet().stream()
-        .forEach(header -> builder.append(doubleTab).append(header.getKey()).append("=").append(header.getValue())
-            .append(lineSeparator()));
+    if (headers.isEmpty()) {
+      builder.append("]");
+    } else {
+      headers.entryList().stream()
+          .forEach(header -> builder.append(lineSeparator()).append(doubleTab)
+              .append(header.getKey()).append("=").append(header.getValue()));
 
-    builder.append(tab).append("]").append(lineSeparator()).append("}");
+      builder.append(lineSeparator()).append(tab).append("]");
+    }
+    builder.append(lineSeparator()).append("}");
 
     return builder.toString();
   }

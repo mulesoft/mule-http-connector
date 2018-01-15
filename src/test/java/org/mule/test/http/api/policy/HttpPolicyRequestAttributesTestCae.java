@@ -9,16 +9,15 @@ package org.mule.test.http.api.policy;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
-import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.policy.HttpPolicyRequestAttributes;
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import org.junit.Test;
 
-public class HttpPolicyRequestAttributesTestCae {
+public class HttpPolicyRequestAttributesTestCae extends AbstractMuleTestCase {
 
   private static final String TO_STRING_COMPLETE = "org.mule.extension.http.api.policy.HttpPolicyRequestAttributes\n" +
       "{\n" +
@@ -40,30 +39,27 @@ public class HttpPolicyRequestAttributesTestCae {
   private static final String TO_STRING_EMPTY = "org.mule.extension.http.api.policy.HttpPolicyRequestAttributes\n" +
       "{\n" +
       "   Request path=\n" +
-      "   Headers=[\n" +
-      "   ]\n" +
-      "   Query Parameters=[\n" +
-      "   ]\n" +
-      "   URI Parameters=[\n" +
-      "   ]\n" +
+      "   Headers=[]\n" +
+      "   Query Parameters=[]\n" +
+      "   URI Parameters=[]\n" +
       "}";
 
   private static final String TO_STRING_QUERY_PARAMS = "org.mule.extension.http.api.policy.HttpPolicyRequestAttributes\n" +
       "{\n" +
       "   Request path=null\n" +
-      "   Headers=[\n" +
-      "   ]\n" +
+      "   Headers=[]\n" +
       "   Query Parameters=[\n" +
       "      queryParam1=queryParam1\n" +
       "      queryParam2=queryParam2\n" +
       "   ]\n" +
+      "   URI Parameters=[]\n" +
       "}";
 
   private static final String TO_STRING_URI_PARAMS = "org.mule.extension.http.api.policy.HttpPolicyRequestAttributes\n" +
       "{\n" +
       "   Request path=null\n" +
-      "   Headers=[\n" +
-      "   ]\n" +
+      "   Headers=[]\n" +
+      "   Query Parameters=[]\n" +
       "   URI Parameters=[\n" +
       "      uriParam1=uriParam1\n" +
       "      uriParam2=uriParam2\n" +

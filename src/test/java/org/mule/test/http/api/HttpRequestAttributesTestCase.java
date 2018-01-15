@@ -9,15 +9,15 @@ package org.mule.test.http.api;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
-import org.mule.extension.http.api.HttpRequestAttributes;
+import org.mule.extension.http.api.HttpRequestAttributesBuilder;
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import org.junit.Test;
 
-public class HttpRequestAttributesTestCase {
+public class HttpRequestAttributesTestCase extends AbstractMuleTestCase {
 
   private static final String TO_STRING_COMPLETE = "org.mule.extension.http.api.HttpRequestAttributes\n" +
       "{\n" +
@@ -57,8 +57,9 @@ public class HttpRequestAttributesTestCase {
       "   Request Uri=null\n" +
       "   Scheme=null\n" +
       "   Version=null\n" +
-      "   Headers=[\n" +
-      "   ]\n" +
+      "   Headers=[]\n" +
+      "   Query Parameters=[]\n" +
+      "   URI Parameters=[]\n" +
       "}";
 
   private static final String TO_STRING_QUERY_PARAMS = "org.mule.extension.http.api.HttpRequestAttributes\n" +
@@ -73,12 +74,12 @@ public class HttpRequestAttributesTestCase {
       "   Request Uri=null\n" +
       "   Scheme=null\n" +
       "   Version=null\n" +
-      "   Headers=[\n" +
-      "   ]\n" +
+      "   Headers=[]\n" +
       "   Query Parameters=[\n" +
       "      queryParam1=queryParam1\n" +
       "      queryParam2=queryParam2\n" +
       "   ]\n" +
+      "   URI Parameters=[]\n" +
       "}";
 
   private static final String TO_STRING_URI_PARAMS = "org.mule.extension.http.api.HttpRequestAttributes\n" +
@@ -93,8 +94,8 @@ public class HttpRequestAttributesTestCase {
       "   Request Uri=null\n" +
       "   Scheme=null\n" +
       "   Version=null\n" +
-      "   Headers=[\n" +
-      "   ]\n" +
+      "   Headers=[]\n" +
+      "   Query Parameters=[]\n" +
       "   URI Parameters=[\n" +
       "      uriParam1=uriParam1\n" +
       "      uriParam2=uriParam2\n" +
@@ -105,46 +106,30 @@ public class HttpRequestAttributesTestCase {
 
   @Test
   public void completeToString() throws IllegalAccessException, InvocationTargetException, InstantiationException {
-    Constructor constructor = HttpRequestAttributes.class.getDeclaredConstructors()[1];
-    constructor.setAccessible(true);
-    requestAttributes = constructor.newInstance(getHeaders(), "/listener/path", "/relative/path",
-                                                "1.0", "scheme", "GET", "/request/path", "http://127.0.0.1/gateway",
-                                                "queryString", getQueryParams(), getUriParams(), "http://127.0.0.1:8080/",
-                                                "http://10.1.2.5:8080/", null);
+    HttpRequestAttributesBuilder builder = new HttpRequestAttributesBuilder();
+    requestAttributes = builder.headers(getHeaders()).listenerPath("/listener/path").relativePath("/relative/path")
+        .version("1.0").scheme("scheme").method("GET").requestPath("/request/path").remoteAddress("http://10.1.2.5:8080/")
+        .queryString("queryString").queryParams(getQueryParams()).uriParams(getUriParams())
+        .localAddress("http://127.0.0.1:8080/").requestUri("http://127.0.0.1/gateway").build();
+
     assertThat(TO_STRING_COMPLETE, is(requestAttributes.toString()));
   }
 
   @Test
   public void emptyToString() throws IllegalAccessException, InvocationTargetException, InstantiationException {
-    Constructor constructor = HttpRequestAttributes.class.getDeclaredConstructors()[1];
-    constructor.setAccessible(true);
-    requestAttributes = constructor.newInstance(new MultiMap<>(), null, null,
-                                                null, null, null, null, null,
-                                                null, null, null, null,
-                                                null, null);
-    assertThat(TO_STRING_EMPTY, is(requestAttributes.toString()));
+    assertThat(TO_STRING_EMPTY, is(new HttpRequestAttributesBuilder().headers(new MultiMap<>()).build().toString()));
   }
 
   @Test
   public void onlyQueryParamToString() throws IllegalAccessException, InvocationTargetException, InstantiationException {
-    Constructor constructor = HttpRequestAttributes.class.getDeclaredConstructors()[1];
-    constructor.setAccessible(true);
-    requestAttributes = constructor.newInstance(new MultiMap<>(), null, null,
-                                                null, null, null, null, null,
-                                                null, getQueryParams(), null, null,
-                                                null, null);
-    assertThat(TO_STRING_QUERY_PARAMS, is(requestAttributes.toString()));
+    assertThat(TO_STRING_QUERY_PARAMS, is(new HttpRequestAttributesBuilder()
+        .headers(new MultiMap<>()).queryParams(getQueryParams()).build().toString()));
   }
 
   @Test
   public void onlyUriParamToString() throws IllegalAccessException, InvocationTargetException, InstantiationException {
-    Constructor constructor = HttpRequestAttributes.class.getDeclaredConstructors()[1];
-    constructor.setAccessible(true);
-    requestAttributes = constructor.newInstance(new MultiMap<>(), null, null,
-                                                null, null, null, null, null,
-                                                null, null, getUriParams(), null,
-                                                null, null);
-    assertThat(TO_STRING_URI_PARAMS, is(requestAttributes.toString()));
+    assertThat(TO_STRING_URI_PARAMS, is(new HttpRequestAttributesBuilder()
+        .headers(new MultiMap<>()).uriParams(getUriParams()).build().toString()));
   }
 
   private MultiMap<String, String> getHeaders() {
