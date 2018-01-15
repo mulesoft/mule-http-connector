@@ -14,6 +14,7 @@ import org.mule.runtime.api.util.MultiMap;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 
 import org.junit.Test;
 
@@ -38,7 +39,7 @@ public class HttpPolicyRequestAttributesTestCae extends AbstractMuleTestCase {
 
   private static final String TO_STRING_EMPTY = "org.mule.extension.http.api.policy.HttpPolicyRequestAttributes\n" +
       "{\n" +
-      "   Request path=\n" +
+      "   Request path=null\n" +
       "   Headers=[]\n" +
       "   Query Parameters=[]\n" +
       "   URI Parameters=[]\n" +
@@ -76,19 +77,19 @@ public class HttpPolicyRequestAttributesTestCae extends AbstractMuleTestCase {
 
   @Test
   public void emptyToString() throws IllegalAccessException, InvocationTargetException, InstantiationException {
-    requestAttributes = new HttpPolicyRequestAttributes();
+    requestAttributes = new HttpPolicyRequestAttributes(new MultiMap<>(), new MultiMap<>(), new HashMap<>(), null);
     assertThat(TO_STRING_EMPTY, is(requestAttributes.toString()));
   }
 
   @Test
   public void onlyQueryParamToString() throws IllegalAccessException, InvocationTargetException, InstantiationException {
-    requestAttributes = new HttpPolicyRequestAttributes(new MultiMap<>(), getQueryParams(), null, null);
+    requestAttributes = new HttpPolicyRequestAttributes(new MultiMap<>(), getQueryParams(), new HashMap<>(), null);
     assertThat(TO_STRING_QUERY_PARAMS, is(requestAttributes.toString()));
   }
 
   @Test
   public void onlyUriParamToString() throws IllegalAccessException, InvocationTargetException, InstantiationException {
-    requestAttributes = new HttpPolicyRequestAttributes(new MultiMap<>(), null, getUriParams(), null);
+    requestAttributes = new HttpPolicyRequestAttributes(new MultiMap<>(), new MultiMap<>(), getUriParams(), null);
     assertThat(TO_STRING_URI_PARAMS, is(requestAttributes.toString()));
   }
 

@@ -46,8 +46,8 @@ public class HttpResponseAttributes extends HttpAttributes {
     StringBuilder builder = new StringBuilder();
 
     builder.append(this.getClass().getName()).append(lineSeparator()).append("{").append(lineSeparator())
-        .append(tab).append("Status Code=").append(statusCode).append(lineSeparator())
-        .append(tab).append("Reason Phrase=").append(reasonPhrase).append(lineSeparator());
+        .append(TAB).append("Status Code=").append(statusCode).append(lineSeparator())
+        .append(TAB).append("Reason Phrase=").append(reasonPhrase).append(lineSeparator());
 
     buildMapToString(headers, "Headers", headers == null ? null : headers.entryList().stream(), builder);
 

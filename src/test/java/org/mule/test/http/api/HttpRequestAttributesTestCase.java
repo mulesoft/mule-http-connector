@@ -14,6 +14,7 @@ import org.mule.runtime.api.util.MultiMap;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 
 import org.junit.Test;
 
@@ -117,19 +118,20 @@ public class HttpRequestAttributesTestCase extends AbstractMuleTestCase {
 
   @Test
   public void emptyToString() throws IllegalAccessException, InvocationTargetException, InstantiationException {
-    assertThat(TO_STRING_EMPTY, is(new HttpRequestAttributesBuilder().headers(new MultiMap<>()).build().toString()));
+    assertThat(TO_STRING_EMPTY, is(new HttpRequestAttributesBuilder().headers(new MultiMap<>())
+        .queryParams(new MultiMap<>()).uriParams(new HashMap<>()).build().toString()));
   }
 
   @Test
   public void onlyQueryParamToString() throws IllegalAccessException, InvocationTargetException, InstantiationException {
     assertThat(TO_STRING_QUERY_PARAMS, is(new HttpRequestAttributesBuilder()
-        .headers(new MultiMap<>()).queryParams(getQueryParams()).build().toString()));
+        .headers(new MultiMap<>()).queryParams(getQueryParams()).uriParams(new HashMap<>()).build().toString()));
   }
 
   @Test
   public void onlyUriParamToString() throws IllegalAccessException, InvocationTargetException, InstantiationException {
     assertThat(TO_STRING_URI_PARAMS, is(new HttpRequestAttributesBuilder()
-        .headers(new MultiMap<>()).uriParams(getUriParams()).build().toString()));
+        .headers(new MultiMap<>()).uriParams(getUriParams()).queryParams(new MultiMap<>()).build().toString()));
   }
 
   private MultiMap<String, String> getHeaders() {

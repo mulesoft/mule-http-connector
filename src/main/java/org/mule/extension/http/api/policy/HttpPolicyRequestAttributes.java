@@ -48,12 +48,12 @@ public class HttpPolicyRequestAttributes extends BaseHttpRequestAttributes {
 
     StringBuilder builder = new StringBuilder();
     builder.append(this.getClass().getName()).append(lineSeparator()).append("{")
-        .append(lineSeparator()).append(tab).append("Request path=").append(requestPath)
+        .append(lineSeparator()).append(TAB).append("Request path=").append(requestPath)
         .append(lineSeparator());
 
-    buildMapToString(headers, "Headers", headers == null ? null : headers.entryList().stream(), builder);
-    buildMapToString(queryParams, "Query Parameters", queryParams == null ? null : queryParams.entryList().stream(), builder);
-    buildMapToString(uriParams, "URI Parameters", uriParams == null ? null : uriParams.entrySet().stream(), builder);
+    buildMapToString(headers, "Headers", headers.entryList().stream(), builder);
+    buildMapToString(queryParams, "Query Parameters", queryParams.entryList().stream(), builder);
+    buildMapToString(uriParams, "URI Parameters", uriParams.entrySet().stream(), builder);
     builder.append("}");
 
     return builder.toString();

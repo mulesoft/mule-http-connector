@@ -7,6 +7,8 @@
 package org.mule.extension.http.api.policy;
 
 import static java.lang.System.lineSeparator;
+import static org.mule.extension.http.api.HttpAttributes.TAB;
+import static org.mule.extension.http.api.HttpAttributes.buildMapToString;
 
 import org.mule.runtime.api.util.MultiMap;
 
@@ -20,9 +22,6 @@ import java.io.Serializable;
  * @since 1.0
  */
 public class HttpPolicyResponseAttributes implements Serializable {
-
-  protected static final String tab = "   ";
-  protected static final String doubleTab = tab + tab;
 
   private static final long serialVersionUID = 2530600012948674328L;
 
@@ -69,21 +68,13 @@ public class HttpPolicyResponseAttributes implements Serializable {
 
     builder.append(this.getClass().getName())
         .append(lineSeparator()).append("{")
-        .append(lineSeparator()).append(tab).append("Status Code=").append(statusCode)
-        .append(lineSeparator()).append(tab).append("Reason Phrase=").append(reasonPhrase)
-        .append(lineSeparator()).append(tab).append("Headers=[");
+        .append(lineSeparator()).append(TAB).append("Status Code=").append(statusCode)
+        .append(lineSeparator()).append(TAB).append("Reason Phrase=").append(reasonPhrase)
+        .append(lineSeparator());
 
-    if (headers.isEmpty()) {
-      builder.append("]");
-    } else {
-      headers.entryList().stream()
-          .forEach(header -> builder.append(lineSeparator()).append(doubleTab)
-              .append(header.getKey()).append("=").append(header.getValue()));
+    buildMapToString(headers, "Headers", headers.entryList().stream(), builder);
 
-      builder.append(lineSeparator()).append(tab).append("]");
-    }
-    builder.append(lineSeparator()).append("}");
-
+    builder.append("}");
     return builder.toString();
   }
 }

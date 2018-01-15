@@ -23,8 +23,8 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
  */
 public abstract class HttpAttributes implements Serializable {
 
-  protected static final String tab = "   ";
-  protected static final String doubleTab = tab + tab;
+  public static final String TAB = "   ";
+  public static final String DOUBLE_TAB = TAB + TAB;
 
   /**
    * Map of HTTP headers in the message. Former properties.
@@ -44,18 +44,18 @@ public abstract class HttpAttributes implements Serializable {
     return ReflectionToStringBuilder.toString(this, SHORT_PREFIX_STYLE);
   }
 
-  protected String formatHttpAttributesMapsToString(String name, Stream<Map.Entry<String, String>> stream) {
+  private static String formatHttpAttributesMapsToString(String name, Stream<Map.Entry<String, String>> stream) {
     StringBuilder builder = new StringBuilder();
-    builder.append(tab).append(name).append("=[").append(lineSeparator());
-    stream.forEach(element -> builder.append(doubleTab)
+    builder.append(TAB).append(name).append("=[").append(lineSeparator());
+    stream.forEach(element -> builder.append(DOUBLE_TAB)
         .append(element.getKey()).append("=").append(element.getValue()).append(lineSeparator()));
-    builder.append(tab).append("]").append(lineSeparator());
+    builder.append(TAB).append("]").append(lineSeparator());
     return builder.toString();
   }
 
-  protected StringBuilder buildMapToString(Map map, String name, Stream stream, StringBuilder builder) {
-    if (map == null || map.isEmpty()) {
-      builder.append(tab).append(name).append("=[]").append(lineSeparator());
+  public static StringBuilder buildMapToString(Map map, String name, Stream stream, StringBuilder builder) {
+    if (map.isEmpty()) {
+      builder.append(TAB).append(name).append("=[]").append(lineSeparator());
       return builder;
     }
     builder.append(formatHttpAttributesMapsToString(name, stream));
