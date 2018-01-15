@@ -6,6 +6,8 @@
  */
 package org.mule.extension.http.api;
 
+import static java.lang.System.lineSeparator;
+
 import org.mule.runtime.api.util.MultiMap;
 
 import java.security.cert.Certificate;
@@ -132,15 +134,45 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
 
   public String toString() {
     StringBuilder builder = new StringBuilder();
-    builder.append("The requester has these values:\n");
-    builder.append("Request Headers:\n");
-    headers.entrySet().stream().forEach(header -> builder.append("   " + header.getKey() + ": " + header.getValue() + "\n"));
-    builder.append("Query Parameters:\n");
-    queryParams.entrySet().stream()
-        .forEach(queryParam -> builder.append("   " + queryParam.getKey() + ": " + queryParam.getValue() + "\n"));
-    builder.append("URI Parameters:\n");
-    uriParams.entrySet().stream()
-        .forEach(uriParam -> builder.append("   " + uriParam.getKey() + ": " + uriParam.getValue() + "\n"));
+    String tab = "   ";
+    String doubleTab = tab + tab;
+    builder.append(this.getClass().getName()).append(lineSeparator()).append("{").append(lineSeparator())
+        .append(tab).append("Request path=").append(requestPath).append(lineSeparator())
+        .append(tab).append("Method=").append(method).append(lineSeparator())
+        .append(tab).append("Listener path=").append(this.listenerPath).append(lineSeparator())
+        .append(tab).append("Local Address=").append(localAddress).append(lineSeparator())
+        .append(tab).append("Query String=").append(this.queryString).append(lineSeparator())
+        .append(tab).append("Relative Path=").append(this.relativePath).append(lineSeparator())
+        .append(tab).append("Remote Address=").append(this.remoteAddress).append(lineSeparator())
+        .append(tab).append("Request Uri=").append(this.requestUri).append(lineSeparator())
+        .append(tab).append("Scheme=").append(scheme).append(lineSeparator())
+        .append(tab).append("Version=").append(this.version).append(lineSeparator())
+        .append(tab).append("Headers=[").append(lineSeparator());
+
+    headers.entrySet().stream()
+        .forEach(header -> builder.append(doubleTab).append(header.getKey()).append("=").append(header.getValue())
+            .append(lineSeparator()));
+
+    builder.append(tab).append("]");
+
+    if (queryParams != null) {
+      builder.append(lineSeparator()).append(tab).append("Query Parameters=[").append(lineSeparator());
+      queryParams.entrySet().stream()
+          .forEach(queryParam -> builder.append(doubleTab).append(queryParam.getKey()).append("=").append(queryParam.getValue())
+              .append(lineSeparator()));
+      builder.append(tab).append("]");
+    }
+    if (uriParams != null) {
+      builder.append(lineSeparator()).append(tab).append("URI Parameters=[").append(lineSeparator());
+      uriParams.entrySet().stream()
+          .forEach(uriParam -> builder.append(doubleTab).append(uriParam.getKey()).append("=").append(uriParam.getValue())
+              .append(lineSeparator()));
+      builder.append(tab).append("]");
+    }
+
+    builder.append(lineSeparator());
+    builder.append("}");
+
     return builder.toString();
   }
 }

@@ -6,6 +6,8 @@
  */
 package org.mule.extension.http.api;
 
+import static java.lang.System.lineSeparator;
+
 import org.mule.runtime.api.util.MultiMap;
 
 /**
@@ -42,18 +44,20 @@ public class HttpResponseAttributes extends HttpAttributes {
 
   public String toString() {
     StringBuilder builder = new StringBuilder();
-    builder.append("The response has these values\n");
-    builder.append("Status Code: ").append(statusCode);
-    builder.append("\n");
+    String tab = "   ";
+    String doubleTab = tab + tab;
 
-    builder.append("Reason Phrase: ").append(reasonPhrase);
-    builder.append("\n");
-
-    builder.append("Headers:");
-    builder.append("\n");
+    builder.append(this.getClass().getName()).append(lineSeparator()).append("{").append(lineSeparator())
+        .append(tab).append("Status Code=").append(statusCode).append(lineSeparator())
+        .append(tab).append("Reason Phrase=").append(reasonPhrase).append(lineSeparator())
+        .append(tab).append("Headers=[").append(lineSeparator());
 
     headers.entrySet().stream()
-        .forEach(header -> builder.append("   ").append(header.getKey()).append(": ").append(header.getValue()).append("\n"));
+        .forEach(header -> builder.append(doubleTab).append(header.getKey()).append("=").append(header.getValue())
+            .append(lineSeparator()));
+
+    builder.append(tab).append("]").append(lineSeparator()).append("}");
+
     return builder.toString();
   }
 }

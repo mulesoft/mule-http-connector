@@ -6,6 +6,8 @@
  */
 package org.mule.extension.http.api.policy;
 
+import static java.lang.System.lineSeparator;
+
 import org.mule.extension.http.api.BaseHttpRequestAttributes;
 import org.mule.runtime.api.util.MultiMap;
 
@@ -43,16 +45,38 @@ public class HttpPolicyRequestAttributes extends BaseHttpRequestAttributes {
   }
 
   public String toString() {
+
     StringBuilder builder = new StringBuilder();
-    builder.append("The requester has these values:\n");
-    builder.append("Request Headers:\n");
-    headers.entrySet().stream().forEach(header -> builder.append("   " + header.getKey() + ": " + header.getValue() + "\n"));
-    builder.append("Query Parameters:\n");
-    queryParams.entrySet().stream()
-        .forEach(queryParam -> builder.append("   " + queryParam.getKey() + ": " + queryParam.getValue() + "\n"));
-    builder.append("URI Parameters:\n");
-    uriParams.entrySet().stream()
-        .forEach(uriParam -> builder.append("   " + uriParam.getKey() + ": " + uriParam.getValue() + "\n"));
+    String tab = "   ";
+    String doubleTab = tab + tab;
+    builder.append(this.getClass().getName()).append(lineSeparator()).append("{").append(lineSeparator())
+        .append(tab).append("Request path=").append(requestPath).append(lineSeparator())
+        .append(tab).append("Headers=[").append(lineSeparator());
+
+    headers.entrySet().stream()
+        .forEach(header -> builder.append(doubleTab).append(header.getKey()).append("=").append(header.getValue())
+            .append(lineSeparator()));
+
+    builder.append(tab).append("]");
+
+    if (queryParams != null) {
+      builder.append(lineSeparator()).append(tab).append("Query Parameters=[").append(lineSeparator());
+      queryParams.entrySet().stream()
+          .forEach(queryParam -> builder.append(doubleTab).append(queryParam.getKey()).append("=").append(queryParam.getValue())
+              .append(lineSeparator()));
+      builder.append(tab).append("]");
+    }
+    if (uriParams != null) {
+      builder.append(lineSeparator()).append(tab).append("URI Parameters=[").append(lineSeparator());
+      uriParams.entrySet().stream()
+          .forEach(uriParam -> builder.append(doubleTab).append(uriParam.getKey()).append("=").append(uriParam.getValue())
+              .append(lineSeparator()));
+      builder.append(tab).append("]");
+    }
+
+    builder.append(lineSeparator());
+    builder.append("}");
+
     return builder.toString();
   }
 }
