@@ -6,6 +6,8 @@
  */
 package org.mule.extension.http.api.policy;
 
+import static java.lang.System.lineSeparator;
+
 import org.mule.extension.http.api.BaseHttpRequestAttributes;
 import org.mule.runtime.api.util.MultiMap;
 
@@ -42,4 +44,18 @@ public class HttpPolicyRequestAttributes extends BaseHttpRequestAttributes {
     this.uriParams = uriParams;
   }
 
+  public String toString() {
+
+    StringBuilder builder = new StringBuilder();
+    builder.append(this.getClass().getName()).append(lineSeparator()).append("{")
+        .append(lineSeparator()).append(TAB).append("Request path=").append(requestPath)
+        .append(lineSeparator());
+
+    buildMapToString(headers, "Headers", headers.entryList().stream(), builder);
+    buildMapToString(queryParams, "Query Parameters", queryParams.entryList().stream(), builder);
+    buildMapToString(uriParams, "URI Parameters", uriParams.entrySet().stream(), builder);
+    builder.append("}");
+
+    return builder.toString();
+  }
 }
