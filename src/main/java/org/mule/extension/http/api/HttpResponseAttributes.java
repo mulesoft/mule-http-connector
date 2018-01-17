@@ -6,8 +6,6 @@
  */
 package org.mule.extension.http.api;
 
-import static java.lang.System.lineSeparator;
-
 import org.mule.runtime.api.util.MultiMap;
 
 /**
@@ -42,17 +40,4 @@ public class HttpResponseAttributes extends HttpAttributes {
     return reasonPhrase;
   }
 
-  public String toString() {
-    StringBuilder builder = new StringBuilder();
-
-    builder.append(this.getClass().getName()).append(lineSeparator()).append("{").append(lineSeparator())
-        .append(TAB).append("Status Code=").append(statusCode).append(lineSeparator())
-        .append(TAB).append("Reason Phrase=").append(reasonPhrase).append(lineSeparator());
-
-    buildMapToString(headers, "Headers", headers == null ? null : headers.entryList().stream(), builder);
-
-    builder.append("}");
-
-    return builder.toString();
-  }
 }
