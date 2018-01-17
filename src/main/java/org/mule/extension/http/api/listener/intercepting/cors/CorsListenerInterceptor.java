@@ -4,10 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.http.internal.listener.intercepting.cors;
+package org.mule.extension.http.api.listener.intercepting.cors;
 
 import org.mule.extension.http.internal.listener.intercepting.HttpListenerInterceptor;
 import org.mule.extension.http.internal.listener.intercepting.Interception;
+import org.mule.extension.http.internal.listener.intercepting.cors.CorsInterceptionFactory;
 import org.mule.modules.cors.CorsKernel;
 import org.mule.modules.cors.response.CorsAction;
 import org.mule.runtime.api.util.MultiMap;

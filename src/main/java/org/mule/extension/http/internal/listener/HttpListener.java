@@ -35,7 +35,7 @@ import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.listener.builder.HttpListenerErrorResponseBuilder;
 import org.mule.extension.http.api.listener.builder.HttpListenerSuccessResponseBuilder;
 import org.mule.extension.http.api.listener.server.HttpListenerConfig;
-import org.mule.extension.http.internal.HttpStreamingType;
+import org.mule.extension.http.api.streaming.HttpStreamingType;
 import org.mule.extension.http.internal.listener.intercepting.InterceptingException;
 import org.mule.extension.http.internal.listener.server.ModuleRequestHandler;
 import org.mule.runtime.api.component.ComponentIdentifier;

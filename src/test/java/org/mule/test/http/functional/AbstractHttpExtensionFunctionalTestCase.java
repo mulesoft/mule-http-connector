@@ -10,8 +10,6 @@ import static java.util.Collections.singletonMap;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
-import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.HTTPS;
-
 import org.mule.extension.http.internal.temporary.HttpConnector;
 import org.mule.extension.socket.api.SocketsExtension;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
@@ -26,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 
 /**
  * Needs to access resources for validating different TLS scenarios and it cannot be done with
@@ -34,12 +31,11 @@ import io.qameta.allure.Story;
  * {@link ExtensionFunctionalTestCase}.
  * <p>
  * Mostly these scenarios are about changing the {@code tls.properties} so it is modified by tests and that cannot be done with an
- * isolated class loader.
+ * isolated class loader or validations.
  */
 // TODO(pablo.kraan): MULE-12188 - migrate subclasses to use the isolated test runner
 @Feature(HTTP_EXTENSION)
-@Story(HTTPS)
-public abstract class AbstractTlsRestrictedProtocolsAndCiphersTestCase extends ExtensionFunctionalTestCase {
+public abstract class AbstractHttpExtensionFunctionalTestCase extends ExtensionFunctionalTestCase {
 
   // TODO - MULE-11119: Remove once the service is injected higher up on the hierarchy
   private SchedulerService schedulerService = new SimpleUnitTestSupportSchedulerService();

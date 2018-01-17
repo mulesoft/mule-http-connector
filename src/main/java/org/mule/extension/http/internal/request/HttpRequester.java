@@ -12,10 +12,12 @@ import static org.mule.extension.http.api.error.HttpError.CONNECTIVITY;
 import static org.mule.extension.http.api.error.HttpError.TIMEOUT;
 import static org.mule.extension.http.api.notification.HttpNotificationAction.REQUEST_COMPLETE;
 import static org.mule.extension.http.api.notification.HttpNotificationAction.REQUEST_START;
+import static org.mule.extension.http.internal.HttpConnectorConstants.DEFAULT_RETRY_ATTEMPTS;
 import static org.mule.extension.http.internal.HttpConnectorConstants.IDEMPOTENT_METHODS;
+import static org.mule.extension.http.internal.HttpConnectorConstants.REMOTELY_CLOSED;
+import static org.mule.extension.http.internal.HttpConnectorConstants.RETRY_ATTEMPTS_PROPERTY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.TypedValue.of;
-import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
 import static reactor.core.publisher.Mono.from;
 import org.mule.extension.http.api.HttpResponseAttributes;
@@ -24,12 +26,13 @@ import org.mule.extension.http.api.error.HttpErrorMessageGenerator;
 import org.mule.extension.http.api.error.HttpRequestFailedException;
 import org.mule.extension.http.api.notification.HttpRequestNotificationData;
 import org.mule.extension.http.api.notification.HttpResponseNotificationData;
+import org.mule.extension.http.api.request.HttpSendBodyMode;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
 import org.mule.extension.http.api.request.authentication.UsernamePasswordAuthentication;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
-import org.mule.extension.http.internal.HttpStreamingType;
+import org.mule.extension.http.api.streaming.HttpStreamingType;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -58,9 +61,6 @@ import org.slf4j.LoggerFactory;
 public class HttpRequester {
 
   private static final Logger logger = LoggerFactory.getLogger(HttpRequester.class);
-  public static final String REMOTELY_CLOSED = "Remotely closed";
-  public static String RETRY_ATTEMPTS_PROPERTY = SYSTEM_PROPERTY_PREFIX + "http.client.maxRetries";
-  public static final int DEFAULT_RETRY_ATTEMPTS = 3;
 
   private final boolean followRedirects;
   private final HttpRequestAuthentication authentication;

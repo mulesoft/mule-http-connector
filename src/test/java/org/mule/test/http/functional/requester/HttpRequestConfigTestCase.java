@@ -10,23 +10,26 @@ package org.mule.test.http.functional.requester;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.extension.http.internal.request.RequestConnectionParams.DEFAULT_CONNECTION_IDLE_TIMEOUT;
-import static org.mule.extension.http.internal.request.RequestConnectionParams.DEFAULT_MAX_CONNECTIONS;
-import static org.mule.extension.http.internal.request.RequestConnectionParams.DEFAULT_RESPONSE_BUFFER_SIZE;
+import static org.mule.extension.http.api.request.RequestConnectionParams.DEFAULT_CONNECTION_IDLE_TIMEOUT;
+import static org.mule.extension.http.api.request.RequestConnectionParams.DEFAULT_MAX_CONNECTIONS;
+import static org.mule.extension.http.api.request.RequestConnectionParams.DEFAULT_RESPONSE_BUFFER_SIZE;
 import static org.mule.runtime.core.api.connection.util.ConnectionProviderUtils.unwrapProviderWrapper;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTP;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
+import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationInstanceFromRegistry;
 import org.mule.extension.http.internal.request.HttpRequesterProvider;
-import org.mule.extension.http.internal.request.RequestConnectionParams;
+import org.mule.extension.http.api.request.RequestConnectionParams;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.test.http.functional.AbstractHttpTestCase;
+import org.mule.test.http.functional.AbstractHttpExtensionFunctionalTestCase;
 
+import io.qameta.allure.Feature;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpRequestConfigTestCase extends AbstractHttpTestCase {
+@Feature(HTTP_EXTENSION)
+public class HttpRequestConfigTestCase extends AbstractHttpExtensionFunctionalTestCase {
 
   private static final String DEFAULT_HTTP_REQUEST_CONFIG_NAME = "requestConfig";
   private static final String DEFAULT_PORT_HTTP_REQUEST_CONFIG_NAME = "requestConfigHttp";
@@ -41,6 +44,7 @@ public class HttpRequestConfigTestCase extends AbstractHttpTestCase {
   public SystemProperty maxConnections = new SystemProperty("maxConnections", String.valueOf(MAX_CONNECTIONS));
   @Rule
   public SystemProperty idleTimeout = new SystemProperty("idleTimeout", String.valueOf(IDLE_TIMEOUT));
+
 
   @Override
   protected String getConfigFile() {
