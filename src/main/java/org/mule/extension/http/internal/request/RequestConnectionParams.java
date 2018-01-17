@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.http.api.request;
+package org.mule.extension.http.internal.request;
 
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
@@ -23,7 +23,6 @@ import org.mule.runtime.http.api.HttpConstants;
  *
  * @since 1.0
  */
-// TODO - MULE-14469: Implicit connection factory cannot find internal parameter group, move back to internal once fixed
 public final class RequestConnectionParams {
 
   public static final String DEFAULT_MAX_CONNECTIONS = "-1";
