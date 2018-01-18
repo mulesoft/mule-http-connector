@@ -6,6 +6,10 @@
  */
 package org.mule.extension.http.api.policy;
 
+import static java.lang.System.lineSeparator;
+import static org.mule.extension.http.api.HttpAttributes.TAB;
+import static org.mule.extension.http.api.HttpAttributes.buildMapToString;
+
 import org.mule.runtime.api.util.MultiMap;
 
 import java.io.Serializable;
@@ -59,4 +63,18 @@ public class HttpPolicyResponseAttributes implements Serializable {
     this.headers = headers;
   }
 
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+
+    builder.append(this.getClass().getName())
+        .append(lineSeparator()).append("{")
+        .append(lineSeparator()).append(TAB).append("Status Code=").append(statusCode)
+        .append(lineSeparator()).append(TAB).append("Reason Phrase=").append(reasonPhrase)
+        .append(lineSeparator());
+
+    buildMapToString(headers, "Headers", headers.entryList().stream(), builder);
+
+    builder.append("}");
+    return builder.toString();
+  }
 }
