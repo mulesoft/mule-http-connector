@@ -8,8 +8,8 @@
 package org.mule.extension.http.internal.listener;
 
 import static java.lang.String.format;
-import static org.mule.extension.http.internal.HttpStreamingType.ALWAYS;
-import static org.mule.extension.http.internal.HttpStreamingType.AUTO;
+import static org.mule.extension.http.api.streaming.HttpStreamingType.ALWAYS;
+import static org.mule.extension.http.api.streaming.HttpStreamingType.AUTO;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.NOT_MODIFIED;
@@ -21,7 +21,7 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
 
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
-import org.mule.extension.http.internal.HttpStreamingType;
+import org.mule.extension.http.api.streaming.HttpStreamingType;
 import org.mule.extension.http.internal.listener.intercepting.Interception;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;

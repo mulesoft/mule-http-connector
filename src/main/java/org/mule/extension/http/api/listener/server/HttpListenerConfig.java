@@ -15,7 +15,7 @@ import org.mule.extension.http.internal.listener.HttpListener;
 import org.mule.extension.http.internal.listener.HttpListenerProvider;
 import org.mule.extension.http.internal.listener.ListenerPath;
 import org.mule.extension.http.internal.listener.intercepting.HttpListenerInterceptor;
-import org.mule.extension.http.internal.listener.intercepting.cors.CorsInterceptorWrapper;
+import org.mule.extension.http.api.listener.intercepting.cors.CorsInterceptorWrapper;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.Configuration;
