@@ -8,6 +8,7 @@ package org.mule.test.http.functional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.HTTPS;
 import static org.mule.test.http.functional.TlsConstants.DEFAULT_SECURITY_MODEL;
 import static org.mule.test.http.functional.TlsConstants.PROPERTIES_FILE_PATTERN;
 import org.mule.runtime.api.tls.TlsContextFactory;
@@ -24,13 +25,15 @@ import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
+import io.qameta.allure.Story;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
+@Story(HTTPS)
 public abstract class AbstractServerTlsRestrictedProtocolsAndCiphersTestCase
-    extends AbstractTlsRestrictedProtocolsAndCiphersTestCase {
+    extends AbstractHttpExtensionFunctionalTestCase {
 
   @Rule
   public DynamicPort httpsPort = new DynamicPort("port");

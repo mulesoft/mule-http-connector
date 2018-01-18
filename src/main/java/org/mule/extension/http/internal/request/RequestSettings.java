@@ -8,9 +8,10 @@ package org.mule.extension.http.internal.request;
 
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.extension.api.runtime.parameter.OutboundCorrelationStrategy.AUTO;
+import org.mule.extension.http.api.request.HttpSendBodyMode;
 import org.mule.extension.http.api.request.builder.QueryParam;
 import org.mule.extension.http.api.request.builder.RequestHeader;
-import org.mule.extension.http.internal.HttpStreamingType;
+import org.mule.extension.http.api.streaming.HttpStreamingType;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
