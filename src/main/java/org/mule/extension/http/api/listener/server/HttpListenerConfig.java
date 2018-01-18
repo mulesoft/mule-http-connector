@@ -43,6 +43,9 @@ public class HttpListenerConfig implements Initialisable {
   @Expression(NOT_SUPPORTED)
   private String basePath;
 
+  /**
+   * Listener interceptors that will apply on request and on response events.
+   */
   @Parameter
   @Optional
   @Expression(NOT_SUPPORTED)
