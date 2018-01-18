@@ -18,6 +18,9 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
  */
 public class CorsInterceptorWrapper {
 
+  /**
+   * Interceptor which validates that requests match CORS specification and acts on responses accordingly.
+   */
   @Parameter
   private CorsListenerInterceptor corsInterceptor;
 
