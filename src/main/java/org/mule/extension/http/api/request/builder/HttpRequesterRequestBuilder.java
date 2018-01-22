@@ -6,8 +6,10 @@
  */
 package org.mule.extension.http.api.request.builder;
 
+import static java.lang.String.format;
 import static java.util.Collections.unmodifiableMap;
 import static org.mule.runtime.extension.api.runtime.parameter.OutboundCorrelationStrategy.AUTO;
+
 import org.mule.extension.http.api.HttpMessageBuilder;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.MultiMap;
@@ -103,10 +105,10 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
       String uriParamValue = uriParams.get(uriParamName);
 
       if (uriParamValue == null) {
-        throw new NullPointerException(String.format("Expression {%s} evaluated to null.", uriParamName));
+        throw new NullPointerException(format("Expression {%s} evaluated to null.", uriParamName));
       }
 
-      path = path.replaceAll(String.format("\\{%s\\}", uriParamName), uriParamValue);
+      path = path.replaceAll("\\{" + uriParamName + "\\}", uriParamValue);
     }
     return path;
   }
