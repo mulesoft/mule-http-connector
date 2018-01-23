@@ -18,9 +18,6 @@
     <description>A Mule extension that provides HTTP server and client functionality</description>
 
     <properties>
-        <mule.version>4.2.0-SNAPSHOT</mule.version>
-        <muleHttpServiceVersion>1.2.0-SNAPSHOT</muleHttpServiceVersion>
-        
         <commonsCodecVersion>1.9</commonsCodecVersion>
         <commonsCollectionsVersion>3.2.2</commonsCollectionsVersion>
         <fluentHcVersion>4.5.2</fluentHcVersion>
