@@ -25,6 +25,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.tck.junit4.rule.SystemProperty;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -55,6 +56,11 @@ public class HttpRequestContentTypeTestCase extends AbstractHttpRequestTestCase 
   public void setUp() {
     refreshSystemProperties();
     responder = super::writeResponse;
+  }
+
+  @After
+  public void tearDown() {
+    refreshSystemProperties();
   }
 
   @Test
