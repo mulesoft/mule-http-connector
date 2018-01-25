@@ -7,6 +7,7 @@
 package org.mule.extension.http.internal.request;
 
 import static org.mule.extension.http.internal.HttpConnectorConstants.URL_CONFIGURATION;
+
 import org.mule.extension.http.api.request.HttpSendBodyMode;
 import org.mule.extension.http.api.request.builder.QueryParam;
 import org.mule.extension.http.api.request.builder.RequestHeader;
@@ -80,6 +81,10 @@ public class HttpRequesterConfig implements Initialisable, HttpRequesterCookieCo
 
   public HttpSendBodyMode getSendBodyMode() {
     return requestSettings.getSendBodyMode();
+  }
+
+  public boolean isPreserveHeadersCase() {
+    return requestSettings.isPreserveHeadersCase();
   }
 
   public Integer getResponseTimeout() {
