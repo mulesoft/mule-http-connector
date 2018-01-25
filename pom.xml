@@ -34,7 +34,7 @@
         <formatterConfigPath>formatter.xml</formatterConfigPath>
 
         <muleSocketsConnectorVersion>1.2.0-SNAPSHOT</muleSocketsConnectorVersion>
-        <muleCorsKernelVersion>1.1.0-SNAPSHOT</muleCorsKernelVersion>
+        <muleCorsKernelVersion>1.1.0</muleCorsKernelVersion>
     </properties>
 
     <build>
