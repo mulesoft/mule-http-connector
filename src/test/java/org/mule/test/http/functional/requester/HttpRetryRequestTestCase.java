@@ -22,6 +22,7 @@ import org.mule.test.http.functional.AbstractHttpTestCase;
 import org.mule.test.http.utils.TestServerSocket;
 import org.mule.test.runner.RunnerDelegateTo;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -69,6 +70,11 @@ public class HttpRetryRequestTestCase extends AbstractHttpTestCase {
 
   @Before
   public void setUp() {
+    refreshSystemProperties();
+  }
+
+  @After
+  public void tearDown() {
     refreshSystemProperties();
   }
 

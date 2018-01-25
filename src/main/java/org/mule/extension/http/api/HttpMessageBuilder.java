@@ -11,6 +11,7 @@ import org.mule.extension.http.internal.request.HttpRequester;
 import org.mule.extension.http.internal.request.HttpResponseToResult;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.http.api.server.HttpServerProperties;
 
 /**
  * Base component to create HTTP messages.
@@ -34,5 +35,6 @@ public abstract class HttpMessageBuilder {
   public static void refreshSystemProperties() {
     HttpRequester.refreshSystemProperties();
     HttpResponseToResult.refreshSystemProperties();
+    HttpServerProperties.refreshSystemProperties();
   }
 }
