@@ -52,7 +52,7 @@
         </http:listener>
         <http:request path="copyHeaders" config-ref="requestConfig">
             <http:headers>
-                #[attributes.headers ++ {'pRoXyHeAdEr' : 'value'}]
+                #[attributes.headers]
             </http:headers>
         </http:request>
     </flow>
@@ -61,7 +61,7 @@
         <http:listener path="proxyResponse" config-ref="listenerConfig">
             <http:response>
                 <http:headers>
-                    #[attributes.headers ++ {'pRoXyHeAdEr' : 'value'}]
+                    #[attributes.headers]
                 </http:headers>
             </http:response>
         </http:listener>
@@ -72,7 +72,7 @@
         <http:listener path="copyHeaders" config-ref="listenerConfig">
             <http:response>
                 <http:headers>
-                    #[attributes.headers]
+                    #[attributes.headers ++ {'pRoXyHeAdErReSpOnSe' : 'value'}]
                 </http:headers>
             </http:response>
         </http:listener>

@@ -93,7 +93,7 @@ public class HttpHeaderCaseTestCase extends AbstractHttpTestCase {
   @Test
   public void proxyPreservesRequestHeaderCase() throws ClientProtocolException, IOException {
     HttpResponse response = Request.Get(format("http://localhost:%s/proxyRequest", port.getNumber()))
-        .execute().returnResponse();
+        .addHeader("pRoXyHeAdEr", "value").execute().returnResponse();
 
     assertThat(response.getStatusLine().getStatusCode(), is(OK.getStatusCode()));
     Set<String> headerNames = stream(response.getAllHeaders()).map(h -> h.getName()).collect(toSet());
@@ -107,7 +107,7 @@ public class HttpHeaderCaseTestCase extends AbstractHttpTestCase {
 
     assertThat(response.getStatusLine().getStatusCode(), is(OK.getStatusCode()));
     Set<String> headerNames = stream(response.getAllHeaders()).map(h -> h.getName()).collect(toSet());
-    assertThat(headerNames, hasItems("pRoXyHeAdEr"));
+    assertThat(headerNames, hasItems("pRoXyHeAdErReSpOnSe"));
   }
 
   public static class AssertRequestHeaderProcessor extends AbstractComponent implements Processor {
