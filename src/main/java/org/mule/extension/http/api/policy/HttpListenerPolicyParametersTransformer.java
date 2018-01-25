@@ -46,7 +46,6 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
   }
 
   private Message responseParametersToMessage(HttpListenerResponseBuilder responseBuilder, int defaultStatusCode) {
-    MultiMap<String, String> headers = new MultiMap<>(responseBuilder.getHeaders());
     Message.Builder messageBuilder;
     Message.PayloadBuilder builder = Message.builder();
     TypedValue<Object> body = responseBuilder.getBody();
@@ -57,7 +56,7 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
     }
     int statusCode = responseBuilder.getStatusCode() == null ? defaultStatusCode : responseBuilder.getStatusCode();
     return messageBuilder
-        .attributesValue(new HttpResponseAttributes(statusCode, responseBuilder.getReasonPhrase(), headers))
+        .attributesValue(new HttpResponseAttributes(statusCode, responseBuilder.getReasonPhrase(), responseBuilder.getHeaders()))
         .build();
   }
 
