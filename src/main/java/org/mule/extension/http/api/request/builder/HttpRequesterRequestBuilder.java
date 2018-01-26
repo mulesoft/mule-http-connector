@@ -7,7 +7,9 @@
 package org.mule.extension.http.api.request.builder;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
+import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 import static org.mule.runtime.extension.api.runtime.parameter.OutboundCorrelationStrategy.AUTO;
 
 import org.mule.extension.http.api.HttpMessageBuilder;
@@ -21,7 +23,6 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
 import org.mule.runtime.extension.api.runtime.parameter.OutboundCorrelationStrategy;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -44,7 +45,7 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
   @Parameter
   @Optional
   @Content
-  protected MultiMap<String, String> headers = new MultiMap<>();
+  protected MultiMap<String, String> headers = emptyMultiMap();
 
   /**
    * URI parameters that should be used to create the request.
@@ -53,7 +54,7 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
   @Optional
   @Content
   @DisplayName("URI Parameters")
-  private Map<String, String> uriParams = new HashMap<>();
+  private Map<String, String> uriParams = emptyMap();
 
   /**
    * Query parameters the request should include.
@@ -62,7 +63,7 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
   @Optional
   @Content
   @DisplayName("Query Parameters")
-  private MultiMap<String, String> queryParams = new MultiMap<>();
+  private MultiMap<String, String> queryParams = emptyMultiMap();
 
   /**
    * Options on whether to include an outbound correlation id or not
