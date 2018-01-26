@@ -7,6 +7,7 @@
 package org.mule.extension.http.api.policy;
 
 import static java.lang.System.lineSeparator;
+import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 
 import org.mule.extension.http.api.BaseHttpRequestAttributes;
 import org.mule.runtime.api.util.MultiMap;
@@ -29,7 +30,7 @@ public class HttpPolicyRequestAttributes extends BaseHttpRequestAttributes {
   }
 
   public HttpPolicyRequestAttributes() {
-    super(new MultiMap<>(), new MultiMap<>(), new MultiMap<>(), "");
+    super(emptyMultiMap(), emptyMultiMap(), emptyMultiMap(), "");
   }
 
   public void setHeaders(MultiMap<String, String> headers) {
@@ -44,6 +45,7 @@ public class HttpPolicyRequestAttributes extends BaseHttpRequestAttributes {
     this.uriParams = uriParams;
   }
 
+  @Override
   public String toString() {
 
     StringBuilder builder = new StringBuilder();

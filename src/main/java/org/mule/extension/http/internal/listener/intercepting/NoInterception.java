@@ -6,6 +6,8 @@
  */
 package org.mule.extension.http.internal.listener.intercepting;
 
+import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
+
 import org.mule.runtime.api.util.MultiMap;
 
 /**
@@ -15,6 +17,6 @@ public class NoInterception implements Interception {
 
   @Override
   public MultiMap<String, String> getHeaders() {
-    return new MultiMap<>();
+    return emptyMultiMap();
   }
 }
