@@ -21,7 +21,7 @@
         <commonsCodecVersion>1.9</commonsCodecVersion>
         <commonsCollectionsVersion>3.2.2</commonsCollectionsVersion>
         <fluentHcVersion>4.5.2</fluentHcVersion>
-        <grizzlyVersion>2.3.34</grizzlyVersion>
+        <grizzlyVersion>2.3.35</grizzlyVersion>
         <grizzlyAhcVersion>1.14</grizzlyAhcVersion>
         <javaxMailVersion>1.4.3</javaxMailVersion>
         <jettyVersion>9.0.7.v20131107</jettyVersion>
