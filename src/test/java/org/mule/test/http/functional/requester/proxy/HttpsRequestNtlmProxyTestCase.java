@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.http.functional.requester;
+package org.mule.test.http.functional.requester.proxy;
 
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_PROXY_AUTHENTICATION_REQUIRED;
@@ -14,6 +14,8 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.PROXY_AUTHORIZATION;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.test.http.functional.matcher.HttpMessageAttributesMatchers;
+import org.mule.test.http.functional.requester.AbstractNtlmTestCase;
+import org.mule.test.http.functional.requester.NtlmConnectHandler;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;

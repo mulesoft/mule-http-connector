@@ -4,19 +4,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.http.functional.requester;
+package org.mule.test.http.functional.requester.proxy;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.api.component.FunctionalTestProcessor.getFromFlow;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.tck.http.TestProxyServer;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;
-import org.mule.test.http.functional.TestProxyServer;
 import org.mule.test.http.functional.matcher.HttpMessageAttributesMatchers;
 import org.mule.test.runner.RunnerDelegateTo;
 
@@ -46,7 +47,7 @@ public class HttpRequestProxyTlsTestCase extends AbstractHttpTestCase {
   @Rule
   public SystemProperty trustStorePathProperty;
 
-  private TestProxyServer proxyServer = new TestProxyServer(proxyPort.getNumber(), httpPort.getNumber());
+  private TestProxyServer proxyServer = new TestProxyServer(proxyPort.getNumber(), httpPort.getNumber(), true);
 
   private String requestURI;
   private String requestPayload;
@@ -92,6 +93,7 @@ public class HttpRequestProxyTlsTestCase extends AbstractHttpTestCase {
     assertThat((HttpResponseAttributes) event.getMessage().getAttributes().getValue(), HttpMessageAttributesMatchers
         .hasStatusCode(OK.getStatusCode()));
     assertThat(event.getMessage().getPayload().getValue(), equalTo(OK_RESPONSE));
+    assertThat(proxyServer.hasConnections(), is(true));
 
     proxyServer.stop();
   }
