@@ -158,11 +158,13 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
           + "If you defined a tls:context element in your listener-config then you must set protocol=\"HTTPS\""), this);
     }
     if (connectionParams.protocol.equals(HTTPS) && tlsContext == null) {
-      throw new InitialisationException(createStaticMessage("Configured protocol is HTTPS but there's no TlsContext configured"),
+      throw new InitialisationException(createStaticMessage("Configured protocol is HTTPS but there's no TlsContext configured for configuration "
+          + configName),
                                         this);
     }
     if (tlsContext != null && !tlsContext.isKeyStoreConfigured()) {
-      throw new InitialisationException(createStaticMessage("KeyStore must be configured for server side SSL"), this);
+      throw new InitialisationException(createStaticMessage("KeyStore must be configured for server side SSL in configuration "
+          + configName), this);
     }
 
     if (tlsContext != null) {
@@ -182,7 +184,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
     try {
       server = httpService.getServerFactory().create(serverConfiguration);
     } catch (ServerCreationException e) {
-      throw new InitialisationException(createStaticMessage("Could not create HTTP server"), e, this);
+      throw new InitialisationException(createStaticMessage(buildFailureMessage("create", e)), e, this);
     }
   }
 
@@ -191,9 +193,24 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
     try {
       server.start();
     } catch (IOException e) {
-      throw new DefaultMuleException(new ConnectionException("Could not start HTTP server for " + configName + " on port "
-          + connectionParams.port, e));
+      throw new DefaultMuleException(new ConnectionException(buildFailureMessage("start", e), e));
     }
+  }
+
+  private String buildFailureMessage(final String action, Throwable e) {
+    StringBuilder builder = new StringBuilder()
+        .append("Could not ")
+        .append(action)
+        .append(" HTTP server for ")
+        .append(configName)
+        .append(" on port ")
+        .append(connectionParams.port);
+    if (e.getMessage() != null) {
+      builder
+          .append(": ")
+          .append(e.getMessage());
+    }
+    return builder.toString();
   }
 
   @Override
