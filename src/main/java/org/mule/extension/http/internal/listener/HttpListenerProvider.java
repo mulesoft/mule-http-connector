@@ -158,13 +158,14 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
           + "If you defined a tls:context element in your listener-config then you must set protocol=\"HTTPS\""), this);
     }
     if (connectionParams.protocol.equals(HTTPS) && tlsContext == null) {
-      throw new InitialisationException(createStaticMessage("Configured protocol is HTTPS but there's no TlsContext configured for configuration "
-          + configName),
+      throw new InitialisationException(createStaticMessage("Configured protocol is HTTPS but there's no TlsContext configured for configuration '%s'.",
+                                                            configName),
                                         this);
     }
     if (tlsContext != null && !tlsContext.isKeyStoreConfigured()) {
-      throw new InitialisationException(createStaticMessage("KeyStore must be configured for server side SSL in configuration "
-          + configName), this);
+      throw new InitialisationException(createStaticMessage("KeyStore must be configured for server side SSL in configuration '%s'.",
+                                                            configName),
+                                        this);
     }
 
     if (tlsContext != null) {
@@ -201,9 +202,9 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
     StringBuilder builder = new StringBuilder()
         .append("Could not ")
         .append(action)
-        .append(" HTTP server for ")
+        .append(" HTTP server for '")
         .append(configName)
-        .append(" on port ")
+        .append("' on port ")
         .append(connectionParams.port);
     if (e.getMessage() != null) {
       builder
