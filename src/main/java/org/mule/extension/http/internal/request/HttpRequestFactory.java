@@ -50,6 +50,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.Set;
 
 /**
@@ -162,7 +163,7 @@ public class HttpRequestFactory {
     HttpEntity entity;
 
     Object payload = body.getValue();
-    Optional<Long> length = body.getLength();
+    OptionalLong length = body.getByteLength();
     Optional<String> transferEncoding = requestBuilder.getHeaderValue(TRANSFER_ENCODING_HEADER);
     Optional<String> contentLength = requestBuilder.getHeaderValue(CONTENT_LENGTH_HEADER);
 
@@ -237,9 +238,9 @@ public class HttpRequestFactory {
   /**
    * Generates an {@link InputStreamHttpEntity} with a length and sets the Content-Length header with it as well
    */
-  private HttpEntity avoidConsumingPayload(HttpRequestBuilder requestBuilder, InputStream payload, Optional<Long> length) {
-    requestBuilder.addHeader(CONTENT_LENGTH, valueOf(length.get()));
-    return new InputStreamHttpEntity(payload, length.get());
+  private HttpEntity avoidConsumingPayload(HttpRequestBuilder requestBuilder, InputStream payload, OptionalLong length) {
+    requestBuilder.addHeader(CONTENT_LENGTH, valueOf(length.getAsLong()));
+    return new InputStreamHttpEntity(payload, length.getAsLong());
   }
 
   private byte[] getPayloadAsBytes(Object payload, TransformationService transformationService) {
