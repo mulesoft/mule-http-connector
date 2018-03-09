@@ -113,12 +113,12 @@ public class HttpResponseFactory {
           httpEntity = guaranteeStreamingIfPossible(supportsTransferEncoding, httpResponseHeaderBuilder, payload);
         } else {
           // No explicit desire but we have a length to take advantage of
-          httpEntity = avoidConsumingPayload(httpResponseHeaderBuilder, payload, body.getLength().get());
+          httpEntity = avoidConsumingPayload(httpResponseHeaderBuilder, payload, body.getByteLength().getAsLong());
         }
       } else {
         // NEVER was selected but we could take advantage of the length
         if (hasLength) {
-          httpEntity = avoidConsumingPayload(httpResponseHeaderBuilder, payload, body.getLength().get());
+          httpEntity = avoidConsumingPayload(httpResponseHeaderBuilder, payload, body.getByteLength().getAsLong());
         } else {
           httpEntity = consumePayload(httpResponseHeaderBuilder, payload);
         }
