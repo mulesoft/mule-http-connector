@@ -163,7 +163,7 @@ public class HttpRequestFactory {
     HttpEntity entity;
 
     Object payload = body.getValue();
-    OptionalLong length = body.getLength();
+    OptionalLong length = body.getByteLength();
     Optional<String> transferEncoding = requestBuilder.getHeaderValue(TRANSFER_ENCODING_HEADER);
     Optional<String> contentLength = requestBuilder.getHeaderValue(CONTENT_LENGTH_HEADER);
 
