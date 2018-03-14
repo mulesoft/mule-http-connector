@@ -9,7 +9,6 @@ package org.mule.extension.http.api.policy;
 import static java.lang.System.lineSeparator;
 import static org.mule.extension.http.api.HttpAttributes.TAB;
 import static org.mule.extension.http.api.HttpAttributes.buildMapToString;
-import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 
 import org.mule.runtime.api.util.MultiMap;
 
@@ -38,7 +37,7 @@ public class HttpPolicyResponseAttributes implements Serializable {
   /**
    * Map of HTTP headers in the message. Former properties.
    */
-  private MultiMap<String, String> headers = emptyMultiMap();
+  private MultiMap<String, String> headers = new MultiMap<>();
 
   public Integer getStatusCode() {
     return statusCode;
@@ -57,14 +56,13 @@ public class HttpPolicyResponseAttributes implements Serializable {
   }
 
   public MultiMap<String, String> getHeaders() {
-    return headers.toImmutableMultiMap();
+    return headers;
   }
 
   public void setHeaders(MultiMap<String, String> headers) {
     this.headers = headers;
   }
 
-  @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();
 

@@ -7,8 +7,6 @@
 package org.mule.extension.http.api.listener.builder;
 
 import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSES;
-import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
-
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.extension.api.annotation.param.Content;
@@ -39,7 +37,7 @@ public class HttpListenerErrorResponseBuilder extends HttpListenerResponseBuilde
   @Optional
   @Content
   @Placement(tab = RESPONSES, order = 2)
-  protected MultiMap<String, String> headers = emptyMultiMap();
+  protected MultiMap<String, String> headers = new MultiMap<>();
 
   /**
    * HTTP status code the response should have.
@@ -57,22 +55,18 @@ public class HttpListenerErrorResponseBuilder extends HttpListenerResponseBuilde
   @Placement(tab = RESPONSES, order = 4)
   private String reasonPhrase;
 
-  @Override
   public Integer getStatusCode() {
     return statusCode;
   }
 
-  @Override
   public String getReasonPhrase() {
     return reasonPhrase;
   }
 
-  @Override
   public void setStatusCode(Integer statusCode) {
     this.statusCode = statusCode;
   }
 
-  @Override
   public void setReasonPhrase(String reasonPhrase) {
     this.reasonPhrase = reasonPhrase;
   }

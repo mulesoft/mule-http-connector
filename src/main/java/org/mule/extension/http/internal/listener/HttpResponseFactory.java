@@ -50,8 +50,6 @@ import java.util.Collection;
  */
 public class HttpResponseFactory {
 
-  private static final String HEADER_TRANSFER_ENCODING = TRANSFER_ENCODING.toLowerCase();
-
   private Logger logger = LoggerFactory.getLogger(getClass());
 
   private HttpStreamingType responseStreaming = AUTO;
@@ -141,7 +139,7 @@ public class HttpResponseFactory {
         responseBuilder.statusCode(statusCode);
         if (statusCode == NO_CONTENT.getStatusCode() || statusCode == NOT_MODIFIED.getStatusCode()) {
           httpEntity = new EmptyHttpEntity();
-          httpResponseHeaderBuilder.removeHeader(HEADER_TRANSFER_ENCODING);
+          httpResponseHeaderBuilder.removeHeader(TRANSFER_ENCODING);
         }
       }
     }
@@ -163,20 +161,21 @@ public class HttpResponseFactory {
   }
 
   private void addInterceptingHeaders(Interception interception, HttpResponseHeaderBuilder httpResponseHeaderBuilder) {
-    MultiMap<String, String> headers = interception.getHeaders();
-    headers.keySet().forEach(key -> httpResponseHeaderBuilder.addHeader(key, headers.getAll(key)));
+    interception
+        .getHeaders().entryList()
+        .forEach(entry -> httpResponseHeaderBuilder.addHeader(entry.getKey(), entry.getValue()));
   }
 
   private void addUserHeaders(HttpListenerResponseBuilder listenerResponseBuilder, boolean supportsTransferEncoding,
                               HttpResponseHeaderBuilder httpResponseHeaderBuilder) {
     MultiMap<String, String> headers = listenerResponseBuilder.getHeaders();
 
-    headers.keySet().forEach(key -> {
-      if (!supportsTransferEncoding && HEADER_TRANSFER_ENCODING.equalsIgnoreCase(key)) {
+    headers.entryList().forEach(entry -> {
+      if (TRANSFER_ENCODING.equals(entry.getKey()) && !supportsTransferEncoding) {
         logger.debug(
                      "Client HTTP version is lower than 1.1 so the unsupported 'Transfer-Encoding' header has been removed and 'Content-Length' will be sent instead.");
       } else {
-        httpResponseHeaderBuilder.addHeader(key, headers.getAll(key));
+        httpResponseHeaderBuilder.addHeader(entry.getKey(), entry.getValue());
       }
     });
   }
@@ -238,7 +237,7 @@ public class HttpResponseFactory {
   private void setupContentLengthEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder, long contentLength) {
     if (httpResponseHeaderBuilder.getTransferEncoding() != null) {
       logger.debug("Content-Length encoding is being used so the 'Transfer-Encoding' header has been removed");
-      httpResponseHeaderBuilder.removeHeader(HEADER_TRANSFER_ENCODING);
+      httpResponseHeaderBuilder.removeHeader(TRANSFER_ENCODING);
     }
     httpResponseHeaderBuilder.setContentLength(String.valueOf(contentLength));
   }
@@ -250,7 +249,7 @@ public class HttpResponseFactory {
     }
     String existingTransferEncoding = httpResponseHeaderBuilder.getTransferEncoding();
     if (!CHUNKED.equals(existingTransferEncoding)) {
-      httpResponseHeaderBuilder.addHeader(HEADER_TRANSFER_ENCODING, CHUNKED);
+      httpResponseHeaderBuilder.addHeader(TRANSFER_ENCODING, CHUNKED);
     }
   }
 

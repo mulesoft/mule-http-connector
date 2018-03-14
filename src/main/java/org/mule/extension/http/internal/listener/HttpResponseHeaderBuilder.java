@@ -6,21 +6,22 @@
  */
 package org.mule.extension.http.internal.listener;
 
+import static com.google.common.collect.Multimaps.newMultimap;
 import static java.util.Arrays.asList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.http.api.HttpHeaders.Names.ACCESS_CONTROL_ALLOW_ORIGIN;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
-import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.util.MultiMap;
-import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
+import org.mule.runtime.api.util.CaseInsensitiveMapWrapper;
+
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class HttpResponseHeaderBuilder {
@@ -31,34 +32,41 @@ public class HttpResponseHeaderBuilder {
                          CONTENT_TYPE.toLowerCase(),
                          ACCESS_CONTROL_ALLOW_ORIGIN.toLowerCase()));
 
-  private MultiMap<String, String> headers = new CaseInsensitiveMultiMap(!PRESERVE_HEADER_CASE);
+  Multimap<String, String> headers = newMultimap(new CaseInsensitiveMapWrapper<>(), Sets::newHashSet);
 
-  public void addHeader(String headerName, Collection<String> headerValue) {
-    if (headerValue.size() > 1 || headers.containsKey(headerName)) {
+  public void addHeader(String headerName, Object headerValue) {
+    if (headerValue instanceof Iterable) {
       failIfHeaderDoesNotSupportMultipleValues(headerName);
-    }
-
-    headers.put(headerName, headerValue);
-  }
-
-  public void addHeader(String headerName, String headerValue) {
-    if (headers.containsKey(headerName)) {
+      Iterable values = (Iterable) headerValue;
+      for (Object value : values) {
+        addSimpleValue(headerName, value.toString());
+      }
+    } else if (headerValue instanceof String[]) {
       failIfHeaderDoesNotSupportMultipleValues(headerName);
+      String[] values = (String[]) headerValue;
+      for (String value : values) {
+        addSimpleValue(headerName, value);
+      }
+    } else {
+      addSimpleValue(headerName, headerValue.toString());
     }
-
-    headers.put(headerName, headerValue);
   }
 
   public Collection<String> removeHeader(String headerName) {
-    List<String> values = headers.getAll(headerName);
-    headers.remove(headerName);
-    return values;
+    return headers.removeAll(headerName);
   }
 
   private void failIfHeaderDoesNotSupportMultipleValues(String headerName) {
     if (uniqueHeadersNames.contains(headerName.toLowerCase())) {
       throw new MuleRuntimeException(createStaticMessage("Header " + headerName + " does not support multiple values"));
     }
+  }
+
+  private void addSimpleValue(String headerName, String headerValue) {
+    if (headers.containsKey(headerName)) {
+      failIfHeaderDoesNotSupportMultipleValues(headerName);
+    }
+    headers.put(headerName, headerValue);
   }
 
   public String getContentType() {
@@ -77,16 +85,16 @@ public class HttpResponseHeaderBuilder {
     if (!headers.containsKey(header)) {
       return null;
     }
-    return headers.get(header);
+    return (String) ((Collection) headers.get(header)).iterator().next();
   }
 
   public void addContentType(String multipartFormData) {
-    addHeader(CONTENT_TYPE, multipartFormData);
+    addSimpleValue(CONTENT_TYPE, multipartFormData);
   }
 
   public void setContentLength(String calculatedContentLength) {
     removeHeader(CONTENT_LENGTH);
-    addHeader(CONTENT_LENGTH, calculatedContentLength);
+    addSimpleValue(CONTENT_LENGTH, calculatedContentLength);
   }
 
   public Collection<String> getHeaderNames() {
@@ -94,6 +102,6 @@ public class HttpResponseHeaderBuilder {
   }
 
   public Collection<String> getHeader(String headerName) {
-    return headers.getAll(headerName);
+    return headers.get(headerName);
   }
 }

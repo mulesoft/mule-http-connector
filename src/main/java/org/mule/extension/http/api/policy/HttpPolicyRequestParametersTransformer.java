@@ -7,7 +7,6 @@
 package org.mule.extension.http.api.policy;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
-import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 
 import org.mule.extension.http.api.BaseHttpRequestAttributes;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -18,6 +17,7 @@ import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 
 import com.google.common.collect.ImmutableMap;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -77,10 +77,10 @@ public class HttpPolicyRequestParametersTransformer implements OperationPolicyPa
   }
 
   private MultiMap<String, String> getMultiMap(Map<String, Object> parameters, String key) {
-    return (MultiMap<String, String>) parameters.getOrDefault(key, emptyMultiMap());
+    return (MultiMap<String, String>) parameters.getOrDefault(key, new MultiMap<String, String>());
   }
 
   private Map<String, String> getMap(Map<String, Object> parameters, String key) {
-    return (Map<String, String>) parameters.getOrDefault(key, emptyMultiMap());
+    return (Map<String, String>) parameters.getOrDefault(key, new HashMap<String, String>());
   }
 }
