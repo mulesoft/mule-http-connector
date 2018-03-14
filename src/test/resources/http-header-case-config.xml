@@ -13,70 +13,24 @@
         <http:request-connection host="localhost" port="${port}"/>
     </http:request-config>
 
-    <flow name="serverRequest">
-        <http:listener path="testRequest" config-ref="listenerConfig"/>
-        <custom-processor class="org.mule.test.http.functional.HttpHeaderCaseTestCase$AssertRequestHeaderProcessor"/>
-    </flow>
-
-    <flow name="serverResponse">
-        <http:listener path="testResponse" config-ref="listenerConfig">
+    <flow name="server">
+        <http:listener path="test" config-ref="listenerConfig">
             <http:response>
                 <http:headers>
-                    #[{'rEsPoNsEhEaDeR' : 'value'}]
+                    #[{'Content-Type' : 'application/x-www-form-urlencoded', 'customname1' : 'customValue'}]
                 </http:headers>
             </http:response>
         </http:listener>
-        <logger />
+        <set-payload value="#[attributes.headers.CusTomName2 ++ '=value']" />
     </flow>
 
-    <flow name="clientRequest">
-        <http:request path="testRequest" config-ref="requestConfig">
+    <flow name="client">
+        <http:request path="test" config-ref="requestConfig">
             <http:headers>
-                #[{'rEqUeStHeAdEr' : 'value'}]
+                #[{'CusTomName2' : 'CustomValue'}]
             </http:headers>
         </http:request>
-    </flow>
-
-    <flow name="clientResponse">
-        <http:request path="testResponse" config-ref="requestConfig"/>
-        <custom-processor class="org.mule.test.http.functional.HttpHeaderCaseTestCase$AssertResponseHeaderProcessor"/>
-    </flow>
-
-    <flow name="proxyRequest">
-        <http:listener path="proxyRequest" config-ref="listenerConfig">
-            <http:response>
-                <http:headers>
-                    #[attributes.headers]
-                </http:headers>
-            </http:response>
-        </http:listener>
-        <http:request path="copyHeaders" config-ref="requestConfig">
-            <http:headers>
-                #[attributes.headers]
-            </http:headers>
-        </http:request>
-    </flow>
-
-    <flow name="proxyResponse">
-        <http:listener path="proxyResponse" config-ref="listenerConfig">
-            <http:response>
-                <http:headers>
-                    #[attributes.headers]
-                </http:headers>
-            </http:response>
-        </http:listener>
-        <http:request path="copyHeaders" config-ref="requestConfig"/>
-    </flow>
-
-    <flow name="copyHeaders">
-        <http:listener path="copyHeaders" config-ref="listenerConfig">
-            <http:response>
-                <http:headers>
-                    #[attributes.headers ++ {'pRoXyHeAdErReSpOnSe' : 'value'}]
-                </http:headers>
-            </http:response>
-        </http:listener>
-        <logger />
+        <object-to-string-transformer/>
     </flow>
 
 </mule>
