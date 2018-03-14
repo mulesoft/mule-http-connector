@@ -7,6 +7,7 @@
 package org.mule.extension.http.internal.request.builder;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
+import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 
 /**
@@ -22,9 +23,14 @@ public class HttpResponseAttributesBuilder {
   }
 
   public HttpResponseAttributes build() {
+    MultiMap<String, String> headers = new MultiMap<>();
+    for (String headerName : response.getHeaderNames()) {
+      headers.put(headerName, response.getHeaderValues(headerName));
+    }
+
     int statusCode = response.getStatusCode();
     String reasonPhrase = response.getReasonPhrase();
 
-    return new HttpResponseAttributes(statusCode, reasonPhrase, response.getHeaders());
+    return new HttpResponseAttributes(statusCode, reasonPhrase, headers);
   }
 }

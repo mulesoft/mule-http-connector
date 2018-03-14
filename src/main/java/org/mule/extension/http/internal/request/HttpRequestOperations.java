@@ -12,7 +12,6 @@ import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST;
 import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.encodeSpaces;
-
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.api.request.client.UriParameters;
@@ -26,7 +25,6 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
-import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.error.Throws;
@@ -53,14 +51,8 @@ public class HttpRequestOperations implements Initialisable, Disposable {
 
   private static final int WAIT_FOR_EVER = MAX_VALUE;
 
-  private static final SuccessStatusCodeValidator DEFAULT_STATUS_CODE_VALIDATOR = new SuccessStatusCodeValidator("0..399");
-  private static final HttpRequesterRequestBuilder DEFAULT_REQUEST_BUILDER = new HttpRequesterRequestBuilder();
-  private static final HttpRequester REQUESTER = new HttpRequester();
-
   @Inject
   private MuleContext muleContext;
-  @Inject
-  private TransformationService transformationService;
   @Inject
   private SchedulerService schedulerService;
 
@@ -97,7 +89,7 @@ public class HttpRequestOperations implements Initialisable, Disposable {
                       NotificationEmitter notificationEmitter,
                       CompletionCallback<InputStream, HttpResponseAttributes> callback) {
     try {
-      HttpRequesterRequestBuilder resolvedBuilder = requestBuilder != null ? requestBuilder : DEFAULT_REQUEST_BUILDER;
+      HttpRequesterRequestBuilder resolvedBuilder = requestBuilder != null ? requestBuilder : new HttpRequesterRequestBuilder();
       resolvedBuilder.setCorrelationInfo(correlationInfo);
 
       String resolvedUri;
@@ -112,11 +104,25 @@ public class HttpRequestOperations implements Initialisable, Disposable {
 
       Integer resolvedTimeout = resolveResponseTimeout(overrides.getResponseTimeout());
       ResponseValidator responseValidator = responseValidationSettings.getResponseValidator();
-      responseValidator = responseValidator != null ? responseValidator : DEFAULT_STATUS_CODE_VALIDATOR;
+      responseValidator = responseValidator != null ? responseValidator : new SuccessStatusCodeValidator("0..399");
 
-      REQUESTER.doRequest(client, config, resolvedUri, method, overrides.getRequestStreamingMode(), overrides.getSendBodyMode(),
-                          overrides.getFollowRedirects(), client.getDefaultAuthentication(), resolvedTimeout, responseValidator,
-                          transformationService, resolvedBuilder, true, muleContext, scheduler, notificationEmitter, callback);
+      HttpRequester requester =
+          new HttpRequester.Builder()
+              .setConfig(config)
+              .setUri(resolvedUri)
+              .setMethod(method)
+              .setFollowRedirects(overrides.getFollowRedirects())
+              .setRequestStreamingMode(overrides.getRequestStreamingMode())
+              .setSendBodyMode(overrides.getSendBodyMode())
+              .setAuthentication(client.getDefaultAuthentication())
+              .setResponseTimeout(resolvedTimeout)
+              .setResponseValidator(responseValidator)
+              .setTransformationService(muleContext.getTransformationService())
+              .setScheduler(scheduler)
+              .setNotificationEmitter(notificationEmitter)
+              .build();
+
+      requester.doRequest(client, resolvedBuilder, true, muleContext, callback);
     } catch (Throwable t) {
       callback.error(t instanceof Exception ? (Exception) t : new DefaultMuleException(t));
     }

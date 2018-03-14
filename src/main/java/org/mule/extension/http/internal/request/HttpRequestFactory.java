@@ -6,7 +6,6 @@
  */
 package org.mule.extension.http.internal.request;
 
-import static com.google.common.collect.Sets.newHashSet;
 import static java.lang.String.valueOf;
 import static java.util.Collections.emptyMap;
 import static org.mule.extension.http.api.error.HttpError.SECURITY;
@@ -22,7 +21,6 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.COOKIE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpHeaders.Names.X_CORRELATION_ID;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
-
 import org.mule.extension.http.api.request.HttpSendBodyMode;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
@@ -40,8 +38,7 @@ import org.mule.runtime.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.google.common.collect.Lists;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -49,7 +46,9 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Component that generates {@link HttpRequest HttpRequests}.
@@ -58,21 +57,32 @@ import java.util.Set;
  */
 public class HttpRequestFactory {
 
-
   private static final Logger LOGGER = LoggerFactory.getLogger(HttpRequestFactory.class);
-
-  private static final String CONTENT_TYPE_HEADER = CONTENT_TYPE.toLowerCase();
-  private static final String CONTENT_LENGTH_HEADER = CONTENT_LENGTH.toLowerCase();
-  private static final String TRANSFER_ENCODING_HEADER = TRANSFER_ENCODING.toLowerCase();
-
-  private static final Set<String> DEFAULT_EMPTY_BODY_METHODS = newHashSet("GET", "HEAD", "OPTIONS");
-
+  private static final List<String> DEFAULT_EMPTY_BODY_METHODS = Lists.newArrayList("GET", "HEAD", "OPTIONS");
   private static final String BOTH_TRANSFER_HEADERS_SET_MESSAGE =
       "Cannot send both Transfer-Encoding and Content-Length headers. Transfer-Encoding will not be sent.";
   private static final String TRANSFER_ENCODING_NOT_ALLOWED_WHEN_NEVER_MESSAGE =
       "Transfer-Encoding header will not be sent, as the configured requestStreamingMode is NEVER.";
   private static final String INVALID_TRANSFER_ENCODING_HEADER_MESSAGE =
       "Transfer-Encoding header value was invalid and will not be sent.";
+
+  private final String uri;
+  private final String method;
+  private final HttpRequesterConfig config;
+  private final HttpStreamingType streamingMode;
+  private final HttpSendBodyMode sendBodyMode;
+  private final TransformationService transformationService;
+
+
+  HttpRequestFactory(HttpRequesterConfig config, String uri, String method, HttpStreamingType streamingMode,
+                     HttpSendBodyMode sendBodyMode, TransformationService transformationService) {
+    this.config = config;
+    this.uri = uri;
+    this.method = method;
+    this.streamingMode = streamingMode;
+    this.sendBodyMode = sendBodyMode;
+    this.transformationService = transformationService;
+  }
 
   /**
    * Creates an {@HttpRequest}.
@@ -83,13 +93,11 @@ public class HttpRequestFactory {
    * @return an {@HttpRequest} configured based on the parameters.
    * @throws MuleException if the request creation fails.
    */
-  public HttpRequest create(HttpRequesterConfig config, String uri, String method, HttpStreamingType streamingMode,
-                            HttpSendBodyMode sendBodyMode, TransformationService transformationService,
-                            HttpRequesterRequestBuilder requestBuilder, HttpRequestAuthentication authentication) {
+  public HttpRequest create(HttpRequesterRequestBuilder requestBuilder, HttpRequestAuthentication authentication) {
     HttpRequestBuilder builder = HttpRequest.builder();
 
-    builder.uri(uri)
-        .method(method)
+    builder.uri(this.uri)
+        .method(this.method)
         .headers(requestBuilder.getHeaders())
         .queryParams(requestBuilder.getQueryParams());
 
@@ -100,16 +108,16 @@ public class HttpRequestFactory {
         .forEach(param -> builder.addQueryParam(param.getKey(), param.getValue()));
 
     MediaType mediaType = requestBuilder.getBody().getDataType().getMediaType();
-    if (!builder.getHeaderValue(CONTENT_TYPE_HEADER).isPresent()) {
+    if (!builder.getHeaderValue(CONTENT_TYPE).isPresent()) {
       if (!MediaType.ANY.matches(mediaType)) {
-        builder.addHeader(CONTENT_TYPE_HEADER, mediaType.toRfcString());
+        builder.addHeader(CONTENT_TYPE, mediaType.toRfcString());
       }
     }
 
     requestBuilder.getSendCorrelationId()
         .getOutboundCorrelationId(requestBuilder.getCorrelationInfo(), requestBuilder.getCorrelationId())
         .ifPresent(correlationId -> {
-          if (builder.getHeaderValue(X_CORRELATION_ID).isPresent()) {
+          if (builder.getHeaders().containsKey(X_CORRELATION_ID)) {
             if (LOGGER.isDebugEnabled()) {
               LOGGER.debug(
                            X_CORRELATION_ID
@@ -138,8 +146,7 @@ public class HttpRequestFactory {
     }
 
     try {
-      builder.entity(createRequestEntity(streamingMode, sendBodyMode, transformationService, builder, method,
-                                         requestBuilder.getBody()));
+      builder.entity(createRequestEntity(builder, this.method, requestBuilder.getBody()));
     } catch (Exception e) {
       throw new ModuleException(TRANSFORMATION, e);
     }
@@ -155,17 +162,15 @@ public class HttpRequestFactory {
     return builder.build();
   }
 
-  private HttpEntity createRequestEntity(HttpStreamingType streamingMode, HttpSendBodyMode sendBodyMode,
-                                         TransformationService transformationService, HttpRequestBuilder requestBuilder,
-                                         String resolvedMethod, TypedValue<?> body) {
+  private HttpEntity createRequestEntity(HttpRequestBuilder requestBuilder, String resolvedMethod, TypedValue<?> body) {
     HttpEntity entity;
 
     Object payload = body.getValue();
     Optional<Long> length = body.getLength();
-    Optional<String> transferEncoding = requestBuilder.getHeaderValue(TRANSFER_ENCODING_HEADER);
-    Optional<String> contentLength = requestBuilder.getHeaderValue(CONTENT_LENGTH_HEADER);
+    Optional<String> transferEncoding = requestBuilder.getHeaderValue(TRANSFER_ENCODING);
+    Optional<String> contentLength = requestBuilder.getHeaderValue(CONTENT_LENGTH);
 
-    if (isEmptyBody(payload, resolvedMethod, sendBodyMode)) {
+    if (isEmptyBody(payload, resolvedMethod)) {
       entity = new EmptyHttpEntity();
     } else if (payload instanceof InputStream || payload instanceof CursorStreamProvider) {
       payload = payload instanceof CursorStreamProvider ? ((CursorStreamProvider) payload).openCursor() : payload;
@@ -174,7 +179,7 @@ public class HttpRequestFactory {
       } else if (streamingMode == AUTO) {
         if (contentLength.isPresent()) {
           sanitizeForContentLength(requestBuilder, transferEncoding, BOTH_TRANSFER_HEADERS_SET_MESSAGE);
-          entity = new ByteArrayHttpEntity(getPayloadAsBytes(payload, transformationService));
+          entity = new ByteArrayHttpEntity(getPayloadAsBytes(payload));
         } else if ((transferEncoding.isPresent() && CHUNKED.equalsIgnoreCase(transferEncoding.get())) || !length.isPresent()) {
           entity = new InputStreamHttpEntity((InputStream) payload);
         } else {
@@ -186,11 +191,11 @@ public class HttpRequestFactory {
         if (length.isPresent()) {
           entity = avoidConsumingPayload(requestBuilder, (InputStream) payload, length);
         } else {
-          entity = new ByteArrayHttpEntity(getPayloadAsBytes(payload, transformationService));
+          entity = new ByteArrayHttpEntity(getPayloadAsBytes(payload));
         }
       }
     } else {
-      byte[] payloadAsBytes = getPayloadAsBytes(payload, transformationService);
+      byte[] payloadAsBytes = getPayloadAsBytes(payload);
       if (streamingMode == ALWAYS) {
         entity = guaranteeStreaming(requestBuilder, transferEncoding, contentLength, new ByteArrayInputStream(payloadAsBytes));
       } else if (streamingMode == NEVER) {
@@ -208,7 +213,7 @@ public class HttpRequestFactory {
     return entity;
   }
 
-  private boolean isEmptyBody(Object body, String method, HttpSendBodyMode sendBodyMode) {
+  private boolean isEmptyBody(Object body, String method) {
     boolean emptyBody;
 
     if (body == null) {
@@ -241,7 +246,7 @@ public class HttpRequestFactory {
     return new InputStreamHttpEntity(payload, length.get());
   }
 
-  private byte[] getPayloadAsBytes(Object payload, TransformationService transformationService) {
+  private byte[] getPayloadAsBytes(Object payload) {
     return (byte[]) transformationService.transform(of(payload), BYTE_ARRAY).getPayload().getValue();
   }
 

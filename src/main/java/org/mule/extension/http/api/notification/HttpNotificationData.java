@@ -27,7 +27,9 @@ public abstract class HttpNotificationData {
   }
 
   private MultiMap<String, String> createHeadersMultiMap(HttpMessage message) {
-    return message.getHeaders().toImmutableMultiMap();
+    MultiMap<String, String> headers = new MultiMap<>();
+    message.getHeaderNames().forEach(key -> message.getHeaderValues(key).forEach(value -> headers.put(key, value)));
+    return headers.toImmutableMultiMap();
   }
 
 }

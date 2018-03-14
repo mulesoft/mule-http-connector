@@ -7,7 +7,6 @@
 package org.mule.extension.http.internal.request;
 
 import static java.lang.Integer.getInteger;
-import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
 import static org.mule.extension.http.api.error.HttpError.CONNECTIVITY;
 import static org.mule.extension.http.api.error.HttpError.TIMEOUT;
@@ -21,7 +20,6 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.TypedValue.of;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
 import static reactor.core.publisher.Mono.from;
-
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.error.HttpError;
 import org.mule.extension.http.api.error.HttpErrorMessageGenerator;
@@ -48,12 +46,12 @@ import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.TimeoutException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Component capable of performing an HTTP request given a request.
@@ -64,34 +62,42 @@ public class HttpRequester {
 
   private static final Logger logger = LoggerFactory.getLogger(HttpRequester.class);
 
-  private static int RETRY_ATTEMPTS = getInteger(RETRY_ATTEMPTS_PROPERTY, DEFAULT_RETRY_ATTEMPTS);
+  private final boolean followRedirects;
+  private final HttpRequestAuthentication authentication;
+  private final int responseTimeout;
+  private final ResponseValidator responseValidator;
 
-  private static final HttpRequestFactory EVENT_TO_HTTP_REQUEST = new HttpRequestFactory();
-  private static final HttpResponseToResult RESPONSE_TO_RESULT = new HttpResponseToResult();
-  private static final HttpErrorMessageGenerator ERROR_MESSAGE_GENERATOR = new HttpErrorMessageGenerator();
+  private final HttpRequesterConfig config;
+  private final NotificationEmitter notificationEmitter;
+  private final HttpRequestFactory eventToHttpRequest;
+  private final Scheduler scheduler;
+  private final int retryAttempts;
 
-  public void doRequest(HttpExtensionClient client, HttpRequesterConfig config, String uri, String method,
-                        HttpStreamingType streamingMode, HttpSendBodyMode sendBodyMode,
-                        boolean followRedirects, HttpRequestAuthentication authentication,
-                        int responseTimeout, ResponseValidator responseValidator,
-                        TransformationService transformationService, HttpRequesterRequestBuilder requestBuilder,
-                        boolean checkRetry, MuleContext muleContext, Scheduler scheduler, NotificationEmitter notificationEmitter,
-                        CompletionCallback<InputStream, HttpResponseAttributes> callback) {
-    doRequestWithRetry(client, config, uri, method, streamingMode, sendBodyMode, followRedirects, authentication, responseTimeout,
-                       responseValidator, transformationService, requestBuilder, checkRetry, muleContext, scheduler,
-                       notificationEmitter, callback,
-                       EVENT_TO_HTTP_REQUEST.create(config, uri, method, streamingMode, sendBodyMode, transformationService,
-                                                    requestBuilder, authentication),
-                       RETRY_ATTEMPTS);
+  private HttpErrorMessageGenerator errorMessageGenerator = new HttpErrorMessageGenerator();
+
+  public HttpRequester(HttpRequestFactory eventToHttpRequest, boolean followRedirects, HttpRequestAuthentication authentication,
+                       int responseTimeout, ResponseValidator responseValidator, HttpRequesterConfig config,
+                       Scheduler scheduler, NotificationEmitter notificationEmitter) {
+    this.followRedirects = followRedirects;
+    this.authentication = authentication;
+    this.responseTimeout = responseTimeout;
+    this.responseValidator = responseValidator;
+    this.config = config;
+    this.scheduler = scheduler;
+    this.eventToHttpRequest = eventToHttpRequest;
+    this.notificationEmitter = notificationEmitter;
+    retryAttempts = getInteger(RETRY_ATTEMPTS_PROPERTY, DEFAULT_RETRY_ATTEMPTS);
   }
 
-  private void doRequestWithRetry(HttpExtensionClient client, HttpRequesterConfig config, String uri, String method,
-                                  HttpStreamingType streamingMode, HttpSendBodyMode sendBodyMode,
-                                  boolean followRedirects, HttpRequestAuthentication authentication,
-                                  int responseTimeout, ResponseValidator responseValidator,
-                                  TransformationService transformationService, HttpRequesterRequestBuilder requestBuilder,
-                                  boolean checkRetry, MuleContext muleContext, Scheduler scheduler,
-                                  NotificationEmitter notificationEmitter,
+  public void doRequest(HttpExtensionClient client, HttpRequesterRequestBuilder requestBuilder,
+                        boolean checkRetry, MuleContext muleContext,
+                        CompletionCallback<InputStream, HttpResponseAttributes> callback) {
+    doRequestWithRetry(client, requestBuilder, checkRetry, muleContext, callback,
+                       eventToHttpRequest.create(requestBuilder, authentication), retryAttempts);
+  }
+
+  private void doRequestWithRetry(HttpExtensionClient client, HttpRequesterRequestBuilder requestBuilder,
+                                  boolean checkRetry, MuleContext muleContext,
                                   CompletionCallback<InputStream, HttpResponseAttributes> callback, HttpRequest httpRequest,
                                   int retryCount) {
     notificationEmitter.fire(REQUEST_START, of(HttpRequestNotificationData.from(httpRequest)));
@@ -99,44 +105,37 @@ public class HttpRequester {
         .whenComplete(
                       (response, exception) -> {
                         if (response != null) {
-                          try {
-                            notificationEmitter.fire(REQUEST_COMPLETE, of(HttpResponseNotificationData.from(response)));
-                            from(RESPONSE_TO_RESULT.convert(config, muleContext, response, httpRequest.getUri()))
-                                .doOnNext(result -> {
-                                  try {
-                                    if (resendRequest(result, checkRetry, authentication)) {
-                                      scheduler.submit(() -> consumePayload(result));
-                                      doRequest(client, config, uri, method, streamingMode, sendBodyMode, followRedirects,
-                                                authentication, responseTimeout, responseValidator, transformationService,
-                                                requestBuilder, false, muleContext, scheduler, notificationEmitter, callback);
-                                    } else {
-                                      responseValidator.validate(result, httpRequest);
-                                      callback.success(result);
-                                    }
-                                  } catch (Exception e) {
-                                    callback.error(e);
+                          notificationEmitter.fire(REQUEST_COMPLETE, of(HttpResponseNotificationData.from(response)));
+                          HttpResponseToResult httpResponseToResult = new HttpResponseToResult(config, muleContext);
+                          from(httpResponseToResult.convert(response, httpRequest.getUri()))
+                              .doOnNext(result -> {
+                                try {
+                                  if (resendRequest(result, checkRetry, authentication)) {
+                                    scheduler.submit(() -> consumePayload(result));
+                                    doRequest(client, requestBuilder, false, muleContext, callback);
+                                  } else {
+                                    responseValidator.validate(result, httpRequest);
+                                    callback.success(result);
                                   }
-                                })
-                                .doOnError(Exception.class, e -> callback.error(e))
-                                .subscribe();
-                          } catch (Exception e) {
-                            callback.error(e);
-                          }
+                                } catch (Exception e) {
+                                  callback.error(e);
+                                }
+                              })
+                              .doOnError(Exception.class, e -> callback.error(e))
+                              .subscribe();
                         } else {
                           checkIfRemotelyClosed(exception, client.getDefaultUriParameters());
 
                           if (shouldRetryRemotelyClosed(exception, retryCount, httpRequest.getMethod())) {
-                            doRequestWithRetry(client, config, uri, method, streamingMode, sendBodyMode, followRedirects,
-                                               authentication, responseTimeout, responseValidator, transformationService,
-                                               requestBuilder, checkRetry, muleContext, scheduler, notificationEmitter, callback,
-                                               httpRequest, retryCount - 1);
+                            doRequestWithRetry(client, requestBuilder, checkRetry, muleContext, callback, httpRequest,
+                                               retryCount - 1);
                             return;
                           }
 
                           logger.error(getErrorMessage(httpRequest));
                           HttpError error = exception instanceof TimeoutException ? TIMEOUT : CONNECTIVITY;
                           callback.error(new HttpRequestFailedException(
-                                                                        createStaticMessage(ERROR_MESSAGE_GENERATOR
+                                                                        createStaticMessage(errorMessageGenerator
                                                                             .createFrom(httpRequest, exception.getMessage())),
                                                                         exception, error));
                         }
@@ -144,7 +143,7 @@ public class HttpRequester {
   }
 
   private String getErrorMessage(HttpRequest httpRequest) {
-    return format("Error sending HTTP request to %s", httpRequest.getUri());
+    return String.format("Error sending HTTP request to %s", httpRequest.getUri());
   }
 
   private boolean resendRequest(Result result, boolean retry, HttpRequestAuthentication authentication) throws MuleException {
@@ -170,7 +169,8 @@ public class HttpRequester {
   }
 
   private void checkIfRemotelyClosed(Throwable exception, UriParameters uriParameters) {
-    if (HTTPS.equals(uriParameters.getScheme()) && containsIgnoreCase(exception.getMessage(), REMOTELY_CLOSED)) {
+    if (HTTPS.getScheme().equals(uriParameters.getScheme())
+        && containsIgnoreCase(exception.getMessage(), REMOTELY_CLOSED)) {
       logger
           .error("Remote host closed connection. Possible SSL/TLS handshake issue. Check protocols, cipher suites and certificate set up. Use -Djavax.net.debug=handshake for further debugging.");
     }
@@ -186,8 +186,88 @@ public class HttpRequester {
     return shouldRetry;
   }
 
-  public static void refreshSystemProperties() {
-    RETRY_ATTEMPTS = getInteger(RETRY_ATTEMPTS_PROPERTY, DEFAULT_RETRY_ATTEMPTS);
-  }
+  public static class Builder {
 
+    private String uri;
+    private String method;
+    private boolean followRedirects;
+    private HttpStreamingType requestStreamingMode;
+    private HttpSendBodyMode sendBodyMode;
+    private HttpRequestAuthentication authentication;
+
+    private int responseTimeout;
+    private ResponseValidator responseValidator;
+
+    private HttpRequesterConfig config;
+    private TransformationService transformationService;
+    private Scheduler scheduler;
+    private NotificationEmitter notificationEmitter;
+
+    public Builder setUri(String uri) {
+      this.uri = uri;
+      return this;
+    }
+
+    public Builder setMethod(String method) {
+      this.method = method;
+      return this;
+    }
+
+    public Builder setFollowRedirects(boolean followRedirects) {
+      this.followRedirects = followRedirects;
+      return this;
+    }
+
+    public Builder setRequestStreamingMode(HttpStreamingType requestStreamingMode) {
+      this.requestStreamingMode = requestStreamingMode;
+      return this;
+    }
+
+    public Builder setSendBodyMode(HttpSendBodyMode sendBodyMode) {
+      this.sendBodyMode = sendBodyMode;
+      return this;
+    }
+
+    public Builder setAuthentication(HttpRequestAuthentication authentication) {
+      this.authentication = authentication;
+      return this;
+    }
+
+    public Builder setResponseTimeout(int responseTimeout) {
+      this.responseTimeout = responseTimeout;
+      return this;
+    }
+
+    public Builder setResponseValidator(ResponseValidator responseValidator) {
+      this.responseValidator = responseValidator;
+      return this;
+    }
+
+    public Builder setConfig(HttpRequesterConfig config) {
+      this.config = config;
+      return this;
+    }
+
+    public Builder setTransformationService(TransformationService transformationService) {
+      this.transformationService = transformationService;
+      return this;
+    }
+
+    public Builder setScheduler(Scheduler scheduler) {
+      this.scheduler = scheduler;
+      return this;
+    }
+
+    public Builder setNotificationEmitter(NotificationEmitter notificationEmitter) {
+      this.notificationEmitter = notificationEmitter;
+      return this;
+    }
+
+    public HttpRequester build() {
+      HttpRequestFactory eventToHttpRequest =
+          new HttpRequestFactory(config, uri, method, requestStreamingMode, sendBodyMode, transformationService);
+      return new HttpRequester(eventToHttpRequest, followRedirects, authentication, responseTimeout,
+                               responseValidator, config, scheduler, notificationEmitter);
+    }
+  }
 }

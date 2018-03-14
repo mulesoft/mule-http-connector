@@ -8,9 +8,9 @@ package org.mule.extension.http.internal.listener;
 
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.decodeQueryString;
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.decodeUriParams;
-
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpRequestAttributesBuilder;
+import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.request.ClientConnection;
 import org.mule.runtime.http.api.domain.request.HttpRequestContext;
@@ -47,6 +47,11 @@ public class HttpRequestAttributesResolver {
 
     ClientConnection clientConnection = requestContext.getClientConnection();
 
+    MultiMap<String, String> headers = new MultiMap<>();
+    for (String headerName : request.getHeaderNames()) {
+      headers.put(headerName, request.getHeaderValues(headerName));
+    }
+
     String queryString = uri.getQuery();
     if (queryString != null) {
       uriString += "?" + queryString;
@@ -62,7 +67,7 @@ public class HttpRequestAttributesResolver {
         .method(request.getMethod())
         .scheme(requestContext.getScheme())
         .version(request.getProtocol().asString())
-        .headers(request.getHeaders())
+        .headers(headers)
         .uriParams(decodeUriParams(listenerPath, path))
         .queryString(queryString)
         .queryParams(decodeQueryString(queryString))
