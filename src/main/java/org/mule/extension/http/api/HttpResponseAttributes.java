@@ -8,7 +8,6 @@ package org.mule.extension.http.api;
 
 import static java.lang.System.lineSeparator;
 import org.mule.runtime.api.util.MultiMap;
-import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 /**
@@ -30,7 +29,6 @@ public class HttpResponseAttributes extends HttpAttributes {
    * HTTP reason phrase of the response. Former 'http.reason'.
    */
   @Parameter
-  @Optional
   private final String reasonPhrase;
 
   public HttpResponseAttributes(int statusCode, String reasonPhrase, MultiMap<String, String> headers) {

@@ -63,7 +63,6 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
    * Query string of the request. Former 'http.query.string'.
    */
   @Parameter
-  @Optional
   private final String queryString;
 
   /**
