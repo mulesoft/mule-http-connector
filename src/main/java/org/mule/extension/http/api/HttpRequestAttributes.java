@@ -7,8 +7,9 @@
 package org.mule.extension.http.api;
 
 import static java.lang.System.lineSeparator;
-
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.security.cert.Certificate;
 import java.util.Map;
@@ -25,42 +26,63 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
   /**
    * Full path where the request was received. Former 'http.listener.path'.
    */
+  @Parameter
   private final String listenerPath;
+
   /**
    * Path where the request was received, without considering the base path. Former 'http.relative.path'.
    */
+  @Parameter
   private final String relativePath;
+
   /**
    * HTTP version of the request. Former 'http.version'.
    */
+  @Parameter
   private final String version;
+
   /**
    * HTTP scheme of the request. Former 'http.scheme'.
    */
+  @Parameter
   private final String scheme;
+
   /**
    * HTTP method of the request. Former 'http.method'.
    */
+  @Parameter
   private final String method;
+
   /**
    * Full URI of the request. Former 'http.request.uri'.
    */
+  @Parameter
   private final String requestUri;
+
   /**
    * Query string of the request. Former 'http.query.string'.
    */
+  @Parameter
+  @Optional
   private final String queryString;
+
   /**
    * Local host address from the server.
    */
+  @Parameter
   private final String localAddress;
+
   /**
    * Remote host address from the sender. Former 'http.remote.address'.
    */
+  @Parameter
   private final String remoteAddress;
+
   /**
    * Client certificate (if 2 way TLS is enabled). Former 'http.client.cert'.
    */
+  @Parameter
+  @Optional
   private final Certificate clientCertificate;
 
   /**

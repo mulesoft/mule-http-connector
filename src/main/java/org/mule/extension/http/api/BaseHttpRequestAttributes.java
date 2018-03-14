@@ -7,6 +7,7 @@
 package org.mule.extension.http.api;
 
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.util.Map;
 
@@ -20,15 +21,19 @@ public class BaseHttpRequestAttributes extends HttpAttributes {
   /**
    * Query parameters map built from the parsed string. Former 'http.query.params'.
    */
+  @Parameter
   protected MultiMap<String, String> queryParams;
+
   /**
    * URI parameters extracted from the request path. Former 'http.uri.params'.
    */
+  @Parameter
   protected Map<String, String> uriParams;
 
   /**
    * Full path requested. Former 'http.request.path'.
    */
+  @Parameter
   protected String requestPath;
 
   public BaseHttpRequestAttributes(MultiMap<String, String> headers, MultiMap<String, String> queryParams,
