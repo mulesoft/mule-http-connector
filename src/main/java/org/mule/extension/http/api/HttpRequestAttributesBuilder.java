@@ -6,6 +6,8 @@
  */
 package org.mule.extension.http.api;
 
+import static java.util.Collections.emptyMap;
+import static java.util.Objects.requireNonNull;
 import org.mule.runtime.api.util.MultiMap;
 
 import java.security.cert.Certificate;
@@ -18,9 +20,11 @@ import java.util.Map;
  */
 public class HttpRequestAttributesBuilder {
 
-  private MultiMap<String, String> headers;
-  private MultiMap<String, String> queryParams;
-  private Map<String, String> uriParams;
+  private static final MultiMap<String, String> EMPTY_MAP = new MultiMap<String, String>().toImmutableMultiMap();
+
+  private MultiMap<String, String> headers = EMPTY_MAP;
+  private MultiMap<String, String> queryParams = EMPTY_MAP;
+  private Map<String, String> uriParams = emptyMap();
   private String requestPath;
   private String listenerPath;
   private String relativePath;
@@ -28,7 +32,7 @@ public class HttpRequestAttributesBuilder {
   private String scheme;
   private String method;
   private String requestUri;
-  private String queryString;
+  private String queryString = "";
   private String localAddress;
   private String remoteAddress;
   private Certificate clientCertificate;
@@ -53,16 +57,19 @@ public class HttpRequestAttributesBuilder {
   }
 
   public HttpRequestAttributesBuilder headers(MultiMap<String, String> headers) {
+    requireNonNull(headers, "HTTP headers cannot be null.");
     this.headers = headers;
     return this;
   }
 
   public HttpRequestAttributesBuilder queryParams(MultiMap<String, String> queryParams) {
+    requireNonNull(queryParams, "Query params cannot be null.");
     this.queryParams = queryParams;
     return this;
   }
 
   public HttpRequestAttributesBuilder uriParams(Map<String, String> uriParams) {
+    requireNonNull(uriParams, "URI params cannot be null.");
     this.uriParams = uriParams;
     return this;
   }
@@ -103,6 +110,7 @@ public class HttpRequestAttributesBuilder {
   }
 
   public HttpRequestAttributesBuilder queryString(String queryString) {
+    requireNonNull(queryString, "Query string cannot be null.");
     this.queryString = queryString;
     return this;
   }
@@ -123,6 +131,15 @@ public class HttpRequestAttributesBuilder {
   }
 
   public HttpRequestAttributes build() {
+    requireNonNull(listenerPath, "Listener path cannot be null.");
+    requireNonNull(relativePath, "Relative path cannot be null.");
+    requireNonNull(version, "HTTP version cannot be null.");
+    requireNonNull(scheme, "Scheme cannot be null.");
+    requireNonNull(method, "HTTP method cannot be null.");
+    requireNonNull(requestPath, "Request path cannot be null.");
+    requireNonNull(requestUri, "Request URI cannot be null.");
+    requireNonNull(localAddress, "Local address cannot be null.");
+    requireNonNull(remoteAddress, "Remote address cannot be null.");
     return new HttpRequestAttributes(headers, listenerPath, relativePath, version, scheme, method, requestPath, requestUri,
                                      queryString, queryParams, uriParams, localAddress, remoteAddress, clientCertificate);
   }
