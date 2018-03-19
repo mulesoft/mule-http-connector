@@ -8,13 +8,16 @@ package org.mule.test.http.api;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import io.qameta.allure.Feature;
 import org.junit.Test;
 
+@Feature(HTTP_EXTENSION)
 public class HttpResponseAttributesTestCase extends AbstractMuleTestCase {
 
   private static final String COMPLETE_TO_STRING = "org.mule.extension.http.api.HttpResponseAttributes\n" +
