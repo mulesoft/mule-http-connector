@@ -10,16 +10,14 @@ import static org.mule.extension.http.api.policy.HttpListenerPolicyParametersTra
 import static org.mule.extension.http.api.policy.HttpListenerPolicyParametersTransformer.ResponseType.SUCCESS;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 
-import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.listener.builder.HttpListenerErrorResponseBuilder;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.api.listener.builder.HttpListenerSuccessResponseBuilder;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -45,26 +43,20 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
     return responseParametersToMessage(responseBuilder, SUCCESS.getStatusCode());
   }
 
-  private Message responseParametersToMessage(HttpListenerResponseBuilder responseBuilder, int defaultStatusCode) {
-    Message.Builder messageBuilder;
-    Message.PayloadBuilder builder = Message.builder();
-    TypedValue<Object> body = responseBuilder.getBody();
-    if (body.getValue() == null) {
-      messageBuilder = builder.nullValue();
-    } else {
-      messageBuilder = builder.value(body.getValue()).mediaType(body.getDataType().getMediaType());
-    }
-    int statusCode = responseBuilder.getStatusCode() == null ? defaultStatusCode : responseBuilder.getStatusCode();
-    return messageBuilder
-        .attributesValue(new HttpResponseAttributes(statusCode, responseBuilder.getReasonPhrase(), responseBuilder.getHeaders()))
-        .build();
-  }
-
   @Override
   public Message fromFailureResponseParametersToMessage(Map<String, Object> parameters) {
     HttpListenerResponseBuilder responseBuilder =
         (HttpListenerResponseBuilder) parameters.get(FAILURE.getResponseBuilderParameterName());
     return responseParametersToMessage(responseBuilder, FAILURE.getStatusCode());
+  }
+
+  private Message responseParametersToMessage(HttpListenerResponseBuilder responseBuilder, int defaultStatusCode) {
+    MultiMap<String, String> headers = new MultiMap<>(responseBuilder.getHeaders());
+    int statusCode = responseBuilder.getStatusCode() == null ? defaultStatusCode : responseBuilder.getStatusCode();
+    return Message.builder()
+        .payload(responseBuilder.getBody())
+        .attributesValue(new HttpResponseAttributes(statusCode, responseBuilder.getReasonPhrase(), headers))
+        .build();
   }
 
   @Override
