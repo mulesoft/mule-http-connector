@@ -45,26 +45,20 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
     return responseParametersToMessage(responseBuilder, SUCCESS.getStatusCode());
   }
 
-  private Message responseParametersToMessage(HttpListenerResponseBuilder responseBuilder, int defaultStatusCode) {
-    Message.Builder messageBuilder;
-    Message.PayloadBuilder builder = Message.builder();
-    TypedValue<Object> body = responseBuilder.getBody();
-    if (body.getValue() == null) {
-      messageBuilder = builder.nullValue();
-    } else {
-      messageBuilder = builder.value(body.getValue()).mediaType(body.getDataType().getMediaType());
-    }
-    int statusCode = responseBuilder.getStatusCode() == null ? defaultStatusCode : responseBuilder.getStatusCode();
-    return messageBuilder
-        .attributesValue(new HttpResponseAttributes(statusCode, responseBuilder.getReasonPhrase(), responseBuilder.getHeaders()))
-        .build();
-  }
-
   @Override
   public Message fromFailureResponseParametersToMessage(Map<String, Object> parameters) {
     HttpListenerResponseBuilder responseBuilder =
         (HttpListenerResponseBuilder) parameters.get(FAILURE.getResponseBuilderParameterName());
     return responseParametersToMessage(responseBuilder, FAILURE.getStatusCode());
+  }
+
+  private Message responseParametersToMessage(HttpListenerResponseBuilder responseBuilder, int defaultStatusCode) {
+    MultiMap<String, String> headers = new MultiMap<>(responseBuilder.getHeaders());
+    int statusCode = responseBuilder.getStatusCode() == null ? defaultStatusCode : responseBuilder.getStatusCode();
+    return Message.builder()
+        .payload(responseBuilder.getBody())
+        .attributesValue(new HttpResponseAttributes(statusCode, responseBuilder.getReasonPhrase(), headers))
+        .build();
   }
 
   @Override
