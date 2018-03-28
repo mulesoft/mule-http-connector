@@ -7,20 +7,30 @@
 package org.mule.test.http.policy;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.mule.runtime.api.metadata.DataType.ATOM_STRING;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.POLICY_SUPPORT;
+
 import org.mule.extension.http.api.HttpRequestAttributesBuilder;
+import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.listener.builder.HttpListenerErrorResponseBuilder;
+import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.api.policy.HttpListenerPolicyParametersTransformer;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import com.google.common.collect.ImmutableMap;
+
 import java.security.cert.Certificate;
 import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalLong;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -30,28 +40,32 @@ import org.junit.Test;
 @Story(POLICY_SUPPORT)
 public class HttpListenerPolicyParametersTransformerTestCase extends AbstractMuleTestCase {
 
-  private final String EXPECTED_PAYLOAD = "{'message': 'this is the payload'}";
-  private final MediaType EXPECTED_MEDIA_TYPE = MediaType.APPLICATION_JSON;
+  private static final String EXPECTED_PAYLOAD = "{'message': 'this is the payload'}";
+  private static final MediaType EXPECTED_MEDIA_TYPE = MediaType.APPLICATION_JSON;
 
   //HttpRequestAttributes parameters
-  private final MultiMap<String, String> HEADERS = new MultiMap<>();
-  private final String LISTENER_PATH = "/test";
-  private final String RELATIVE_PATH = "/";
-  private final String VERSION = "1";
-  private final String SCHEME = "scheme";
-  private final String METHOD = "GET";
-  private final String REQUEST_PATH = "/test";
-  private final String REQUEST_URI = "";
-  private final String QUERY_STRING = "";
-  private final MultiMap<String, String> QUERY_PARAMS = new MultiMap<>();
-  private final MultiMap<String, String> URI_PARAMS = new MultiMap<>();
-  private final String REMOTE_ADDRESS = "";
-  private final String LOCAL_ADDRESS = "";
-  private final Certificate CLIENT_CERTIFICATE = null;
+  private static final MultiMap<String, String> HEADERS = new MultiMap<>();
+  private static final String LISTENER_PATH = "/test";
+  private static final String RELATIVE_PATH = "/";
+  private static final String VERSION = "1";
+  private static final String SCHEME = "scheme";
+  private static final String METHOD = "GET";
+  private static final String REQUEST_PATH = "/test";
+  private static final String REQUEST_URI = "";
+  private static final String QUERY_STRING = "";
+  private static final MultiMap<String, String> QUERY_PARAMS = new MultiMap<>();
+  private static final MultiMap<String, String> URI_PARAMS = new MultiMap<>();
+  private static final String REMOTE_ADDRESS = "";
+  private static final String LOCAL_ADDRESS = "";
+  private static final Certificate CLIENT_CERTIFICATE = null;
+
+  private static final String REASON_PHRASE = "reasonPhrase";
+  private static final Integer STATUS_CODE = 100;
+
+  private HttpListenerPolicyParametersTransformer transformer = new HttpListenerPolicyParametersTransformer();
 
   @Test
   public void getErrorResponseBodyWhenSendingHttpRequestAttributes() {
-    HttpListenerPolicyParametersTransformer transformer = new HttpListenerPolicyParametersTransformer();
     Message message = Message.builder().value(EXPECTED_PAYLOAD)
         .mediaType(EXPECTED_MEDIA_TYPE)
         .attributesValue(new HttpRequestAttributesBuilder()
@@ -79,5 +93,27 @@ public class HttpListenerPolicyParametersTransformerTestCase extends AbstractMul
                is(EXPECTED_PAYLOAD));
     assertThat(((HttpListenerErrorResponseBuilder) result.get("errorResponse")).getBody().getDataType().getMediaType().toString(),
                is(EXPECTED_MEDIA_TYPE.toString()));
+  }
+
+  @Test
+  public void payloadAndAttributesArePreservedWhenTransformingFromSuccessToMessage() {
+    Optional<Long> length = Optional.of(10L);
+    TypedValue<Object> body = new TypedValue<>(EXPECTED_PAYLOAD, ATOM_STRING, length);
+    HttpListenerResponseBuilder httpListenerResponseBuilder = new HttpListenerErrorResponseBuilder();
+    httpListenerResponseBuilder.setBody(body);
+    httpListenerResponseBuilder.setReasonPhrase(REASON_PHRASE);
+    httpListenerResponseBuilder.setStatusCode(STATUS_CODE);
+    httpListenerResponseBuilder.setHeaders(HEADERS);
+    Map<String, Object> parameters = ImmutableMap.of("response", httpListenerResponseBuilder);
+
+    Message message = transformer.fromSuccessResponseParametersToMessage(parameters);
+
+    assertThat(message, is(notNullValue()));
+    assertThat(message.getPayload(), is(body));
+    assertThat(message.getAttributes().getValue(), instanceOf(HttpResponseAttributes.class));
+    HttpResponseAttributes attributes = (HttpResponseAttributes) message.getAttributes().getValue();
+    assertThat(attributes.getReasonPhrase(), is(REASON_PHRASE));
+    assertThat(attributes.getStatusCode(), is(STATUS_CODE));
+    assertThat(attributes.getHeaders(), is(HEADERS));
   }
 }
