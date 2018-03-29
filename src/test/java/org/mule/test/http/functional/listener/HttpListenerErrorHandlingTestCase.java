@@ -36,7 +36,7 @@ public class HttpListenerErrorHandlingTestCase extends AbstractHttpListenerError
   public void exceptionBuildingResponseIsHandled() throws Exception {
     final Response response = Get(getUrl("exceptionBuildingResponse")).execute();
     final HttpResponse httpResponse = response.returnResponse();
-    assertExceptionStrategyFailed(httpResponse, "java.io.IOException: Some exception");
+    assertExceptionStrategyFailed(httpResponse, "Some exception");
   }
 
   @Test

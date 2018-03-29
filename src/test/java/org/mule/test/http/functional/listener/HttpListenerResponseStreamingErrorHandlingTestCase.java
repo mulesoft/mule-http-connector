@@ -33,7 +33,7 @@ public class HttpListenerResponseStreamingErrorHandlingTestCase extends Abstract
 
     final HttpResponse httpResponse = response.returnResponse();
 
-    assertExceptionStrategyFailed(httpResponse, "java.io.IOException: Some exception");
+    assertExceptionStrategyFailed(httpResponse, "Some exception");
   }
 
   @Test
@@ -53,7 +53,7 @@ public class HttpListenerResponseStreamingErrorHandlingTestCase extends Abstract
 
     final HttpResponse httpResponse = response.returnResponse();
 
-    assertExceptionStrategyFailed(httpResponse, "java.io.IOException: Some exception");
+    assertExceptionStrategyFailed(httpResponse, "Some exception");
   }
 
   @Test

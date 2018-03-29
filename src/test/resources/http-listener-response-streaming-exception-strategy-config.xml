@@ -24,7 +24,7 @@
         <error-handler>
             <on-error-propagate>
                 <custom-processor class="org.mule.test.http.functional.listener.AbstractHttpListenerErrorHandlingTestCase$TrackPassageMessageProcessor"/>
-                <set-payload value="#[mel:'Exception Handled']"/>
+                <set-payload value="Exception Handled"/>
             </on-error-propagate>
         </error-handler>
     </flow>
@@ -36,7 +36,7 @@
         <error-handler>
             <on-error-continue>
                 <custom-processor class="org.mule.test.http.functional.listener.AbstractHttpListenerErrorHandlingTestCase$TrackPassageMessageProcessor"/>
-                <set-payload value="#[mel:'Exception Handled']"/>
+                <set-payload value="Exception Handled"/>
             </on-error-continue>
         </error-handler>
     </flow>

@@ -19,21 +19,20 @@ import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.internal.listener.HttpResponseFactory;
 import org.mule.extension.http.internal.listener.intercepting.NoInterception;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.ByteArrayInputStream;
 
-import org.junit.Test;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Test;
 
 @Feature(HTTP_EXTENSION)
 @Story("Issues")
-public class HttpResponseFactoryTestCase extends AbstractMuleTestCase {
+public class HttpResponseFactoryTestCase extends AbstractMuleContextTestCase {
 
   private static final String EXAMPLE_STRING = "exampleString";
   private static final String WRONG_CONTENT_LENGTH = "12";
@@ -48,7 +47,7 @@ public class HttpResponseFactoryTestCase extends AbstractMuleTestCase {
     headers.put(CONTENT_LENGTH, WRONG_CONTENT_LENGTH);
     when(listenerResponseBuilder.getHeaders()).thenReturn(headers);
     when(listenerResponseBuilder.getStatusCode()).thenReturn(200);
-    HttpResponseFactory httpResponseBuilder = new HttpResponseFactory(AUTO, mock(TransformationService.class));
+    HttpResponseFactory httpResponseBuilder = new HttpResponseFactory(AUTO, muleContext.getTransformationService());
 
     HttpResponse httpResponse =
         httpResponseBuilder.create(HttpResponse.builder(), new NoInterception(), listenerResponseBuilder, true);

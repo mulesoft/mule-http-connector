@@ -19,7 +19,6 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
-
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.api.streaming.HttpStreamingType;
 import org.mule.extension.http.internal.listener.intercepting.Interception;
@@ -28,7 +27,6 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.api.util.MultiMap;
-import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.runtime.http.api.domain.entity.EmptyHttpEntity;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
@@ -36,12 +34,12 @@ import org.mule.runtime.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.mule.runtime.http.api.domain.message.response.HttpResponseBuilder;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Component that creates {@link HttpResponse HttpResponses}.
@@ -105,7 +103,7 @@ public class HttpResponseFactory {
       } else if (responseStreaming == AUTO) {
         if (existingContentLength != null) {
           // We can't guarantee the length is right, but we know that was desired
-          httpEntity = consumePayload(httpResponseHeaderBuilder, payload);
+          httpEntity = consumePayload(httpResponseHeaderBuilder, body);
         } else if (CHUNKED.equals(existingTransferEncoding) || !hasLength) {
           // Either chunking was explicit or we have no choice
           httpEntity = guaranteeStreamingIfPossible(supportsTransferEncoding, httpResponseHeaderBuilder, payload);
@@ -118,7 +116,7 @@ public class HttpResponseFactory {
         if (hasLength) {
           httpEntity = avoidConsumingPayload(httpResponseHeaderBuilder, payload, body.getLength().get());
         } else {
-          httpEntity = consumePayload(httpResponseHeaderBuilder, payload);
+          httpEntity = consumePayload(httpResponseHeaderBuilder, body);
         }
       }
     } else {
@@ -214,8 +212,8 @@ public class HttpResponseFactory {
   /**
    * Generates a {@link ByteArrayHttpEntity} and makes the content length explicit with it
    */
-  private HttpEntity consumePayload(HttpResponseHeaderBuilder httpResponseHeaderBuilder, Object stream) {
-    ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(IOUtils.toByteArray((InputStream) stream));
+  private HttpEntity consumePayload(HttpResponseHeaderBuilder httpResponseHeaderBuilder, TypedValue stream) {
+    ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(getMessageAsBytes(stream));
     setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getBytes().length);
     return byteArrayHttpEntity;
   }

@@ -12,14 +12,19 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import org.apache.commons.lang3.RandomStringUtils;
@@ -27,6 +32,7 @@ import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.fluent.Response;
+import org.junit.Before;
 import org.junit.Rule;
 
 public abstract class HttpListenerResponseStreamingTestCase extends AbstractHttpTestCase {
@@ -35,6 +41,7 @@ public abstract class HttpListenerResponseStreamingTestCase extends AbstractHttp
 
   public static final String TEST_BODY = RandomStringUtils.randomAlphabetic(100 * 1024);
   public static final String TEST_BODY_MAP = "one=1&two=2";
+  private static InputStreamWrapper testStream;
 
   @Rule
   public SystemProperty stringPayloadLength = new SystemProperty("stringPayloadLength", String.valueOf(TEST_BODY.length()));
@@ -42,6 +49,11 @@ public abstract class HttpListenerResponseStreamingTestCase extends AbstractHttp
   public DynamicPort listenPort = new DynamicPort("port");
 
   protected abstract HttpVersion getHttpVersion();
+
+  @Before
+  public void setUp() {
+    testStream = null;
+  }
 
   @Override
   protected String getConfigFile() {
@@ -86,6 +98,10 @@ public abstract class HttpListenerResponseStreamingTestCase extends AbstractHttp
     assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(expectedBody));
   }
 
+  protected void streamIsClosed() {
+    assertThat(testStream.isClosed(), is(true));
+  }
+
   private HttpResponse verifyIsContentLength(String url, HttpVersion httpVersion) throws IOException {
     final Response response =
         Get(url).version(httpVersion).connectTimeout(DEFAULT_TIMEOUT).socketTimeout(DEFAULT_TIMEOUT).execute();
@@ -110,6 +126,34 @@ public abstract class HttpListenerResponseStreamingTestCase extends AbstractHttp
     final Header contentLengthHeader = httpResponse.getFirstHeader(CONTENT_LENGTH);
     assertThat(contentLengthHeader, nullValue());
     assertThat(transferEncodingHeader, is(nullValue()));
+  }
+
+  public static class InputStreamWrapper extends ByteArrayInputStream {
+
+    boolean closed = false;
+
+    public InputStreamWrapper(byte[] buf) {
+      super(buf);
+    }
+
+    @Override
+    public void close() throws IOException {
+      super.close();
+      closed = true;
+    }
+
+    public boolean isClosed() {
+      return closed;
+    }
+  }
+
+  public static class StreamProcessor implements Processor {
+
+    @Override
+    public CoreEvent process(CoreEvent coreEvent) throws MuleException {
+      testStream = new InputStreamWrapper(TEST_BODY.getBytes());
+      return CoreEvent.builder(coreEvent).message(of(testStream)).build();
+    }
   }
 
 }
