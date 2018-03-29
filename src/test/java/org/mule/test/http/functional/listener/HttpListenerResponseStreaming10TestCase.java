@@ -50,24 +50,28 @@ public class HttpListenerResponseStreaming10TestCase extends HttpListenerRespons
   public void inputStream() throws Exception {
     final String url = getUrl("inputStream");
     testResponseIsNotChunkedEncoding(url, getHttpVersion());
+    streamIsClosed();
   }
 
   @Test
   public void inputStreamWithContentLengthHeader() throws Exception {
     final String url = getUrl("inputStreamWithContentLengthHeader");
     testResponseIsContentLengthEncoding(url, getHttpVersion());
+    streamIsClosed();
   }
 
   @Test
   public void inputStreamWithTransferEncodingHeader() throws Exception {
     final String url = getUrl("inputStreamWithTransferEncodingHeader");
     testResponseIsNotChunkedEncoding(url, getHttpVersion());
+    streamIsClosed();
   }
 
   @Test
   public void inputStreamWithTransferEncodingAndContentLengthHeader() throws Exception {
     final String url = getUrl("inputStreamWithTransferEncodingAndContentLengthHeader");
     testResponseIsContentLengthEncoding(url, getHttpVersion());
+    streamIsClosed();
   }
 
   // NEVER - String
@@ -90,12 +94,14 @@ public class HttpListenerResponseStreaming10TestCase extends HttpListenerRespons
   public void neverInputStream() throws Exception {
     final String url = getUrl("neverInputStream");
     testResponseIsContentLengthEncoding(url, getHttpVersion());
+    streamIsClosed();
   }
 
   @Test
   public void neverInputStreamTransferEncodingHeader() throws Exception {
     final String url = getUrl("neverInputStreamTransferEncodingHeader");
     testResponseIsContentLengthEncoding(url, getHttpVersion());
+    streamIsClosed();
   }
 
   // ALWAYS - String
@@ -124,12 +130,14 @@ public class HttpListenerResponseStreaming10TestCase extends HttpListenerRespons
   public void alwaysInputStream() throws Exception {
     final String url = getUrl("alwaysInputStream");
     testResponseIsNotChunkedEncoding(url, getHttpVersion());
+    streamIsClosed();
   }
 
   @Test
   public void alwaysInputStreamContentLengthHeader() throws Exception {
     final String url = getUrl("alwaysInputStreamContentLengthHeader");
     testResponseIsContentLengthEncoding(url, getHttpVersion());
+    streamIsClosed();
   }
 
   // Map

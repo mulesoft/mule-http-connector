@@ -48,24 +48,28 @@ public class HttpListenerResponseStreaming11TestCase extends HttpListenerRespons
   public void inputStream() throws Exception {
     final String url = getUrl("inputStream");
     testResponseIsChunkedEncoding(url, getHttpVersion());
+    streamIsClosed();
   }
 
   @Test
   public void inputStreamWithContentLengthHeader() throws Exception {
     final String url = getUrl("inputStreamWithContentLengthHeader");
     testResponseIsContentLengthEncoding(url, getHttpVersion());
+    streamIsClosed();
   }
 
   @Test
   public void inputStreamWithTransferEncodingHeader() throws Exception {
     final String url = getUrl("inputStreamWithTransferEncodingHeader");
     testResponseIsChunkedEncoding(url, getHttpVersion());
+    streamIsClosed();
   }
 
   @Test
   public void inputStreamWithTransferEncodingAndContentLengthHeader() throws Exception {
     final String url = getUrl("inputStreamWithTransferEncodingAndContentLengthHeader");
     testResponseIsContentLengthEncoding(url, getHttpVersion());
+    streamIsClosed();
   }
 
   // NEVER - String
@@ -88,12 +92,14 @@ public class HttpListenerResponseStreaming11TestCase extends HttpListenerRespons
   public void neverInputStream() throws Exception {
     final String url = getUrl("neverInputStream");
     testResponseIsContentLengthEncoding(url, getHttpVersion());
+    streamIsClosed();
   }
 
   @Test
   public void neverInputStreamTransferEncodingHeader() throws Exception {
     final String url = getUrl("neverInputStreamTransferEncodingHeader");
     testResponseIsContentLengthEncoding(url, getHttpVersion());
+    streamIsClosed();
   }
 
   // ALWAYS - String
@@ -116,12 +122,14 @@ public class HttpListenerResponseStreaming11TestCase extends HttpListenerRespons
   public void alwaysInputStream() throws Exception {
     final String url = getUrl("alwaysInputStream");
     testResponseIsChunkedEncoding(url, getHttpVersion());
+    streamIsClosed();
   }
 
   @Test
   public void alwaysInputStreamContentLengthHeader() throws Exception {
     final String url = getUrl("alwaysInputStreamContentLengthHeader");
     testResponseIsChunkedEncoding(url, getHttpVersion());
+    streamIsClosed();
   }
 
   // Map
