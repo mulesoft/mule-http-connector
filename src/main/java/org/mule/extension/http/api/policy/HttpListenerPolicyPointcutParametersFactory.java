@@ -7,13 +7,13 @@
 package org.mule.extension.http.api.policy;
 
 import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
-import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.runtime.policy.api.SourcePolicyPointcutParametersFactory;
@@ -36,11 +36,11 @@ public class HttpListenerPolicyPointcutParametersFactory implements SourcePolicy
   @Override
   public <T> PolicyPointcutParameters createPolicyPointcutParameters(Component component,
                                                                      TypedValue<T> attributes) {
-    checkNotNull(component, "Cannot create a policy pointcut parameter instance without a component");
+    requireNonNull(component, "Cannot create a policy pointcut parameter instance without a component");
     checkArgument(attributes.getValue() instanceof HttpRequestAttributes,
                   () -> format("Cannot create a policy pointcut parameter instance from a message which attributes is not an instance of %s, the current attribute instance type is: %s",
                                HttpRequestAttributes.class.getName(),
-                               attributes != null ? attributes.getClass().getName() : "null"));
+                               attributes.getClass().getName()));
 
     HttpRequestAttributes httpRequestAttributes = (HttpRequestAttributes) attributes.getValue();
     return new HttpListenerPolicyPointcutParameters(component, httpRequestAttributes.getRequestPath(),

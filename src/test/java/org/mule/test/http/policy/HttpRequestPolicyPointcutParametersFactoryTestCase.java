@@ -7,27 +7,32 @@
 package org.mule.test.http.policy;
 
 import static java.util.Collections.emptyMap;
+import static java.util.Optional.of;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mule.extension.http.api.policy.HttpRequestPolicyPointcutParametersFactory.PATH_PARAMETER_NAME;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.tck.junit4.matcher.IsEmptyOptional.empty;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.POLICY_SUPPORT;
 
 import org.mule.extension.http.api.policy.HttpRequestPolicyPointcutParameters;
 import org.mule.extension.http.api.policy.HttpRequestPolicyPointcutParametersFactory;
-import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.policy.api.OperationPolicyPointcutParametersParameters;
+import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
+import java.util.Optional;
 
+import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Test;
-import io.qameta.allure.Feature;
 
 @Feature(HTTP_EXTENSION)
 @Story(POLICY_SUPPORT)
@@ -70,6 +75,26 @@ public class HttpRequestPolicyPointcutParametersFactoryTestCase extends Abstract
         (HttpRequestPolicyPointcutParameters) factory.createPolicyPointcutParameters(component, parametersMap);
 
     assertThat(policyPointcutParameters.getComponent(), is(component));
+    assertThat(policyPointcutParameters.getSourceParameters(), empty());
+    assertThat(policyPointcutParameters.getPath(), is(TEST_REQUEST_PATH));
+    assertThat(policyPointcutParameters.getMethod(), is(TEST_METHOD));
+  }
+
+  @Test
+  public void policyPointcutParametersWithSourceParameters() {
+    Component component = mock(Component.class);
+    Map<String, Object> parametersMap =
+        ImmutableMap.<String, Object>builder().put(HttpRequestPolicyPointcutParametersFactory.METHOD_PARAMETER_NAME, TEST_METHOD)
+            .put(PATH_PARAMETER_NAME, TEST_REQUEST_PATH).build();
+    PolicyPointcutParameters sourceParameters = mock(PolicyPointcutParameters.class);
+    OperationPolicyPointcutParametersParameters parameters =
+        new OperationPolicyPointcutParametersParameters(component, parametersMap, sourceParameters);
+
+    HttpRequestPolicyPointcutParameters policyPointcutParameters =
+        (HttpRequestPolicyPointcutParameters) factory.createPolicyPointcutParameters(parameters);
+
+    assertThat(policyPointcutParameters.getComponent(), is(component));
+    assertThat(policyPointcutParameters.getSourceParameters(), is(of(sourceParameters)));
     assertThat(policyPointcutParameters.getPath(), is(TEST_REQUEST_PATH));
     assertThat(policyPointcutParameters.getMethod(), is(TEST_METHOD));
   }

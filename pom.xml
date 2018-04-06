@@ -35,6 +35,10 @@
 
         <muleSocketsConnectorVersion>1.1.1</muleSocketsConnectorVersion>
         <muleCorsKernelVersion>1.1.0</muleCorsKernelVersion>
+
+        <!--TODO: Point to 1.1.2-SNAPSHOT -->
+        <muleHttpPolicyApiVersion>1.2.0-SNAPSHOT</muleHttpPolicyApiVersion>
+        <mulePolicyApiVersion>1.2.0-SNAPSHOT</mulePolicyApiVersion>
     </properties>
 
     <build>
@@ -84,6 +88,18 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-tls</artifactId>
             <version>${mule.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-policy-api</artifactId>
+            <version>${mulePolicyApiVersion}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-http-policy-api</artifactId>
+            <version>${muleHttpPolicyApiVersion}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
