@@ -28,4 +28,17 @@ public class HttpRequestPolicyPointcutParameters extends HttpPolicyPointcutParam
     super(requester, path, method);
   }
 
+  /**
+   * Creates a new {@link PolicyPointcutParameters}
+   *
+   * @param requester the requester where the policy is being applied.
+   * @param sourcePointcutParameters parameters used to match pointcuts of source policies
+   * @param path the target path of the http:request operation.
+   * @param method the HTTP method of the http:request operation.
+   */
+  public HttpRequestPolicyPointcutParameters(Component requester, PolicyPointcutParameters sourcePointcutParameters, String path,
+                                             String method) {
+    super(requester, sourcePointcutParameters, path, method);
+  }
+
 }
