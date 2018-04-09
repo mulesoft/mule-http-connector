@@ -7,11 +7,13 @@
 package org.mule.extension.http.api.policy;
 
 
+import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.runtime.api.util.Preconditions.checkNotNull;
-import org.mule.runtime.api.component.ComponentIdentifier;
+
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.policy.api.OperationPolicyPointcutParametersFactory;
+import org.mule.runtime.policy.api.OperationPolicyPointcutParametersParameters;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 
 import java.util.Map;
@@ -33,12 +35,30 @@ public class HttpRequestPolicyPointcutParametersFactory implements OperationPoli
     return requestIdentifier.equals(operationIdentifier);
   }
 
+  /**
+   * This method is used in Mule versions prior to 4.1.2, so, as long as HTTP connector supports those versions, this
+   * implementation has to remain here
+   */
   @Override
   public PolicyPointcutParameters createPolicyPointcutParameters(Component requester,
                                                                  Map<String, Object> operationParameters) {
-    checkNotNull(requester, "Cannot create a policy pointcut parameter instance without a valid component");
+    requireNonNull(requester, "Cannot create a policy pointcut parameter instance without a valid component");
     String pathParameter = (String) operationParameters.get(PATH_PARAMETER_NAME);
     String methodParameter = (String) operationParameters.get(METHOD_PARAMETER_NAME);
     return new HttpRequestPolicyPointcutParameters(requester, pathParameter, methodParameter);
+  }
+
+  @Override
+  public PolicyPointcutParameters createPolicyPointcutParameters(OperationPolicyPointcutParametersParameters pointcutParametersParameters) {
+    requireNonNull(pointcutParametersParameters.getOperation(),
+                   "Cannot create a policy pointcut parameter instance without a valid component");
+
+    String pathParameter = (String) pointcutParametersParameters.getOperationParameters().get(PATH_PARAMETER_NAME);
+    String methodParameter = (String) pointcutParametersParameters.getOperationParameters().get(METHOD_PARAMETER_NAME);
+
+    return new HttpRequestPolicyPointcutParameters(pointcutParametersParameters.getOperation(),
+                                                   pointcutParametersParameters.getSourceParameters(),
+                                                   pathParameter,
+                                                   methodParameter);
   }
 }
