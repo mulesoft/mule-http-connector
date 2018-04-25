@@ -384,10 +384,8 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
         String muleCorrelationId = headers.get(MULE_CORRELATION_ID_PROPERTY.toLowerCase());
         if (xCorrelationId != null) {
           if (muleCorrelationId != null) {
-            LOGGER.warn("'X-Correlation-ID' and 'MULE_CORRELATION_ID' headers found.");
-            if (!xCorrelationId.equals(muleCorrelationId)) {
-              LOGGER.warn("Correlation values do not match. 'X-Correlation-ID' will be used.");
-            }
+            LOGGER.warn("'X-Correlation-ID: {}' and 'MULE_CORRELATION_ID: {}' headers found. 'X-Correlation-ID' will be used.",
+                        xCorrelationId, muleCorrelationId);
           }
           context.setCorrelationId(xCorrelationId);
         } else if (muleCorrelationId != null) {

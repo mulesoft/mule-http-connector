@@ -16,6 +16,7 @@ import static org.mule.extension.http.api.streaming.HttpStreamingType.AUTO;
 import static org.mule.extension.http.api.streaming.HttpStreamingType.NEVER;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.COOKIE;
@@ -23,7 +24,6 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpHeaders.Names.X_CORRELATION_ID;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
-
 import org.mule.extension.http.api.request.HttpSendBodyMode;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
@@ -41,9 +41,6 @@ import org.mule.runtime.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,6 +49,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Component that generates {@link HttpRequest HttpRequests}.
@@ -111,6 +111,7 @@ public class HttpRequestFactory {
     requestBuilder.getSendCorrelationId()
         .getOutboundCorrelationId(requestBuilder.getCorrelationInfo(), requestBuilder.getCorrelationId())
         .ifPresent(correlationId -> {
+          String xCorrelationId;
           if (builder.getHeaderValue(X_CORRELATION_ID).isPresent()) {
             if (LOGGER.isDebugEnabled()) {
               LOGGER.debug(
@@ -118,9 +119,15 @@ public class HttpRequestFactory {
                                + " was specified both as explicit header and through the standard propagation of the mule "
                                + "correlation ID. The explicit header will prevail.");
             }
+            xCorrelationId = builder.getHeaderValue(X_CORRELATION_ID).get();
           } else {
+            xCorrelationId = correlationId;
             builder.addHeader(X_CORRELATION_ID, correlationId);
           }
+          builder.getHeaderValue(MULE_CORRELATION_ID_PROPERTY)
+              .ifPresent(muleCorrelationId -> LOGGER
+                  .warn("Explicitly configured 'MULE_CORRELATION_ID: {}' header could interfere with 'X-Correlation-ID: {}' header.",
+                        muleCorrelationId, xCorrelationId));
         });
 
     if (config.isEnableCookies()) {
