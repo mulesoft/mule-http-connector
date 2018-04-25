@@ -18,6 +18,7 @@ import static org.mule.extension.http.internal.listener.HttpRequestToResult.tran
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SECURITY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
@@ -364,10 +365,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
           SourceCallbackContext context = sourceCallback.createContext();
           context.addVariable(RESPONSE_CONTEXT, responseContext);
 
-          String correlationId = headers.get(X_CORRELATION_ID.toLowerCase());
-          if (correlationId != null) {
-            context.setCorrelationId(correlationId);
-          }
+          resolveCorrelationId(headers, context);
 
           sourceCallback.handle(result, context);
         } catch (IllegalArgumentException e) {
@@ -378,6 +376,20 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
         } catch (RuntimeException e) {
           LOGGER.warn("Exception occurred processing request:", e);
           sendErrorResponse(INTERNAL_SERVER_ERROR, SERVER_PROBLEM, responseCallback);
+        }
+      }
+
+      private void resolveCorrelationId(MultiMap<String, String> headers, SourceCallbackContext context) {
+        String xCorrelationId = headers.get(X_CORRELATION_ID.toLowerCase());
+        String muleCorrelationId = headers.get(MULE_CORRELATION_ID_PROPERTY.toLowerCase());
+        if (xCorrelationId != null) {
+          if (muleCorrelationId != null) {
+            LOGGER.warn("'X-Correlation-ID: {}' and 'MULE_CORRELATION_ID: {}' headers found. 'X-Correlation-ID' will be used.",
+                        xCorrelationId, muleCorrelationId);
+          }
+          context.setCorrelationId(xCorrelationId);
+        } else if (muleCorrelationId != null) {
+          context.setCorrelationId(muleCorrelationId);
         }
       }
 

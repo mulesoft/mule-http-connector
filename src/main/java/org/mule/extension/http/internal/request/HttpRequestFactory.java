@@ -15,6 +15,7 @@ import static org.mule.extension.http.api.streaming.HttpStreamingType.AUTO;
 import static org.mule.extension.http.api.streaming.HttpStreamingType.NEVER;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.COOKIE;
@@ -117,16 +118,23 @@ public class HttpRequestFactory {
     requestBuilder.getSendCorrelationId()
         .getOutboundCorrelationId(requestBuilder.getCorrelationInfo(), requestBuilder.getCorrelationId())
         .ifPresent(correlationId -> {
-          if (builder.getHeaders().containsKey(X_CORRELATION_ID)) {
+          String xCorrelationId;
+          if (builder.getHeaderValue(X_CORRELATION_ID).isPresent()) {
             if (LOGGER.isDebugEnabled()) {
               LOGGER.debug(
                            X_CORRELATION_ID
                                + " was specified both as explicit header and through the standard propagation of the mule "
                                + "correlation ID. The explicit header will prevail.");
             }
+            xCorrelationId = builder.getHeaderValue(X_CORRELATION_ID).get();
           } else {
+            xCorrelationId = correlationId;
             builder.addHeader(X_CORRELATION_ID, correlationId);
           }
+          builder.getHeaderValue(MULE_CORRELATION_ID_PROPERTY)
+              .ifPresent(muleCorrelationId -> LOGGER
+                  .warn("Explicitly configured 'MULE_CORRELATION_ID: {}' header could interfere with 'X-Correlation-ID: {}' header.",
+                        muleCorrelationId, xCorrelationId));
         });
 
     if (config.isEnableCookies()) {
