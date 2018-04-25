@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:request-config name="requestConfig" basePath="basePath">
+        <http:request-connection host="localhost" port="${httpPort}"/>
+    </http:request-config>
+
+    <http:listener-config name="listenerConfig">
+        <http:listener-connection host="localhost" port="${serverPort}"/>
+    </http:listener-config>
+
+    <flow name="requestFlow">
+        <http:request config-ref="requestConfig" method="POST" path="requestPath"/>
+        <object-to-string-transformer />
+    </flow>
+
+    <flow name="requestFlowWithCustomCorrelationId">
+        <http:request config-ref="requestConfig" method="POST" path="requestPath" correlationId="customCorrelationId"/>
+        <object-to-string-transformer />
+    </flow>
+
+    <flow name="neverSendCorrelationId">
+        <http:request config-ref="requestConfig" method="POST" path="requestPath" sendCorrelationId="NEVER" correlationId="customCorrelationId"/>
+        <object-to-string-transformer />
+    </flow>
+
+    <flow name="clashingCorrelationIds">
+        <http:request config-ref="requestConfig" method="POST" path="requestPath" correlationId="override me">
+            <http:headers>
+                #[{'X-Correlation-ID' : 'customCorrelationId'}]
+            </http:headers>
+        </http:request>
+        <object-to-string-transformer />
+    </flow>
+
+    <flow name="server">
+        <http:listener config-ref="listenerConfig" path="/"/>
+        <http:request config-ref="requestConfig" method="POST" path="requestPath"/>
+    </flow>
+
+</mule>
