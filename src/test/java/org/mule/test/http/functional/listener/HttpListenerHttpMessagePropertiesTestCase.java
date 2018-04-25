@@ -15,6 +15,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
 import static org.mule.runtime.http.api.HttpHeaders.Names.X_CORRELATION_ID;
 import static org.mule.runtime.http.api.HttpHeaders.Names.X_FORWARDED_FOR;
 import static org.mule.runtime.http.api.domain.HttpProtocol.HTTP_1_1;
@@ -241,6 +242,36 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
     assertThat(event.getCorrelationId(), is(myCorrelationId));
     HttpRequestAttributes attributes = getAttributes(event.getMessage());
     assertThat(attributes.getHeaders().get(X_CORRELATION_ID.toLowerCase()), is(myCorrelationId));
+  }
+
+  @Test
+  public void muleCorrelationIdHeader() throws Exception {
+    final String url = String.format("http://localhost:%s/some-path", listenPort.getNumber());
+
+    final String myCorrelationId = "myCorrelationId";
+    Post(url).addHeader(MULE_CORRELATION_ID_PROPERTY, myCorrelationId).connectTimeout(RECEIVE_TIMEOUT).execute();
+    final CoreEvent event = queueHandler.read("out", RECEIVE_TIMEOUT);
+    assertThat(event.getCorrelationId(), is(myCorrelationId));
+    HttpRequestAttributes attributes = getAttributes(event.getMessage());
+    assertThat(attributes.getHeaders().get(MULE_CORRELATION_ID_PROPERTY.toLowerCase()), is(myCorrelationId));
+  }
+
+  @Test
+  public void xOverridesMuleCorrelationIdHeader() throws Exception {
+    final String url = String.format("http://localhost:%s/some-path", listenPort.getNumber());
+
+    final String myCorrelationId = "myCorrelationId";
+    final String myOtherCorrelationId = "myOtherCorrelationId";
+    Post(url)
+        .addHeader(X_CORRELATION_ID, myCorrelationId)
+        .addHeader(MULE_CORRELATION_ID_PROPERTY, myOtherCorrelationId)
+        .connectTimeout(RECEIVE_TIMEOUT)
+        .execute();
+    final CoreEvent event = queueHandler.read("out", RECEIVE_TIMEOUT);
+    assertThat(event.getCorrelationId(), is(myCorrelationId));
+    HttpRequestAttributes attributes = getAttributes(event.getMessage());
+    assertThat(attributes.getHeaders().get(X_CORRELATION_ID.toLowerCase()), is(myCorrelationId));
+    assertThat(attributes.getHeaders().get(MULE_CORRELATION_ID_PROPERTY.toLowerCase()), is(myOtherCorrelationId));
   }
 
   @Test
