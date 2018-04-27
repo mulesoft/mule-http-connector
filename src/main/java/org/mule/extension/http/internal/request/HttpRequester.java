@@ -169,10 +169,9 @@ public class HttpRequester {
   }
 
   private void checkIfRemotelyClosed(Throwable exception, UriParameters uriParameters) {
-    if (HTTPS.getScheme().equals(uriParameters.getScheme())
-        && containsIgnoreCase(exception.getMessage(), REMOTELY_CLOSED)) {
+    if (HTTPS.equals(uriParameters.getScheme()) && containsIgnoreCase(exception.getMessage(), REMOTELY_CLOSED)) {
       logger
-          .error("Remote host closed connection. Possible SSL/TLS handshake issue. Check protocols, cipher suites and certificate set up. Use -Djavax.net.debug=handshake for further debugging.");
+          .error("Remote host closed connection. Possible SSL/TLS handshake issue. Check protocols, cipher suites and certificate set up. Use -Djavax.net.debug=ssl for further debugging.");
     }
   }
 
