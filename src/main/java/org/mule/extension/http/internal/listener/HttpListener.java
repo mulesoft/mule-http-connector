@@ -10,6 +10,7 @@ import static java.lang.Boolean.FALSE;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
+import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 import static org.mule.extension.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.extension.http.api.error.HttpError.BASIC_AUTHENTICATION;
 import static org.mule.extension.http.api.error.HttpError.NOT_FOUND;
@@ -370,13 +371,17 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
           sourceCallback.handle(result, context);
         } catch (IllegalArgumentException e) {
           LOGGER.warn("Exception occurred parsing request:", e);
-          sendErrorResponse(BAD_REQUEST, e.getMessage(), responseCallback);
+          sendErrorResponse(BAD_REQUEST, getEscapedErrorBody(e), responseCallback);
         } catch (InterceptingException e) {
           sendErrorResponse(e, responseCallback);
         } catch (RuntimeException e) {
           LOGGER.warn("Exception occurred processing request:", e);
           sendErrorResponse(INTERNAL_SERVER_ERROR, SERVER_PROBLEM, responseCallback);
         }
+      }
+
+      private String getEscapedErrorBody(Exception e) {
+        return format("HTTP request parsing failed with error: \"%s\"", escapeHtml4(e.getMessage()));
       }
 
       private void resolveCorrelationId(MultiMap<String, String> headers, SourceCallbackContext context) {
