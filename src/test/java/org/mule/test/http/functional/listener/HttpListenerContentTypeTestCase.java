@@ -93,6 +93,12 @@ public class HttpListenerContentTypeTestCase extends AbstractHttpTestCase {
     testRejectContentType(request, "MediaType cannot be parsed: application");
   }
 
+  @Test
+  public void rejectsAndEscapesInvalidContentTypeWithScript() throws Exception {
+    Request request = Request.Post(getUrl()).body(new StringEntity(TEST_MESSAGE, "<script>alert('Hello');</script>", null));
+    testRejectContentType(request, "MediaType cannot be parsed: &lt;script&gt;alert('Hello');&lt;/script&gt;;");
+  }
+
   private void testRejectContentType(Request request, String expectedMessage) throws IOException {
     HttpResponse response = request.execute().returnResponse();
     StatusLine statusLine = response.getStatusLine();
