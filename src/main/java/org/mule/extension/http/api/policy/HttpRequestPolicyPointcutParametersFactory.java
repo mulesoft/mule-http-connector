@@ -13,7 +13,6 @@ import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.policy.api.OperationPolicyPointcutParametersFactory;
-import org.mule.runtime.policy.api.OperationPolicyPointcutParametersParameters;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 
 import java.util.Map;
@@ -49,15 +48,17 @@ public class HttpRequestPolicyPointcutParametersFactory implements OperationPoli
   }
 
   @Override
-  public PolicyPointcutParameters createPolicyPointcutParameters(OperationPolicyPointcutParametersParameters pointcutParametersParameters) {
-    requireNonNull(pointcutParametersParameters.getOperation(),
+  public PolicyPointcutParameters createPolicyPointcutParameters(Component requester,
+                                                                 Map<String, Object> operationParameters,
+                                                                 PolicyPointcutParameters sourceParameters) {
+    requireNonNull(requester,
                    "Cannot create a policy pointcut parameter instance without a valid component");
 
-    String pathParameter = (String) pointcutParametersParameters.getOperationParameters().get(PATH_PARAMETER_NAME);
-    String methodParameter = (String) pointcutParametersParameters.getOperationParameters().get(METHOD_PARAMETER_NAME);
+    String pathParameter = (String) operationParameters.get(PATH_PARAMETER_NAME);
+    String methodParameter = (String) operationParameters.get(METHOD_PARAMETER_NAME);
 
-    return new HttpRequestPolicyPointcutParameters(pointcutParametersParameters.getOperation(),
-                                                   pointcutParametersParameters.getSourceParameters(),
+    return new HttpRequestPolicyPointcutParameters(requester,
+                                                   sourceParameters,
                                                    pathParameter,
                                                    methodParameter);
   }
