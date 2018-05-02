@@ -21,14 +21,12 @@ import org.mule.extension.http.api.policy.HttpRequestPolicyPointcutParameters;
 import org.mule.extension.http.api.policy.HttpRequestPolicyPointcutParametersFactory;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.policy.api.OperationPolicyPointcutParametersParameters;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
-import java.util.Optional;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -87,11 +85,9 @@ public class HttpRequestPolicyPointcutParametersFactoryTestCase extends Abstract
         ImmutableMap.<String, Object>builder().put(HttpRequestPolicyPointcutParametersFactory.METHOD_PARAMETER_NAME, TEST_METHOD)
             .put(PATH_PARAMETER_NAME, TEST_REQUEST_PATH).build();
     PolicyPointcutParameters sourceParameters = mock(PolicyPointcutParameters.class);
-    OperationPolicyPointcutParametersParameters parameters =
-        new OperationPolicyPointcutParametersParameters(component, parametersMap, sourceParameters);
 
     HttpRequestPolicyPointcutParameters policyPointcutParameters =
-        (HttpRequestPolicyPointcutParameters) factory.createPolicyPointcutParameters(parameters);
+        (HttpRequestPolicyPointcutParameters) factory.createPolicyPointcutParameters(component, parametersMap, sourceParameters);
 
     assertThat(policyPointcutParameters.getComponent(), is(component));
     assertThat(policyPointcutParameters.getSourceParameters(), is(of(sourceParameters)));
