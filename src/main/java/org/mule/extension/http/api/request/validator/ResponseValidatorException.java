@@ -23,12 +23,22 @@ import java.io.InputStream;
  */
 public class ResponseValidatorException extends MuleRuntimeException implements ErrorMessageAwareException {
 
+  private static final long serialVersionUID = -4959265341679865838L;
+
   Message errorMessage;
 
   public ResponseValidatorException(String message) {
     super(createStaticMessage(message));
   }
 
+  /**
+   * Creates a new exception, based in the rejected {@link Result}.
+   *
+   * @param message exception message
+   * @param result the rejected data
+   * @deprecated use {@link #ResponseValidatorException(String, Message)} instead.
+   */
+  @Deprecated
   public ResponseValidatorException(String message, Result<InputStream, HttpResponseAttributes> result) {
     this(message);
     this.errorMessage = Message.builder()
@@ -36,6 +46,17 @@ public class ResponseValidatorException extends MuleRuntimeException implements 
         .attributesValue(result.getAttributes().get())
         .mediaType(result.getMediaType().orElse(ANY))
         .build();
+  }
+
+  /**
+   * Creates a new exception with the provided {@link Message}.
+   *
+   * @param message exception message
+   * @param errorMessage the rejected data as a {@link Message}
+   */
+  public ResponseValidatorException(String message, Message errorMessage) {
+    this(message);
+    this.errorMessage = errorMessage;
   }
 
   @Override

@@ -140,6 +140,13 @@ public class HttpRequestErrorHandlingTestCase extends AbstractHttpRequestTestCas
 
   }
 
+  @Test
+  public void errorPayloadStreamIsManaged() throws Exception {
+    serverStatus = NOT_FOUND.getStatusCode();
+    assertThat(getFlowRunner("streaming", httpPort.getNumber()).keepStreamsOpen().run().getMessage(),
+               hasPayload(equalTo(DEFAULT_RESPONSE)));
+  }
+
   private String getErrorMessage(String customMessage, DynamicPort port) {
     return format("HTTP GET on resource 'http://localhost:%s/testPath' failed%s.", port.getValue(), customMessage);
   }

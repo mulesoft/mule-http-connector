@@ -12,7 +12,6 @@ import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST;
 import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.encodeSpaces;
-
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.api.request.client.UriParameters;
@@ -43,6 +42,7 @@ import org.mule.runtime.extension.api.notification.NotificationEmitter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
+import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.http.api.HttpConstants;
 
 import java.io.InputStream;
@@ -95,6 +95,7 @@ public class HttpRequestOperations implements Initialisable, Disposable {
                       @Config HttpRequesterConfig config,
                       CorrelationInfo correlationInfo,
                       NotificationEmitter notificationEmitter,
+                      StreamingHelper streamingHelper,
                       CompletionCallback<InputStream, HttpResponseAttributes> callback) {
     try {
       HttpRequesterRequestBuilder resolvedBuilder = requestBuilder != null ? requestBuilder : DEFAULT_REQUEST_BUILDER;
@@ -116,7 +117,8 @@ public class HttpRequestOperations implements Initialisable, Disposable {
 
       REQUESTER.doRequest(client, config, resolvedUri, method, overrides.getRequestStreamingMode(), overrides.getSendBodyMode(),
                           overrides.getFollowRedirects(), client.getDefaultAuthentication(), resolvedTimeout, responseValidator,
-                          transformationService, resolvedBuilder, true, muleContext, scheduler, notificationEmitter, callback);
+                          transformationService, resolvedBuilder, true, muleContext, scheduler, notificationEmitter,
+                          streamingHelper, callback);
     } catch (Throwable t) {
       callback.error(t instanceof Exception ? (Exception) t : new DefaultMuleException(t));
     }

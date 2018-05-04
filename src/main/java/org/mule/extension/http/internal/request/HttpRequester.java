@@ -44,6 +44,7 @@ import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.notification.NotificationEmitter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
+import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 
@@ -75,10 +76,10 @@ public class HttpRequester {
                         int responseTimeout, ResponseValidator responseValidator,
                         TransformationService transformationService, HttpRequesterRequestBuilder requestBuilder,
                         boolean checkRetry, MuleContext muleContext, Scheduler scheduler, NotificationEmitter notificationEmitter,
-                        CompletionCallback<InputStream, HttpResponseAttributes> callback) {
+                        StreamingHelper streamingHelper, CompletionCallback<InputStream, HttpResponseAttributes> callback) {
     doRequestWithRetry(client, config, uri, method, streamingMode, sendBodyMode, followRedirects, authentication, responseTimeout,
                        responseValidator, transformationService, requestBuilder, checkRetry, muleContext, scheduler,
-                       notificationEmitter, callback,
+                       notificationEmitter, streamingHelper, callback,
                        EVENT_TO_HTTP_REQUEST.create(config, uri, method, streamingMode, sendBodyMode, transformationService,
                                                     requestBuilder, authentication),
                        RETRY_ATTEMPTS);
@@ -91,6 +92,7 @@ public class HttpRequester {
                                   TransformationService transformationService, HttpRequesterRequestBuilder requestBuilder,
                                   boolean checkRetry, MuleContext muleContext, Scheduler scheduler,
                                   NotificationEmitter notificationEmitter,
+                                  StreamingHelper streamingHelper,
                                   CompletionCallback<InputStream, HttpResponseAttributes> callback, HttpRequest httpRequest,
                                   int retryCount) {
     notificationEmitter.fire(REQUEST_START, of(HttpRequestNotificationData.from(httpRequest)));
@@ -107,9 +109,10 @@ public class HttpRequester {
                                       scheduler.submit(() -> consumePayload(result));
                                       doRequest(client, config, uri, method, streamingMode, sendBodyMode, followRedirects,
                                                 authentication, responseTimeout, responseValidator, transformationService,
-                                                requestBuilder, false, muleContext, scheduler, notificationEmitter, callback);
+                                                requestBuilder, false, muleContext, scheduler, notificationEmitter,
+                                                streamingHelper, callback);
                                     } else {
-                                      responseValidator.validate(result, httpRequest);
+                                      responseValidator.validate(result, httpRequest, streamingHelper);
                                       callback.success(result);
                                     }
                                   } catch (Exception e) {
@@ -127,7 +130,8 @@ public class HttpRequester {
                           if (shouldRetryRemotelyClosed(exception, retryCount, httpRequest.getMethod())) {
                             doRequestWithRetry(client, config, uri, method, streamingMode, sendBodyMode, followRedirects,
                                                authentication, responseTimeout, responseValidator, transformationService,
-                                               requestBuilder, checkRetry, muleContext, scheduler, notificationEmitter, callback,
+                                               requestBuilder, checkRetry, muleContext, scheduler, notificationEmitter,
+                                               streamingHelper, callback,
                                                httpRequest, retryCount - 1);
                             return;
                           }

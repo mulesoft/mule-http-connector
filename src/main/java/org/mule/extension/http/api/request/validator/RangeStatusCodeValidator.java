@@ -8,17 +8,17 @@ package org.mule.extension.http.api.request.validator;
 
 import static java.lang.Integer.parseInt;
 import static org.mule.extension.http.api.error.HttpError.getErrorByCode;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.util.ClassUtils.memoize;
-
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.extension.http.api.error.HttpError;
 import org.mule.extension.http.api.error.HttpErrorMessageGenerator;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 
 import java.io.InputStream;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
@@ -79,16 +79,42 @@ public abstract class RangeStatusCodeValidator implements ResponseValidator {
    * @param result the result of the request operation
    * @param request the HTTP request sent
    * @param status the HTTP response status code
-   * @return
    * @throws ResponseValidatorTypedException
+   * @throws ResponseValidatorException
    */
   protected void throwValidationException(Result<InputStream, HttpResponseAttributes> result, HttpRequest request, int status) {
-    Optional<HttpError> error = getErrorByCode(status);
-    if (error.isPresent()) {
-      throw new ResponseValidatorTypedException(errorMessageGenerator.createFrom(request, status), error.get(), result);
-    } else {
-      throw new ResponseValidatorException(errorMessageGenerator.createFrom(request, status), result);
-    }
+    getErrorByCode(status)
+        .map(error -> {
+          throw new ResponseValidatorTypedException(errorMessageGenerator.createFrom(request, status), error, result);
+        })
+        .orElseThrow(
+                     () -> new ResponseValidatorException(errorMessageGenerator.createFrom(request, status), result));
+  }
+
+  /**
+   * Creates the exception to be thrown if the validation didn't pass.
+   *
+   * @param message the message for the exception
+   * @param request the HTTP request sent
+   * @param status the HTTP response status code
+   * @throws ResponseValidatorTypedException
+   * @throws ResponseValidatorException
+   */
+  protected void throwValidationException(Message message, HttpRequest request, int status) {
+    getErrorByCode(status)
+        .map(error -> {
+          throw new ResponseValidatorTypedException(errorMessageGenerator.createFrom(request, status), error, message);
+        })
+        .orElseThrow(
+                     () -> new ResponseValidatorException(errorMessageGenerator.createFrom(request, status), message));
+  }
+
+  protected Message toMessage(Result<InputStream, HttpResponseAttributes> result, StreamingHelper streamingHelper) {
+    return Message.builder()
+        .value(streamingHelper.resolveCursorProvider(result.getOutput()))
+        .attributesValue(result.getAttributes().get())
+        .mediaType(result.getMediaType().orElse(ANY))
+        .build();
   }
 
 }
