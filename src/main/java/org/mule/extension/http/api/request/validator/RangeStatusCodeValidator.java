@@ -80,6 +80,7 @@ public abstract class RangeStatusCodeValidator implements ResponseValidator {
    * @param request the HTTP request sent
    * @param status the HTTP response status code
    * @throws ResponseValidatorTypedException
+   * @throws ResponseValidatorException
    */
   protected void throwValidationException(Result<InputStream, HttpResponseAttributes> result, HttpRequest request, int status) {
     getErrorByCode(status)
@@ -97,6 +98,7 @@ public abstract class RangeStatusCodeValidator implements ResponseValidator {
    * @param request the HTTP request sent
    * @param status the HTTP response status code
    * @throws ResponseValidatorTypedException
+   * @throws ResponseValidatorException
    */
   protected void throwValidationException(Message message, HttpRequest request, int status) {
     getErrorByCode(status)
