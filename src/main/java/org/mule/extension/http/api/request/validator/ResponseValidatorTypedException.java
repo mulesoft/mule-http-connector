@@ -23,12 +23,22 @@ import java.io.InputStream;
  */
 public class ResponseValidatorTypedException extends ModuleException implements ErrorMessageAwareException {
 
+  private static final long serialVersionUID = -1610352261673523461L;
+
   Message errorMessage;
 
   public ResponseValidatorTypedException(String message, HttpError error) {
     super(message, error);
   }
 
+  /**
+   *
+   * @param message the exception message
+   * @param error the {@link HttpError} to raise
+   * @param result the rejected data
+   * @deprecated use {{@link #ResponseValidatorTypedException(String, HttpError, Message)}} instead
+   */
+  @Deprecated
   public ResponseValidatorTypedException(String message, HttpError error, Result<InputStream, HttpResponseAttributes> result) {
     this(message, error);
     this.errorMessage = Message.builder()
@@ -36,6 +46,17 @@ public class ResponseValidatorTypedException extends ModuleException implements 
         .attributesValue(result.getAttributes().get())
         .mediaType(result.getMediaType().orElse(ANY))
         .build();
+  }
+
+  /**
+   *
+   * @param message the exception message
+   * @param error the {@link HttpError} to raise
+   * @param errorMessage
+   */
+  public ResponseValidatorTypedException(String message, HttpError error, Message errorMessage) {
+    this(message, error);
+    this.errorMessage = errorMessage;
   }
 
   @Override
