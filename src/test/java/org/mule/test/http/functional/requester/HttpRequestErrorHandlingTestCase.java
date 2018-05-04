@@ -142,7 +142,7 @@ public class HttpRequestErrorHandlingTestCase extends AbstractHttpRequestTestCas
 
   @Test
   public void errorPayloadStreamIsManaged() throws Exception {
-    serverStatus = 404;
+    serverStatus = NOT_FOUND.getStatusCode();
     assertThat(getFlowRunner("streaming", httpPort.getNumber()).keepStreamsOpen().run().getMessage(),
                hasPayload(equalTo(DEFAULT_RESPONSE)));
   }

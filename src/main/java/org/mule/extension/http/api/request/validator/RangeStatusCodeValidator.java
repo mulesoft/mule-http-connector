@@ -11,7 +11,6 @@ import static org.mule.extension.http.api.error.HttpError.getErrorByCode;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.util.ClassUtils.memoize;
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.extension.http.api.error.HttpError;
 import org.mule.extension.http.api.error.HttpErrorMessageGenerator;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -20,7 +19,6 @@ import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 
 import java.io.InputStream;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
@@ -84,12 +82,12 @@ public abstract class RangeStatusCodeValidator implements ResponseValidator {
    * @throws ResponseValidatorTypedException
    */
   protected void throwValidationException(Result<InputStream, HttpResponseAttributes> result, HttpRequest request, int status) {
-    Optional<HttpError> error = getErrorByCode(status);
-    if (error.isPresent()) {
-      throw new ResponseValidatorTypedException(errorMessageGenerator.createFrom(request, status), error.get(), result);
-    } else {
-      throw new ResponseValidatorException(errorMessageGenerator.createFrom(request, status), result);
-    }
+    getErrorByCode(status)
+        .map(error -> {
+          throw new ResponseValidatorTypedException(errorMessageGenerator.createFrom(request, status), error, result);
+        })
+        .orElseThrow(
+                     () -> new ResponseValidatorException(errorMessageGenerator.createFrom(request, status), result));
   }
 
   /**
@@ -101,12 +99,12 @@ public abstract class RangeStatusCodeValidator implements ResponseValidator {
    * @throws ResponseValidatorTypedException
    */
   protected void throwValidationException(Message message, HttpRequest request, int status) {
-    Optional<HttpError> error = getErrorByCode(status);
-    if (error.isPresent()) {
-      throw new ResponseValidatorTypedException(errorMessageGenerator.createFrom(request, status), error.get(), message);
-    } else {
-      throw new ResponseValidatorException(errorMessageGenerator.createFrom(request, status), message);
-    }
+    getErrorByCode(status)
+        .map(error -> {
+          throw new ResponseValidatorTypedException(errorMessageGenerator.createFrom(request, status), error, message);
+        })
+        .orElseThrow(
+                     () -> new ResponseValidatorException(errorMessageGenerator.createFrom(request, status), message));
   }
 
   protected Message toMessage(Result<InputStream, HttpResponseAttributes> result, StreamingHelper streamingHelper) {
