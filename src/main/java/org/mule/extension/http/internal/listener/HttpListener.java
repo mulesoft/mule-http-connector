@@ -38,6 +38,7 @@ import org.mule.extension.http.api.listener.builder.HttpListenerErrorResponseBui
 import org.mule.extension.http.api.listener.builder.HttpListenerSuccessResponseBuilder;
 import org.mule.extension.http.api.listener.server.HttpListenerConfig;
 import org.mule.extension.http.api.streaming.HttpStreamingType;
+import org.mule.extension.http.internal.HttpMetadataResolver;
 import org.mule.extension.http.internal.listener.intercepting.InterceptingException;
 import org.mule.extension.http.internal.listener.server.ModuleRequestHandler;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -61,6 +62,7 @@ import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
 import org.mule.runtime.extension.api.annotation.execution.OnTerminate;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
@@ -112,6 +114,7 @@ import org.slf4j.Logger;
 @Streaming
 @MediaType(value = ANY, strict = false)
 @BackPressure(defaultMode = BackPressureMode.FAIL, supportedModes = {BackPressureMode.FAIL})
+@MetadataScope(outputResolver = HttpMetadataResolver.class)
 public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
 
   private static final String RESPONSE_SEND_ATTEMPT = "responseSendAttempt";
