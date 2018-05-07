@@ -11,6 +11,8 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.mule.runtime.api.component.location.Location.builder;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.METADATA;
+
+import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.BinaryType;
 import org.mule.runtime.api.meta.model.OutputModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -46,7 +48,7 @@ public class HttpMetadataResolverTestCase extends AbstractHttpTestCase {
         service.getOperationMetadata(builder().globalName("client").addProcessorsPart().addIndexPart(0).build());
     assertThat(result.isSuccess(), is(true));
     OutputModel request = result.get().getModel().getOutput();
-    assertThat(request.getType(), is(instanceOf(BinaryType.class)));
+    assertThat(request.getType(), is(instanceOf(AnyType.class)));
   }
 
   @Test
@@ -54,7 +56,7 @@ public class HttpMetadataResolverTestCase extends AbstractHttpTestCase {
     MetadataResult<ComponentMetadataDescriptor<SourceModel>> server =
         service.getSourceMetadata(builder().globalName("server").addSourcePart().build());
     assertThat(server.isSuccess(), is(true));
-    assertThat(server.get().getModel().getOutput().getType(), is(instanceOf(BinaryType.class)));
+    assertThat(server.get().getModel().getOutput().getType(), is(instanceOf(AnyType.class)));
   }
 
 }
