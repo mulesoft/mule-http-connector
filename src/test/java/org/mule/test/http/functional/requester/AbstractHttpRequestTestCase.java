@@ -7,6 +7,7 @@
 package org.mule.test.http.functional.requester;
 
 import static com.google.common.collect.Multimaps.newMultimap;
+
 import org.mule.runtime.api.util.CaseInsensitiveMapWrapper;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.api.util.IOUtils;
@@ -43,13 +44,13 @@ public abstract class AbstractHttpRequestTestCase extends AbstractHttpTestCase {
 
   public static final String DEFAULT_RESPONSE = "<h1>Response</h1>";
 
-  protected Server server;
+  protected volatile Server server;
 
-  protected String method;
-  protected String uri;
-  protected Multimap<String, String> headers = newMultimap(new CaseInsensitiveMapWrapper<>(), Sets::newHashSet);
+  protected volatile String method;
+  protected volatile String uri;
+  protected volatile Multimap<String, String> headers = newMultimap(new CaseInsensitiveMapWrapper<>(), Sets::newHashSet);
 
-  protected String body;
+  protected volatile String body;
 
   @Before
   public void startServer() throws Exception {
