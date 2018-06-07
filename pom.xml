@@ -31,7 +31,7 @@
 
         <commonsLangVersion>3.6</commonsLangVersion>
         <commonsIoVersion>2.4</commonsIoVersion>
-        <guavaVersion>23.5-jre</guavaVersion>
+        <guavaVersion>25.1-jre</guavaVersion>
         <formatterConfigPath>formatter.xml</formatterConfigPath>
 
         <muleSocketsConnectorVersion>1.1.1</muleSocketsConnectorVersion>
