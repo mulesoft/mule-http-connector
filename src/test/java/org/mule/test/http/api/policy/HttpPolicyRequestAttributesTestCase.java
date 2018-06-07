@@ -18,7 +18,7 @@ import java.util.HashMap;
 
 import org.junit.Test;
 
-public class HttpPolicyRequestAttributesTestCae extends AbstractMuleTestCase {
+public class HttpPolicyRequestAttributesTestCase extends AbstractMuleTestCase {
 
   private static final String TO_STRING_COMPLETE = "org.mule.extension.http.api.policy.HttpPolicyRequestAttributes\n" +
       "{\n" +
