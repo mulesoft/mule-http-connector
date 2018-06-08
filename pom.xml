@@ -29,7 +29,7 @@
         <projectReactorVersion>3.2.0.M1</projectReactorVersion>
 
         <commonsLangVersion>3.7</commonsLangVersion>
-        <commonsIoVersion>2.4</commonsIoVersion>
+        <commonsIoVersion>2.6</commonsIoVersion>
         <guavaVersion>25.1-jre</guavaVersion>
         <formatterConfigPath>formatter.xml</formatterConfigPath>
 
