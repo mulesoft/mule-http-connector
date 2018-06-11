@@ -19,7 +19,7 @@
     <description>A Mule extension that provides HTTP server and client functionality</description>
 
     <properties>
-        <commonsCodecVersion>1.9</commonsCodecVersion>
+        <commonsCodecVersion>1.11</commonsCodecVersion>
         <commonsCollectionsVersion>3.2.2</commonsCollectionsVersion>
         <fluentHcVersion>4.5.2</fluentHcVersion>
         <grizzlyVersion>2.3.35</grizzlyVersion>
