@@ -50,9 +50,18 @@ public abstract class HttpAttributes implements Serializable {
     StringBuilder builder = new StringBuilder();
     builder.append(TAB).append(name).append("=[").append(lineSeparator());
     stream.forEach(element -> builder.append(DOUBLE_TAB)
-        .append(element.getKey()).append("=").append(element.getValue()).append(lineSeparator()));
+        .append(element.getKey()).append("=").append(obfuscateValueIfNecessary(element)).append(lineSeparator()));
     builder.append(TAB).append("]").append(lineSeparator());
     return builder.toString();
+  }
+
+  private static String obfuscateValueIfNecessary(Map.Entry<String, String> entry) {
+    String key = entry.getKey();
+    if (key.equals("password") || key.equals("pass") || key.contains("secret")) {
+      return "****";
+    } else {
+      return entry.getValue();
+    }
   }
 
   public static StringBuilder buildMapToString(Map map, String name, Stream stream, StringBuilder builder) {

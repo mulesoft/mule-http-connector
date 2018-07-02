@@ -9,24 +9,22 @@ package org.mule.test.http.api;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
-
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.util.MultiMap;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import io.qameta.allure.Feature;
 import org.junit.Test;
 
 @Feature(HTTP_EXTENSION)
-public class HttpResponseAttributesTestCase extends AbstractMuleTestCase {
+public class HttpResponseAttributesTestCase extends AbstractHttpAttributesTestCase {
 
   private static final String COMPLETE_TO_STRING = "org.mule.extension.http.api.HttpResponseAttributes\n" +
       "{\n" +
       "   Status Code=401\n" +
       "   Reason Phrase=Some Reason Phrase\n" +
       "   Headers=[\n" +
-      "      header2=value2\n" +
-      "      header1=value1\n" +
+      "      header2=headerValue2\n" +
+      "      header1=headerValue1\n" +
       "   ]\n" +
       "}";
 
@@ -42,8 +40,20 @@ public class HttpResponseAttributesTestCase extends AbstractMuleTestCase {
       "   Status Code=401\n" +
       "   Reason Phrase=null\n" +
       "   Headers=[\n" +
-      "      header2=value2\n" +
-      "      header1=value1\n" +
+      "      header2=headerValue2\n" +
+      "      header1=headerValue1\n" +
+      "   ]\n" +
+      "}";
+
+  private static final String OBFUSCATED_TO_STRING = "org.mule.extension.http.api.HttpResponseAttributes\n" +
+      "{\n" +
+      "   Status Code=401\n" +
+      "   Reason Phrase=Unauthorised\n" +
+      "   Headers=[\n" +
+      "      password=****\n" +
+      "      pass=****\n" +
+      "      client_secret=****\n" +
+      "      regular=show me\n" +
       "   ]\n" +
       "}";
 
@@ -51,29 +61,30 @@ public class HttpResponseAttributesTestCase extends AbstractMuleTestCase {
 
   @Test
   public void completeToString() {
-    responseAttributes = new HttpResponseAttributes(401, "Some Reason Phrase", getHeadersToResponseAttributes());
+    responseAttributes = new HttpResponseAttributes(401, "Some Reason Phrase", getHeaders());
 
-    assertThat(COMPLETE_TO_STRING, is(responseAttributes.toString()));
+    assertThat(responseAttributes.toString(), is(COMPLETE_TO_STRING));
   }
 
   @Test
   public void toStringWithoutHeaders() {
     responseAttributes = new HttpResponseAttributes(401, "Some Reason Phrase", new MultiMap<>());
 
-    assertThat(TO_STRING_WITHOUT_HEADERS, is(responseAttributes.toString()));
+    assertThat(responseAttributes.toString(), is(TO_STRING_WITHOUT_HEADERS));
   }
 
   @Test
-  public void toStringWithoutReasonPrhase() {
-    responseAttributes = new HttpResponseAttributes(401, null, getHeadersToResponseAttributes());
+  public void toStringWithoutReasonPhrase() {
+    responseAttributes = new HttpResponseAttributes(401, null, getHeaders());
 
-    assertThat(TO_STRING_WITHOUT_REASON_PHRASE, is(responseAttributes.toString()));
+    assertThat(responseAttributes.toString(), is(TO_STRING_WITHOUT_REASON_PHRASE));
   }
 
-  private MultiMap<String, String> getHeadersToResponseAttributes() {
-    MultiMap<String, String> headers = new MultiMap<>();
-    headers.put("header1", "value1");
-    headers.put("header2", "value2");
-    return headers;
+  @Test
+  public void sensitiveContentIsHidden() {
+    responseAttributes = new HttpResponseAttributes(401, "Unauthorised", prepareSensitiveDataMap(new MultiMap<>()));
+
+    assertThat(responseAttributes.toString(), is(OBFUSCATED_TO_STRING));
   }
+
 }
