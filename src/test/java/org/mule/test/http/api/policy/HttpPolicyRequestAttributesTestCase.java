@@ -8,32 +8,31 @@ package org.mule.test.http.api.policy;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-
 import org.mule.extension.http.api.policy.HttpPolicyRequestAttributes;
 import org.mule.runtime.api.util.MultiMap;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.test.http.api.AbstractHttpAttributesTestCase;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
 import org.junit.Test;
 
-public class HttpPolicyRequestAttributesTestCae extends AbstractMuleTestCase {
+public class HttpPolicyRequestAttributesTestCase extends AbstractHttpAttributesTestCase {
 
   private static final String TO_STRING_COMPLETE = "org.mule.extension.http.api.policy.HttpPolicyRequestAttributes\n" +
       "{\n" +
       "   Request path=/request/path\n" +
       "   Headers=[\n" +
-      "      header2=header2\n" +
-      "      header1=header1\n" +
+      "      header2=headerValue2\n" +
+      "      header1=headerValue1\n" +
       "   ]\n" +
       "   Query Parameters=[\n" +
-      "      queryParam1=queryParam1\n" +
-      "      queryParam2=queryParam2\n" +
+      "      queryParam1=queryParamValue1\n" +
+      "      queryParam2=queryParamValue2\n" +
       "   ]\n" +
       "   URI Parameters=[\n" +
-      "      uriParam1=uriParam1\n" +
-      "      uriParam2=uriParam2\n" +
+      "      uriParam1=uriParamValue1\n" +
+      "      uriParam2=uriParamValue2\n" +
       "   ]\n" +
       "}";
 
@@ -50,8 +49,8 @@ public class HttpPolicyRequestAttributesTestCae extends AbstractMuleTestCase {
       "   Request path=null\n" +
       "   Headers=[]\n" +
       "   Query Parameters=[\n" +
-      "      queryParam1=queryParam1\n" +
-      "      queryParam2=queryParam2\n" +
+      "      queryParam1=queryParamValue1\n" +
+      "      queryParam2=queryParamValue2\n" +
       "   ]\n" +
       "   URI Parameters=[]\n" +
       "}";
@@ -62,8 +61,31 @@ public class HttpPolicyRequestAttributesTestCae extends AbstractMuleTestCase {
       "   Headers=[]\n" +
       "   Query Parameters=[]\n" +
       "   URI Parameters=[\n" +
-      "      uriParam1=uriParam1\n" +
-      "      uriParam2=uriParam2\n" +
+      "      uriParam1=uriParamValue1\n" +
+      "      uriParam2=uriParamValue2\n" +
+      "   ]\n" +
+      "}";
+
+  private static final String TO_STRING_OBFUSCATED = "org.mule.extension.http.api.policy.HttpPolicyRequestAttributes\n" +
+      "{\n" +
+      "   Request path=/request/path\n" +
+      "   Headers=[\n" +
+      "      password=****\n" +
+      "      pass=****\n" +
+      "      client_secret=****\n" +
+      "      regular=show me\n" +
+      "   ]\n" +
+      "   Query Parameters=[\n" +
+      "      password=****\n" +
+      "      pass=****\n" +
+      "      client_secret=****\n" +
+      "      regular=show me\n" +
+      "   ]\n" +
+      "   URI Parameters=[\n" +
+      "      password=****\n" +
+      "      pass=****\n" +
+      "      client_secret=****\n" +
+      "      regular=show me\n" +
       "   ]\n" +
       "}";
 
@@ -93,24 +115,12 @@ public class HttpPolicyRequestAttributesTestCae extends AbstractMuleTestCase {
     assertThat(TO_STRING_URI_PARAMS, is(requestAttributes.toString()));
   }
 
-  private MultiMap<String, String> getHeaders() {
-    MultiMap headers = new MultiMap();
-    headers.put("header1", "header1");
-    headers.put("header2", "header2");
-    return headers;
+  @Test
+  public void sensitiveContentIsHidden() throws IllegalAccessException, InvocationTargetException, InstantiationException {
+    MultiMap<String, String> sensitiveDataMultiMap = prepareSensitiveDataMap(new MultiMap<>());
+    requestAttributes = new HttpPolicyRequestAttributes(sensitiveDataMultiMap, sensitiveDataMultiMap,
+                                                        prepareSensitiveDataMap(new HashMap<>()), "/request/path");
+    assertThat(TO_STRING_OBFUSCATED, is(requestAttributes.toString()));
   }
 
-  private MultiMap<String, String> getQueryParams() {
-    MultiMap queryParams = new MultiMap();
-    queryParams.put("queryParam1", "queryParam1");
-    queryParams.put("queryParam2", "queryParam2");
-    return queryParams;
-  }
-
-  private MultiMap<String, String> getUriParams() {
-    MultiMap uriParams = new MultiMap();
-    uriParams.put("uriParam1", "uriParam1");
-    uriParams.put("uriParam2", "uriParam2");
-    return uriParams;
-  }
 }

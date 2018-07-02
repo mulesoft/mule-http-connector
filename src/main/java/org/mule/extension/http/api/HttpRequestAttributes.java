@@ -160,7 +160,7 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
         .append(TAB).append("Method=").append(method).append(lineSeparator())
         .append(TAB).append("Listener path=").append(this.listenerPath).append(lineSeparator())
         .append(TAB).append("Local Address=").append(localAddress).append(lineSeparator())
-        .append(TAB).append("Query String=").append(this.queryString).append(lineSeparator())
+        .append(TAB).append("Query String=").append(obfuscateQueryIfNecessary()).append(lineSeparator())
         .append(TAB).append("Relative Path=").append(this.relativePath).append(lineSeparator())
         .append(TAB).append("Remote Address=").append(this.remoteAddress).append(lineSeparator())
         .append(TAB).append("Request Uri=").append(this.requestUri).append(lineSeparator())
@@ -174,5 +174,12 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
     builder.append("}");
 
     return builder.toString();
+  }
+
+  private String obfuscateQueryIfNecessary() {
+    if (queryParams.keySet().stream().anyMatch(key -> key.equals("pass") || key.equals("password") || key.contains("secret"))) {
+      return "****";
+    }
+    return this.queryString;
   }
 }
