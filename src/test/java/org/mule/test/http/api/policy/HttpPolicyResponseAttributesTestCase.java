@@ -8,23 +8,22 @@ package org.mule.test.http.api.policy;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-
 import org.mule.extension.http.api.policy.HttpPolicyResponseAttributes;
 import org.mule.runtime.api.util.MultiMap;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.test.http.api.AbstractHttpAttributesTestCase;
 
 import org.junit.Before;
 import org.junit.Test;
 
-public class HttpPolicyResponseAttributesTestCase extends AbstractMuleTestCase {
+public class HttpPolicyResponseAttributesTestCase extends AbstractHttpAttributesTestCase {
 
   private static final String COMPLETE_TO_STRING = "org.mule.extension.http.api.policy.HttpPolicyResponseAttributes\n" +
       "{\n" +
       "   Status Code=401\n" +
       "   Reason Phrase=Some Reason Phrase\n" +
       "   Headers=[\n" +
-      "      header1=value1\n" +
-      "      header2=value2\n" +
+      "      header1=headerValue1\n" +
+      "      header2=headerValue2\n" +
       "   ]\n" +
       "}";
 
@@ -34,8 +33,8 @@ public class HttpPolicyResponseAttributesTestCase extends AbstractMuleTestCase {
           "   Status Code=null\n" +
           "   Reason Phrase=Some Reason Phrase\n" +
           "   Headers=[\n" +
-          "      header1=value1\n" +
-          "      header2=value2\n" +
+          "      header1=headerValue1\n" +
+          "      header2=headerValue2\n" +
           "   ]\n" +
           "}";
 
@@ -52,10 +51,22 @@ public class HttpPolicyResponseAttributesTestCase extends AbstractMuleTestCase {
           "   Status Code=401\n" +
           "   Reason Phrase=null\n" +
           "   Headers=[\n" +
-          "      header1=value1\n" +
-          "      header2=value2\n" +
+          "      header1=headerValue1\n" +
+          "      header2=headerValue2\n" +
           "   ]\n" +
           "}";
+
+  private static final String OBFUSCATED_TO_STRING = "org.mule.extension.http.api.policy.HttpPolicyResponseAttributes\n" +
+      "{\n" +
+      "   Status Code=401\n" +
+      "   Reason Phrase=Some Reason Phrase\n" +
+      "   Headers=[\n" +
+      "      password=****\n" +
+      "      pass=****\n" +
+      "      client_secret=****\n" +
+      "      regular=show me\n" +
+      "   ]\n" +
+      "}";
 
   private HttpPolicyResponseAttributes responseAttributes;
 
@@ -70,7 +81,7 @@ public class HttpPolicyResponseAttributesTestCase extends AbstractMuleTestCase {
     setUpReasonPhraseToResponseAttributes(responseAttributes);
     setUpStatusCodeToResponseAttributes(responseAttributes);
 
-    assertThat(COMPLETE_TO_STRING, is(responseAttributes.toString()));
+    assertThat(responseAttributes.toString(), is(COMPLETE_TO_STRING));
   }
 
   @Test
@@ -78,7 +89,7 @@ public class HttpPolicyResponseAttributesTestCase extends AbstractMuleTestCase {
     setUpReasonPhraseToResponseAttributes(responseAttributes);
     setUpStatusCodeToResponseAttributes(responseAttributes);
 
-    assertThat(TO_STRING_WITHOUT_HEADERS, is(responseAttributes.toString()));
+    assertThat(responseAttributes.toString(), is(TO_STRING_WITHOUT_HEADERS));
   }
 
   @Test
@@ -86,7 +97,7 @@ public class HttpPolicyResponseAttributesTestCase extends AbstractMuleTestCase {
     setUpHeadersToResponseAttributes(responseAttributes);
     setUpStatusCodeToResponseAttributes(responseAttributes);
 
-    assertThat(TO_STRING_WITHOUT_REASON_PHRASE, is(responseAttributes.toString()));
+    assertThat(responseAttributes.toString(), is(TO_STRING_WITHOUT_REASON_PHRASE));
   }
 
   @Test
@@ -94,14 +105,20 @@ public class HttpPolicyResponseAttributesTestCase extends AbstractMuleTestCase {
     setUpHeadersToResponseAttributes(responseAttributes);
     setUpReasonPhraseToResponseAttributes(responseAttributes);
 
-    assertThat(TO_STRING_WITHOUT_STATUS_CODE, is(responseAttributes.toString()));
+    assertThat(responseAttributes.toString(), is(TO_STRING_WITHOUT_STATUS_CODE));
+  }
+
+  @Test
+  public void sensitiveContentIsHidden() {
+    responseAttributes.setHeaders(prepareSensitiveDataMap(new MultiMap<>()));
+    setUpReasonPhraseToResponseAttributes(responseAttributes);
+    setUpStatusCodeToResponseAttributes(responseAttributes);
+
+    assertThat(responseAttributes.toString(), is(OBFUSCATED_TO_STRING));
   }
 
   private void setUpHeadersToResponseAttributes(HttpPolicyResponseAttributes responseAttributes) {
-    MultiMap<String, String> headers = new MultiMap<>();
-    headers.put("header1", "value1");
-    headers.put("header2", "value2");
-    responseAttributes.setHeaders(headers);
+    responseAttributes.setHeaders(getHeaders());
   }
 
   private void setUpReasonPhraseToResponseAttributes(HttpPolicyResponseAttributes responseAttributes) {
