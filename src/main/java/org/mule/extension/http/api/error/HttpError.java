@@ -9,6 +9,7 @@ package org.mule.extension.http.api.error;
 import static java.util.Optional.ofNullable;
 import static org.mule.extension.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.getStatusByCode;
+
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.http.api.HttpConstants.HttpStatus;
@@ -56,7 +57,7 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
   NOT_ACCEPTABLE,
 
   UNSUPPORTED_MEDIA_TYPE(
-      request -> "media type " + request.getHeaderValueIgnoreCase(CONTENT_TYPE) + " not supported"),
+      request -> "media type " + request.getHeaderValue(CONTENT_TYPE) + " not supported"),
 
   TOO_MANY_REQUESTS,
 
@@ -69,7 +70,8 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
   private Function<HttpRequest, String> errorMessageFunction;
 
   HttpError() {
-    errorMessageFunction = httpRequest -> this.name().replace("_", " ").toLowerCase();
+    String message = this.name().replace("_", " ").toLowerCase();
+    errorMessageFunction = httpRequest -> message;
   }
 
   HttpError(ErrorTypeDefinition<?> parentErrorType) {

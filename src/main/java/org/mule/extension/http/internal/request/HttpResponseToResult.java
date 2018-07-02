@@ -95,8 +95,8 @@ public class HttpResponseToResult {
   }
 
   private void processCookies(HttpRequesterCookieConfig config, HttpResponse response, URI uri) {
-    Collection<String> setCookieHeader = response.getHeaderValuesIgnoreCase(SET_COOKIE);
-    Collection<String> setCookie2Header = response.getHeaderValuesIgnoreCase(SET_COOKIE2);
+    Collection<String> setCookieHeader = response.getHeaderValues(SET_COOKIE);
+    Collection<String> setCookie2Header = response.getHeaderValues(SET_COOKIE2);
 
     Map<String, List<String>> cookieHeaders = new HashMap<>();
 
