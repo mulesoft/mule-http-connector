@@ -19,11 +19,11 @@ import org.mule.runtime.http.api.domain.entity.HttpEntity;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.request.HttpRequestContext;
 
-import java.io.InputStream;
-import java.nio.charset.Charset;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.InputStream;
+import java.nio.charset.Charset;
 
 /**
  * Component that transforms an HTTP request to a proper {@link Result}.
@@ -39,7 +39,7 @@ public class HttpRequestToResult {
                                                                      ListenerPath listenerPath) {
     final HttpRequest request = requestContext.getRequest();
 
-    MediaType mediaType = getMediaType(request.getHeaderValueIgnoreCase(CONTENT_TYPE), encoding);
+    MediaType mediaType = getMediaType(request.getHeaderValue(CONTENT_TYPE), encoding);
 
     final HttpEntity entity = request.getEntity();
     InputStream payload = entity.getContent();
@@ -56,7 +56,7 @@ public class HttpRequestToResult {
   }
 
   /**
-   * 
+   *
    * @param contentTypeValue
    * @param defaultCharset the encoding to use if the given {@code contentTypeValue} doesn't have a {@code charset} parameter.
    * @return

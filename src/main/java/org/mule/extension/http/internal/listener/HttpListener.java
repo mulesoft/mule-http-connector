@@ -126,6 +126,9 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   private static final String RESPONSE_CONTEXT = "responseContext";
   private static final String RESPONSE_CONTEXT_NOT_FOUND = "Response Context is not present. Could not send response.";
 
+  private static final String HEADER_X_CORRELATION_ID = X_CORRELATION_ID.toLowerCase();
+  private static final String HEADER_MULE_CORRELATION_ID = MULE_CORRELATION_ID_PROPERTY.toLowerCase();
+
   @Inject
   private TransformationService transformationService;
 
@@ -397,8 +400,8 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
       }
 
       private void resolveCorrelationId(MultiMap<String, String> headers, SourceCallbackContext context) {
-        String xCorrelationId = headers.get(X_CORRELATION_ID.toLowerCase());
-        String muleCorrelationId = headers.get(MULE_CORRELATION_ID_PROPERTY.toLowerCase());
+        String xCorrelationId = headers.get(HEADER_X_CORRELATION_ID);
+        String muleCorrelationId = headers.get(HEADER_MULE_CORRELATION_ID);
         if (xCorrelationId != null) {
           if (muleCorrelationId != null) {
             LOGGER.warn("'X-Correlation-ID: {}' and 'MULE_CORRELATION_ID: {}' headers found. 'X-Correlation-ID' will be used.",
