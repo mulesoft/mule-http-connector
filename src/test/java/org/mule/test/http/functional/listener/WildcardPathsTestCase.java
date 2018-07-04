@@ -66,7 +66,7 @@ public class WildcardPathsTestCase extends AbstractHttpTestCase {
 
   @Override
   protected String getConfigFile() {
-    return "HttpTestPathsWildcard.xml";
+    return "http-test-paths-wildcard.xml";
   }
 
   @Parameters
