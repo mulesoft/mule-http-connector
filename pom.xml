@@ -21,7 +21,6 @@
 
     <properties>
         <commonsCodecVersion>1.11</commonsCodecVersion>
-        <commonsCollectionsVersion>3.2.2</commonsCollectionsVersion>
         <fluentHcVersion>4.5.2</fluentHcVersion>
         <grizzlyVersion>2.3.36-MULE-002</grizzlyVersion>
         <grizzlyAhcVersion>1.14-MULE-002</grizzlyAhcVersion>
@@ -249,12 +248,6 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>${commonsCollectionsVersion}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <distributionManagement>

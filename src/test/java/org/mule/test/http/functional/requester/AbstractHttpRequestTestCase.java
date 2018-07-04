@@ -18,6 +18,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -25,7 +26,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.collections.EnumerationUtils;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -127,7 +127,7 @@ public abstract class AbstractHttpRequestTestCase extends AbstractHttpTestCase {
   }
 
   protected void extractHeadersFromBaseRequest(Request baseRequest) {
-    for (String headerName : (List<String>) EnumerationUtils.toList(baseRequest.getHeaderNames())) {
+    for (String headerName : getHeaderNames(baseRequest)) {
       Enumeration<String> headerValues = baseRequest.getHeaders(headerName);
 
       while (headerValues.hasMoreElements()) {
@@ -144,5 +144,14 @@ public abstract class AbstractHttpRequestTestCase extends AbstractHttpTestCase {
 
   public String getFirstReceivedHeader(String headerName) {
     return headers.get(headerName).iterator().next();
+  }
+
+  private List<String> getHeaderNames(Request baseRequest) {
+    Enumeration<String> headerNames = baseRequest.getHeaderNames();
+    List<String> headerList = new ArrayList<>();
+    while (headerNames.hasMoreElements()) {
+      headerList.add(headerNames.nextElement());
+    }
+    return headerList;
   }
 }
