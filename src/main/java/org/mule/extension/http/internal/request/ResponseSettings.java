@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.internal.request;
 
+import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
@@ -23,6 +24,13 @@ public final class ResponseSettings {
   @Parameter
   @Optional
   private Integer responseTimeout;
+
+  /**
+   * Configures a default error handling of the response.
+   */
+  @Parameter
+  @Optional
+  private ResponseValidator responseValidator;
 
   public Integer getResponseTimeout() {
     return responseTimeout;
