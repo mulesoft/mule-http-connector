@@ -98,13 +98,16 @@ public class HttpRequester {
                                   NotificationEmitter notificationEmitter,
                                   CompletionCallback<InputStream, HttpResponseAttributes> callback, HttpRequest httpRequest,
                                   int retryCount) {
-    notificationEmitter.fire(REQUEST_START, new TypedValue<>(HttpRequestNotificationData.from(httpRequest), REQUEST_NOTIFICATION_DATA_TYPE));
+    notificationEmitter.fire(REQUEST_START,
+                             new TypedValue<>(HttpRequestNotificationData.from(httpRequest), REQUEST_NOTIFICATION_DATA_TYPE));
     client.send(httpRequest, responseTimeout, followRedirects, resolveAuthentication(authentication))
         .whenComplete(
                       (response, exception) -> {
                         if (response != null) {
                           try {
-                            notificationEmitter.fire(REQUEST_COMPLETE, new TypedValue<>(HttpResponseNotificationData.from(response), RESPONSE_NOTIFICATION_DATA_TYPE));
+                            notificationEmitter.fire(REQUEST_COMPLETE,
+                                                     new TypedValue<>(HttpResponseNotificationData.from(response),
+                                                                      RESPONSE_NOTIFICATION_DATA_TYPE));
                             from(RESPONSE_TO_RESULT.convert(config, muleContext, response, httpRequest.getUri()))
                                 .doOnNext(result -> {
                                   try {
