@@ -37,6 +37,8 @@ import org.mule.extension.http.api.streaming.HttpStreamingType;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
@@ -65,6 +67,9 @@ public class HttpRequester {
 
   private static int RETRY_ATTEMPTS = getInteger(RETRY_ATTEMPTS_PROPERTY, DEFAULT_RETRY_ATTEMPTS);
 
+  private static final DataType REQUEST_NOTIFICATION_DATA_TYPE = DataType.fromType(HttpRequestNotificationData.class);
+  private static final DataType RESPONSE_NOTIFICATION_DATA_TYPE = DataType.fromType(HttpResponseNotificationData.class);
+  
   private static final HttpRequestFactory EVENT_TO_HTTP_REQUEST = new HttpRequestFactory();
   private static final HttpResponseToResult RESPONSE_TO_RESULT = new HttpResponseToResult();
   private static final HttpErrorMessageGenerator ERROR_MESSAGE_GENERATOR = new HttpErrorMessageGenerator();
@@ -93,13 +98,13 @@ public class HttpRequester {
                                   NotificationEmitter notificationEmitter,
                                   CompletionCallback<InputStream, HttpResponseAttributes> callback, HttpRequest httpRequest,
                                   int retryCount) {
-    notificationEmitter.fire(REQUEST_START, of(HttpRequestNotificationData.from(httpRequest)));
+    notificationEmitter.fire(REQUEST_START, new TypedValue<>(HttpRequestNotificationData.from(httpRequest), REQUEST_NOTIFICATION_DATA_TYPE));
     client.send(httpRequest, responseTimeout, followRedirects, resolveAuthentication(authentication))
         .whenComplete(
                       (response, exception) -> {
                         if (response != null) {
                           try {
-                            notificationEmitter.fire(REQUEST_COMPLETE, of(HttpResponseNotificationData.from(response)));
+                            notificationEmitter.fire(REQUEST_COMPLETE, new TypedValue<>(HttpResponseNotificationData.from(response), RESPONSE_NOTIFICATION_DATA_TYPE));
                             from(RESPONSE_TO_RESULT.convert(config, muleContext, response, httpRequest.getUri()))
                                 .doOnNext(result -> {
                                   try {
