@@ -18,9 +18,9 @@ import static org.mule.extension.http.internal.HttpConnectorConstants.IDEMPOTENT
 import static org.mule.extension.http.internal.HttpConnectorConstants.REMOTELY_CLOSED;
 import static org.mule.extension.http.internal.HttpConnectorConstants.RETRY_ATTEMPTS_PROPERTY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.metadata.TypedValue.of;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
 import static reactor.core.publisher.Mono.from;
+
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.error.HttpError;
 import org.mule.extension.http.api.error.HttpErrorMessageGenerator;
@@ -49,12 +49,12 @@ import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.TimeoutException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Component capable of performing an HTTP request given a request.
@@ -69,7 +69,7 @@ public class HttpRequester {
 
   private static final DataType REQUEST_NOTIFICATION_DATA_TYPE = DataType.fromType(HttpRequestNotificationData.class);
   private static final DataType RESPONSE_NOTIFICATION_DATA_TYPE = DataType.fromType(HttpResponseNotificationData.class);
-  
+
   private static final HttpRequestFactory EVENT_TO_HTTP_REQUEST = new HttpRequestFactory();
   private static final HttpResponseToResult RESPONSE_TO_RESULT = new HttpResponseToResult();
   private static final HttpErrorMessageGenerator ERROR_MESSAGE_GENERATOR = new HttpErrorMessageGenerator();
