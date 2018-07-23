@@ -110,7 +110,7 @@ public class HttpRequestOperations implements Initialisable, Disposable {
         resolvedUri = resolvedBuilder.replaceUriParams(uriSettings.getUrl());
       }
 
-      Integer resolvedTimeout = resolveResponseTimeout(overrides.getResponseTimeout());
+      int resolvedTimeout = resolveResponseTimeout(overrides.getResponseTimeout());
       ResponseValidator responseValidator = responseValidationSettings.getResponseValidator();
       responseValidator = responseValidator != null ? responseValidator : DEFAULT_STATUS_CODE_VALIDATOR;
 
