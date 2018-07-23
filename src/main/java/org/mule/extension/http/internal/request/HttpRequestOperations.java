@@ -12,6 +12,7 @@ import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST;
 import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.encodeSpaces;
+
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.api.request.client.UriParameters;
@@ -111,7 +112,7 @@ public class HttpRequestOperations implements Initialisable, Disposable {
         resolvedUri = resolvedBuilder.replaceUriParams(uriSettings.getUrl());
       }
 
-      Integer resolvedTimeout = resolveResponseTimeout(overrides.getResponseTimeout());
+      int resolvedTimeout = resolveResponseTimeout(overrides.getResponseTimeout());
       ResponseValidator responseValidator = responseValidationSettings.getResponseValidator();
       responseValidator = responseValidator != null ? responseValidator : DEFAULT_STATUS_CODE_VALIDATOR;
 
