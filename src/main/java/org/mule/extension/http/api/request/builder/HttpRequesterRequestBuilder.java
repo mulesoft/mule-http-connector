@@ -11,8 +11,10 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 import static org.mule.runtime.extension.api.runtime.parameter.OutboundCorrelationStrategy.AUTO;
+import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
 
 import org.mule.extension.http.api.HttpMessageBuilder;
+import org.mule.extension.http.internal.request.HttpRequesterConfig;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
@@ -22,6 +24,8 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
 import org.mule.runtime.extension.api.runtime.parameter.OutboundCorrelationStrategy;
+import org.mule.runtime.http.api.domain.message.request.HttpRequest;
+import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
 
 import java.util.Map;
 
@@ -80,6 +84,8 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
   private String correlationId;
 
   private CorrelationInfo correlationInfo;
+
+  private HttpRequestBuilder reqBuilder;
 
   @Override
   public TypedValue<Object> getBody() {
@@ -145,4 +151,11 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
   public String getCorrelationId() {
     return correlationId;
   }
+
+  public HttpRequestBuilder configure(HttpRequesterConfig config) {
+    return HttpRequest.builder(PRESERVE_HEADER_CASE || config.isPreserveHeadersCase())
+        .headers(headers)
+        .queryParams(queryParams);
+  }
+
 }
