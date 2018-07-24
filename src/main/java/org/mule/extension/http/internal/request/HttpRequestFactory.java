@@ -23,7 +23,7 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.COOKIE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpHeaders.Names.X_CORRELATION_ID;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
-import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
+
 import org.mule.extension.http.api.request.HttpSendBodyMode;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
@@ -45,7 +45,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.Set;
@@ -60,12 +59,14 @@ import org.slf4j.LoggerFactory;
  */
 public class HttpRequestFactory {
 
-
   private static final Logger LOGGER = LoggerFactory.getLogger(HttpRequestFactory.class);
 
   private static final String CONTENT_TYPE_HEADER = CONTENT_TYPE.toLowerCase();
   private static final String CONTENT_LENGTH_HEADER = CONTENT_LENGTH.toLowerCase();
   private static final String TRANSFER_ENCODING_HEADER = TRANSFER_ENCODING.toLowerCase();
+  private static final String X_CORRELATION_ID_HEADER = X_CORRELATION_ID.toLowerCase();
+  private static final String MULE_CORRELATION_ID_PROPERTY_HEADER = MULE_CORRELATION_ID_PROPERTY.toLowerCase();
+  private static final String COOKIE_HEADER = COOKIE.toLowerCase();
 
   private static final Set<String> DEFAULT_EMPTY_BODY_METHODS = newHashSet("GET", "HEAD", "OPTIONS");
 
@@ -88,12 +89,9 @@ public class HttpRequestFactory {
   public HttpRequest create(HttpRequesterConfig config, String uri, String method, HttpStreamingType streamingMode,
                             HttpSendBodyMode sendBodyMode, TransformationService transformationService,
                             HttpRequesterRequestBuilder requestBuilder, HttpRequestAuthentication authentication) {
-    HttpRequestBuilder builder = HttpRequest.builder(PRESERVE_HEADER_CASE || config.isPreserveHeadersCase());
-
-    builder.uri(uri)
-        .method(method)
-        .headers(requestBuilder.getHeaders())
-        .queryParams(requestBuilder.getQueryParams());
+    HttpRequestBuilder builder = requestBuilder.configure(config)
+        .uri(uri)
+        .method(method);
 
     config.getDefaultHeaders()
         .forEach(header -> builder.addHeader(header.getKey(), header.getValue()));
@@ -112,19 +110,19 @@ public class HttpRequestFactory {
         .getOutboundCorrelationId(requestBuilder.getCorrelationInfo(), requestBuilder.getCorrelationId())
         .ifPresent(correlationId -> {
           String xCorrelationId;
-          if (builder.getHeaderValue(X_CORRELATION_ID).isPresent()) {
+          if (builder.getHeaderValue(X_CORRELATION_ID_HEADER).isPresent()) {
             if (LOGGER.isDebugEnabled()) {
               LOGGER.debug(
                            X_CORRELATION_ID
                                + " was specified both as explicit header and through the standard propagation of the mule "
                                + "correlation ID. The explicit header will prevail.");
             }
-            xCorrelationId = builder.getHeaderValue(X_CORRELATION_ID).get();
+            xCorrelationId = builder.getHeaderValue(X_CORRELATION_ID_HEADER).get();
           } else {
             xCorrelationId = correlationId;
-            builder.addHeader(X_CORRELATION_ID, correlationId);
+            builder.addHeader(X_CORRELATION_ID_HEADER, correlationId);
           }
-          builder.getHeaderValue(MULE_CORRELATION_ID_PROPERTY)
+          builder.getHeaderValue(MULE_CORRELATION_ID_PROPERTY_HEADER)
               .ifPresent(muleCorrelationId -> LOGGER
                   .warn("Explicitly configured 'MULE_CORRELATION_ID: {}' header could interfere with 'X-Correlation-ID: {}' header.",
                         muleCorrelationId, xCorrelationId));
@@ -132,18 +130,13 @@ public class HttpRequestFactory {
 
     if (config.isEnableCookies()) {
       try {
-        Map<String, List<String>> headers =
-            config.getCookieManager().get(builder.getUri(), emptyMap());
-        List<String> cookies = headers.get(COOKIE);
+        List<String> cookies = config.getCookieManager().get(builder.getUri(), emptyMap()).get(COOKIE);
         if (cookies != null) {
-          for (String cookie : cookies) {
-            builder.addHeader(COOKIE, cookie);
-          }
+          builder.addHeaders(COOKIE_HEADER, cookies);
         }
       } catch (IOException e) {
         LOGGER.warn("Error reading cookies for URI " + uri, e);
       }
-
     }
 
     try {
