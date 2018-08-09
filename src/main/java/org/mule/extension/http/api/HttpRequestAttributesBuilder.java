@@ -6,7 +6,6 @@
  */
 package org.mule.extension.http.api;
 
-import static java.util.Arrays.copyOfRange;
 import static java.util.Collections.emptyMap;
 import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
@@ -21,6 +20,9 @@ import java.util.Map;
  * @since 1.1
  */
 public class HttpRequestAttributesBuilder {
+
+  private static final char SLASH = '/';
+  private static final String WILDCARD = "*";
 
   private MultiMap<String, String> headers = emptyMultiMap();
   private MultiMap<String, String> queryParams = emptyMultiMap();
@@ -149,25 +151,25 @@ public class HttpRequestAttributesBuilder {
   }
 
   private String resolveProxyRequestPath() {
-    byte[] listenerPathBytes = listenerPath.getBytes();
-    byte[] requestPathBytes = requestPath.getBytes();
-    int listenerPathIndex = 0;
-    int requestPathIndex = 0;
-    try {
-      while (listenerPathBytes[listenerPathIndex] != '*') {
-        listenerPathIndex = iterateUntilSlash(listenerPathBytes, listenerPathIndex);
-        requestPathIndex = iterateUntilSlash(requestPathBytes, requestPathIndex);
-      }
-    } catch (ArrayIndexOutOfBoundsException e) {
-      //We could reach an error here if paths are not formed consistently. E.g: The listenerPath does not ends with *.
-      //In that case we return null and let other logic parse the path as if this never existed
+    //Avoid resolution if not a valid proxy listenerPath
+    if (!listenerPath.endsWith(WILDCARD)) {
       return null;
     }
-    return new String(copyOfRange(requestPathBytes, requestPathIndex - 1, requestPathBytes.length));
+
+    byte[] listenerPathBytes = listenerPath.getBytes();
+    byte[] requestPathBytes = requestPath.getBytes();
+    int listenerPathCurrentSlashIndex = 0;
+    int requestPathCurrentSlashIndex = 0;
+    while (listenerPathCurrentSlashIndex < listenerPathBytes.length - 1) {
+      listenerPathCurrentSlashIndex = iterateUntilNextSlash(listenerPathBytes, listenerPathCurrentSlashIndex);
+      requestPathCurrentSlashIndex = iterateUntilNextSlash(requestPathBytes, requestPathCurrentSlashIndex);
+    }
+
+    return requestPath.substring(requestPathCurrentSlashIndex - 1);
   }
 
-  private int iterateUntilSlash(byte[] bytes, int position) {
-    while (bytes[position] != '/') {
+  private int iterateUntilNextSlash(byte[] bytes, int position) {
+    while (bytes[position] != SLASH) {
       position++;
     }
     position++;

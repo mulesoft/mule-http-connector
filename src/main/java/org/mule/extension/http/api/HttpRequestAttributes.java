@@ -175,11 +175,9 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
         .append(TAB).append("Listener path=").append(this.listenerPath).append(lineSeparator())
         .append(TAB).append("Local Address=").append(localAddress).append(lineSeparator())
         .append(TAB).append("Query String=").append(obfuscateQueryIfNecessary()).append(lineSeparator())
-        .append(TAB).append("Relative Path=").append(this.relativePath).append(lineSeparator());
-    if (proxyRequestPath != null) {
-      builder.append(TAB).append("Proxy Request Path=").append(this.proxyRequestPath).append(lineSeparator());
-    }
-    builder.append(TAB).append("Remote Address=").append(this.remoteAddress).append(lineSeparator())
+        .append(TAB).append("Relative Path=").append(this.relativePath).append(lineSeparator())
+        .append(TAB).append("Proxy Request Path=").append(this.proxyRequestPath).append(lineSeparator())
+        .append(TAB).append("Remote Address=").append(this.remoteAddress).append(lineSeparator())
         .append(TAB).append("Request Uri=").append(this.requestUri).append(lineSeparator())
         .append(TAB).append("Scheme=").append(scheme).append(lineSeparator())
         .append(TAB).append("Version=").append(this.version).append(lineSeparator());

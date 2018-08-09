@@ -26,6 +26,7 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
       "   Local Address=http://127.0.0.1:8080/\n" +
       "   Query String=queryParam1=queryParam1&queryParam2=queryParam2\n" +
       "   Relative Path=/relative/path\n" +
+      "   Proxy Request Path=null\n" +
       "   Remote Address=http://10.1.2.5:8080/\n" +
       "   Request Uri=http://127.0.0.1/gateway\n" +
       "   Scheme=scheme\n" +
@@ -52,6 +53,7 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
       "   Local Address=http://127.0.0.1:8080/\n" +
       "   Query String=\n" +
       "   Relative Path=/relative/path\n" +
+      "   Proxy Request Path=null\n" +
       "   Remote Address=http://10.1.2.5:8080/\n" +
       "   Request Uri=http://127.0.0.1/gateway\n" +
       "   Scheme=scheme\n" +
@@ -87,6 +89,7 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
       "   Local Address=http://127.0.0.1:8080/\n" +
       "   Query String=queryParam1=queryParam1&queryParam2=queryParam2\n" +
       "   Relative Path=/relative/path\n" +
+      "   Proxy Request Path=null\n" +
       "   Remote Address=http://10.1.2.5:8080/\n" +
       "   Request Uri=http://127.0.0.1/gateway\n" +
       "   Scheme=scheme\n" +
@@ -107,6 +110,7 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
       "   Local Address=http://127.0.0.1:8080/\n" +
       "   Query String=\n" +
       "   Relative Path=/relative/path\n" +
+      "   Proxy Request Path=null\n" +
       "   Remote Address=http://10.1.2.5:8080/\n" +
       "   Request Uri=http://127.0.0.1/gateway\n" +
       "   Scheme=scheme\n" +
@@ -127,6 +131,7 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
       "   Local Address=http://127.0.0.1:8080/\n" +
       "   Query String=****\n" +
       "   Relative Path=/relative/path\n" +
+      "   Proxy Request Path=null\n" +
       "   Remote Address=http://10.1.2.5:8080/\n" +
       "   Request Uri=http://127.0.0.1/gateway\n" +
       "   Scheme=scheme\n" +
