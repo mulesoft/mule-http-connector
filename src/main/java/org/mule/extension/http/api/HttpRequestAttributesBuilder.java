@@ -158,7 +158,7 @@ public class HttpRequestAttributesBuilder {
   }
 
   private String maskRequestPath() {
-    //Avoid resolution if not a valid proxy listenerPath
+    //Avoid resolution if not a valid listenerPath mask
     if (!listenerPath.endsWith(WILDCARD)) {
       return null;
     }
