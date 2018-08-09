@@ -21,12 +21,16 @@ import java.util.Map;
  */
 public class HttpRequestAttributesBuilder {
 
+  private static final char SLASH = '/';
+  private static final String WILDCARD = "*";
+
   private MultiMap<String, String> headers = emptyMultiMap();
   private MultiMap<String, String> queryParams = emptyMultiMap();
   private Map<String, String> uriParams = emptyMap();
   private String requestPath;
   private String listenerPath;
   private String relativePath;
+  private String maskedRequestPath;
   private String version;
   private String scheme;
   private String method;
@@ -35,6 +39,8 @@ public class HttpRequestAttributesBuilder {
   private String localAddress;
   private String remoteAddress;
   private Certificate clientCertificate;
+
+  private boolean resolveMaskedRequestPath = false;
 
   public HttpRequestAttributesBuilder() {}
 
@@ -45,6 +51,7 @@ public class HttpRequestAttributesBuilder {
     this.requestPath = requestAttributes.getRequestPath();
     this.listenerPath = requestAttributes.getListenerPath();
     this.relativePath = requestAttributes.getRelativePath();
+    this.maskedRequestPath = requestAttributes.getMaskedRequestPath();
     this.version = requestAttributes.getVersion();
     this.scheme = requestAttributes.getScheme();
     this.method = requestAttributes.getMethod();
@@ -75,11 +82,13 @@ public class HttpRequestAttributesBuilder {
 
   public HttpRequestAttributesBuilder requestPath(String requestPath) {
     this.requestPath = requestPath;
+    resolveMaskedRequestPath = true;
     return this;
   }
 
   public HttpRequestAttributesBuilder listenerPath(String listenerPath) {
     this.listenerPath = listenerPath;
+    resolveMaskedRequestPath = true;
     return this;
   }
 
@@ -139,7 +148,39 @@ public class HttpRequestAttributesBuilder {
     requireNonNull(requestUri, "Request URI cannot be null.");
     requireNonNull(localAddress, "Local address cannot be null.");
     requireNonNull(remoteAddress, "Remote address cannot be null.");
-    return new HttpRequestAttributes(headers, listenerPath, relativePath, version, scheme, method, requestPath, requestUri,
+    if (resolveMaskedRequestPath && listenerPath != null && requestPath != null) {
+      maskedRequestPath = maskRequestPath();
+    }
+    resolveMaskedRequestPath = false;
+    return new HttpRequestAttributes(headers, listenerPath, relativePath, maskedRequestPath, version, scheme, method, requestPath,
+                                     requestUri,
                                      queryString, queryParams, uriParams, localAddress, remoteAddress, clientCertificate);
   }
+
+  private String maskRequestPath() {
+    //Avoid resolution if not a valid listenerPath mask
+    if (!listenerPath.endsWith(WILDCARD)) {
+      return null;
+    }
+
+    byte[] listenerPathBytes = listenerPath.getBytes();
+    byte[] requestPathBytes = requestPath.getBytes();
+    int listenerPathCurrentSlashIndex = 0;
+    int requestPathCurrentSlashIndex = 0;
+    while (listenerPathCurrentSlashIndex < listenerPathBytes.length - 1) {
+      listenerPathCurrentSlashIndex = iterateUntilNextSlash(listenerPathBytes, listenerPathCurrentSlashIndex);
+      requestPathCurrentSlashIndex = iterateUntilNextSlash(requestPathBytes, requestPathCurrentSlashIndex);
+    }
+
+    return requestPath.substring(requestPathCurrentSlashIndex - 1);
+  }
+
+  private int iterateUntilNextSlash(byte[] bytes, int position) {
+    while (bytes[position] != SLASH) {
+      position++;
+    }
+    position++;
+    return position;
+  }
+
 }
