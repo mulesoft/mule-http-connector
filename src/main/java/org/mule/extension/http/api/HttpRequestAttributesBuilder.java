@@ -40,6 +40,8 @@ public class HttpRequestAttributesBuilder {
   private String remoteAddress;
   private Certificate clientCertificate;
 
+  private boolean resolveProxyRequestPath = false;
+
   public HttpRequestAttributesBuilder() {}
 
   public HttpRequestAttributesBuilder(HttpRequestAttributes requestAttributes) {
@@ -80,11 +82,13 @@ public class HttpRequestAttributesBuilder {
 
   public HttpRequestAttributesBuilder requestPath(String requestPath) {
     this.requestPath = requestPath;
+    resolveProxyRequestPath = true;
     return this;
   }
 
   public HttpRequestAttributesBuilder listenerPath(String listenerPath) {
     this.listenerPath = listenerPath;
+    resolveProxyRequestPath = true;
     return this;
   }
 
@@ -144,7 +148,10 @@ public class HttpRequestAttributesBuilder {
     requireNonNull(requestUri, "Request URI cannot be null.");
     requireNonNull(localAddress, "Local address cannot be null.");
     requireNonNull(remoteAddress, "Remote address cannot be null.");
-    this.proxyRequestPath = resolveProxyRequestPath();
+    if (resolveProxyRequestPath && listenerPath != null && requestPath != null) {
+      proxyRequestPath = resolveProxyRequestPath();
+    }
+    resolveProxyRequestPath = false;
     return new HttpRequestAttributes(headers, listenerPath, relativePath, proxyRequestPath, version, scheme, method, requestPath,
                                      requestUri,
                                      queryString, queryParams, uriParams, localAddress, remoteAddress, clientCertificate);
