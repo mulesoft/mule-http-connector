@@ -41,7 +41,7 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
    * @since 1.4.0
    */
   @Parameter
-  private final String proxyRequestPath;
+  private final String maskedRequestPath;
 
   /**
    * HTTP version of the request. Former 'http.version'.
@@ -104,7 +104,7 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
          uriParams, "", remoteAddress, clientCertificate);
   }
 
-  HttpRequestAttributes(MultiMap<String, String> headers, String listenerPath, String relativePath, String proxyRequestPath,
+  HttpRequestAttributes(MultiMap<String, String> headers, String listenerPath, String relativePath, String maskedRequestPath,
                         String version,
                         String scheme, String method, String requestPath, String requestUri, String queryString,
                         MultiMap<String, String> queryParams, Map<String, String> uriParams, String localAddress,
@@ -112,7 +112,7 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
     super(headers, queryParams, uriParams, requestPath);
     this.listenerPath = listenerPath;
     this.relativePath = relativePath;
-    this.proxyRequestPath = proxyRequestPath;
+    this.maskedRequestPath = maskedRequestPath;
     this.version = version;
     this.scheme = scheme;
     this.method = method;
@@ -131,8 +131,8 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
     return relativePath;
   }
 
-  public String getProxyRequestPath() {
-    return proxyRequestPath;
+  public String getMaskedRequestPath() {
+    return maskedRequestPath;
   }
 
   public String getVersion() {
@@ -176,7 +176,7 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
         .append(TAB).append("Local Address=").append(localAddress).append(lineSeparator())
         .append(TAB).append("Query String=").append(obfuscateQueryIfNecessary()).append(lineSeparator())
         .append(TAB).append("Relative Path=").append(this.relativePath).append(lineSeparator())
-        .append(TAB).append("Proxy Request Path=").append(this.proxyRequestPath).append(lineSeparator())
+        .append(TAB).append("Masked Request Path=").append(this.maskedRequestPath).append(lineSeparator())
         .append(TAB).append("Remote Address=").append(this.remoteAddress).append(lineSeparator())
         .append(TAB).append("Request Uri=").append(this.requestUri).append(lineSeparator())
         .append(TAB).append("Scheme=").append(scheme).append(lineSeparator())

@@ -26,7 +26,7 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
       "   Local Address=http://127.0.0.1:8080/\n" +
       "   Query String=queryParam1=queryParam1&queryParam2=queryParam2\n" +
       "   Relative Path=/relative/path\n" +
-      "   Proxy Request Path=null\n" +
+      "   Masked Request Path=null\n" +
       "   Remote Address=http://10.1.2.5:8080/\n" +
       "   Request Uri=http://127.0.0.1/gateway\n" +
       "   Scheme=scheme\n" +
@@ -53,7 +53,7 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
       "   Local Address=http://127.0.0.1:8080/\n" +
       "   Query String=\n" +
       "   Relative Path=/relative/path\n" +
-      "   Proxy Request Path=null\n" +
+      "   Masked Request Path=null\n" +
       "   Remote Address=http://10.1.2.5:8080/\n" +
       "   Request Uri=http://127.0.0.1/gateway\n" +
       "   Scheme=scheme\n" +
@@ -63,7 +63,7 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
       "   URI Parameters=[]\n" +
       "}";
 
-  private static final String TO_STRING_EMPTY_WITH_PROXY_REQUEST_PATH = "org.mule.extension.http.api.HttpRequestAttributes\n" +
+  private static final String TO_STRING_EMPTY_WITH_MASKED_REQUEST_PATH = "org.mule.extension.http.api.HttpRequestAttributes\n" +
       "{\n" +
       "   Request path=/request/path/proxy\n" +
       "   Method=GET\n" +
@@ -71,7 +71,7 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
       "   Local Address=http://127.0.0.1:8080/\n" +
       "   Query String=\n" +
       "   Relative Path=/relative/path\n" +
-      "   Proxy Request Path=/proxy\n" +
+      "   Masked Request Path=/proxy\n" +
       "   Remote Address=http://10.1.2.5:8080/\n" +
       "   Request Uri=http://127.0.0.1/gateway\n" +
       "   Scheme=scheme\n" +
@@ -89,7 +89,7 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
       "   Local Address=http://127.0.0.1:8080/\n" +
       "   Query String=queryParam1=queryParam1&queryParam2=queryParam2\n" +
       "   Relative Path=/relative/path\n" +
-      "   Proxy Request Path=null\n" +
+      "   Masked Request Path=null\n" +
       "   Remote Address=http://10.1.2.5:8080/\n" +
       "   Request Uri=http://127.0.0.1/gateway\n" +
       "   Scheme=scheme\n" +
@@ -110,7 +110,7 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
       "   Local Address=http://127.0.0.1:8080/\n" +
       "   Query String=\n" +
       "   Relative Path=/relative/path\n" +
-      "   Proxy Request Path=null\n" +
+      "   Masked Request Path=null\n" +
       "   Remote Address=http://10.1.2.5:8080/\n" +
       "   Request Uri=http://127.0.0.1/gateway\n" +
       "   Scheme=scheme\n" +
@@ -131,7 +131,7 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
       "   Local Address=http://127.0.0.1:8080/\n" +
       "   Query String=****\n" +
       "   Relative Path=/relative/path\n" +
-      "   Proxy Request Path=null\n" +
+      "   Masked Request Path=null\n" +
       "   Remote Address=http://10.1.2.5:8080/\n" +
       "   Request Uri=http://127.0.0.1/gateway\n" +
       "   Scheme=scheme\n" +
@@ -214,9 +214,9 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
   }
 
   @Test
-  public void withProxyRequestPath() throws Exception {
+  public void withMaskedRequestPath() throws Exception {
     assertThat(baseBuilder.listenerPath("/listener/path/*").requestPath("/request/path/proxy").build().toString(),
-               is(TO_STRING_EMPTY_WITH_PROXY_REQUEST_PATH));
+               is(TO_STRING_EMPTY_WITH_MASKED_REQUEST_PATH));
   }
 
 }

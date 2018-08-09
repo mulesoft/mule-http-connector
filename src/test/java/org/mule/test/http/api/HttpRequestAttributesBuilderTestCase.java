@@ -146,7 +146,7 @@ public class HttpRequestAttributesBuilderTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void proxyRequestPathIsSet() {
+  public void maskedRequestPathIsSet() {
     MultiMap<String, String> params = new MultiMap<>();
     params.put("from", "ITA");
 
@@ -163,7 +163,7 @@ public class HttpRequestAttributesBuilderTestCase extends AbstractMuleTestCase {
         .requestPath("/api/v2/clients")
         .build();
 
-    assertThat(attributes.getProxyRequestPath(), is(equalTo("/clients")));
+    assertThat(attributes.getMaskedRequestPath(), is(equalTo("/clients")));
   }
 
   private void assertFailure(Runnable closure, String message) {

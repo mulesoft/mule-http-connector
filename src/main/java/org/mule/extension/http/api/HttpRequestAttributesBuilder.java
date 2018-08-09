@@ -30,7 +30,7 @@ public class HttpRequestAttributesBuilder {
   private String requestPath;
   private String listenerPath;
   private String relativePath;
-  private String proxyRequestPath;
+  private String maskedRequestPath;
   private String version;
   private String scheme;
   private String method;
@@ -40,7 +40,7 @@ public class HttpRequestAttributesBuilder {
   private String remoteAddress;
   private Certificate clientCertificate;
 
-  private boolean resolveProxyRequestPath = false;
+  private boolean resolveMaskedRequestPath = false;
 
   public HttpRequestAttributesBuilder() {}
 
@@ -51,7 +51,7 @@ public class HttpRequestAttributesBuilder {
     this.requestPath = requestAttributes.getRequestPath();
     this.listenerPath = requestAttributes.getListenerPath();
     this.relativePath = requestAttributes.getRelativePath();
-    this.proxyRequestPath = requestAttributes.getProxyRequestPath();
+    this.maskedRequestPath = requestAttributes.getMaskedRequestPath();
     this.version = requestAttributes.getVersion();
     this.scheme = requestAttributes.getScheme();
     this.method = requestAttributes.getMethod();
@@ -82,13 +82,13 @@ public class HttpRequestAttributesBuilder {
 
   public HttpRequestAttributesBuilder requestPath(String requestPath) {
     this.requestPath = requestPath;
-    resolveProxyRequestPath = true;
+    resolveMaskedRequestPath = true;
     return this;
   }
 
   public HttpRequestAttributesBuilder listenerPath(String listenerPath) {
     this.listenerPath = listenerPath;
-    resolveProxyRequestPath = true;
+    resolveMaskedRequestPath = true;
     return this;
   }
 
@@ -148,16 +148,16 @@ public class HttpRequestAttributesBuilder {
     requireNonNull(requestUri, "Request URI cannot be null.");
     requireNonNull(localAddress, "Local address cannot be null.");
     requireNonNull(remoteAddress, "Remote address cannot be null.");
-    if (resolveProxyRequestPath && listenerPath != null && requestPath != null) {
-      proxyRequestPath = resolveProxyRequestPath();
+    if (resolveMaskedRequestPath && listenerPath != null && requestPath != null) {
+      maskedRequestPath = maskRequestPath();
     }
-    resolveProxyRequestPath = false;
-    return new HttpRequestAttributes(headers, listenerPath, relativePath, proxyRequestPath, version, scheme, method, requestPath,
+    resolveMaskedRequestPath = false;
+    return new HttpRequestAttributes(headers, listenerPath, relativePath, maskedRequestPath, version, scheme, method, requestPath,
                                      requestUri,
                                      queryString, queryParams, uriParams, localAddress, remoteAddress, clientCertificate);
   }
 
-  private String resolveProxyRequestPath() {
+  private String maskRequestPath() {
     //Avoid resolution if not a valid proxy listenerPath
     if (!listenerPath.endsWith(WILDCARD)) {
       return null;
