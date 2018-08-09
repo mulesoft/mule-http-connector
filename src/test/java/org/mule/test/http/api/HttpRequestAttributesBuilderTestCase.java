@@ -13,6 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpRequestAttributesBuilder;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -142,6 +143,27 @@ public class HttpRequestAttributesBuilderTestCase extends AbstractMuleTestCase {
         .requestUri("api/v2/clients?from=ITA")
         .localAddress("localhost/127.0.0.1:8081")
         .build(), "Remote address cannot be null.");
+  }
+
+  @Test
+  public void proxyRequestPathIsSet() {
+    MultiMap<String, String> params = new MultiMap<>();
+    params.put("from", "ITA");
+
+    HttpRequestAttributes attributes = builder.remoteAddress("not_localhost")
+        .relativePath("clients")
+        .version("1.1")
+        .scheme("https")
+        .method("GET")
+        .queryString("from=ITA")
+        .queryParams(params)
+        .requestUri("api/v2/clients?from=ITA")
+        .localAddress("localhost/127.0.0.1:8081")
+        .listenerPath("/api/v2/*")
+        .requestPath("/api/v2/clients")
+        .build();
+
+    assertThat(attributes.getProxyRequestPath(), is(equalTo("/clients")));
   }
 
   private void assertFailure(Runnable closure, String message) {

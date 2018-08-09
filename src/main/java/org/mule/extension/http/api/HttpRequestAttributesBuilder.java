@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.api;
 
+import static java.util.Arrays.copyOfRange;
 import static java.util.Collections.emptyMap;
 import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
@@ -27,6 +28,7 @@ public class HttpRequestAttributesBuilder {
   private String requestPath;
   private String listenerPath;
   private String relativePath;
+  private String proxyRequestPath;
   private String version;
   private String scheme;
   private String method;
@@ -45,6 +47,7 @@ public class HttpRequestAttributesBuilder {
     this.requestPath = requestAttributes.getRequestPath();
     this.listenerPath = requestAttributes.getListenerPath();
     this.relativePath = requestAttributes.getRelativePath();
+    this.proxyRequestPath = requestAttributes.getProxyRequestPath();
     this.version = requestAttributes.getVersion();
     this.scheme = requestAttributes.getScheme();
     this.method = requestAttributes.getMethod();
@@ -139,7 +142,30 @@ public class HttpRequestAttributesBuilder {
     requireNonNull(requestUri, "Request URI cannot be null.");
     requireNonNull(localAddress, "Local address cannot be null.");
     requireNonNull(remoteAddress, "Remote address cannot be null.");
-    return new HttpRequestAttributes(headers, listenerPath, relativePath, version, scheme, method, requestPath, requestUri,
+    this.proxyRequestPath = resolveProxyRequestPath();
+    return new HttpRequestAttributes(headers, listenerPath, relativePath, proxyRequestPath, version, scheme, method, requestPath,
+                                     requestUri,
                                      queryString, queryParams, uriParams, localAddress, remoteAddress, clientCertificate);
   }
+
+  private String resolveProxyRequestPath() {
+    byte[] listenerPathBytes = listenerPath.getBytes();
+    byte[] requestPathBytes = requestPath.getBytes();
+    int listenerPathIndex = 0;
+    int requestPathIndex = 0;
+    while (listenerPathBytes[listenerPathIndex] != '*') {
+      listenerPathIndex = iterateUntilSlash(listenerPathBytes, listenerPathIndex);
+      requestPathIndex = iterateUntilSlash(requestPathBytes, requestPathIndex);
+    }
+    return new String(copyOfRange(requestPathBytes, requestPathIndex - 1, requestPathBytes.length));
+  }
+
+  private int iterateUntilSlash(byte[] bytes, int position) {
+    while (bytes[position] != '/') {
+      position++;
+    }
+    position++;
+    return position;
+  }
+
 }

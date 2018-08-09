@@ -36,6 +36,14 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
   private final String relativePath;
 
   /**
+   * Path computed from masking the {@code requestPath} with the {@code listenerPath} and taking the difference.
+   *
+   * @since 1.4.0
+   */
+  @Parameter
+  private final String proxyRequestPath;
+
+  /**
    * HTTP version of the request. Former 'http.version'.
    */
   @Parameter
@@ -92,17 +100,19 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
                                String scheme, String method, String requestPath, String requestUri, String queryString,
                                MultiMap<String, String> queryParams, Map<String, String> uriParams, String remoteAddress,
                                Certificate clientCertificate) {
-    this(headers, listenerPath, relativePath, version, scheme, method, requestPath, requestUri, queryString, queryParams,
+    this(headers, listenerPath, relativePath, null, version, scheme, method, requestPath, requestUri, queryString, queryParams,
          uriParams, "", remoteAddress, clientCertificate);
   }
 
-  HttpRequestAttributes(MultiMap<String, String> headers, String listenerPath, String relativePath, String version,
+  HttpRequestAttributes(MultiMap<String, String> headers, String listenerPath, String relativePath, String proxyRequestPath,
+                        String version,
                         String scheme, String method, String requestPath, String requestUri, String queryString,
                         MultiMap<String, String> queryParams, Map<String, String> uriParams, String localAddress,
                         String remoteAddress, Certificate clientCertificate) {
     super(headers, queryParams, uriParams, requestPath);
     this.listenerPath = listenerPath;
     this.relativePath = relativePath;
+    this.proxyRequestPath = proxyRequestPath;
     this.version = version;
     this.scheme = scheme;
     this.method = method;
@@ -113,12 +123,18 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
     this.clientCertificate = clientCertificate;
   }
 
+
+
   public String getListenerPath() {
     return listenerPath;
   }
 
   public String getRelativePath() {
     return relativePath;
+  }
+
+  public String getProxyRequestPath() {
+    return proxyRequestPath;
   }
 
   public String getVersion() {
@@ -162,6 +178,7 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
         .append(TAB).append("Local Address=").append(localAddress).append(lineSeparator())
         .append(TAB).append("Query String=").append(obfuscateQueryIfNecessary()).append(lineSeparator())
         .append(TAB).append("Relative Path=").append(this.relativePath).append(lineSeparator())
+        .append(TAB).append("Proxy Request Path=").append(this.relativePath).append(lineSeparator())
         .append(TAB).append("Remote Address=").append(this.remoteAddress).append(lineSeparator())
         .append(TAB).append("Request Uri=").append(this.requestUri).append(lineSeparator())
         .append(TAB).append("Scheme=").append(scheme).append(lineSeparator())
