@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.api;
 
+import static java.lang.String.valueOf;
 import static java.util.Collections.emptyMap;
 import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
@@ -167,9 +168,16 @@ public class HttpRequestAttributesBuilder {
     byte[] requestPathBytes = requestPath.getBytes();
     int listenerPathCurrentSlashIndex = 0;
     int requestPathCurrentSlashIndex = 0;
-    while (listenerPathCurrentSlashIndex < listenerPathBytes.length - 1) {
-      listenerPathCurrentSlashIndex = iterateUntilNextSlash(listenerPathBytes, listenerPathCurrentSlashIndex);
-      requestPathCurrentSlashIndex = iterateUntilNextSlash(requestPathBytes, requestPathCurrentSlashIndex);
+
+    try {
+      while (listenerPathCurrentSlashIndex < listenerPathBytes.length - 1) {
+        listenerPathCurrentSlashIndex = iterateUntilNextSlash(listenerPathBytes, listenerPathCurrentSlashIndex);
+        requestPathCurrentSlashIndex = iterateUntilNextSlash(requestPathBytes, requestPathCurrentSlashIndex);
+      }
+    } catch (ArrayIndexOutOfBoundsException e) {
+      //If here it means that the number of slashes in the requestPath is not the same as in the listenerPath.
+      //That can only happen if the requestPath is equal to the listenerPath without considering the *.
+      return valueOf(SLASH);
     }
 
     return requestPath.substring(requestPathCurrentSlashIndex - 1);
