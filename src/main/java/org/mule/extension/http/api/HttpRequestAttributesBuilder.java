@@ -153,9 +153,15 @@ public class HttpRequestAttributesBuilder {
     byte[] requestPathBytes = requestPath.getBytes();
     int listenerPathIndex = 0;
     int requestPathIndex = 0;
-    while (listenerPathBytes[listenerPathIndex] != '*') {
-      listenerPathIndex = iterateUntilSlash(listenerPathBytes, listenerPathIndex);
-      requestPathIndex = iterateUntilSlash(requestPathBytes, requestPathIndex);
+    try {
+      while (listenerPathBytes[listenerPathIndex] != '*') {
+        listenerPathIndex = iterateUntilSlash(listenerPathBytes, listenerPathIndex);
+        requestPathIndex = iterateUntilSlash(requestPathBytes, requestPathIndex);
+      }
+    } catch (ArrayIndexOutOfBoundsException e) {
+      //We could reach an error here if paths are not formed consistently. E.g: The listenerPath does not ends with *.
+      //In that case we return null and let other logic parse the path as if this never existed
+      return null;
     }
     return new String(copyOfRange(requestPathBytes, requestPathIndex - 1, requestPathBytes.length));
   }
