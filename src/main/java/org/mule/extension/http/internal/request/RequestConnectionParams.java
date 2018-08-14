@@ -46,7 +46,7 @@ public final class RequestConnectionParams {
    */
   @Parameter
   @Optional
-  @Example("www.somehost.com")
+  @Example("www.mulesoft.com")
   @Placement(order = 2)
   private String host;
 
