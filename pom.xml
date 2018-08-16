@@ -110,11 +110,6 @@
             <version>${muleCorsKernelVersion}</version>
         </dependency>
         <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
-            <version>${javaxMailVersion}</version>
-        </dependency>
-        <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
             <version>${commonsCodecVersion}</version>
@@ -123,11 +118,6 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>${commonsLangVersion}</version>             
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>${commonsIoVersion}</version>
         </dependency>
         <dependency>
             <groupId>io.projectreactor</groupId>

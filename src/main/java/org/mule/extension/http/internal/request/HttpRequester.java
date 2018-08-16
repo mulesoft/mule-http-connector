@@ -35,7 +35,6 @@ import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.streaming.HttpStreamingType;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -100,62 +99,63 @@ public class HttpRequester {
                                   int retryCount) {
     notificationEmitter.fire(REQUEST_START,
                              new TypedValue<>(HttpRequestNotificationData.from(httpRequest), REQUEST_NOTIFICATION_DATA_TYPE));
+
     client.send(httpRequest, responseTimeout, followRedirects, resolveAuthentication(authentication))
-        .whenComplete(
-                      (response, exception) -> {
-                        if (response != null) {
-                          try {
-                            notificationEmitter.fire(REQUEST_COMPLETE,
-                                                     new TypedValue<>(HttpResponseNotificationData.from(response),
-                                                                      RESPONSE_NOTIFICATION_DATA_TYPE));
-                            from(RESPONSE_TO_RESULT.convert(config, muleContext, response, httpRequest.getUri()))
-                                .doOnNext(result -> {
-                                  try {
-                                    if (resendRequest(result, checkRetry, authentication)) {
-                                      scheduler.submit(() -> consumePayload(result));
-                                      doRequest(client, config, uri, method, streamingMode, sendBodyMode, followRedirects,
-                                                authentication, responseTimeout, responseValidator, transformationService,
-                                                requestBuilder, false, muleContext, scheduler, notificationEmitter, callback);
-                                    } else {
-                                      responseValidator.validate(result, httpRequest);
-                                      callback.success(result);
-                                    }
-                                  } catch (Exception e) {
-                                    callback.error(e);
-                                  }
-                                })
-                                .doOnError(Exception.class, e -> callback.error(e))
-                                .subscribe();
-                          } catch (Exception e) {
-                            callback.error(e);
-                          }
-                        } else {
-                          checkIfRemotelyClosed(exception, client.getDefaultUriParameters());
+        .whenComplete((response, exception) -> {
+          if (response != null) {
+            try {
+              notificationEmitter.fire(REQUEST_COMPLETE,
+                                       new TypedValue<>(HttpResponseNotificationData.from(response),
+                                                        RESPONSE_NOTIFICATION_DATA_TYPE));
+              from(RESPONSE_TO_RESULT.convert(config, muleContext, response, httpRequest.getUri()))
+                  .doOnNext(result -> {
+                    resendRequest(result, checkRetry, authentication, () -> {
+                      scheduler.submit(() -> consumePayload(result));
+                      doRequest(client, config, uri, method, streamingMode, sendBodyMode, followRedirects,
+                                authentication, responseTimeout, responseValidator, transformationService,
+                                requestBuilder, false, muleContext, scheduler, notificationEmitter, callback);
+                    }, () -> {
+                      responseValidator.validate(result, httpRequest);
+                      callback.success(result);
+                    });
+                  })
+                  .doOnError(Exception.class, e -> callback.error(e))
+                  .subscribe();
+            } catch (Exception e) {
+              callback.error(e);
+            }
+          } else {
+            checkIfRemotelyClosed(exception, client.getDefaultUriParameters());
 
-                          if (shouldRetryRemotelyClosed(exception, retryCount, httpRequest.getMethod())) {
-                            doRequestWithRetry(client, config, uri, method, streamingMode, sendBodyMode, followRedirects,
-                                               authentication, responseTimeout, responseValidator, transformationService,
-                                               requestBuilder, checkRetry, muleContext, scheduler, notificationEmitter, callback,
-                                               httpRequest, retryCount - 1);
-                            return;
-                          }
+            if (shouldRetryRemotelyClosed(exception, retryCount, httpRequest.getMethod())) {
+              doRequestWithRetry(client, config, uri, method, streamingMode, sendBodyMode, followRedirects,
+                                 authentication, responseTimeout, responseValidator, transformationService,
+                                 requestBuilder, checkRetry, muleContext, scheduler, notificationEmitter, callback,
+                                 httpRequest, retryCount - 1);
+              return;
+            }
 
-                          logger.error(getErrorMessage(httpRequest));
-                          HttpError error = exception instanceof TimeoutException ? TIMEOUT : CONNECTIVITY;
-                          callback.error(new HttpRequestFailedException(
-                                                                        createStaticMessage(ERROR_MESSAGE_GENERATOR
-                                                                            .createFrom(httpRequest, exception.getMessage())),
-                                                                        exception, error));
-                        }
-                      });
+            logger.error(getErrorMessage(httpRequest));
+            HttpError error = exception instanceof TimeoutException ? TIMEOUT : CONNECTIVITY;
+            callback.error(new HttpRequestFailedException(
+                                                          createStaticMessage(ERROR_MESSAGE_GENERATOR
+                                                              .createFrom(httpRequest, exception.getMessage())),
+                                                          exception, error));
+          }
+        });
   }
 
   private String getErrorMessage(HttpRequest httpRequest) {
     return format("Error sending HTTP request to %s", httpRequest.getUri());
   }
 
-  private boolean resendRequest(Result result, boolean retry, HttpRequestAuthentication authentication) throws MuleException {
-    return retry && authentication != null && authentication.shouldRetry(result);
+  private void resendRequest(Result result, boolean retry, HttpRequestAuthentication authentication, Runnable retryCallback,
+                             Runnable notRetryCallback) {
+    if (retry && authentication != null) {
+      authentication.retryIfShould(result, retryCallback, notRetryCallback);
+    } else {
+      notRetryCallback.run();
+    }
   }
 
   private void consumePayload(final Result result) {
