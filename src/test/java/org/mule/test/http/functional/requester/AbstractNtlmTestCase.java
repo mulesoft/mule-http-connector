@@ -6,31 +6,19 @@
  */
 package org.mule.test.http.functional.requester;
 
-import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
-import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.NTLM;
-import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.runtime.api.message.Message;
-import org.mule.test.http.functional.matcher.HttpMessageAttributesMatchers;
-
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Story;
 import org.eclipse.jetty.server.Request;
-import org.junit.Test;
 
-@Story(NTLM)
 public abstract class AbstractNtlmTestCase extends AbstractHttpRequestTestCase {
 
   protected static final String USER = "Zaphod";
   protected static final String PASSWORD = "Beeblebrox";
   protected static final String DOMAIN = "Ursa-Minor";
-  private static final String AUTHORIZED = "Authorized";
+  protected static final String AUTHORIZED = "Authorized";
 
   protected String requestUrl;
 
@@ -59,19 +47,6 @@ public abstract class AbstractNtlmTestCase extends AbstractHttpRequestTestCase {
   protected void handleRequest(Request baseRequest, HttpServletRequest request, HttpServletResponse response)
       throws IOException {
     handleRequest(baseRequest.getRequestURL().toString(), request, response);
-  }
-
-  @Test
-  @Description("Verifies a flow involving a NTLM proxy is successfully performed.")
-  public void validNtlmAuth() throws Exception {
-    Message response = runFlow(getFlowName()).getMessage();
-
-    assertThat((HttpResponseAttributes) response.getAttributes().getValue(), HttpMessageAttributesMatchers.hasStatusCode(SC_OK));
-    assertThat(getPayloadAsString(response), equalTo(AUTHORIZED));
-  }
-
-  protected String getFlowName() {
-    return "ntlmFlow";
   }
 
   private TestAuthorizer createTestAuthorizer(String clientAuthHeader, String serverAuthHeader, int unauthorizedHeader) {
