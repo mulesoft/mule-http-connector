@@ -18,7 +18,7 @@ import org.junit.Before;
 import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
-public class HttpRequestNtlmAuthTestCase extends AbstractNtlmTestCase {
+public class HttpRequestNtlmAuthTestCase extends AbstractAuthNtlmTestCase {
 
   @Parameterized.Parameter(0)
   public String flowName;

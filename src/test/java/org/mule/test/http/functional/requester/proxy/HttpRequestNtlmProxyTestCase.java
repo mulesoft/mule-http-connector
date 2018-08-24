@@ -12,12 +12,12 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.http.api.HttpHeaders.Names.PROXY_AUTHENTICATE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.PROXY_AUTHORIZATION;
 
-import org.mule.test.http.functional.requester.AbstractNtlmTestCase;
+import org.junit.Before;
+import org.mule.test.http.functional.requester.AbstractAuthNtlmTestCase;
 
 import io.qameta.allure.Description;
-import org.junit.Before;
 
-public class HttpRequestNtlmProxyTestCase extends AbstractNtlmTestCase {
+public class HttpRequestNtlmProxyTestCase extends AbstractAuthNtlmTestCase {
 
   @Before
   public void setup() {

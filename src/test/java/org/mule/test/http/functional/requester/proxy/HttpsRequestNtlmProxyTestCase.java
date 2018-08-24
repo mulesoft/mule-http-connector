@@ -11,21 +11,22 @@ import static javax.servlet.http.HttpServletResponse.SC_PROXY_AUTHENTICATION_REQ
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.http.api.HttpHeaders.Names.PROXY_AUTHENTICATE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.PROXY_AUTHORIZATION;
-import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.runtime.api.message.Message;
-import org.mule.test.http.functional.matcher.HttpMessageAttributesMatchers;
-import org.mule.test.http.functional.requester.AbstractNtlmTestCase;
-import org.mule.test.http.functional.requester.NtlmConnectHandler;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.junit4.DisplayName;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.junit.Before;
 import org.junit.Test;
+import org.mule.extension.http.api.HttpResponseAttributes;
+import org.mule.runtime.api.message.Message;
+import org.mule.test.http.functional.matcher.HttpMessageAttributesMatchers;
+import org.mule.test.http.functional.requester.AbstractAuthNtlmTestCase;
+import org.mule.test.http.functional.requester.NtlmConnectHandler;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.junit4.DisplayName;
 
 @DisplayName("HTTPS server behind NTLM HTTP proxy. Authentication is required.")
-public class HttpsRequestNtlmProxyTestCase extends AbstractNtlmTestCase {
+public class HttpsRequestNtlmProxyTestCase extends AbstractAuthNtlmTestCase {
 
   @Override
   protected AbstractHandler createHandler(Server server) {
