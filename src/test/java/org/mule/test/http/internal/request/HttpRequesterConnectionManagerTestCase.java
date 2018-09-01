@@ -20,6 +20,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.extension.http.internal.request.HttpRequesterConnectionManager;
+import org.mule.extension.http.internal.request.HttpRequesterConnectionManager.ShareableHttpClient;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.http.api.client.HttpClient;
 import org.mule.runtime.http.api.client.HttpClientConfiguration;
@@ -66,7 +67,7 @@ public class HttpRequesterConnectionManagerTestCase extends AbstractMuleTestCase
   @Test
   public void lookup() {
     assertThat(connectionManager.lookup(CONFIG_NAME), is(empty()));
-    HttpClient client = connectionManager.create(CONFIG_NAME, mock(HttpClientConfiguration.class));
+    ShareableHttpClient client = connectionManager.create(CONFIG_NAME, mock(HttpClientConfiguration.class));
     assertThat(connectionManager.lookup(CONFIG_NAME).get(), is(sameInstance(client)));
   }
 
@@ -81,8 +82,8 @@ public class HttpRequesterConnectionManagerTestCase extends AbstractMuleTestCase
   @Test
   public void sharedClientIsStartedByFirstUse() {
     HttpClientConfiguration configuration = getHttpClientConfiguration(CONFIG_NAME);
-    HttpClient client1 = connectionManager.create(CONFIG_NAME, configuration);
-    HttpClient client2 = connectionManager.lookup(CONFIG_NAME).get();
+    ShareableHttpClient client1 = connectionManager.create(CONFIG_NAME, configuration);
+    ShareableHttpClient client2 = connectionManager.lookup(CONFIG_NAME).get();
     client1.start();
     verify(delegateHttpClient).start();
     reset(delegateHttpClient);
@@ -92,8 +93,8 @@ public class HttpRequesterConnectionManagerTestCase extends AbstractMuleTestCase
 
   @Test
   public void sharedClientIsStoppedByLastUse() {
-    HttpClient client1 = connectionManager.create(CONFIG_NAME, getHttpClientConfiguration(CONFIG_NAME));
-    HttpClient client2 = connectionManager.lookup(CONFIG_NAME).get();
+    ShareableHttpClient client1 = connectionManager.create(CONFIG_NAME, getHttpClientConfiguration(CONFIG_NAME));
+    ShareableHttpClient client2 = connectionManager.lookup(CONFIG_NAME).get();
     client1.start();
     client2.start();
     client1.stop();
@@ -105,7 +106,7 @@ public class HttpRequesterConnectionManagerTestCase extends AbstractMuleTestCase
 
   @Test
   public void differentClientsDoNotAffectEachOther() {
-    HttpClient client1 = connectionManager.create(CONFIG_NAME, getHttpClientConfiguration(CONFIG_NAME));
+    ShareableHttpClient client1 = connectionManager.create(CONFIG_NAME, getHttpClientConfiguration(CONFIG_NAME));
     String otherConfig = "otherConfig";
     connectionManager.create(otherConfig, getHttpClientConfiguration(otherConfig));
     client1.start();
