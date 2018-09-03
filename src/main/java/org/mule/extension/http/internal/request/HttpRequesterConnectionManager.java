@@ -17,19 +17,17 @@ import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
 
 /**
- * Manages {@link HttpClient HttpClients} across multiple configurations based on their name, meaning two configurations spawning
- * from the same prototype will receive the same {@link HttpClient}.
+ * Manages {@link ShareableHttpClient ShareableHttpClients} across multiple configurations based on their name, meaning two
+ * configurations spawning from the same prototype will receive the same {@link ShareableHttpClient}.
  *
  * @since 1.0
  */
@@ -38,7 +36,7 @@ public class HttpRequesterConnectionManager implements Disposable {
   @Inject
   private HttpService httpService;
 
-  private Map<String, HttpClient> clients = new HashMap<>();
+  private Map<String, ShareableHttpClient> clients = new HashMap<>();
 
   public HttpRequesterConnectionManager() {}
 
@@ -47,24 +45,24 @@ public class HttpRequesterConnectionManager implements Disposable {
   }
 
   /**
-   * Searches for an already existing {@link HttpClient} associated with the desired configuration name.
+   * Searches for an already existing {@link ShareableHttpClient} associated with the desired configuration name.
    *
    * @param configName the name of the client to look for
-   * @return an {@link Optional} with an {@link HttpClient} if found or an empty one otherwise
+   * @return an {@link Optional} with an {@link ShareableHttpClient} if found or an empty one otherwise
    */
-  public Optional<HttpClient> lookup(String configName) {
+  public Optional<ShareableHttpClient> lookup(String configName) {
     return ofNullable(clients.get(configName));
   }
 
   /**
-   * Creates an {@link HttpClient} associated with the given configuration name. If there's already one, this operation will fail
-   * so {@link #lookup(String)} should be used first.
+   * Creates an {@link ShareableHttpClient} associated with the given configuration name. If there's already one, this operation
+   * will fail so {@link #lookup(String)} should be used first.
    *
    * @param configName
    * @param clientConfiguration
    * @return
    */
-  public synchronized HttpClient create(String configName, HttpClientConfiguration clientConfiguration) {
+  public synchronized ShareableHttpClient create(String configName, HttpClientConfiguration clientConfiguration) {
     checkArgument(!clients.containsKey(configName), format("There's an HttpClient available for %s already.", configName));
     ShareableHttpClient client = new ShareableHttpClient(httpService.getClientFactory().create(clientConfiguration));
     clients.put(configName, client);
@@ -77,10 +75,10 @@ public class HttpRequesterConnectionManager implements Disposable {
   }
 
   /**
-   * Proxy implementation of an {@link HttpClient} that allows being shared by only configuring the client when first required and
-   * only disabling it when last required.
+   * Wrapper implementation of an {@link HttpClient} that allows being shared by only configuring the client when first required
+   * and only disabling it when last required.
    */
-  private class ShareableHttpClient implements HttpClient {
+  public class ShareableHttpClient {
 
     private HttpClient delegate;
     private AtomicInteger usageCount = new AtomicInteger(0);
@@ -89,28 +87,18 @@ public class HttpRequesterConnectionManager implements Disposable {
       delegate = client;
     }
 
-    @Override
     public void start() {
       if (usageCount.incrementAndGet() == 1) {
         delegate.start();
       }
     }
 
-    @Override
     public void stop() {
       if (usageCount.decrementAndGet() == 0) {
         delegate.stop();
       }
     }
 
-    @Override
-    public HttpResponse send(HttpRequest request, int responseTimeout, boolean followRedirects,
-                             HttpAuthentication authentication)
-        throws IOException, TimeoutException {
-      return delegate.send(request, responseTimeout, followRedirects, authentication);
-    }
-
-    @Override
     public CompletableFuture<HttpResponse> sendAsync(HttpRequest request, int responseTimeout, boolean followRedirects,
                                                      HttpAuthentication authentication) {
       return delegate.sendAsync(request, responseTimeout, followRedirects, authentication);
