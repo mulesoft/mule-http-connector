@@ -21,6 +21,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.proxy.HttpProxyConfig;
+import org.mule.extension.http.internal.request.HttpRequesterConnectionManager.ShareableHttpClient;
 import org.mule.extension.http.internal.request.client.DefaultUriParameters;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
 import org.mule.extension.socket.api.socket.tcp.TcpClientSocketProperties;
@@ -45,7 +46,6 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.connectivity.NoConnectivityTest;
 import org.mule.runtime.http.api.HttpConstants;
-import org.mule.runtime.http.api.client.HttpClient;
 import org.mule.runtime.http.api.client.HttpClientConfiguration;
 import org.mule.runtime.http.api.client.proxy.ProxyConfig;
 
@@ -165,8 +165,8 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
 
   @Override
   public HttpExtensionClient connect() throws ConnectionException {
-    HttpClient httpClient;
-    java.util.Optional<HttpClient> client = connectionManager.lookup(configName);
+    ShareableHttpClient httpClient;
+    java.util.Optional<ShareableHttpClient> client = connectionManager.lookup(configName);
     if (client.isPresent()) {
       httpClient = client.get();
     } else {
