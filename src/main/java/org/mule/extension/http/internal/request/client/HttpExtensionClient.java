@@ -10,10 +10,10 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
 import org.mule.extension.http.api.request.client.UriParameters;
+import org.mule.extension.http.internal.request.HttpRequesterConnectionManager.ShareableHttpClient;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.http.api.client.HttpClient;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
@@ -21,18 +21,19 @@ import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Composition of an {@link HttpClient} with URI and authentication parameters that allow falling back to connection default
- * values for them.
+ * Composition of a {@link ShareableHttpClient} with URI and authentication parameters that allow falling back to connection
+ * default values for them.
  *
  * @since 1.0
  */
 public class HttpExtensionClient implements Startable, Stoppable {
 
   private final HttpRequestAuthentication authentication;
-  private final HttpClient httpClient;
+  private final ShareableHttpClient httpClient;
   private final UriParameters uriParameters;
 
-  public HttpExtensionClient(HttpClient httpClient, UriParameters uriParameters, HttpRequestAuthentication authentication) {
+  public HttpExtensionClient(ShareableHttpClient httpClient, UriParameters uriParameters,
+                             HttpRequestAuthentication authentication) {
     this.httpClient = httpClient;
     this.uriParameters = uriParameters;
     this.authentication = authentication;
