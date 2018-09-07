@@ -52,22 +52,6 @@ public class HttpRequestConfigTestCase extends AbstractHttpExtensionFunctionalTe
   }
 
   @Test
-  public void requestConfigDefaultPortHttp() throws Exception {
-    ConfigurationInstance config =
-        getConfigurationInstanceFromRegistry(DEFAULT_PORT_HTTP_REQUEST_CONFIG_NAME, testEvent(), muleContext);
-    HttpRequesterProvider provider = (HttpRequesterProvider) unwrapProviderWrapper(config.getConnectionProvider().get());
-    assertThat(provider.getConnectionParams().getPort(), is(HTTP.getDefaultPort()));
-  }
-
-  @Test
-  public void requestConfigDefaultPortHttps() throws Exception {
-    ConfigurationInstance config =
-        getConfigurationInstanceFromRegistry(DEFAULT_PORT_HTTPS_REQUEST_CONFIG_NAME, testEvent(), muleContext);
-    HttpRequesterProvider provider = (HttpRequesterProvider) unwrapProviderWrapper(config.getConnectionProvider().get());
-    assertThat(provider.getConnectionParams().getPort(), is(HTTPS.getDefaultPort()));
-  }
-
-  @Test
   public void requestConfigDefaultTlsContextHttps() throws Exception {
     ConfigurationInstance config =
         getConfigurationInstanceFromRegistry(DEFAULT_PORT_HTTPS_REQUEST_CONFIG_NAME, testEvent(), muleContext);

@@ -26,5 +26,4 @@
         </http:request>
         <object-to-string-transformer />
     </flow>
-    
 </mule>
