@@ -24,6 +24,7 @@
         <fluentHcVersion>4.5.2</fluentHcVersion>
         <grizzlyVersion>2.3.36-MULE-002</grizzlyVersion>
         <grizzlyAhcVersion>1.14-MULE-004</grizzlyAhcVersion>
+        <javaxActivationVersion>1.2.0</javaxActivationVersion>
         <javaxMailVersion>1.4.3</javaxMailVersion>
         <jettyVersion>9.0.7.v20131107</jettyVersion>
         <projectReactorVersion>3.2.0.M1</projectReactorVersion>
@@ -126,6 +127,11 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${guavaVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.activation</groupId>
+            <artifactId>javax.activation</artifactId>
+            <version>${javaxActivationVersion}</version>
         </dependency>
 
         <!-- Tests -->
