@@ -118,9 +118,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
   public void initialise() throws InitialisationException {
     final HttpConstants.Protocol protocol = connectionParams.getProtocol();
 
-    if (connectionParams.getPort() == null) {
-      connectionParams.setPort(protocol.getDefaultPort());
-    }
+    setPortIfNeeded();
 
     if (protocol.equals(HTTP) && tlsContext != null) {
       throw new InitialisationException(createStaticMessage("TlsContext cannot be configured with protocol HTTP, "
@@ -147,6 +145,20 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
   public void dispose() {
     if (authentication != null) {
       disposeIfNeeded(authentication, LOGGER);
+    }
+  }
+
+  private void setPortIfNeeded() {
+    final HttpConstants.Protocol protocol = connectionParams.getProtocol();
+    int defaultProtocolPort = protocol.getDefaultPort();
+    Integer configuredPort = connectionParams.getPort();
+    if (configuredPort == null) {
+      connectionParams.setPort(defaultProtocolPort);
+    } else if(configuredPort < 0) {
+      connectionParams.setPort(defaultProtocolPort);
+      if(LOGGER.isWarnEnabled()) {
+        LOGGER.warn("Invalid port: " + configuredPort + " in " + configName + ", defaulting to " + defaultProtocolPort);
+      }
     }
   }
 
@@ -185,6 +197,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
 
       httpClient = connectionManager.create(configName, configuration);
     }
+    setPortIfNeeded();
     UriParameters uriParameters = new DefaultUriParameters(connectionParams.getProtocol(), connectionParams.getHost(),
                                                            connectionParams.getPort());
     HttpExtensionClient extensionClient = new HttpExtensionClient(httpClient, uriParameters, authentication);

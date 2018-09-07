@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:request-config name="http_requester_config">
+        <http:request-connection host="#[vars.host]" port="#[vars.port]" protocol="HTTP"/>
+    </http:request-config>
+
+    <http:request-config name="https_requester_config">
+        <http:request-connection host="#[vars.host]" port="#[vars.port]" protocol="HTTPS"/>
+    </http:request-config>
+
+    <flow name="requestHTTPFlow">
+        <http:request config-ref="http_requester_config" path="/" method="GET"/>
+        <error-handler>
+            <test:on-error-check-log>
+                <test:check-summary>
+                    <test:summary-info key="Message" value="HTTP GET on resource 'http://localhost:80/' failed: Connection refused."/>
+                </test:check-summary>
+            </test:on-error-check-log>
+        </error-handler>
+    </flow>
+
+    <flow name="requestHTTPSFlow">
+        <http:request config-ref="https_requester_config" path="/" method="GET"/>
+        <error-handler>
+            <test:on-error-check-log>
+                <test:check-summary>
+                    <test:summary-info key="Message" value="HTTP GET on resource 'https://localhost:443/' failed: Connection refused."/>
+                </test:check-summary>
+            </test:on-error-check-log>
+        </error-handler>
+    </flow>
+
+</mule>
