@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
-      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="
-            http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
             http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
             http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
@@ -28,38 +26,5 @@
         </http:request>
         <object-to-string-transformer />
     </flow>
-
-
-
-    <http:request-config name="http_requester_config">
-        <http:request-connection host="#[vars.host]" port="#[vars.port]" protocol="HTTP"/>
-    </http:request-config>
-
-    <http:request-config name="https_requester_config">
-        <http:request-connection host="#[vars.host]" port="#[vars.port]" protocol="HTTPS"/>
-    </http:request-config>
-
-    <flow name="requestHTTPFlow">
-        <http:request config-ref="http_requester_config" path="/" method="GET"/>
-        <error-handler>
-            <test:on-error-check-log>
-                <test:check-summary>
-                    <test:summary-info key="Message" value="HTTP GET on resource 'http://invalidHostOnlyUsedToGetAnException:80/' failed: java.nio.channels.UnresolvedAddressException."/>
-                </test:check-summary>
-            </test:on-error-check-log>
-        </error-handler>
-    </flow>
-
-    <flow name="requestHTTPSFlow">
-        <http:request config-ref="https_requester_config" path="/" method="GET"/>
-        <error-handler>
-            <test:on-error-check-log>
-                <test:check-summary>
-                    <test:summary-info key="Message" value="HTTP GET on resource 'https://invalidHostOnlyUsedToGetAnException:443/' failed: java.nio.channels.UnresolvedAddressException."/>
-                </test:check-summary>
-            </test:on-error-check-log>
-        </error-handler>
-    </flow>
-
-
+    
 </mule>

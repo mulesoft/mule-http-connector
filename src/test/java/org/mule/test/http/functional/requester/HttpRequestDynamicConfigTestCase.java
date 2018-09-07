@@ -136,6 +136,4 @@ public class HttpRequestDynamicConfigTestCase extends AbstractHttpRequestTestCas
         .withPayload(AbstractMuleContextTestCase.TEST_MESSAGE)
         .run();
   }
-
-
 }
