@@ -154,9 +154,9 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
     Integer configuredPort = connectionParams.getPort();
     if (configuredPort == null) {
       connectionParams.setPort(defaultProtocolPort);
-    } else if(configuredPort < 0) {
+    } else if (configuredPort < 0) {
       connectionParams.setPort(defaultProtocolPort);
-      if(LOGGER.isWarnEnabled()) {
+      if (LOGGER.isWarnEnabled()) {
         LOGGER.warn("Invalid port: " + configuredPort + " in " + configName + ", defaulting to " + defaultProtocolPort);
       }
     }

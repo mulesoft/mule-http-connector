@@ -136,4 +136,44 @@ public class HttpRequestDynamicConfigTestCase extends AbstractHttpRequestTestCas
         .withPayload(AbstractMuleContextTestCase.TEST_MESSAGE)
         .run();
   }
+
+
+  private void requestHttp(Integer port) throws Exception {
+    flowRunner("requestHTTPFlow").withVariable("host", "invalidHostOnlyUsedToGetAnException").withVariable("port", port).run();
+  }
+
+  private void requestHttps(Integer port) throws Exception {
+    flowRunner("requestHTTPSFlow").withVariable("host", "invalidHostOnlyUsedToGetAnException").withVariable("port", port).run();
+  }
+
+  @Test
+  public void requestHttpWithValidPort() throws Exception {
+    requestHttp(80);
+  }
+
+  @Test
+  public void requestHttpsWithValidPort() throws Exception {
+    requestHttps(443);
+  }
+
+  @Test
+  public void requestHttpWithNullPortDefaultsTo80() throws Exception {
+    requestHttp(null);
+  }
+
+  @Test
+  public void requestHttpsWithNullPortDefaultsTo443() throws Exception {
+    requestHttps(null);
+  }
+
+  @Test
+  public void requestHttpWithNegativePortDefaultsTo80() throws Exception {
+    requestHttp(-78);
+  }
+
+  @Test
+  public void requestHttpsWithNegativePortDefaultsTo443() throws Exception {
+    requestHttps(-78);
+  }
+
 }
