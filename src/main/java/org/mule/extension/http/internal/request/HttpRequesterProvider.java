@@ -118,10 +118,6 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
   public void initialise() throws InitialisationException {
     final HttpConstants.Protocol protocol = connectionParams.getProtocol();
 
-    if (connectionParams.getPort() == null) {
-      connectionParams.setPort(protocol.getDefaultPort());
-    }
-
     if (protocol.equals(HTTP) && tlsContext != null) {
       throw new InitialisationException(createStaticMessage("TlsContext cannot be configured with protocol HTTP, "
           + "when using tls:context you must set attribute protocol=\"HTTPS\""),
