@@ -45,7 +45,7 @@ public class HttpRequestMaxConnectionsTestCase extends AbstractHttpRequestTestCa
 
     // Max connections should be reached
     flowRunner("limitedConnections").runExpectingException(allOf(instanceOf(HttpRequestFailedException.class),
-                                                                 hasMessage(containsString("No slot available"))));
+                                                                 hasMessage(containsString("process"))));
 
     messageHold.release();
     t1.join();
