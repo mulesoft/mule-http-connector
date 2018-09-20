@@ -16,6 +16,7 @@ import static org.mule.extension.http.api.streaming.HttpStreamingType.AUTO;
 import static org.mule.extension.http.api.streaming.HttpStreamingType.NEVER;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
@@ -23,7 +24,6 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.COOKIE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpHeaders.Names.X_CORRELATION_ID;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
-
 import org.mule.extension.http.api.request.HttpSendBodyMode;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
@@ -99,13 +99,6 @@ public class HttpRequestFactory {
     config.getDefaultQueryParams()
         .forEach(param -> builder.addQueryParam(param.getKey(), param.getValue()));
 
-    MediaType mediaType = requestBuilder.getBody().getDataType().getMediaType();
-    if (!builder.getHeaderValue(CONTENT_TYPE_HEADER).isPresent()) {
-      if (!MediaType.ANY.matches(mediaType)) {
-        builder.addHeader(CONTENT_TYPE_HEADER, mediaType.toRfcString());
-      }
-    }
-
     requestBuilder.getSendCorrelationId()
         .getOutboundCorrelationId(requestBuilder.getCorrelationInfo(), requestBuilder.getCorrelationId())
         .ifPresent(correlationId -> {
@@ -167,7 +160,14 @@ public class HttpRequestFactory {
     Optional<String> transferEncoding = requestBuilder.getHeaderValue(TRANSFER_ENCODING_HEADER);
     Optional<String> contentLength = requestBuilder.getHeaderValue(CONTENT_LENGTH_HEADER);
 
-    if (isEmptyBody(payload, resolvedMethod, sendBodyMode)) {
+    boolean emptyBody = isEmptyBody(payload, resolvedMethod, sendBodyMode);
+
+    MediaType mediaType = body.getDataType().getMediaType();
+    if (!requestBuilder.getHeaderValue(CONTENT_TYPE_HEADER).isPresent() && !emptyBody && !ANY.matches(mediaType)) {
+      requestBuilder.addHeader(CONTENT_TYPE_HEADER, mediaType.toRfcString());
+    }
+
+    if (emptyBody) {
       entity = new EmptyHttpEntity();
     } else if (payload instanceof InputStream || payload instanceof CursorStreamProvider) {
       payload = payload instanceof CursorStreamProvider ? ((CursorStreamProvider) payload).openCursor() : payload;
