@@ -16,6 +16,7 @@ import static org.mule.extension.http.api.streaming.HttpStreamingType.AUTO;
 import static org.mule.extension.http.api.streaming.HttpStreamingType.NEVER;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
@@ -162,10 +163,8 @@ public class HttpRequestFactory {
     boolean emptyBody = isEmptyBody(payload, resolvedMethod, sendBodyMode);
 
     MediaType mediaType = body.getDataType().getMediaType();
-    if (!requestBuilder.getHeaderValue(CONTENT_TYPE_HEADER).isPresent() && !emptyBody) {
-      if (!MediaType.ANY.matches(mediaType)) {
-        requestBuilder.addHeader(CONTENT_TYPE_HEADER, mediaType.toRfcString());
-      }
+    if (!requestBuilder.getHeaderValue(CONTENT_TYPE_HEADER).isPresent() && !emptyBody && !ANY.matches(mediaType)) {
+      requestBuilder.addHeader(CONTENT_TYPE_HEADER, mediaType.toRfcString());
     }
 
     if (emptyBody) {
