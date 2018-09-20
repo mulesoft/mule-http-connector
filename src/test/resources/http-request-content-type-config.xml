@@ -12,12 +12,22 @@
 
     <flow name="requesterContentType" >
         <set-payload value="{ &quot;key1&quot; : &quot;value, &quot;key2&quot; : 2 }" mimeType="application/json" encoding="UTF-8"/>
-        <http:request config-ref="requesterConfig" path="testPath" method="GET"/>
+        <http:request config-ref="requesterConfig" path="testPath" method="#[vars.method]"/>
+    </flow>
+
+    <flow name="requesterContentTypeAlways" >
+        <set-payload value="{ &quot;key1&quot; : &quot;value, &quot;key2&quot; : 2 }" mimeType="application/json" encoding="UTF-8"/>
+        <http:request config-ref="requesterConfig" path="testPath" method="#[vars.method]" sendBodyMode="ALWAYS"/>
+    </flow>
+
+    <flow name="requesterContentTypeNever">
+        <set-payload value="{ &quot;key1&quot; : &quot;value, &quot;key2&quot; : 2 }" mimeType="application/json" encoding="UTF-8"/>
+        <http:request config-ref="requesterConfig" path="testPath" method="#[vars.method]" sendBodyMode="NEVER"/>
     </flow>
 
     <flow name="requesterBuilderContentType" >
         <set-payload value="{ &quot;key1&quot; : &quot;value, &quot;key2&quot; : 2 }" mimeType="text/plain" encoding="UTF-8"/>
-        <http:request config-ref="requesterConfig" path="testPath" method="GET">
+        <http:request config-ref="requesterConfig" path="testPath" method="#[vars.method]">
             <http:headers>
                 #[{'content-type' : 'application/json; charset=UTF-8'}]
             </http:headers>
