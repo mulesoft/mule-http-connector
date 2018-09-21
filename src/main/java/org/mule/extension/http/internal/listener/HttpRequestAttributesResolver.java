@@ -68,7 +68,7 @@ public class HttpRequestAttributesResolver {
         .queryParams(decodeQueryString(queryString))
         .localAddress(requestContext.getServerConnection().getLocalHostAddress().toString())
         .remoteAddress(clientConnection.getRemoteHostAddress().toString())
-        .clientCertificate(clientConnection.getClientCertificate())
+        .clientCertificate(clientConnection::getClientCertificate)
         .build();
   }
 }
