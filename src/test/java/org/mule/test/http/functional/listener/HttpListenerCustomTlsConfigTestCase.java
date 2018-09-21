@@ -6,8 +6,9 @@
  */
 package org.mule.test.http.functional.listener;
 
-import static org.hamcrest.core.Is.is;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
+import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.HTTPS;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -39,8 +40,9 @@ public class HttpListenerCustomTlsConfigTestCase extends AbstractHttpTestCase {
     final CoreEvent res = flowRunner("testFlowGlobalContextClient")
         .withVariable("port", port1.getNumber())
         .withPayload("data")
+        .keepStreamsOpen()
         .run();
-    assertThat(res.getMessage().getPayload().getValue(), is("ok"));
+    assertThat(res.getMessage(), hasPayload(equalTo("ok X.509")));
   }
 
   @Test
@@ -48,8 +50,9 @@ public class HttpListenerCustomTlsConfigTestCase extends AbstractHttpTestCase {
     final CoreEvent res = flowRunner("testFlowNestedContextClient")
         .withVariable("port", port2.getNumber())
         .withPayload("data")
+        .keepStreamsOpen()
         .run();
-    assertThat(res.getMessage().getPayload().getValue(), is("all right"));
+    assertThat(res.getMessage(), hasPayload(equalTo("all right X.509")));
   }
 
 }

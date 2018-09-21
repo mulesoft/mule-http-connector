@@ -32,23 +32,21 @@
 
     <flow name="testFlowGlobalContext">
         <http:listener config-ref="globalConfig" path="/" allowedMethods="GET"/>
-        <expression-component>mel:payload = 'ok'</expression-component>
+        <set-payload value="#['ok ' ++ attributes.clientCertificate.'type']"/>
     </flow>
 
     <flow name="testFlowNestedContext">
         <http:listener config-ref="nestedConfig" path="/" allowedMethods="POST"/>
-        <expression-component>mel:payload = 'all right'</expression-component>
+        <set-payload value="#['all right ' ++ attributes.clientCertificate.'type']"/>
     </flow>
 
 
     <flow name="testFlowGlobalContextClient">
         <http:request config-ref="clientGlobalConfig" path="/" method="GET"/>
-        <object-to-string-transformer />
     </flow>
 
     <flow name="testFlowNestedContextClient">
         <http:request config-ref="clientGlobalConfig" path="/" method="POST"/>
-        <object-to-string-transformer />
     </flow>
 
 </mule>

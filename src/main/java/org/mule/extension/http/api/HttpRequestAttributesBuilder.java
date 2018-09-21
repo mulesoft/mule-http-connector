@@ -14,6 +14,7 @@ import org.mule.runtime.api.util.MultiMap;
 
 import java.security.cert.Certificate;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * Builder for {@link HttpRequestAttributes}.
@@ -39,7 +40,7 @@ public class HttpRequestAttributesBuilder {
   private String queryString = "";
   private String localAddress;
   private String remoteAddress;
-  private Certificate clientCertificate;
+  private Supplier<Certificate> clientCertificate = () -> null;
 
   private boolean resolveMaskedRequestPath = false;
 
@@ -60,7 +61,7 @@ public class HttpRequestAttributesBuilder {
     this.queryString = requestAttributes.getQueryString();
     this.localAddress = requestAttributes.getLocalAddress();
     this.remoteAddress = requestAttributes.getRemoteAddress();
-    this.clientCertificate = requestAttributes.getClientCertificate();
+    this.clientCertificate = requestAttributes::getClientCertificate;
   }
 
   public HttpRequestAttributesBuilder headers(MultiMap<String, String> headers) {
@@ -135,6 +136,18 @@ public class HttpRequestAttributesBuilder {
   }
 
   public HttpRequestAttributesBuilder clientCertificate(Certificate clientCertificate) {
+    this.clientCertificate = () -> clientCertificate;
+    return this;
+  }
+
+  /**
+   * Allows establishing a lazily calculated certificate, avoiding SSL work until the {@link Certificate} is actually needed.
+   *
+   * @param clientCertificate a {@link Supplier} of the client {@link Certificate}
+   * @return this builder
+   * @since 1.4.0
+   */
+  public HttpRequestAttributesBuilder clientCertificate(Supplier<Certificate> clientCertificate) {
     this.clientCertificate = clientCertificate;
     return this;
   }
