@@ -169,8 +169,6 @@ public class HttpRequester {
     if (fireNotificationMethod != null) {
       try {
         fireNotificationMethod.invoke(notificationEmitter, action, data, dataType);
-
-        System.out.println("Invoked lazyly!!!");
       } catch (InvocationTargetException e) {
         throw new MuleRuntimeException(e.getCause());
       } catch (IllegalAccessException | IllegalArgumentException e) {
