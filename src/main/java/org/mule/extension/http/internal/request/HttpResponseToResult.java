@@ -64,7 +64,7 @@ public class HttpResponseToResult {
 
     HttpEntity entity = response.getEntity();
 
-    if (isEmpty(responseContentType) && notEmpty(entity)) {
+    if (isEmpty(responseContentType) && !empty(entity)) {
       // RFC-2616 specifies application/octet-stream as default when none is received
       responseContentType = BINARY_CONTENT_TYPE;
     }
@@ -86,8 +86,8 @@ public class HttpResponseToResult {
     return just(builder.output(entity.getContent()).attributes(responseAttributes).build());
   }
 
-  private boolean notEmpty(HttpEntity entity) {
-    return entity.getLength().map(length -> length > 0).orElse(true);
+  private boolean empty(HttpEntity entity) {
+    return entity.getLength().filter(length -> length <= 0).isPresent();
   }
 
   private HttpResponseAttributes createAttributes(HttpResponse response) {

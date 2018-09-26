@@ -42,6 +42,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.extension.api.notification.NotificationActionDefinition;
 import org.mule.runtime.extension.api.notification.NotificationEmitter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
@@ -54,7 +55,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
 
 /**
  * Component capable of performing an HTTP request given a request.
@@ -73,6 +77,19 @@ public class HttpRequester {
   private static final HttpRequestFactory EVENT_TO_HTTP_REQUEST = new HttpRequestFactory();
   private static final HttpResponseToResult RESPONSE_TO_RESULT = new HttpResponseToResult();
   private static final HttpErrorMessageGenerator ERROR_MESSAGE_GENERATOR = new HttpErrorMessageGenerator();
+
+  private static final Method fireNotificationMethod;
+
+  static {
+    Method fireLazy = null;
+    try {
+      fireLazy = NotificationEmitter.class.getDeclaredMethod("fireLazy", NotificationActionDefinition.class, Supplier.class,
+                                                             DataType.class);
+    } catch (NoSuchMethodException | SecurityException e) {
+      // Nothing to do;
+    }
+    fireNotificationMethod = fireLazy;
+  }
 
   public void doRequest(HttpExtensionClient client, HttpRequesterConfig config, String uri, String method,
                         HttpStreamingType streamingMode, HttpSendBodyMode sendBodyMode,
@@ -99,16 +116,15 @@ public class HttpRequester {
                                   StreamingHelper streamingHelper,
                                   CompletionCallback<InputStream, HttpResponseAttributes> callback, HttpRequest httpRequest,
                                   int retryCount) {
-    notificationEmitter.fire(REQUEST_START,
-                             new TypedValue<>(HttpRequestNotificationData.from(httpRequest), REQUEST_NOTIFICATION_DATA_TYPE));
+    fireNotification(notificationEmitter, REQUEST_START, () -> HttpRequestNotificationData.from(httpRequest),
+                     REQUEST_NOTIFICATION_DATA_TYPE);
 
     client.send(httpRequest, responseTimeout, followRedirects, resolveAuthentication(authentication))
         .whenComplete((response, exception) -> {
           if (response != null) {
             try {
-              notificationEmitter.fire(REQUEST_COMPLETE,
-                                       new TypedValue<>(HttpResponseNotificationData.from(response),
-                                                        RESPONSE_NOTIFICATION_DATA_TYPE));
+              fireNotification(notificationEmitter, REQUEST_COMPLETE, () -> HttpResponseNotificationData.from(response),
+                               RESPONSE_NOTIFICATION_DATA_TYPE);
               from(RESPONSE_TO_RESULT.convert(config, muleContext, response, httpRequest.getUri()))
                   .doOnNext(result -> {
                     resendRequest(result, checkRetry, authentication, () -> {
@@ -146,6 +162,21 @@ public class HttpRequester {
                                                           exception, error));
           }
         });
+  }
+
+  private void fireNotification(NotificationEmitter notificationEmitter, NotificationActionDefinition action,
+                                Supplier<?> data, DataType dataType) {
+    if (fireNotificationMethod != null) {
+      try {
+        fireNotificationMethod.invoke(notificationEmitter, action, data, dataType);
+      } catch (InvocationTargetException e) {
+        throw new MuleRuntimeException(e.getCause());
+      } catch (IllegalAccessException | IllegalArgumentException e) {
+        notificationEmitter.fire(action, new TypedValue(data.get(), dataType));
+      }
+    } else {
+      notificationEmitter.fire(action, new TypedValue(data.get(), dataType));
+    }
   }
 
   private String getErrorMessage(HttpRequest httpRequest) {
