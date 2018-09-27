@@ -24,8 +24,13 @@ import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.api.streaming.Cursor;
+import org.mule.runtime.api.streaming.CursorProvider;
+import org.mule.runtime.api.streaming.bytes.CursorStream;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.Streaming;
@@ -98,6 +103,9 @@ public class HttpRequestOperations implements Initialisable, Disposable {
                       CompletionCallback<InputStream, HttpResponseAttributes> callback) {
     try {
       HttpRequesterRequestBuilder resolvedBuilder = requestBuilder != null ? requestBuilder : DEFAULT_REQUEST_BUILDER;
+
+      handleCursor(resolvedBuilder);
+
       resolvedBuilder.setCorrelationInfo(correlationInfo);
 
       String resolvedUri;
@@ -119,6 +127,28 @@ public class HttpRequestOperations implements Initialisable, Disposable {
                           transformationService, resolvedBuilder, true, muleContext, scheduler, notificationEmitter, callback);
     } catch (Throwable t) {
       callback.error(t instanceof Exception ? (Exception) t : new DefaultMuleException(t));
+    }
+  }
+
+  /**
+   * If the body is a {@link Cursor}, we need to change it for the {@link CursorProvider} to re-read the content in the case we
+   * need to make a retry of a request.
+   */
+  protected void handleCursor(HttpRequesterRequestBuilder resolvedBuilder) {
+    if (resolvedBuilder.getBody().getValue() instanceof CursorStream) {
+      CursorStream cursor = (CursorStream) (resolvedBuilder.getBody().getValue());
+
+      long position = cursor.getPosition();
+      CursorStreamProvider provider = (CursorStreamProvider) cursor.getProvider();
+
+      if (position == 0) {
+        resolvedBuilder.setBody(new TypedValue<Object>(provider, resolvedBuilder.getBody().getDataType(),
+                                                       resolvedBuilder.getBody().getByteLength()));
+      } else {
+        resolvedBuilder.setBody(new TypedValue<Object>(new OffsetCursorProviderWrapper(provider, position),
+                                                       resolvedBuilder.getBody().getDataType(),
+                                                       resolvedBuilder.getBody().getByteLength()));
+      }
     }
   }
 

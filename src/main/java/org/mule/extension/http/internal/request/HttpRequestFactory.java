@@ -8,7 +8,9 @@ package org.mule.extension.http.internal.request;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static java.lang.String.valueOf;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
+import static java.util.Optional.ofNullable;
 import static org.mule.extension.http.api.error.HttpError.SECURITY;
 import static org.mule.extension.http.api.error.HttpError.TRANSFORMATION;
 import static org.mule.extension.http.api.streaming.HttpStreamingType.ALWAYS;
@@ -16,6 +18,7 @@ import static org.mule.extension.http.api.streaming.HttpStreamingType.AUTO;
 import static org.mule.extension.http.api.streaming.HttpStreamingType.NEVER;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
+import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
@@ -38,12 +41,14 @@ import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.runtime.http.api.domain.entity.EmptyHttpEntity;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
 import org.mule.runtime.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.runtime.http.api.domain.entity.multipart.HttpPart;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalLong;
@@ -51,6 +56,8 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import sun.misc.IOUtils;
 
 /**
  * Component that generates {@link HttpRequest HttpRequests}.
@@ -167,10 +174,33 @@ public class HttpRequestFactory {
     Optional<String> transferEncoding = requestBuilder.getHeaderValue(TRANSFER_ENCODING_HEADER);
     Optional<String> contentLength = requestBuilder.getHeaderValue(CONTENT_LENGTH_HEADER);
 
+    // TODO This screams for a refactor into an Abstract Factory...
     if (isEmptyBody(payload, resolvedMethod, sendBodyMode)) {
       entity = new EmptyHttpEntity();
-    } else if (payload instanceof InputStream || payload instanceof CursorStreamProvider) {
-      payload = payload instanceof CursorStreamProvider ? ((CursorStreamProvider) payload).openCursor() : payload;
+    } else if (payload instanceof CursorStreamProvider) {
+      if (streamingMode == ALWAYS) {
+        entity = guaranteeStreaming(requestBuilder, transferEncoding, contentLength, (CursorStreamProvider) payload);
+      } else if (streamingMode == AUTO) {
+        if (contentLength.isPresent()) {
+          sanitizeForContentLength(requestBuilder, transferEncoding, BOTH_TRANSFER_HEADERS_SET_MESSAGE);
+          entity =
+              new ByteArrayHttpEntity(getPayloadAsBytes(((CursorStreamProvider) payload).openCursor(), transformationService));
+        } else if ((transferEncoding.isPresent() && CHUNKED.equalsIgnoreCase(transferEncoding.get())) || !length.isPresent()) {
+          entity = new RepeatableInputStreamHttpEntity((CursorStreamProvider) payload);
+        } else {
+          sanitizeForContentLength(requestBuilder, transferEncoding, INVALID_TRANSFER_ENCODING_HEADER_MESSAGE);
+          entity = avoidConsumingPayload(requestBuilder, (CursorStreamProvider) payload, length);
+        }
+      } else {
+        sanitizeForContentLength(requestBuilder, transferEncoding, TRANSFER_ENCODING_NOT_ALLOWED_WHEN_NEVER_MESSAGE);
+        if (length.isPresent()) {
+          entity = avoidConsumingPayload(requestBuilder, (CursorStreamProvider) payload, length);
+        } else {
+          entity =
+              new ByteArrayHttpEntity(getPayloadAsBytes(((CursorStreamProvider) payload).openCursor(), transformationService));
+        }
+      }
+    } else if (payload instanceof InputStream) {
       if (streamingMode == ALWAYS) {
         entity = guaranteeStreaming(requestBuilder, transferEncoding, contentLength, (InputStream) payload);
       } else if (streamingMode == AUTO) {
@@ -236,11 +266,29 @@ public class HttpRequestFactory {
   }
 
   /**
+   * Generates an {@link InputStreamHttpEntity} with no length and sanitizes the headers for chunking
+   */
+  private HttpEntity guaranteeStreaming(HttpRequestBuilder requestBuilder, Optional<String> transferEncoding,
+                                        Optional<String> contentLength, CursorStreamProvider streamProvider) {
+    sanitizeForStreaming(requestBuilder, transferEncoding, contentLength);
+    return new RepeatableInputStreamHttpEntity(streamProvider);
+  }
+
+  /**
    * Generates an {@link InputStreamHttpEntity} with a length and sets the Content-Length header with it as well
    */
   private HttpEntity avoidConsumingPayload(HttpRequestBuilder requestBuilder, InputStream payload, OptionalLong length) {
     requestBuilder.addHeader(CONTENT_LENGTH, valueOf(length.getAsLong()));
     return new InputStreamHttpEntity(payload, length.getAsLong());
+  }
+
+  /**
+   * Generates an {@link InputStreamHttpEntity} with a length and sets the Content-Length header with it as well
+   */
+  private HttpEntity avoidConsumingPayload(HttpRequestBuilder requestBuilder, CursorStreamProvider streamProvider,
+                                           OptionalLong length) {
+    requestBuilder.addHeader(CONTENT_LENGTH, valueOf(length.getAsLong()));
+    return new RepeatableInputStreamHttpEntity(streamProvider, length.getAsLong());
   }
 
   private byte[] getPayloadAsBytes(Object payload, TransformationService transformationService) {
@@ -276,5 +324,52 @@ public class HttpRequestFactory {
         LOGGER.debug(reason);
       }
     }
+  }
+
+  private class RepeatableInputStreamHttpEntity implements HttpEntity {
+
+    private Long contentLength;
+    private CursorStreamProvider streamProvider;
+
+    public RepeatableInputStreamHttpEntity(CursorStreamProvider streamProvider) {
+      checkNotNull(streamProvider, "HTTP entity stream provider cannot be null.");
+      this.streamProvider = streamProvider;
+    }
+
+    public RepeatableInputStreamHttpEntity(CursorStreamProvider streamProvider, Long contentLength) {
+      this(streamProvider);
+      this.contentLength = contentLength;
+    }
+
+    @Override
+    public boolean isStreaming() {
+      return true;
+    }
+
+    @Override
+    public boolean isComposed() {
+      return false;
+    }
+
+    @Override
+    public InputStream getContent() {
+      return streamProvider.openCursor();
+    }
+
+    @Override
+    public byte[] getBytes() throws IOException {
+      return IOUtils.readFully(getContent(), -1, true);
+    }
+
+    @Override
+    public Collection<HttpPart> getParts() {
+      return emptyList();
+    }
+
+    @Override
+    public Optional<Long> getLength() {
+      return ofNullable(contentLength);
+    }
+
   }
 }
