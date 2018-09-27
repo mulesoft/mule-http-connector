@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:request-config name="requestConfig" >
+        <http:request-connection host="localhost" port="${httpPort}" />
+    </http:request-config>
+
+    <http:request-config name="requestPayloadConfig" >
+        <http:request-connection host="localhost" port="${httpPortPayload}" />
+    </http:request-config>
+
+    <http:listener-config name="listenerPayloadConfig">
+        <http:listener-connection host="localhost" port="${httpPortPayload}"/>
+    </http:listener-config>
+
+    <flow name="retryFlow">
+        <http:request config-ref="requestPayloadConfig" method="GET"  path="payload" />
+        <logger level="WARN" message="#[payload]"/>
+        <http:request config-ref="requestConfig" method="PUT" path="test" />
+    </flow>
+
+    <flow name="generatePayloadFlow">
+        <http:listener config-ref="listenerPayloadConfig"  path="payload"/>
+        <set-payload value="I'm gonna be repeatable!! Woo-hoo!"/>
+    </flow>
+
+</mule>
