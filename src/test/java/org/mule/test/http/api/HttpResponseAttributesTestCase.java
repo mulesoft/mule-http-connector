@@ -6,9 +6,11 @@
  */
 package org.mule.test.http.api;
 
+import static java.lang.System.lineSeparator;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
+
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.util.MultiMap;
 
@@ -18,43 +20,44 @@ import org.junit.Test;
 @Feature(HTTP_EXTENSION)
 public class HttpResponseAttributesTestCase extends AbstractHttpAttributesTestCase {
 
-  private static final String COMPLETE_TO_STRING = "org.mule.extension.http.api.HttpResponseAttributes\n" +
-      "{\n" +
-      "   Status Code=401\n" +
-      "   Reason Phrase=Some Reason Phrase\n" +
-      "   Headers=[\n" +
-      "      header2=headerValue2\n" +
-      "      header1=headerValue1\n" +
-      "   ]\n" +
+  private static final String COMPLETE_TO_STRING = "org.mule.extension.http.api.HttpResponseAttributes" + lineSeparator() +
+      "{" + lineSeparator() +
+      "   Status Code=401" + lineSeparator() +
+      "   Reason Phrase=Some Reason Phrase" + lineSeparator() +
+      "   Headers=[" + lineSeparator() +
+      "      header2=headerValue2" + lineSeparator() +
+      "      header1=headerValue1" + lineSeparator() +
+      "   ]" + lineSeparator() +
       "}";
 
-  private static final String TO_STRING_WITHOUT_HEADERS = "org.mule.extension.http.api.HttpResponseAttributes\n" +
-      "{\n" +
-      "   Status Code=401\n" +
-      "   Reason Phrase=Some Reason Phrase\n" +
-      "   Headers=[]\n" +
+  private static final String TO_STRING_WITHOUT_HEADERS = "org.mule.extension.http.api.HttpResponseAttributes" + lineSeparator() +
+      "{" + lineSeparator() +
+      "   Status Code=401" + lineSeparator() +
+      "   Reason Phrase=Some Reason Phrase" + lineSeparator() +
+      "   Headers=[]" + lineSeparator() +
       "}";
 
-  private static final String TO_STRING_WITHOUT_REASON_PHRASE = "org.mule.extension.http.api.HttpResponseAttributes\n" +
-      "{\n" +
-      "   Status Code=401\n" +
-      "   Reason Phrase=null\n" +
-      "   Headers=[\n" +
-      "      header2=headerValue2\n" +
-      "      header1=headerValue1\n" +
-      "   ]\n" +
-      "}";
+  private static final String TO_STRING_WITHOUT_REASON_PHRASE =
+      "org.mule.extension.http.api.HttpResponseAttributes" + lineSeparator() +
+          "{" + lineSeparator() +
+          "   Status Code=401" + lineSeparator() +
+          "   Reason Phrase=null" + lineSeparator() +
+          "   Headers=[" + lineSeparator() +
+          "      header2=headerValue2" + lineSeparator() +
+          "      header1=headerValue1" + lineSeparator() +
+          "   ]" + lineSeparator() +
+          "}";
 
-  private static final String OBFUSCATED_TO_STRING = "org.mule.extension.http.api.HttpResponseAttributes\n" +
-      "{\n" +
-      "   Status Code=401\n" +
-      "   Reason Phrase=Unauthorised\n" +
-      "   Headers=[\n" +
-      "      password=****\n" +
-      "      pass=****\n" +
-      "      client_secret=****\n" +
-      "      regular=show me\n" +
-      "   ]\n" +
+  private static final String OBFUSCATED_TO_STRING = "org.mule.extension.http.api.HttpResponseAttributes" + lineSeparator() +
+      "{" + lineSeparator() +
+      "   Status Code=401" + lineSeparator() +
+      "   Reason Phrase=Unauthorised" + lineSeparator() +
+      "   Headers=[" + lineSeparator() +
+      "      password=****" + lineSeparator() +
+      "      pass=****" + lineSeparator() +
+      "      client_secret=****" + lineSeparator() +
+      "      regular=show me" + lineSeparator() +
+      "   ]" + lineSeparator() +
       "}";
 
   private HttpResponseAttributes responseAttributes;

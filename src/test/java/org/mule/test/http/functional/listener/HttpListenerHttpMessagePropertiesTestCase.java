@@ -7,7 +7,6 @@
 package org.mule.test.http.functional.listener;
 
 import static org.apache.http.client.fluent.Request.Post;
-import static org.hamcrest.CoreMatchers.both;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -19,6 +18,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_I
 import static org.mule.runtime.http.api.HttpHeaders.Names.X_CORRELATION_ID;
 import static org.mule.runtime.http.api.HttpHeaders.Names.X_FORWARDED_FOR;
 import static org.mule.runtime.http.api.domain.HttpProtocol.HTTP_1_1;
+
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.functional.api.component.TestConnectorQueueHandler;
 import org.mule.runtime.api.message.Message;
@@ -28,9 +28,6 @@ import org.mule.runtime.http.api.domain.HttpProtocol;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
-import com.google.common.base.Charsets;
-import com.google.common.collect.ImmutableMap;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
@@ -38,6 +35,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
+import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableMap;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.fluent.Request;
 import org.hamcrest.Matchers;
@@ -99,7 +98,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
     assertThat(queryParams.size(), is(0));
     assertThat(attributes.getMethod(), is("GET"));
     assertThat(attributes.getVersion(), is(HTTP_1_1.asString()));
-    assertThat(attributes.getLocalAddress(), both(containsString("localhost")).and(containsString("/127.0.0.1")));
+    assertThat(attributes.getLocalAddress(), containsString("/127.0.0.1"));
     assertThat(attributes.getRemoteAddress(), is(startsWith("/127.0.0.1")));
   }
 
