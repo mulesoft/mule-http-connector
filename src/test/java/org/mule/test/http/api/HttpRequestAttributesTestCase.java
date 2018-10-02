@@ -6,8 +6,10 @@
  */
 package org.mule.test.http.api;
 
+import static java.lang.System.lineSeparator;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+
 import org.mule.extension.http.api.HttpRequestAttributesBuilder;
 import org.mule.runtime.api.util.MultiMap;
 
@@ -18,142 +20,143 @@ import org.junit.Test;
 
 public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCase {
 
-  private static final String TO_STRING_COMPLETE = "org.mule.extension.http.api.HttpRequestAttributes\n" +
-      "{\n" +
-      "   Request path=/request/path\n" +
-      "   Method=GET\n" +
-      "   Listener path=/listener/path\n" +
-      "   Local Address=http://127.0.0.1:8080/\n" +
-      "   Query String=queryParam1=queryParam1&queryParam2=queryParam2\n" +
-      "   Relative Path=/relative/path\n" +
-      "   Masked Request Path=null\n" +
-      "   Remote Address=http://10.1.2.5:8080/\n" +
-      "   Request Uri=http://127.0.0.1/gateway\n" +
-      "   Scheme=scheme\n" +
-      "   Version=1.0\n" +
-      "   Headers=[\n" +
-      "      header2=headerValue2\n" +
-      "      header1=headerValue1\n" +
-      "   ]\n" +
-      "   Query Parameters=[\n" +
-      "      queryParam1=queryParamValue1\n" +
-      "      queryParam2=queryParamValue2\n" +
-      "   ]\n" +
-      "   URI Parameters=[\n" +
-      "      uriParam1=uriParamValue1\n" +
-      "      uriParam2=uriParamValue2\n" +
-      "   ]\n" +
+  private static final String TO_STRING_COMPLETE = "org.mule.extension.http.api.HttpRequestAttributes" + lineSeparator() +
+      "{" + lineSeparator() +
+      "   Request path=/request/path" + lineSeparator() +
+      "   Method=GET" + lineSeparator() +
+      "   Listener path=/listener/path" + lineSeparator() +
+      "   Local Address=http://127.0.0.1:8080/" + lineSeparator() +
+      "   Query String=queryParam1=queryParam1&queryParam2=queryParam2" + lineSeparator() +
+      "   Relative Path=/relative/path" + lineSeparator() +
+      "   Masked Request Path=null" + lineSeparator() +
+      "   Remote Address=http://10.1.2.5:8080/" + lineSeparator() +
+      "   Request Uri=http://127.0.0.1/gateway" + lineSeparator() +
+      "   Scheme=scheme" + lineSeparator() +
+      "   Version=1.0" + lineSeparator() +
+      "   Headers=[" + lineSeparator() +
+      "      header2=headerValue2" + lineSeparator() +
+      "      header1=headerValue1" + lineSeparator() +
+      "   ]" + lineSeparator() +
+      "   Query Parameters=[" + lineSeparator() +
+      "      queryParam1=queryParamValue1" + lineSeparator() +
+      "      queryParam2=queryParamValue2" + lineSeparator() +
+      "   ]" + lineSeparator() +
+      "   URI Parameters=[" + lineSeparator() +
+      "      uriParam1=uriParamValue1" + lineSeparator() +
+      "      uriParam2=uriParamValue2" + lineSeparator() +
+      "   ]" + lineSeparator() +
       "}";
 
-  private static final String TO_STRING_EMPTY = "org.mule.extension.http.api.HttpRequestAttributes\n" +
-      "{\n" +
-      "   Request path=/request/path\n" +
-      "   Method=GET\n" +
-      "   Listener path=/listener/path\n" +
-      "   Local Address=http://127.0.0.1:8080/\n" +
-      "   Query String=\n" +
-      "   Relative Path=/relative/path\n" +
-      "   Masked Request Path=null\n" +
-      "   Remote Address=http://10.1.2.5:8080/\n" +
-      "   Request Uri=http://127.0.0.1/gateway\n" +
-      "   Scheme=scheme\n" +
-      "   Version=1.0\n" +
-      "   Headers=[]\n" +
-      "   Query Parameters=[]\n" +
-      "   URI Parameters=[]\n" +
+  private static final String TO_STRING_EMPTY = "org.mule.extension.http.api.HttpRequestAttributes" + lineSeparator() +
+      "{" + lineSeparator() +
+      "   Request path=/request/path" + lineSeparator() +
+      "   Method=GET" + lineSeparator() +
+      "   Listener path=/listener/path" + lineSeparator() +
+      "   Local Address=http://127.0.0.1:8080/" + lineSeparator() +
+      "   Query String=" + lineSeparator() +
+      "   Relative Path=/relative/path" + lineSeparator() +
+      "   Masked Request Path=null" + lineSeparator() +
+      "   Remote Address=http://10.1.2.5:8080/" + lineSeparator() +
+      "   Request Uri=http://127.0.0.1/gateway" + lineSeparator() +
+      "   Scheme=scheme" + lineSeparator() +
+      "   Version=1.0" + lineSeparator() +
+      "   Headers=[]" + lineSeparator() +
+      "   Query Parameters=[]" + lineSeparator() +
+      "   URI Parameters=[]" + lineSeparator() +
       "}";
 
-  private static final String TO_STRING_EMPTY_WITH_MASKED_REQUEST_PATH = "org.mule.extension.http.api.HttpRequestAttributes\n" +
-      "{\n" +
-      "   Request path=/request/path/proxy\n" +
-      "   Method=GET\n" +
-      "   Listener path=/listener/path/*\n" +
-      "   Local Address=http://127.0.0.1:8080/\n" +
-      "   Query String=\n" +
-      "   Relative Path=/relative/path\n" +
-      "   Masked Request Path=/proxy\n" +
-      "   Remote Address=http://10.1.2.5:8080/\n" +
-      "   Request Uri=http://127.0.0.1/gateway\n" +
-      "   Scheme=scheme\n" +
-      "   Version=1.0\n" +
-      "   Headers=[]\n" +
-      "   Query Parameters=[]\n" +
-      "   URI Parameters=[]\n" +
+  private static final String TO_STRING_EMPTY_WITH_MASKED_REQUEST_PATH =
+      "org.mule.extension.http.api.HttpRequestAttributes" + lineSeparator() +
+          "{" + lineSeparator() +
+          "   Request path=/request/path/proxy" + lineSeparator() +
+          "   Method=GET" + lineSeparator() +
+          "   Listener path=/listener/path/*" + lineSeparator() +
+          "   Local Address=http://127.0.0.1:8080/" + lineSeparator() +
+          "   Query String=" + lineSeparator() +
+          "   Relative Path=/relative/path" + lineSeparator() +
+          "   Masked Request Path=/proxy" + lineSeparator() +
+          "   Remote Address=http://10.1.2.5:8080/" + lineSeparator() +
+          "   Request Uri=http://127.0.0.1/gateway" + lineSeparator() +
+          "   Scheme=scheme" + lineSeparator() +
+          "   Version=1.0" + lineSeparator() +
+          "   Headers=[]" + lineSeparator() +
+          "   Query Parameters=[]" + lineSeparator() +
+          "   URI Parameters=[]" + lineSeparator() +
+          "}";
+
+  private static final String TO_STRING_QUERY_PARAMS = "org.mule.extension.http.api.HttpRequestAttributes" + lineSeparator() +
+      "{" + lineSeparator() +
+      "   Request path=/request/path" + lineSeparator() +
+      "   Method=GET" + lineSeparator() +
+      "   Listener path=/listener/path" + lineSeparator() +
+      "   Local Address=http://127.0.0.1:8080/" + lineSeparator() +
+      "   Query String=queryParam1=queryParam1&queryParam2=queryParam2" + lineSeparator() +
+      "   Relative Path=/relative/path" + lineSeparator() +
+      "   Masked Request Path=null" + lineSeparator() +
+      "   Remote Address=http://10.1.2.5:8080/" + lineSeparator() +
+      "   Request Uri=http://127.0.0.1/gateway" + lineSeparator() +
+      "   Scheme=scheme" + lineSeparator() +
+      "   Version=1.0" + lineSeparator() +
+      "   Headers=[]" + lineSeparator() +
+      "   Query Parameters=[" + lineSeparator() +
+      "      queryParam1=queryParamValue1" + lineSeparator() +
+      "      queryParam2=queryParamValue2" + lineSeparator() +
+      "   ]" + lineSeparator() +
+      "   URI Parameters=[]" + lineSeparator() +
       "}";
 
-  private static final String TO_STRING_QUERY_PARAMS = "org.mule.extension.http.api.HttpRequestAttributes\n" +
-      "{\n" +
-      "   Request path=/request/path\n" +
-      "   Method=GET\n" +
-      "   Listener path=/listener/path\n" +
-      "   Local Address=http://127.0.0.1:8080/\n" +
-      "   Query String=queryParam1=queryParam1&queryParam2=queryParam2\n" +
-      "   Relative Path=/relative/path\n" +
-      "   Masked Request Path=null\n" +
-      "   Remote Address=http://10.1.2.5:8080/\n" +
-      "   Request Uri=http://127.0.0.1/gateway\n" +
-      "   Scheme=scheme\n" +
-      "   Version=1.0\n" +
-      "   Headers=[]\n" +
-      "   Query Parameters=[\n" +
-      "      queryParam1=queryParamValue1\n" +
-      "      queryParam2=queryParamValue2\n" +
-      "   ]\n" +
-      "   URI Parameters=[]\n" +
+  private static final String TO_STRING_URI_PARAMS = "org.mule.extension.http.api.HttpRequestAttributes" + lineSeparator() +
+      "{" + lineSeparator() +
+      "   Request path=/request/path" + lineSeparator() +
+      "   Method=GET" + lineSeparator() +
+      "   Listener path=/listener/path" + lineSeparator() +
+      "   Local Address=http://127.0.0.1:8080/" + lineSeparator() +
+      "   Query String=" + lineSeparator() +
+      "   Relative Path=/relative/path" + lineSeparator() +
+      "   Masked Request Path=null" + lineSeparator() +
+      "   Remote Address=http://10.1.2.5:8080/" + lineSeparator() +
+      "   Request Uri=http://127.0.0.1/gateway" + lineSeparator() +
+      "   Scheme=scheme" + lineSeparator() +
+      "   Version=1.0" + lineSeparator() +
+      "   Headers=[]" + lineSeparator() +
+      "   Query Parameters=[]" + lineSeparator() +
+      "   URI Parameters=[" + lineSeparator() +
+      "      uriParam1=uriParamValue1" + lineSeparator() +
+      "      uriParam2=uriParamValue2" + lineSeparator() +
+      "   ]" + lineSeparator() +
       "}";
 
-  private static final String TO_STRING_URI_PARAMS = "org.mule.extension.http.api.HttpRequestAttributes\n" +
-      "{\n" +
-      "   Request path=/request/path\n" +
-      "   Method=GET\n" +
-      "   Listener path=/listener/path\n" +
-      "   Local Address=http://127.0.0.1:8080/\n" +
-      "   Query String=\n" +
-      "   Relative Path=/relative/path\n" +
-      "   Masked Request Path=null\n" +
-      "   Remote Address=http://10.1.2.5:8080/\n" +
-      "   Request Uri=http://127.0.0.1/gateway\n" +
-      "   Scheme=scheme\n" +
-      "   Version=1.0\n" +
-      "   Headers=[]\n" +
-      "   Query Parameters=[]\n" +
-      "   URI Parameters=[\n" +
-      "      uriParam1=uriParamValue1\n" +
-      "      uriParam2=uriParamValue2\n" +
-      "   ]\n" +
-      "}";
-
-  private static final String TO_STRING_OBFUSCATED = "org.mule.extension.http.api.HttpRequestAttributes\n" +
-      "{\n" +
-      "   Request path=/request/path\n" +
-      "   Method=GET\n" +
-      "   Listener path=/listener/path\n" +
-      "   Local Address=http://127.0.0.1:8080/\n" +
-      "   Query String=****\n" +
-      "   Relative Path=/relative/path\n" +
-      "   Masked Request Path=null\n" +
-      "   Remote Address=http://10.1.2.5:8080/\n" +
-      "   Request Uri=http://127.0.0.1/gateway\n" +
-      "   Scheme=scheme\n" +
-      "   Version=1.0\n" +
-      "   Headers=[\n" +
-      "      password=****\n" +
-      "      pass=****\n" +
-      "      client_secret=****\n" +
-      "      regular=show me\n" +
-      "   ]\n" +
-      "   Query Parameters=[\n" +
-      "      password=****\n" +
-      "      pass=****\n" +
-      "      client_secret=****\n" +
-      "      regular=show me\n" +
-      "   ]\n" +
-      "   URI Parameters=[\n" +
-      "      password=****\n" +
-      "      pass=****\n" +
-      "      client_secret=****\n" +
-      "      regular=show me\n" +
-      "   ]\n" +
+  private static final String TO_STRING_OBFUSCATED = "org.mule.extension.http.api.HttpRequestAttributes" + lineSeparator() +
+      "{" + lineSeparator() +
+      "   Request path=/request/path" + lineSeparator() +
+      "   Method=GET" + lineSeparator() +
+      "   Listener path=/listener/path" + lineSeparator() +
+      "   Local Address=http://127.0.0.1:8080/" + lineSeparator() +
+      "   Query String=****" + lineSeparator() +
+      "   Relative Path=/relative/path" + lineSeparator() +
+      "   Masked Request Path=null" + lineSeparator() +
+      "   Remote Address=http://10.1.2.5:8080/" + lineSeparator() +
+      "   Request Uri=http://127.0.0.1/gateway" + lineSeparator() +
+      "   Scheme=scheme" + lineSeparator() +
+      "   Version=1.0" + lineSeparator() +
+      "   Headers=[" + lineSeparator() +
+      "      password=****" + lineSeparator() +
+      "      pass=****" + lineSeparator() +
+      "      client_secret=****" + lineSeparator() +
+      "      regular=show me" + lineSeparator() +
+      "   ]" + lineSeparator() +
+      "   Query Parameters=[" + lineSeparator() +
+      "      password=****" + lineSeparator() +
+      "      pass=****" + lineSeparator() +
+      "      client_secret=****" + lineSeparator() +
+      "      regular=show me" + lineSeparator() +
+      "   ]" + lineSeparator() +
+      "   URI Parameters=[" + lineSeparator() +
+      "      password=****" + lineSeparator() +
+      "      pass=****" + lineSeparator() +
+      "      client_secret=****" + lineSeparator() +
+      "      regular=show me" + lineSeparator() +
+      "   ]" + lineSeparator() +
       "}";
 
   private HttpRequestAttributesBuilder baseBuilder = new HttpRequestAttributesBuilder()
