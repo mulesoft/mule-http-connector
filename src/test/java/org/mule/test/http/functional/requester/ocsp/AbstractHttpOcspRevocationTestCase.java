@@ -8,6 +8,7 @@
 package org.mule.test.http.functional.requester.ocsp;
 
 import static java.lang.String.format;
+import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
 import static org.junit.Assume.assumeFalse;
 
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -83,6 +84,7 @@ public abstract class AbstractHttpOcspRevocationTestCase extends AbstractHttpTls
 
   @Before
   public void setUp() throws Exception {
+    assumeFalse(IS_OS_WINDOWS);
     process = Runtime.getRuntime().exec(format(RUN_OCSP_SERVER_COMMAND, ocspList, ocspPort, ocspResponder, ocspResponder));
     assumeFalse("Since openssl ocsp command has a flaky behavior the test will be ignored if an error occurs in server initialisation.",
                 getOcspServerCommandOutput(process.getErrorStream()).contains("Error"));
