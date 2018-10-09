@@ -11,8 +11,12 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.HTTPS;
 import static org.mule.test.http.functional.TlsConstants.DEFAULT_SECURITY_MODEL;
 import static org.mule.test.http.functional.TlsConstants.PROPERTIES_FILE_PATTERN;
+
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.File;
@@ -26,14 +30,10 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
 import io.qameta.allure.Story;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
 
 @Story(HTTPS)
 public abstract class AbstractServerTlsRestrictedProtocolsAndCiphersTestCase
-    extends AbstractHttpExtensionFunctionalTestCase {
+    extends AbstractHttpTestCase {
 
   @Rule
   public DynamicPort httpsPort = new DynamicPort("port");
@@ -58,8 +58,7 @@ public abstract class AbstractServerTlsRestrictedProtocolsAndCiphersTestCase
   }
 
   private static File getTlsPropertiesFile() {
-    String path = ClassUtils.getClassPathRoot(AbstractServerTlsRestrictedProtocolsAndCiphersTestCase.class).getPath();
-    return new File(path, String.format(PROPERTIES_FILE_PATTERN, DEFAULT_SECURITY_MODEL));
+    return new File(String.format(PROPERTIES_FILE_PATTERN, DEFAULT_SECURITY_MODEL));
   }
 
   @Test
