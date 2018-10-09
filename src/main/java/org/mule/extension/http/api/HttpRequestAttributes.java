@@ -134,7 +134,7 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
     this.queryString = queryString;
     this.localAddress = localAddress;
     this.remoteAddress = remoteAddress;
-    this.lazyClientCertificate = new LazyValue<>(clientCertificateSupplier);
+    this.lazyClientCertificate = clientCertificateSupplier;
   }
 
   public String getListenerPath() {
@@ -178,7 +178,9 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
   }
 
   public Certificate getClientCertificate() {
-    this.clientCertificate = lazyClientCertificate.get();
+    if(this.lazyClientCertificate != null) {
+      this.clientCertificate = lazyClientCertificate.get();
+    }
     return this.clientCertificate;
   }
 
