@@ -221,7 +221,5 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
     assertThat(baseBuilder.listenerPath("/listener/path/*").requestPath("/request/path/proxy").build().toString(),
                is(TO_STRING_EMPTY_WITH_MASKED_REQUEST_PATH));
   }
-
-
-
+  
 }
