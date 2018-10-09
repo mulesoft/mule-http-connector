@@ -12,6 +12,9 @@ import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.security.cert.Certificate;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -92,12 +95,16 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
    */
   @Parameter
   @Optional
-  private final Certificate clientCertificate = null;
+  private Certificate clientCertificate;
 
   /**
    * Actual {@link Certificate} to use, avoid any processing until it's actually needed.
+   * </p>
+   * This attribute is declared transient due to not being an instance of a serializable class. Custom serialization logic
+   * was added to be able to serialize the information but it will only work with java default serializer. Errors may be found if
+   * another serializer is used. e.g: Kryo.
    */
-  private LazyValue<Certificate> lazyClientCertificate;
+  private transient Supplier<Certificate> lazyClientCertificate;
 
   /**
    * @deprecated use {@link HttpRequestAttributesBuilder} instead
@@ -171,7 +178,19 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
   }
 
   public Certificate getClientCertificate() {
-    return lazyClientCertificate.get();
+    this.clientCertificate = lazyClientCertificate.get();
+    return this.clientCertificate;
+  }
+
+  private void writeObject(ObjectOutputStream out) throws IOException {
+    //This will make the resolved client certificate be stored in the clientCertificate variable
+    getClientCertificate();
+    out.defaultWriteObject();
+  }
+
+  private void readObject(ObjectInputStream in) throws ClassNotFoundException, IOException {
+    in.defaultReadObject();
+    lazyClientCertificate = () -> clientCertificate;
   }
 
   public String toString() {
