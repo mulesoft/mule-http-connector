@@ -14,7 +14,6 @@ import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.HTTPS;
 import static org.mule.test.http.functional.TlsConstants.DEFAULT_SECURITY_MODEL;
 import static org.mule.test.http.functional.TlsConstants.PROPERTIES_FILE_PATTERN;
-import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -40,7 +39,7 @@ import org.junit.Test;
 
 @Story(HTTPS)
 public abstract class AbstractClientTlsRestrictedTlsProtocolsAndCiphersTestCase
-    extends AbstractHttpExtensionFunctionalTestCase {
+    extends AbstractHttpTestCase {
 
   private static final String CLIENT_CIPHER_SUITE_ENABLED = "TLS_DHE_DSS_WITH_AES_128_CBC_SHA256";
   private static final String CLIENT_CIPHER_SUITE_DISABLED = "TLS_DHE_DSS_WITH_AES_128_CBC_SHA";
@@ -68,8 +67,7 @@ public abstract class AbstractClientTlsRestrictedTlsProtocolsAndCiphersTestCase
 
 
   private static File getTlsPropertiesFile() {
-    String path = ClassUtils.getClassPathRoot(AbstractClientTlsRestrictedTlsProtocolsAndCiphersTestCase.class).getPath();
-    return new File(path, String.format(PROPERTIES_FILE_PATTERN, DEFAULT_SECURITY_MODEL));
+    return new File(String.format(PROPERTIES_FILE_PATTERN, DEFAULT_SECURITY_MODEL));
   }
 
   @Test
