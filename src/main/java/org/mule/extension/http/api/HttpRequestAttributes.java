@@ -178,7 +178,7 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
   }
 
   public Certificate getClientCertificate() {
-    if(this.lazyClientCertificate != null) {
+    if (this.lazyClientCertificate != null && this.clientCertificate == null) {
       this.clientCertificate = lazyClientCertificate.get();
     }
     return this.clientCertificate;
