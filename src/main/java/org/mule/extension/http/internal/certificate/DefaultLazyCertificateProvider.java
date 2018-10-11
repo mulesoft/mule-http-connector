@@ -36,6 +36,12 @@ public class DefaultLazyCertificateProvider implements LazyCertificateProvider {
     }
   }
 
+  /**
+   * Returns a new {@link DefaultLazyCertificateProvider}.
+   * Constructor is package private to only allow {@link LazyCertificateProviderFactory} to create instances.
+   *
+   * @param certificateSupplier actual supplier that returns the {@link Certificate}
+   */
   DefaultLazyCertificateProvider(Supplier<Certificate> certificateSupplier) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException{
     this.serializableLazyValue = SERIALIZABLE_LAZY_VALUE_CLASS.getConstructor(Supplier.class).newInstance(certificateSupplier);
   }

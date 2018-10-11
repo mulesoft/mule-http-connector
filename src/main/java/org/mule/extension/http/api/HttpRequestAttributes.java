@@ -7,14 +7,12 @@
 package org.mule.extension.http.api;
 
 import static java.lang.System.lineSeparator;
-import org.mule.runtime.api.util.LazyValue;
+import org.mule.extension.http.internal.certificate.LazyCertificateProvider;
+import org.mule.extension.http.internal.certificate.LazyCertificateProviderFactory;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.security.cert.Certificate;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -95,20 +93,12 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
    */
   @Parameter
   @Optional
-  private Certificate clientCertificate;
-
-
-  /**
-   * This attribute is declared transient due to not being an instance of a serializable class.
-   */
-  private transient LazyValue<Certificate> compatibilityLazyClientCertificate;
+  private transient Certificate clientCertificate;
 
   /**
    * Actual {@link Certificate} to use, avoid any processing until it's actually needed.
-   * </p>
-   *
    */
-  private LazyValue<Certificate> lazyClientCertificate;
+  private LazyCertificateProvider lazyClientCertificateProvider;
 
   /**
    * @deprecated use {@link HttpRequestAttributesBuilder} instead
@@ -126,7 +116,7 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
                         String version,
                         String scheme, String method, String requestPath, String requestUri, String queryString,
                         MultiMap<String, String> queryParams, Map<String, String> uriParams, String localAddress,
-                        String remoteAddress, Supplier<Certificate> clientCertificateSupplier) {
+                        String remoteAddress, Supplier<Certificate> certificateSupplier) {
     super(headers, queryParams, uriParams, requestPath);
     this.listenerPath = listenerPath;
     this.relativePath = relativePath;
@@ -138,7 +128,7 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
     this.queryString = queryString;
     this.localAddress = localAddress;
     this.remoteAddress = remoteAddress;
-    this.compatibilityLazyClientCertificate = new LazyValue<>(clientCertificateSupplier);
+    this.lazyClientCertificateProvider = LazyCertificateProviderFactory.create(certificateSupplier);
   }
 
   public String getListenerPath() {
@@ -182,21 +172,7 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
   }
 
   public Certificate getClientCertificate() {
-    if (this.lazyClientCertificate != null && this.clientCertificate == null) {
-      this.clientCertificate = lazyClientCertificate.get();
-    }
-    return this.clientCertificate;
-  }
-
-  private void writeObject(ObjectOutputStream out) throws IOException {
-    //This will make the resolved client certificate be stored in the clientCertificate variable
-    getClientCertificate();
-    out.defaultWriteObject();
-  }
-
-  private void readObject(ObjectInputStream in) throws ClassNotFoundException, IOException {
-    in.defaultReadObject();
-    lazyClientCertificate = new LazyValue<>(() -> clientCertificate);
+    return lazyClientCertificateProvider.getCertificate();
   }
 
   public String toString() {
