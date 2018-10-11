@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
 package org.mule.extension.http.internal.certificate;
 
 import static java.lang.Class.forName;
@@ -10,14 +16,14 @@ import java.security.cert.Certificate;
 import java.util.function.Supplier;
 
 /**
- * {@link LazyCertificateProvider} that makes use of "SerializableLazyValue" if present in the classpath to store it's
+ * {@link CertificateProvider} that makes use of "SerializableLazyValue" if present in the classpath to store it's
  * values.
  *
  * @since 1.4.0
  */
-public class DefaultLazyCertificateProvider implements LazyCertificateProvider {
+public class DefaultCertificateProvider implements CertificateProvider {
 
-  public static final String SERIALIZABLE_LAZY_VALUE_CLASS_NAME = "org.mule.runtime.api.util.SerializableLazyValue";
+  static final String SERIALIZABLE_LAZY_VALUE_CLASS_NAME = "org.mule.runtime.api.util.SerializableLazyValue";
   private static final String GET_METHOD_NAME = "get";
 
   private static final long serialVersionUID = -4010056097536262602L;
@@ -37,12 +43,13 @@ public class DefaultLazyCertificateProvider implements LazyCertificateProvider {
   }
 
   /**
-   * Returns a new {@link DefaultLazyCertificateProvider}.
-   * Constructor is package private to only allow {@link LazyCertificateProviderFactory} to create instances.
+   * Returns a new {@link DefaultCertificateProvider}.
+   * Constructor is package private to only allow {@link CertificateProviderFactory} to create instances.
    *
    * @param certificateSupplier actual supplier that returns the {@link Certificate}
    */
-  DefaultLazyCertificateProvider(Supplier<Certificate> certificateSupplier) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException{
+  DefaultCertificateProvider(Supplier<Certificate> certificateSupplier)
+      throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
     this.serializableLazyValue = SERIALIZABLE_LAZY_VALUE_CLASS.getConstructor(Supplier.class).newInstance(certificateSupplier);
   }
 
@@ -50,7 +57,7 @@ public class DefaultLazyCertificateProvider implements LazyCertificateProvider {
   public Certificate getCertificate() {
     try {
       return (Certificate) GET.invoke(this.serializableLazyValue);
-    }catch (InvocationTargetException | IllegalAccessException e) {
+    } catch (InvocationTargetException | IllegalAccessException e) {
       throw new MuleRuntimeException(createStaticMessage("Exception while calling method by reflection"), e);
     }
   }
