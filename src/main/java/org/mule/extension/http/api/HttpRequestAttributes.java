@@ -97,14 +97,18 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
   @Optional
   private Certificate clientCertificate;
 
+
+  /**
+   * This attribute is declared transient due to not being an instance of a serializable class.
+   */
+  private transient LazyValue<Certificate> compatibilityLazyClientCertificate;
+
   /**
    * Actual {@link Certificate} to use, avoid any processing until it's actually needed.
    * </p>
-   * This attribute is declared transient due to not being an instance of a serializable class. Custom serialization logic
-   * was added to be able to serialize the information but it will only work with java default serializer. Errors may be found if
-   * another serializer is used. e.g: Kryo.
+   *
    */
-  private transient Supplier<Certificate> lazyClientCertificate;
+  private LazyValue<Certificate> lazyClientCertificate;
 
   /**
    * @deprecated use {@link HttpRequestAttributesBuilder} instead
@@ -134,7 +138,7 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
     this.queryString = queryString;
     this.localAddress = localAddress;
     this.remoteAddress = remoteAddress;
-    this.lazyClientCertificate = clientCertificateSupplier;
+    this.compatibilityLazyClientCertificate = new LazyValue<>(clientCertificateSupplier);
   }
 
   public String getListenerPath() {
@@ -192,7 +196,7 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
 
   private void readObject(ObjectInputStream in) throws ClassNotFoundException, IOException {
     in.defaultReadObject();
-    lazyClientCertificate = () -> clientCertificate;
+    lazyClientCertificate = new LazyValue<>(() -> clientCertificate);
   }
 
   public String toString() {
