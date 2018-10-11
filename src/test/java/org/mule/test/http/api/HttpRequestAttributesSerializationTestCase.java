@@ -20,14 +20,10 @@ import org.mule.extension.http.api.HttpRequestAttributesBuilder;
 
 import java.security.cert.Certificate;
 
+import io.qameta.allure.Description;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-/**
- * Tests for checking correct custom serialization in HttpRequestAttributes
- *
- * @since 1.4.0
- */
 public class HttpRequestAttributesSerializationTestCase extends AbstractHttpAttributesTestCase {
 
   private static final String CERTIFICATE = "TEST_CERTIFICATE";
@@ -57,18 +53,21 @@ public class HttpRequestAttributesSerializationTestCase extends AbstractHttpAttr
   }
 
   @Test
+  @Description("HttpRequestAttributes are correctly serialized and deserialized even if no certificate was defined")
   public void withNoCertificate() {
     HttpRequestAttributes processed = assertSerialization(baseBuilder.build());
     assertThat(processed.getClientCertificate(), is(nullValue()));
   }
 
   @Test
+  @Description("HttpRequestAttributes are correctly serialized and deserialized with an explicit certificate. Certificate can be recover after deserialization")
   public void withResolvedCertificate() {
     HttpRequestAttributes processed = assertSerialization(baseBuilder.clientCertificate(certificateMock).build());
     assertThat(processed.getClientCertificate().toString(), is(CERTIFICATE));
   }
 
   @Test
+  @Description("HttpRequestAttributes are correctly serialized and deserialized with a certificate supplier. Certificate can be recover after deserialization")
   public void withLazyCertificate() {
     HttpRequestAttributes processed = assertSerialization(baseBuilder.clientCertificate(() -> certificateMock).build());
     assertThat(processed.getClientCertificate().toString(), is(CERTIFICATE));
