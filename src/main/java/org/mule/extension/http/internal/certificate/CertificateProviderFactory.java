@@ -7,20 +7,20 @@
 package org.mule.extension.http.internal.certificate;
 
 import static org.mule.extension.http.internal.certificate.DefaultCertificateProvider.SERIALIZABLE_LAZY_VALUE_CLASS_NAME;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.ClassUtils.isClassOnPath;
-import static org.slf4j.LoggerFactory.getLogger;
+
+import org.mule.runtime.api.exception.MuleRuntimeException;
 
 import java.security.cert.Certificate;
 import java.util.function.Supplier;
 
-import org.slf4j.Logger;
 
 /**
  * Factory class responsible for creating the correct {@link CertificateProvider} according to the available classes.
  */
 public class CertificateProviderFactory {
 
-  private static final Logger LOGGER = getLogger(CertificateProviderFactory.class);
   private static boolean isSerializableLazyValuePresent;
 
   static {
@@ -32,13 +32,10 @@ public class CertificateProviderFactory {
       try {
         return new DefaultCertificateProvider(certificateSupplier);
       } catch (Exception e) {
-        LOGGER.warn("Errors while creating " + SERIALIZABLE_LAZY_VALUE_CLASS_NAME
-            + " by reflection, even when class in on classpath. Defaulting to compatibility implementation");
+        throw new MuleRuntimeException(createStaticMessage("Errors while creating " + SERIALIZABLE_LAZY_VALUE_CLASS_NAME
+            + " by reflection, even when class in on classpath."), e);
       }
     }
     return new CompatibilityCertificateProvider(certificateSupplier);
   }
-
-
-
 }
