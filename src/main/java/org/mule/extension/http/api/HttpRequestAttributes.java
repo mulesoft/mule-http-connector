@@ -93,7 +93,7 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
    */
   @Parameter
   @Optional
-  private final Certificate clientCertificate = null;
+  private Certificate clientCertificate;
 
   /**
    * Actual {@link Certificate} to use, avoid any processing until it's actually needed.
@@ -109,7 +109,7 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
    * If found in that situation, a workaround is to call {@link HttpRequestAttributes#getClientCertificate()} before serialization.
    * That way, the certificate will be resolved and serialization will work.
    */
-  private CertificateProvider lazyClientCertificateProvider;
+  private final CertificateProvider lazyClientCertificateProvider;
 
   /**
    * @deprecated use {@link HttpRequestAttributesBuilder} instead
@@ -183,7 +183,8 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
   }
 
   public Certificate getClientCertificate() {
-    return lazyClientCertificateProvider.getCertificate();
+    this.clientCertificate = lazyClientCertificateProvider.getCertificate();
+    return this.clientCertificate;
   }
 
   public String toString() {
