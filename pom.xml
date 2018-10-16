@@ -23,7 +23,7 @@
     <properties>
         <commonsCodecVersion>1.11</commonsCodecVersion>
         <fluentHcVersion>4.5.2</fluentHcVersion>
-        <grizzlyVersion>2.3.36-MULE-002</grizzlyVersion>
+        <grizzlyVersion>2.3.36-MULE-005</grizzlyVersion>
         <grizzlyAhcVersion>1.14-MULE-006</grizzlyAhcVersion>
         <javaxActivationVersion>1.2.0</javaxActivationVersion>
         <javaxMailVersion>1.4.3</javaxMailVersion>
