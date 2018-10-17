@@ -8,15 +8,16 @@
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
+    <object name="blocks-mp" class="org.mule.test.http.functional.HttpListenerFlowBackPressureTestCase$BlocksMP"/>
+
     <http:listener-config name="listenerConfig">
         <http:listener-connection host="localhost" port="${port}"/>
     </http:listener-config>
 
     <flow name="testFlow" maxConcurrency="1">
         <http:listener path="/*" config-ref="listenerConfig"/>
-        <test:processor>
-            <test:return-data>the result</test:return-data>
-        </test:processor>
+        <processor ref="blocks-mp"/>
+        <set-payload value="the result"/>
     </flow>
 
 </mule>
