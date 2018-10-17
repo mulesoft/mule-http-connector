@@ -10,30 +10,32 @@ import static java.lang.String.format;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertThat;
-import static org.mule.functional.api.component.FunctionalTestProcessor.getFromFlow;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.atomic.AtomicInteger;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.util.concurrent.Latch;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import org.mule.functional.api.component.FunctionalTestProcessor;
-import org.mule.runtime.api.util.concurrent.Latch;
-import org.mule.tck.junit4.rule.DynamicPort;
-
 import com.ning.http.client.AsyncCompletionHandlerBase;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 import com.ning.http.client.Response;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
+
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import io.qameta.allure.Story;
 
@@ -43,16 +45,18 @@ public class HttpListenerFlowBackPressureTestCase extends AbstractHttpTestCase {
   @Rule
   public DynamicPort listenPort = new DynamicPort("port");
 
-  private Latch keepProcessorsActive;
-  private AtomicInteger numProcessedRequests;
+  private static AtomicInteger numProcessedRequests;
+  private static Latch keepProcessorsActive;
+  private static CountDownLatch processedLatch;
+  private static ConcurrentLinkedQueue<Throwable> accumulatedErrors;
+
   private AtomicInteger okResponses;
   private AtomicInteger overloadResponses;
-  private ConcurrentLinkedQueue<Throwable> accumulatedErrors;
   private CountDownLatch sentLatch;
   private CountDownLatch overloadResponseLatch;
   private CountDownLatch allResponseLatch;
-  private CountDownLatch processedLatch;
   private AsyncHttpClient client;
+  private ExecutorService executorService;
 
   private static int BUFFER_SIZE = 256;
   private static int OVERLOAD_COUNT = 44;
@@ -75,10 +79,12 @@ public class HttpListenerFlowBackPressureTestCase extends AbstractHttpTestCase {
     processedLatch = new CountDownLatch(BUFFER_SIZE);
     client = new AsyncHttpClient(new GrizzlyAsyncHttpProvider(new AsyncHttpClientConfig.Builder().build()));
 
+    executorService = newFixedThreadPool(1);
   }
 
   @After
   public void tearDown() {
+    executorService.shutdownNow();
     client.close();
   }
 
@@ -92,9 +98,6 @@ public class HttpListenerFlowBackPressureTestCase extends AbstractHttpTestCase {
   public void overloadScenario() throws Exception {
     final String url = format("http://localhost:%s/", listenPort.getNumber());
 
-    configureTestComponent("testFlow");
-
-    ExecutorService executorService = newFixedThreadPool(1);
     for (int i = 0; i < BUFFER_SIZE + OVERLOAD_COUNT; i++) {
       executorService.submit(() -> executeRequestInAnotherThread(url));
     }
@@ -110,12 +113,14 @@ public class HttpListenerFlowBackPressureTestCase extends AbstractHttpTestCase {
 
     // Now we've asserted back-pressure release latched processor and allow buffer to drain
     keepProcessorsActive.release();
-    allResponseLatch.await();
     processedLatch.await();
+    allResponseLatch.await();
 
     assertThat(overloadResponses.get(), equalTo(OVERLOAD_COUNT));
     assertThat(okResponses.get(), equalTo(BUFFER_SIZE));
     assertThat(numProcessedRequests.get(), equalTo(BUFFER_SIZE));
+
+    assertThat(accumulatedErrors, empty());
   }
 
   private void executeRequestInAnotherThread(final String url) {
@@ -123,18 +128,22 @@ public class HttpListenerFlowBackPressureTestCase extends AbstractHttpTestCase {
 
       @Override
       public Response onCompleted(Response response) throws Exception {
-        overloadResponseLatch.countDown();
-        allResponseLatch.countDown();
-        int statusCode = response.getStatusCode();
-        if (statusCode == SERVICE_UNAVAILABLE.getStatusCode()) {
-          overloadResponses.incrementAndGet();
-          assertThat(response.getStatusText(), is(SERVICE_UNAVAILABLE.getReasonPhrase()));
-          assertThat(response.getResponseBody(), is("Flow 'testFlow' is unable to accept new events at this time"));
-        } else if (statusCode == OK.getStatusCode()) {
-          okResponses.incrementAndGet();
-          assertThat(response.getResponseBody(), is("the result"));
-        } else {
-          accumulatedErrors.add(new AssertionError("request returned invalid status code: " + statusCode));
+        try {
+          int statusCode = response.getStatusCode();
+          if (statusCode == SERVICE_UNAVAILABLE.getStatusCode()) {
+            overloadResponseLatch.countDown();
+            overloadResponses.incrementAndGet();
+            assertThat(response.getStatusText(), is(SERVICE_UNAVAILABLE.getReasonPhrase()));
+          } else if (statusCode == OK.getStatusCode()) {
+            okResponses.incrementAndGet();
+            assertThat(response.getResponseBody(), is("the result"));
+          } else {
+            accumulatedErrors.add(new AssertionError("request returned invalid status code: " + statusCode));
+          }
+        } catch (Throwable t) {
+          accumulatedErrors.add(t);
+        } finally {
+          allResponseLatch.countDown();
         }
         return response;
       }
@@ -143,11 +152,12 @@ public class HttpListenerFlowBackPressureTestCase extends AbstractHttpTestCase {
   }
 
   /**
-   * Configures a test component in a specific flow to block until a specific number of concurrent requests are reached.
+   * Configures a test component that blocks until a specific number of concurrent requests are reached.
    */
-  private void configureTestComponent(String flowName) throws Exception {
-    FunctionalTestProcessor testProc = getFromFlow(locator, flowName);
-    testProc.setEventCallback((event, component, muleContext) -> {
+  public static class BlocksMP implements Processor {
+
+    @Override
+    public CoreEvent process(final CoreEvent event) throws MuleException {
       try {
         numProcessedRequests.incrementAndGet();
         keepProcessorsActive.await();
@@ -155,6 +165,9 @@ public class HttpListenerFlowBackPressureTestCase extends AbstractHttpTestCase {
       } catch (Throwable e) {
         accumulatedErrors.add(e);
       }
-    });
+
+      return event;
+    }
   }
+
 }
