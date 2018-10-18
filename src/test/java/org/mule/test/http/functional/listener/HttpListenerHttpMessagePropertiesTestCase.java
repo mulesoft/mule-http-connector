@@ -6,6 +6,7 @@
  */
 package org.mule.test.http.functional.listener;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.http.client.fluent.Request.Post;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -27,12 +28,10 @@ import org.mule.runtime.http.api.domain.HttpProtocol;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
-import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
@@ -209,7 +208,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
   @Test
   public void postUriParamEncoded() throws Exception {
     final String uriParamValue = "uri param value %24";
-    final String uriParamValueEncoded = URLEncoder.encode(uriParamValue, Charsets.UTF_8.displayName());
+    final String uriParamValueEncoded = encode(uriParamValue);
     final String url =
         String.format("http://localhost:%s/some-path/%s/some-other-path", listenPort.getNumber(), uriParamValueEncoded);
     Post(url).connectTimeout(RECEIVE_TIMEOUT).execute();
@@ -317,7 +316,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
   }
 
   private String encode(Object value) throws UnsupportedEncodingException {
-    return URLEncoder.encode(value.toString(), Charset.defaultCharset().name());
+    return URLEncoder.encode(value.toString(), UTF_8.name());
   }
 
 }
