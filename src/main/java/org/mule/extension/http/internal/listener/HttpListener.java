@@ -8,6 +8,7 @@ package org.mule.extension.http.internal.listener;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
@@ -348,6 +349,8 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   }
 
   private RequestHandler getRequestHandler(SourceCallback<InputStream, HttpRequestAttributes> sourceCallback) {
+    ClassLoader appRegionClassLoader = currentThread().getContextClassLoader();
+
     return new ModuleRequestHandler() {
 
       @Override
@@ -471,6 +474,9 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
         }
       }
 
+      public ClassLoader getContextClassLoader() {
+        return appRegionClassLoader;
+      }
     };
   }
 
