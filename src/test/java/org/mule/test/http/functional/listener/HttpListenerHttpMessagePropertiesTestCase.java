@@ -18,7 +18,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_I
 import static org.mule.runtime.http.api.HttpHeaders.Names.X_CORRELATION_ID;
 import static org.mule.runtime.http.api.HttpHeaders.Names.X_FORWARDED_FOR;
 import static org.mule.runtime.http.api.domain.HttpProtocol.HTTP_1_1;
-
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.functional.api.component.TestConnectorQueueHandler;
 import org.mule.runtime.api.message.Message;
@@ -28,6 +27,9 @@ import org.mule.runtime.http.api.domain.HttpProtocol;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
+import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableMap;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
@@ -35,8 +37,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
-import com.google.common.base.Charsets;
-import com.google.common.collect.ImmutableMap;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.fluent.Request;
 import org.hamcrest.Matchers;
@@ -141,15 +141,21 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
   @Test
   public void postWithEncodedValues() throws Exception {
     final ImmutableMap<String, Object> queryParams =
-        ImmutableMap.<String, Object>builder().put(QUERY_PARAM_NAME, QUERY_PARAM_VALUE_WITH_SPACES).build();
-    final String url = String.format("http://localhost:%s/?" + buildQueryString(queryParams), listenPort.getNumber());
+        ImmutableMap.<String, Object>builder()
+            .put(QUERY_PARAM_NAME, QUERY_PARAM_VALUE_WITH_SPACES)
+            .put("encoded", "%")
+            .put("%24", "encodeMe")
+            .build();
+    final String url = String.format("http://localhost:%s/?", listenPort.getNumber()) + buildQueryString(queryParams);
     Post(url).connectTimeout(RECEIVE_TIMEOUT).execute();
     final Message message = queueHandler.read("out", RECEIVE_TIMEOUT).getMessage();
     HttpRequestAttributes attributes = getAttributes(message);
     MultiMap<String, String> retrivedQueryParams = attributes.getQueryParams();
     assertThat(retrivedQueryParams, notNullValue());
-    assertThat(retrivedQueryParams.size(), is(1));
+    assertThat(retrivedQueryParams.size(), is(3));
     assertThat(retrivedQueryParams.get(QUERY_PARAM_NAME), is(QUERY_PARAM_VALUE_WITH_SPACES));
+    assertThat(retrivedQueryParams.get("%24"), is("encodeMe"));
+    assertThat(retrivedQueryParams.get("encoded"), is("%"));
   }
 
   @Test
@@ -202,7 +208,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
 
   @Test
   public void postUriParamEncoded() throws Exception {
-    final String uriParamValue = "uri param value";
+    final String uriParamValue = "uri param value %24";
     final String uriParamValueEncoded = URLEncoder.encode(uriParamValue, Charsets.UTF_8.displayName());
     final String url =
         String.format("http://localhost:%s/some-path/%s/some-other-path", listenPort.getNumber(), uriParamValueEncoded);
@@ -298,16 +304,20 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
       final Object value = queryParams.get(paramName);
       if (value instanceof Collection) {
         for (java.lang.Object eachValue : (Collection) value) {
-          queryString.append(paramName + "=" + URLEncoder.encode(eachValue.toString(), Charset.defaultCharset().name()));
+          queryString.append(encode(paramName) + "=" + encode(eachValue));
           queryString.append("&");
         }
       } else {
-        queryString.append(paramName + "=" + URLEncoder.encode(value.toString(), Charset.defaultCharset().name()));
+        queryString.append(encode(paramName) + "=" + encode(value));
         queryString.append("&");
       }
     }
     queryString.deleteCharAt(queryString.length() - 1);
     return queryString.toString();
+  }
+
+  private String encode(Object value) throws UnsupportedEncodingException {
+    return URLEncoder.encode(value.toString(), Charset.defaultCharset().name());
   }
 
 }
