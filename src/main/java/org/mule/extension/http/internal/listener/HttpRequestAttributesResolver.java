@@ -41,13 +41,13 @@ public class HttpRequestAttributesResolver {
     HttpRequest request = requestContext.getRequest();
 
     URI uri = request.getUri();
-    String path = uri.getPath();
+    String path = uri.getRawPath();
     String uriString = path;
     String relativePath = this.listenerPath.getRelativePath(path);
 
     ClientConnection clientConnection = requestContext.getClientConnection();
 
-    String queryString = uri.getQuery();
+    String queryString = uri.getRawQuery();
     if (queryString != null) {
       uriString += "?" + queryString;
     } else {
