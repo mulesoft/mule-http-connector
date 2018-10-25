@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.internal.request;
 
+import static java.lang.Boolean.getBoolean;
 import static java.lang.Integer.getInteger;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
@@ -17,10 +18,10 @@ import static org.mule.extension.http.internal.HttpConnectorConstants.DEFAULT_RE
 import static org.mule.extension.http.internal.HttpConnectorConstants.IDEMPOTENT_METHODS;
 import static org.mule.extension.http.internal.HttpConnectorConstants.REMOTELY_CLOSED;
 import static org.mule.extension.http.internal.HttpConnectorConstants.RETRY_ATTEMPTS_PROPERTY;
+import static org.mule.extension.http.internal.HttpConnectorConstants.RETRY_ON_ALL_METHODS_PROPERTY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
 import static reactor.core.publisher.Mono.from;
-
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.error.HttpError;
 import org.mule.extension.http.api.error.HttpErrorMessageGenerator;
@@ -50,15 +51,15 @@ import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Component capable of performing an HTTP request given a request.
@@ -70,6 +71,7 @@ public class HttpRequester {
   private static final Logger logger = LoggerFactory.getLogger(HttpRequester.class);
 
   private static int RETRY_ATTEMPTS = getInteger(RETRY_ATTEMPTS_PROPERTY, DEFAULT_RETRY_ATTEMPTS);
+  private static boolean RETRY_ON_ALL_METHODS = getBoolean(RETRY_ON_ALL_METHODS_PROPERTY);
 
   private static final DataType REQUEST_NOTIFICATION_DATA_TYPE = DataType.fromType(HttpRequestNotificationData.class);
   private static final DataType RESPONSE_NOTIFICATION_DATA_TYPE = DataType.fromType(HttpResponseNotificationData.class);
@@ -219,7 +221,7 @@ public class HttpRequester {
 
   private boolean shouldRetryRemotelyClosed(Throwable exception, int retryCount, String httpMethod) {
     boolean shouldRetry = exception instanceof IOException && containsIgnoreCase(exception.getMessage(), REMOTELY_CLOSED)
-        && IDEMPOTENT_METHODS.contains(httpMethod) && retryCount > 0;
+        && supportsRetry(httpMethod) && retryCount > 0;
     if (shouldRetry) {
       logger.warn("Sending HTTP message failed with `" + IOException.class.getCanonicalName() + ": " + REMOTELY_CLOSED
           + "`. Request will be retried " + retryCount + " time(s) before failing.");
@@ -227,8 +229,13 @@ public class HttpRequester {
     return shouldRetry;
   }
 
+  private boolean supportsRetry(String httpMethod) {
+    return RETRY_ON_ALL_METHODS || IDEMPOTENT_METHODS.contains(httpMethod);
+  }
+
   public static void refreshSystemProperties() {
     RETRY_ATTEMPTS = getInteger(RETRY_ATTEMPTS_PROPERTY, DEFAULT_RETRY_ATTEMPTS);
+    RETRY_ON_ALL_METHODS = getBoolean(RETRY_ON_ALL_METHODS_PROPERTY);
   }
 
 }
