@@ -49,7 +49,7 @@ public class HttpRetryRequestTestCase extends AbstractHttpTestCase {
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
-  private int retryAttempts;
+  protected int retryAttempts;
 
   public HttpRetryRequestTestCase(Integer retryAttempts) {
     this.retryAttempts = retryAttempts;
@@ -78,9 +78,13 @@ public class HttpRetryRequestTestCase extends AbstractHttpTestCase {
     refreshSystemProperties();
   }
 
+  protected int getIdempotentMethodExpectedRetries() {
+    return 0;
+  }
+
   @Test
   public void nonIdempotentMethod() throws Exception {
-    runRetryPolicyTest("POST", 0);
+    runRetryPolicyTest("POST", getIdempotentMethodExpectedRetries());
   }
 
   @Test
