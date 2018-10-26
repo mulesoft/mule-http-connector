@@ -7,7 +7,7 @@
 package org.mule.extension.http.internal;
 
 import static com.google.common.collect.ImmutableSet.of;
-import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 
 import java.util.Set;
 
