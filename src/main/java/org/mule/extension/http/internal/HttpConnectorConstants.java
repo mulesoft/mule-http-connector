@@ -7,7 +7,7 @@
 package org.mule.extension.http.internal;
 
 import static com.google.common.collect.ImmutableSet.of;
-import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 
 import java.util.Set;
 
@@ -28,6 +28,7 @@ public interface HttpConnectorConstants {
   Set<String> IDEMPOTENT_METHODS = of("GET", "PUT", "DELETE", "HEAD", "OPTIONS", "TRACE");
   String REMOTELY_CLOSED = "Remotely closed";
   String RETRY_ATTEMPTS_PROPERTY = SYSTEM_PROPERTY_PREFIX + "http.client.maxRetries";
+  String RETRY_ON_ALL_METHODS_PROPERTY = SYSTEM_PROPERTY_PREFIX + "http.client.retryOnAllMethods";
   int DEFAULT_RETRY_ATTEMPTS = 3;
 
 }
