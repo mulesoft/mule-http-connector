@@ -39,8 +39,8 @@
         <muleCorsKernelVersion>1.1.0</muleCorsKernelVersion>
 
         <!-- This dependencies must be explicitly defined as long as HTTP supports runtimes prior to 4.1.2 -->
-        <muleHttpPolicyApiVersion>1.1.2-SNAPSHOT</muleHttpPolicyApiVersion>
-        <mulePolicyApiVersion>1.1.2-SNAPSHOT</mulePolicyApiVersion>
+        <muleHttpPolicyApiVersion>1.1.2</muleHttpPolicyApiVersion>
+        <mulePolicyApiVersion>1.1.2</mulePolicyApiVersion>
     </properties>
 
     <build>
