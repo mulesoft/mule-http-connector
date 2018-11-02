@@ -321,7 +321,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
     HttpResponse httpResponse = response.returnResponse();
     assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
 
-    assertThat(getFirstReceivedHeader(X_FORWARDED_FOR), startsWith("/127.0.0.1:"));
+    assertThat(getFirstReceivedHeader(X_FORWARDED_FOR), startsWith("127.0.0.1:"));
   }
 
   @Test
