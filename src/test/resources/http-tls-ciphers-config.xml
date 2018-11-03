@@ -68,34 +68,27 @@
         <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
     </tls:context>
 
-    <http:listener-config name="mainListenerConfig" basePath="test">
-        <http:listener-connection host="localhost" port="${httpsPort}" tlsContext="globalTlsContextDefaultProtocols" protocol="HTTPS" />
-    </http:listener-config>
-
-    <flow name="testBothProtocolsOneCipher">
-        <http:listener config-ref="mainListenerConfig" path="/bothProtocolsOneCipher" allowedMethods="GET"/>
-        <http:request config-ref="requestConfig1" path="/" method="GET" />
+    <flow name="bothProtocolsOneCipher">
+        <http:request config-ref="requestConfig1" path="/"/>
     </flow>
-    <flow name="testValidProtocolValidCipher">
-        <http:listener config-ref="mainListenerConfig" path="/validProtocolValidCipher" allowedMethods="GET"/>
-        <http:request config-ref="requestConfig2" path="/" method="GET" />
+    <flow name="validProtocolValidCipher">
+        <http:request config-ref="requestConfig2" path="/"/>
     </flow>
-    <flow name="testValidProtocolInvalidCipher">
-        <http:listener config-ref="mainListenerConfig" path="/validProtocolInvalidCipher" allowedMethods="GET"/>
-        <http:request config-ref="requestConfig3" path="/" method="GET" />
+    <flow name="validProtocolInvalidCipher">
+        <http:request config-ref="requestConfig3" path="/"/>
     </flow>
 
     <flow name="server1">
         <http:listener config-ref="listenerConfig1" path="/" allowedMethods="GET"/>
-        <expression-component>mel:payload = 'ok'</expression-component>
+        <set-payload value="ok"/>
     </flow>
     <flow name="server2">
         <http:listener config-ref="listenerConfig2" path="/" allowedMethods="GET"/>
-        <expression-component>mel:payload = 'ok'</expression-component>
+        <set-payload value="ok"/>
     </flow>
     <flow name="server3">
         <http:listener config-ref="listenerConfig3" path="/" allowedMethods="GET"/>
-        <expression-component>mel:payload = 'ok'</expression-component>
+        <set-payload value="ok"/>
     </flow>
 
 </mule>

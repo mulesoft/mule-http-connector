@@ -6,24 +6,20 @@
  */
 package org.mule.test.http.functional.tls;
 
-import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
-import static org.apache.http.HttpStatus.SC_OK;
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mule.test.http.functional.matcher.HttpResponseContentStringMatcher.body;
+import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
+import org.mule.functional.api.exception.ExpectedError;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.test.http.functional.matcher.HttpResponseStatusCodeMatcher;
 
-import org.apache.http.HttpResponse;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 public class HttpTlsContextCustomCiphersTestCase extends AbstractHttpTlsContextTestCase {
 
-  @ClassRule
-  public static DynamicPort httpsPort = new DynamicPort("httpsPort");
   @ClassRule
   public static DynamicPort httpsInternalPort1 = new DynamicPort("internal.port.1");
   @ClassRule
@@ -31,11 +27,10 @@ public class HttpTlsContextCustomCiphersTestCase extends AbstractHttpTlsContextT
   @ClassRule
   public static DynamicPort httpsInternalPort3 = new DynamicPort("internal.port.3");
 
-  private static final String invalidCipher = "SSL_DH_anon_WITH_DES_CBC_SHA";
-  private static final String urlPrefix = "https://localhost:" + httpsPort.getValue();
-  private static final String bothProtocolsOneCipher = urlPrefix + "/test/bothProtocolsOneCipher";
-  private static final String validProtocolValidCipher = urlPrefix + "/test/validProtocolValidCipher";
-  private static final String validProtocolInvalidCipher = urlPrefix + "/test/validProtocolInvalidCipher";
+  private static final String invalidCipher = "TLS_RSA_WITH_AES_256_CBC_SHA";
+  private static final String bothProtocolsOneCipher = "bothProtocolsOneCipher";
+  private static final String validProtocolValidCipher = "validProtocolValidCipher";
+  private static final String validProtocolInvalidCipher = "validProtocolInvalidCipher";
   private static final String OK_RESPONSE = "ok";
   private static final String ERROR_RESPONSE = "Remotely closed";
 
@@ -44,6 +39,9 @@ public class HttpTlsContextCustomCiphersTestCase extends AbstractHttpTlsContextT
   @ClassRule
   public static SystemProperty verboseExceptions = new SystemProperty("mule.verbose.exceptions", "true");
 
+  @Rule
+  public ExpectedError expectedError = ExpectedError.none();
+
   @Override
   protected String getConfigFile() {
     return "http-tls-ciphers-config.xml";
@@ -51,26 +49,21 @@ public class HttpTlsContextCustomCiphersTestCase extends AbstractHttpTlsContextT
 
   @Test
   public void testBothProtocolsOneCipher() throws Exception {
-    HttpResponse response = executeGetRequest(bothProtocolsOneCipher);
-
-    assertThat(response, HttpResponseStatusCodeMatcher.hasStatusCode(SC_OK));
-    assertThat(response, body(is(OK_RESPONSE)));
+    assertThat(flowRunner(bothProtocolsOneCipher).keepStreamsOpen().run().getMessage(),
+               hasPayload(equalTo(OK_RESPONSE)));
   }
 
   @Test
   public void testValidProtocolValidCipher() throws Exception {
-    HttpResponse response = executeGetRequest(validProtocolValidCipher);
-
-    assertThat(response, HttpResponseStatusCodeMatcher.hasStatusCode(SC_OK));
-    assertThat(response, body(is(OK_RESPONSE)));
+    assertThat(flowRunner(validProtocolValidCipher).keepStreamsOpen().run().getMessage(),
+               hasPayload(equalTo(OK_RESPONSE)));
   }
 
   @Test
   public void testValidProtocolInvalidCipher() throws Exception {
-    HttpResponse response = executeGetRequest(validProtocolInvalidCipher);
-
-    assertThat(response, HttpResponseStatusCodeMatcher.hasStatusCode(SC_INTERNAL_SERVER_ERROR));
-    assertThat(response, body(containsString(ERROR_RESPONSE)));
+    expectedError.expectErrorType("HTTP", "CONNECTIVITY");
+    expectedError.expectMessage(containsString(ERROR_RESPONSE));
+    flowRunner(validProtocolInvalidCipher).run();
   }
 
 }
