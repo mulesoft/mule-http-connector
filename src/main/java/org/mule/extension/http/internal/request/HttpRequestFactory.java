@@ -37,6 +37,7 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.transformation.TransformationService;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.runtime.http.api.domain.entity.EmptyHttpEntity;
@@ -58,7 +59,6 @@ import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.Set;
 
-import sun.misc.IOUtils;
 
 /**
  * Component that generates {@link HttpRequest HttpRequests}.
@@ -358,8 +358,8 @@ public class HttpRequestFactory {
     }
 
     @Override
-    public byte[] getBytes() throws IOException {
-      return IOUtils.readFully(getContent(), -1, true);
+    public byte[] getBytes() {
+      return IOUtils.toByteArray(getContent());
     }
 
     @Override
