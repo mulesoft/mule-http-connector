@@ -8,8 +8,10 @@ package org.mule.extension.http.internal.certificate;
 
 import static java.lang.Class.forName;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.cert.Certificate;
@@ -30,6 +32,7 @@ public class DefaultCertificateProvider implements CertificateProvider {
 
   private static Class SERIALIZABLE_LAZY_VALUE_CLASS;
   private static Method GET;
+  private static Constructor SERIALIZABLE_LAZY_VALUE_CONSTRUCTOR;
 
   private Object serializableLazyValue;
 
@@ -37,6 +40,7 @@ public class DefaultCertificateProvider implements CertificateProvider {
     try {
       SERIALIZABLE_LAZY_VALUE_CLASS = forName(SERIALIZABLE_LAZY_VALUE_CLASS_NAME);
       GET = SERIALIZABLE_LAZY_VALUE_CLASS.getDeclaredMethod(GET_METHOD_NAME);
+      SERIALIZABLE_LAZY_VALUE_CONSTRUCTOR = SERIALIZABLE_LAZY_VALUE_CLASS.getConstructor(Supplier.class);
     } catch (ClassNotFoundException | NoSuchMethodException e) {
       throw new RuntimeException("Exception while trying to load " + SERIALIZABLE_LAZY_VALUE_CLASS_NAME + " by reflection", e);
     }
@@ -50,7 +54,7 @@ public class DefaultCertificateProvider implements CertificateProvider {
    */
   DefaultCertificateProvider(Supplier<Certificate> certificateSupplier)
       throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-    this.serializableLazyValue = SERIALIZABLE_LAZY_VALUE_CLASS.getConstructor(Supplier.class).newInstance(certificateSupplier);
+    this.serializableLazyValue = SERIALIZABLE_LAZY_VALUE_CONSTRUCTOR.newInstance(certificateSupplier);
   }
 
   @Override

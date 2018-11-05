@@ -10,6 +10,7 @@ import static java.lang.String.valueOf;
 import static java.util.Collections.emptyMap;
 import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
+
 import org.mule.runtime.api.util.MultiMap;
 
 import java.security.cert.Certificate;
@@ -177,17 +178,15 @@ public class HttpRequestAttributesBuilder {
       return null;
     }
 
-    byte[] listenerPathBytes = listenerPath.getBytes();
-    byte[] requestPathBytes = requestPath.getBytes();
     int listenerPathCurrentSlashIndex = 0;
     int requestPathCurrentSlashIndex = 0;
 
     try {
-      while (listenerPathCurrentSlashIndex < listenerPathBytes.length - 1) {
-        listenerPathCurrentSlashIndex = iterateUntilNextSlash(listenerPathBytes, listenerPathCurrentSlashIndex);
-        requestPathCurrentSlashIndex = iterateUntilNextSlash(requestPathBytes, requestPathCurrentSlashIndex);
+      while (listenerPathCurrentSlashIndex < listenerPath.length() - 1) {
+        listenerPathCurrentSlashIndex = iterateUntilNextSlash(listenerPath, listenerPathCurrentSlashIndex);
+        requestPathCurrentSlashIndex = iterateUntilNextSlash(requestPath, requestPathCurrentSlashIndex);
       }
-    } catch (ArrayIndexOutOfBoundsException e) {
+    } catch (StringIndexOutOfBoundsException e) {
       //If here it means that the number of slashes in the requestPath is not the same as in the listenerPath.
       //That can only happen if the requestPath is equal to the listenerPath without considering the *.
       return valueOf(SLASH);
@@ -196,8 +195,8 @@ public class HttpRequestAttributesBuilder {
     return requestPath.substring(requestPathCurrentSlashIndex - 1);
   }
 
-  private int iterateUntilNextSlash(byte[] bytes, int position) {
-    while (bytes[position] != SLASH) {
+  private int iterateUntilNextSlash(String path, int position) {
+    while (path.charAt(position) != SLASH) {
       position++;
     }
     position++;
