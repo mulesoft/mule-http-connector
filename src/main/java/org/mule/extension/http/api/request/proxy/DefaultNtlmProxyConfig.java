@@ -12,6 +12,8 @@ import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
+import java.util.Objects;
+
 /**
  * A Proxy configuration for NTLM authentication proxies.
  *
@@ -36,4 +38,23 @@ public class DefaultNtlmProxyConfig extends DefaultProxyConfig implements HttpNt
     this.ntlmDomain = ntlmDomain;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+    DefaultNtlmProxyConfig that = (DefaultNtlmProxyConfig) o;
+    return Objects.equals(ntlmDomain, that.ntlmDomain);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), ntlmDomain);
+  }
 }

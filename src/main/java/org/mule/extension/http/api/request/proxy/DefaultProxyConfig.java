@@ -12,6 +12,8 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
 
+import java.util.Objects;
+
 /**
  * Basic HTTP Proxy configuration based on host and port, and optionally a username and password for proxy authentication.
  *
@@ -76,4 +78,24 @@ public class DefaultProxyConfig implements HttpProxyConfig {
     return nonProxyHosts;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    DefaultProxyConfig that = (DefaultProxyConfig) o;
+    return port == that.port &&
+        Objects.equals(host, that.host) &&
+        Objects.equals(username, that.username) &&
+        Objects.equals(password, that.password) &&
+        Objects.equals(nonProxyHosts, that.nonProxyHosts);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(host, port, username, password, nonProxyHosts);
+  }
 }
