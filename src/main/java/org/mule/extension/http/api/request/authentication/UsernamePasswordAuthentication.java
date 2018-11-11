@@ -15,6 +15,8 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
 
+import java.util.Objects;
+
 /**
  * Base class for user/pass based implementations.
  *
@@ -68,4 +70,22 @@ public abstract class UsernamePasswordAuthentication implements HttpAuthenticati
     return preemptive;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    UsernamePasswordAuthentication that = (UsernamePasswordAuthentication) o;
+    return preemptive == that.preemptive &&
+        Objects.equals(username, that.username) &&
+        Objects.equals(password, that.password);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(username, password, preemptive);
+  }
 }
