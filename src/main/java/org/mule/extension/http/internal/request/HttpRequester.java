@@ -21,7 +21,7 @@ import static org.mule.extension.http.internal.HttpConnectorConstants.RETRY_ATTE
 import static org.mule.extension.http.internal.HttpConnectorConstants.RETRY_ON_ALL_METHODS_PROPERTY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
-import static reactor.core.publisher.Mono.from;
+
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.error.HttpError;
 import org.mule.extension.http.api.error.HttpErrorMessageGenerator;
@@ -51,15 +51,15 @@ import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Component capable of performing an HTTP request given a request.
@@ -127,21 +127,20 @@ public class HttpRequester {
             try {
               fireNotification(notificationEmitter, REQUEST_COMPLETE, () -> HttpResponseNotificationData.from(response),
                                RESPONSE_NOTIFICATION_DATA_TYPE);
-              from(RESPONSE_TO_RESULT.convert(config, muleContext, response, httpRequest.getUri()))
-                  .doOnNext(result -> {
-                    resendRequest(result, checkRetry, authentication, () -> {
-                      scheduler.submit(() -> consumePayload(result));
-                      doRequest(client, config, uri, method, streamingMode, sendBodyMode, followRedirects,
-                                authentication, responseTimeout, responseValidator, transformationService,
-                                requestBuilder, false, muleContext, scheduler, notificationEmitter,
-                                streamingHelper, callback);
-                    }, () -> {
-                      responseValidator.validate(result, httpRequest, streamingHelper);
-                      callback.success(result);
-                    });
-                  })
-                  .doOnError(Exception.class, e -> callback.error(e))
-                  .subscribe();
+
+              Result<InputStream, HttpResponseAttributes> result =
+                  RESPONSE_TO_RESULT.convert(config, muleContext, response, httpRequest.getUri());
+
+              resendRequest(result, checkRetry, authentication, () -> {
+                scheduler.submit(() -> consumePayload(result));
+                doRequest(client, config, uri, method, streamingMode, sendBodyMode, followRedirects,
+                          authentication, responseTimeout, responseValidator, transformationService,
+                          requestBuilder, false, muleContext, scheduler, notificationEmitter,
+                          streamingHelper, callback);
+              }, () -> {
+                responseValidator.validate(result, httpRequest, streamingHelper);
+                callback.success(result);
+              });
             } catch (Exception e) {
               callback.error(e);
             }
