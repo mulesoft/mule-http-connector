@@ -18,7 +18,6 @@ import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.SET_COOKIE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.SET_COOKIE2;
-import static reactor.core.publisher.Mono.just;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.internal.request.builder.HttpResponseAttributesBuilder;
@@ -28,7 +27,6 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 
-import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,8 +56,8 @@ public class HttpResponseToResult {
 
   private final Function<String, MediaType> parseMediaType = memoize(ctv -> parseMediaType(ctv), new ConcurrentHashMap<>());
 
-  public Publisher<Result<InputStream, HttpResponseAttributes>> convert(HttpRequesterCookieConfig config, MuleContext muleContext,
-                                                                        HttpResponse response, URI uri) {
+  public Result<InputStream, HttpResponseAttributes> convert(HttpRequesterCookieConfig config, MuleContext muleContext,
+                                                             HttpResponse response, URI uri) {
     String responseContentType = response.getHeaderValue(CONTENT_TYPE);
 
     HttpEntity entity = response.getEntity();
@@ -83,7 +81,7 @@ public class HttpResponseToResult {
       builder.length(entity.getLength().get());
     }
 
-    return just(builder.output(entity.getContent()).attributes(responseAttributes).build());
+    return builder.output(entity.getContent()).attributes(responseAttributes).build();
   }
 
   private boolean empty(HttpEntity entity) {
