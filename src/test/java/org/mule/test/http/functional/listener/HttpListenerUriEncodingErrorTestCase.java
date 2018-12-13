@@ -36,7 +36,7 @@ public class HttpListenerUriEncodingErrorTestCase extends AbstractHttpTestCase {
     Response response = sendGetRequest(address);
 
     assertThat(response.getStatusCode(), is(BAD_REQUEST.getStatusCode()));
-    assertThat(response.getResponseBody(), containsString("HTTP request parsing failed with error: \"Malformed escape pair"));
+    assertThat(response.getResponseBody(), containsString("HTTP request parsing failed with error: \"Malformed "));
   }
 
   @Test
