@@ -41,13 +41,13 @@ public class HttpRequestAttributesResolver {
     HttpRequest request = requestContext.getRequest();
 
     URI uri = request.getUri();
-    String path = uri.getRawPath();
+    String path = uri.getPath();
     String uriString = path;
     String relativePath = this.listenerPath.getRelativePath(path);
 
     ClientConnection clientConnection = requestContext.getClientConnection();
 
-    String queryString = uri.getRawQuery();
+    String queryString = uri.getQuery();
     if (queryString != null) {
       uriString += "?" + queryString;
     } else {
@@ -63,9 +63,9 @@ public class HttpRequestAttributesResolver {
         .scheme(requestContext.getScheme())
         .version(request.getProtocol().asString())
         .headers(request.getHeaders())
-        .uriParams(decodeUriParams(listenerPath, path))
+        .uriParams(decodeUriParams(listenerPath, uri.getRawPath()))
         .queryString(queryString)
-        .queryParams(decodeQueryString(queryString))
+        .queryParams(decodeQueryString(uri.getRawQuery()))
         .localAddress(requestContext.getServerConnection().getLocalHostAddress().getAddress().getHostAddress().concat(":")
             .concat(Integer.toString(requestContext.getServerConnection().getLocalHostAddress().getPort())))
         .remoteAddress(clientConnection.getRemoteHostAddress().getHostString().concat(":")
