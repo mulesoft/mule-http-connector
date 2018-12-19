@@ -29,7 +29,7 @@
 
     <flow name="oneUriParameterInTheMiddle">
         <http:listener config-ref="listenerConfig" path="/some-path/{uri-param1}/some-other-path" />
-        <set-payload value="#[mel:message.getAttributes()]"/>
+        <set-payload value="#[attributes]"/>
         <test:queue name="out"/>
     </flow>
 

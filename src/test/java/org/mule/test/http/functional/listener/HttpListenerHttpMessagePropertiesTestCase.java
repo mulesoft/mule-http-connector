@@ -6,6 +6,7 @@
  */
 package org.mule.test.http.functional.listener;
 
+import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.http.client.fluent.Request.Post;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -19,7 +20,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_I
 import static org.mule.runtime.http.api.HttpHeaders.Names.X_CORRELATION_ID;
 import static org.mule.runtime.http.api.HttpHeaders.Names.X_FORWARDED_FOR;
 import static org.mule.runtime.http.api.domain.HttpProtocol.HTTP_1_1;
-
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.functional.api.component.TestConnectorQueueHandler;
 import org.mule.runtime.api.message.Message;
@@ -29,12 +29,6 @@ import org.mule.runtime.http.api.domain.HttpProtocol;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
-import org.apache.http.HttpVersion;
-import org.apache.http.client.fluent.Request;
-import org.hamcrest.Matchers;
-import org.junit.Rule;
-import org.junit.Test;
-
 import com.google.common.collect.ImmutableMap;
 
 import java.io.UnsupportedEncodingException;
@@ -42,6 +36,12 @@ import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
+
+import org.apache.http.HttpVersion;
+import org.apache.http.client.fluent.Request;
+import org.hamcrest.Matchers;
+import org.junit.Rule;
+import org.junit.Test;
 
 public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestCase {
 
@@ -83,7 +83,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
 
   @Test
   public void get() throws Exception {
-    final String url = String.format("http://localhost:%s", listenPort.getNumber());
+    final String url = format("http://localhost:%s", listenPort.getNumber());
     Request.Get(url).connectTimeout(RECEIVE_TIMEOUT).execute();
     final Message message = queueHandler.read("out", RECEIVE_TIMEOUT).getMessage();
     HttpRequestAttributes attributes = getAttributes(message);
@@ -107,7 +107,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
     final ImmutableMap<String, Object> queryParams = ImmutableMap.<String, Object>builder()
         .put(QUERY_PARAM_NAME, QUERY_PARAM_VALUE).put(SECOND_QUERY_PARAM_NAME, SECOND_QUERY_PARAM_VALUE).build();
     final String uri = "/?" + buildQueryString(queryParams);
-    final String url = String.format("http://localhost:%s" + uri, listenPort.getNumber());
+    final String url = format("http://localhost:%s" + uri, listenPort.getNumber());
     Request.Get(url).connectTimeout(RECEIVE_TIMEOUT).execute();
     final Message message = queueHandler.read("out", RECEIVE_TIMEOUT).getMessage();
     HttpRequestAttributes attributes = getAttributes(message);
@@ -125,7 +125,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
   public void getWithQueryParamMultipleValues() throws Exception {
     final ImmutableMap<String, Object> queryParams = ImmutableMap.<String, Object>builder()
         .put(QUERY_PARAM_NAME, Arrays.asList(QUERY_PARAM_VALUE, QUERY_PARAM_SECOND_VALUE)).build();
-    final String url = String.format("http://localhost:%s/?" + buildQueryString(queryParams), listenPort.getNumber());
+    final String url = format("http://localhost:%s/?" + buildQueryString(queryParams), listenPort.getNumber());
     Request.Get(url).connectTimeout(RECEIVE_TIMEOUT).execute();
     final Message message = queueHandler.read("out", RECEIVE_TIMEOUT).getMessage();
     HttpRequestAttributes attributes = getAttributes(message);
@@ -146,10 +146,14 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
             .put("encoded", "%")
             .put("%24", "encodeMe")
             .build();
-    final String url = String.format("http://localhost:%s/?", listenPort.getNumber()) + buildQueryString(queryParams);
+    final String url = format("http://localhost:%s/%s?", listenPort.getNumber(), "a%20path%25") + buildQueryString(queryParams);
     Post(url).connectTimeout(RECEIVE_TIMEOUT).execute();
     final Message message = queueHandler.read("out", RECEIVE_TIMEOUT).getMessage();
     HttpRequestAttributes attributes = getAttributes(message);
+    assertThat(attributes.getListenerPath(), is("/*"));
+    assertThat(attributes.getRequestPath(), is("/a path%"));
+    assertThat(attributes.getRequestUri(), is("/a path%?queryParam=param+Value&encoded=%&%24=encodeMe"));
+    assertThat(attributes.getQueryString(), is("queryParam=param+Value&encoded=%&%24=encodeMe"));
     MultiMap<String, String> retrivedQueryParams = attributes.getQueryParams();
     assertThat(retrivedQueryParams, notNullValue());
     assertThat(retrivedQueryParams.size(), is(3));
@@ -162,7 +166,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
   public void putWithOldProtocol() throws Exception {
     final ImmutableMap<String, Object> queryParams =
         ImmutableMap.<String, Object>builder().put(QUERY_PARAM_NAME, Arrays.asList(QUERY_PARAM_VALUE, QUERY_PARAM_VALUE)).build();
-    final String url = String.format("http://localhost:%s/?" + buildQueryString(queryParams), listenPort.getNumber());
+    final String url = format("http://localhost:%s/?" + buildQueryString(queryParams), listenPort.getNumber());
     Request.Put(url).version(HttpVersion.HTTP_1_0).connectTimeout(RECEIVE_TIMEOUT).execute();
     final Message message = queueHandler.read("out", RECEIVE_TIMEOUT).getMessage();
     HttpRequestAttributes attributes = getAttributes(message);
@@ -172,7 +176,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
 
   @Test
   public void getFullUriAndPath() throws Exception {
-    final String url = String.format("http://localhost:%s%s", listenPort.getNumber(), CONTEXT_PATH);
+    final String url = format("http://localhost:%s%s", listenPort.getNumber(), CONTEXT_PATH);
     Request.Get(url).connectTimeout(RECEIVE_TIMEOUT).execute();
     final Message message = queueHandler.read("out", RECEIVE_TIMEOUT).getMessage();
     HttpRequestAttributes attributes = getAttributes(message);
@@ -183,8 +187,8 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
 
   @Test
   public void getAllUriParams() throws Exception {
-    final String url = String.format("http://localhost:%s/%s/%s/%s", listenPort.getNumber(), FIRST_URI_PARAM,
-                                     SECOND_URI_PARAM_VALUE, THIRD_URI_PARAM_VALUE);
+    final String url = format("http://localhost:%s/%s/%s/%s", listenPort.getNumber(), FIRST_URI_PARAM,
+                              SECOND_URI_PARAM_VALUE, THIRD_URI_PARAM_VALUE);
     Post(url).connectTimeout(RECEIVE_TIMEOUT).execute();
     final Message message = queueHandler.read("out", RECEIVE_TIMEOUT).getMessage();
     Map<String, String> uriParams = getAttributes(message).getUriParams();
@@ -197,7 +201,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
 
   @Test
   public void getUriParamInTheMiddle() throws Exception {
-    final String url = String.format("http://localhost:%s/some-path/%s/some-other-path", listenPort.getNumber(), FIRST_URI_PARAM);
+    final String url = format("http://localhost:%s/some-path/%s/some-other-path", listenPort.getNumber(), FIRST_URI_PARAM);
     Post(url).connectTimeout(RECEIVE_TIMEOUT).execute();
     final Message message = queueHandler.read("out", RECEIVE_TIMEOUT).getMessage();
     Map<String, String> uriParams = getAttributes(message).getUriParams();
@@ -211,7 +215,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
     final String uriParamValue = "uri param value %24";
     final String uriParamValueEncoded = encode(uriParamValue);
     final String url =
-        String.format("http://localhost:%s/some-path/%s/some-other-path", listenPort.getNumber(), uriParamValueEncoded);
+        format("http://localhost:%s/some-path/%s/some-other-path", listenPort.getNumber(), uriParamValueEncoded);
     Post(url).connectTimeout(RECEIVE_TIMEOUT).execute();
     final Message message = queueHandler.read("out", RECEIVE_TIMEOUT).getMessage();
     Map<String, String> uriParams = getAttributes(message).getUriParams();
@@ -222,7 +226,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
 
   @Test
   public void xForwardedForHeader() throws Exception {
-    final String url = String.format("http://localhost:%s/some-path", listenPort.getNumber());
+    final String url = format("http://localhost:%s/some-path", listenPort.getNumber());
 
     Post(url).connectTimeout(RECEIVE_TIMEOUT).execute();
     final Message message = queueHandler.read("out", RECEIVE_TIMEOUT).getMessage();
@@ -239,7 +243,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
 
   @Test
   public void xCorrelationIdHeader() throws Exception {
-    final String url = String.format("http://localhost:%s/some-path", listenPort.getNumber());
+    final String url = format("http://localhost:%s/some-path", listenPort.getNumber());
 
     final String myCorrelationId = "myCorrelationId";
     Post(url).addHeader(X_CORRELATION_ID, myCorrelationId).connectTimeout(RECEIVE_TIMEOUT).execute();
@@ -251,7 +255,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
 
   @Test
   public void muleCorrelationIdHeader() throws Exception {
-    final String url = String.format("http://localhost:%s/some-path", listenPort.getNumber());
+    final String url = format("http://localhost:%s/some-path", listenPort.getNumber());
 
     final String myCorrelationId = "myCorrelationId";
     Post(url).addHeader(MULE_CORRELATION_ID_PROPERTY, myCorrelationId).connectTimeout(RECEIVE_TIMEOUT).execute();
@@ -263,7 +267,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
 
   @Test
   public void xOverridesMuleCorrelationIdHeader() throws Exception {
-    final String url = String.format("http://localhost:%s/some-path", listenPort.getNumber());
+    final String url = format("http://localhost:%s/some-path", listenPort.getNumber());
 
     final String myCorrelationId = "myCorrelationId";
     final String myOtherCorrelationId = "myOtherCorrelationId";
@@ -281,7 +285,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
 
   @Test
   public void getBasePath() throws Exception {
-    final String url = String.format("http://localhost:%s%s", listenBasePort.getNumber(), API_CONTEXT_PATH);
+    final String url = format("http://localhost:%s%s", listenBasePort.getNumber(), API_CONTEXT_PATH);
     Request.Get(url).connectTimeout(RECEIVE_TIMEOUT).execute();
     final Message message = queueHandler.read("out", RECEIVE_TIMEOUT).getMessage();
     HttpRequestAttributes attributes = getAttributes(message);
