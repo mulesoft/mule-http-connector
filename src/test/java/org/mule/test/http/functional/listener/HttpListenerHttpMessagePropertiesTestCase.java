@@ -153,6 +153,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
     assertThat(attributes.getListenerPath(), is("/*"));
     assertThat(attributes.getRequestPath(), is("/a path%"));
     assertThat(attributes.getRequestUri(), is("/a path%?queryParam=param+Value&encoded=%&%24=encodeMe"));
+    assertThat(attributes.getQueryString(), is("queryParam=param+Value&encoded=%&%24=encodeMe"));
     MultiMap<String, String> retrivedQueryParams = attributes.getQueryParams();
     assertThat(retrivedQueryParams, notNullValue());
     assertThat(retrivedQueryParams.size(), is(3));
