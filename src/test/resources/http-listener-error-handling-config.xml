@@ -83,34 +83,4 @@
             </on-error-continue>
         </error-handler>
     </flow>
-
-    <flow name="exceptionInPropagateErrorHandler">
-        <http:listener config-ref="listenerConfig" path="/exceptionInPropagateErrorHandler">
-            <http:error-response>
-                <http:body>errorResponse</http:body>
-            </http:error-response>
-        </http:listener>
-        <test:processor throwException="true"/>
-        <error-handler>
-            <on-error-propagate>
-                <set-payload value="errorHandler"/>
-                <test:processor throwException="true"/>
-            </on-error-propagate>
-        </error-handler>
-    </flow>
-
-    <flow name="exceptionInContinueErrorHandler">
-        <http:listener config-ref="listenerConfig" path="/exceptionInContinueErrorHandler">
-            <http:error-response>
-                <http:body>errorResponse</http:body>
-            </http:error-response>
-        </http:listener>
-        <test:processor throwException="true"/>
-        <error-handler>
-            <on-error-continue>
-                <set-payload value="errorHandler"/>
-                <test:processor throwException="true"/>
-            </on-error-continue>
-        </error-handler>
-    </flow>
 </mule>
