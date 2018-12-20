@@ -10,12 +10,14 @@ import static org.apache.http.client.fluent.Request.Get;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.ERROR_HANDLING;
+
 import org.mule.runtime.core.api.util.IOUtils;
 
-import io.qameta.allure.Story;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Response;
 import org.junit.Test;
+
+import io.qameta.allure.Story;
 
 @Story(ERROR_HANDLING)
 public class HttpListenerErrorHandlingTestCase extends AbstractHttpListenerErrorHandlingTestCase {
@@ -53,22 +55,6 @@ public class HttpListenerErrorHandlingTestCase extends AbstractHttpListenerError
     assertThat(IOUtils.toString(httpResponse.getEntity().getContent()),
                is("An error occurred: Functional Test Service Exception"));
     assertThat(httpResponse.getFirstHeader("headername").getValue(), is("headerValue"));
-  }
-
-  @Test
-  public void exceptionInPropagateErrorHandlerSkipsErrorResponse() throws Exception {
-    final Response response = Get(getUrl("exceptionInPropagateErrorHandler")).execute();
-    final HttpResponse httpResponse = response.returnResponse();
-
-    assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is("Functional Test Service Exception"));
-  }
-
-  @Test
-  public void exceptionInContinueErrorHandlerSkipsErrorResponse() throws Exception {
-    final Response response = Get(getUrl("exceptionInContinueErrorHandler")).execute();
-    final HttpResponse httpResponse = response.returnResponse();
-
-    assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is("Functional Test Service Exception"));
   }
 
 }
