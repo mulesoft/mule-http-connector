@@ -71,6 +71,14 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
   private final String requestUri;
 
   /**
+   * Full URI of the request, encoded as received.
+   *
+   * @since 1.5.0
+   */
+  @Parameter
+  private final String rawRequestUri;
+
+  /**
    * Query string of the request. Former 'http.query.string'.
    */
   @Parameter
@@ -119,15 +127,15 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
                                String scheme, String method, String requestPath, String requestUri, String queryString,
                                MultiMap<String, String> queryParams, Map<String, String> uriParams, String remoteAddress,
                                Certificate clientCertificate) {
-    this(headers, listenerPath, relativePath, null, version, scheme, method, requestPath, requestUri, queryString, queryParams,
+    this(headers, listenerPath, relativePath, null, version, scheme, method, requestPath, requestUri, "", queryString,
+         queryParams,
          uriParams, "", remoteAddress, () -> clientCertificate);
   }
 
   HttpRequestAttributes(MultiMap<String, String> headers, String listenerPath, String relativePath, String maskedRequestPath,
-                        String version,
-                        String scheme, String method, String requestPath, String requestUri, String queryString,
-                        MultiMap<String, String> queryParams, Map<String, String> uriParams, String localAddress,
-                        String remoteAddress, Supplier<Certificate> certificateSupplier) {
+                        String version, String scheme, String method, String requestPath, String requestUri, String rawRequestUri,
+                        String queryString, MultiMap<String, String> queryParams, Map<String, String> uriParams,
+                        String localAddress, String remoteAddress, Supplier<Certificate> certificateSupplier) {
     super(headers, queryParams, uriParams, requestPath);
     this.listenerPath = listenerPath;
     this.relativePath = relativePath;
@@ -136,6 +144,7 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
     this.scheme = scheme;
     this.method = method;
     this.requestUri = requestUri;
+    this.rawRequestUri = rawRequestUri;
     this.queryString = queryString;
     this.localAddress = localAddress;
     this.remoteAddress = remoteAddress;
@@ -168,6 +177,10 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
 
   public String getRequestUri() {
     return requestUri;
+  }
+
+  public String getRawRequestUri() {
+    return rawRequestUri;
   }
 
   public String getQueryString() {

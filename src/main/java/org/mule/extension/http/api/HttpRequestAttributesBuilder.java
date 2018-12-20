@@ -38,6 +38,7 @@ public class HttpRequestAttributesBuilder {
   private String scheme;
   private String method;
   private String requestUri;
+  private String rawRequestUri;
   private String queryString = "";
   private String localAddress;
   private String remoteAddress;
@@ -120,6 +121,11 @@ public class HttpRequestAttributesBuilder {
     return this;
   }
 
+  public HttpRequestAttributesBuilder rawRequestUri(String rawRequestUri) {
+    this.rawRequestUri = rawRequestUri;
+    return this;
+  }
+
   public HttpRequestAttributesBuilder queryString(String queryString) {
     requireNonNull(queryString, "Query string cannot be null.");
     this.queryString = queryString;
@@ -168,8 +174,8 @@ public class HttpRequestAttributesBuilder {
     }
     resolveMaskedRequestPath = false;
     return new HttpRequestAttributes(headers, listenerPath, relativePath, maskedRequestPath, version, scheme, method, requestPath,
-                                     requestUri,
-                                     queryString, queryParams, uriParams, localAddress, remoteAddress, clientCertificate);
+                                     requestUri, rawRequestUri, queryString, queryParams, uriParams, localAddress, remoteAddress,
+                                     clientCertificate);
   }
 
   private String maskRequestPath() {
