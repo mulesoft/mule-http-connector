@@ -35,7 +35,7 @@
         <guavaVersion>25.1-jre</guavaVersion>
         <formatterConfigPath>formatter.xml</formatterConfigPath>
 
-        <muleSocketsConnectorVersion>1.1.2</muleSocketsConnectorVersion>
+        <muleSocketsConnectorVersion>1.1.4</muleSocketsConnectorVersion>
         <muleCorsKernelVersion>1.1.0</muleCorsKernelVersion>
 
         <!-- This dependencies must be explicitly defined as long as HTTP supports runtimes prior to 4.1.2 -->
