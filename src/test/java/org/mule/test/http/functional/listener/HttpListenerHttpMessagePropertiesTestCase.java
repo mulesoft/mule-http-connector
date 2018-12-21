@@ -31,6 +31,7 @@ import org.mule.test.http.functional.AbstractHttpTestCase;
 
 import com.google.common.collect.ImmutableMap;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Arrays;
@@ -52,7 +53,9 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
   public static final String SECOND_QUERY_PARAM_NAME = "queryParam2";
   public static final String SECOND_QUERY_PARAM_VALUE = "paramValue2";
   public static final String CONTEXT_PATH = "/context/path";
+  public static final String CONTEXT_ENCODED_PATH = "/context%20path%25";
   public static final String API_CONTEXT_PATH = "/api" + CONTEXT_PATH;
+  public static final String API_CONTEXT_ENCODED_PATH = "/a%20p%20i" + CONTEXT_ENCODED_PATH;
   public static final String BASE_PATH = "/";
 
   private static final String FIRST_URI_PARAM_NAME = "uri-param1";
@@ -75,6 +78,9 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
 
   @Rule
   public DynamicPort listenBasePort = new DynamicPort("port2");
+
+  @Rule
+  public DynamicPort listenEncodedBasePort = new DynamicPort("port3");
 
   @Override
   protected String getConfigFile() {
@@ -152,7 +158,9 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
     HttpRequestAttributes attributes = getAttributes(message);
     assertThat(attributes.getListenerPath(), is("/*"));
     assertThat(attributes.getRequestPath(), is("/a path%"));
+    assertThat(attributes.getRawRequestPath(), is("/a%20path%25"));
     assertThat(attributes.getRequestUri(), is("/a path%?queryParam=param+Value&encoded=%&%24=encodeMe"));
+    assertThat(attributes.getRawRequestUri(), is("/a%20path%25?queryParam=param+Value&encoded=%25&%2524=encodeMe"));
     assertThat(attributes.getQueryString(), is("queryParam=param+Value&encoded=%&%24=encodeMe"));
     MultiMap<String, String> retrivedQueryParams = attributes.getQueryParams();
     assertThat(retrivedQueryParams, notNullValue());
@@ -285,13 +293,24 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
 
   @Test
   public void getBasePath() throws Exception {
-    final String url = format("http://localhost:%s%s", listenBasePort.getNumber(), API_CONTEXT_PATH);
+    checkBasePath(listenBasePort, API_CONTEXT_PATH, "/api/*", API_CONTEXT_PATH, CONTEXT_PATH);
+  }
+
+  @Test
+  public void getBasePathEncoded() throws Exception {
+    checkBasePath(listenEncodedBasePort, API_CONTEXT_ENCODED_PATH, "/a p i/*", "/a p i/context path%", "/context path%");
+  }
+
+  private void checkBasePath(DynamicPort listenEncodedBasePort, String apiContextEncodedPath, String expectedListenerPath,
+                             String expectedRequestPath, String expectedRelativePath)
+      throws IOException {
+    final String url = format("http://localhost:%s%s", listenEncodedBasePort.getNumber(), apiContextEncodedPath);
     Request.Get(url).connectTimeout(RECEIVE_TIMEOUT).execute();
     final Message message = queueHandler.read("out", RECEIVE_TIMEOUT).getMessage();
     HttpRequestAttributes attributes = getAttributes(message);
-    assertThat(attributes.getListenerPath(), is("/api/*"));
-    assertThat(attributes.getRequestPath(), is(API_CONTEXT_PATH));
-    assertThat(attributes.getRelativePath(), is(CONTEXT_PATH));
+    assertThat(attributes.getListenerPath(), is(expectedListenerPath));
+    assertThat(attributes.getRequestPath(), is(expectedRequestPath));
+    assertThat(attributes.getRelativePath(), is(expectedRelativePath));
     Map<String, String> uriParams = attributes.getUriParams();
     assertThat(uriParams, notNullValue());
     assertThat(uriParams.isEmpty(), is(true));

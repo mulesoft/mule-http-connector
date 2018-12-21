@@ -14,6 +14,9 @@
     <http:listener-config name="listenerBaseConfig" basePath="api">
         <http:listener-connection host="localhost" port="${port2}"/>
     </http:listener-config>
+    <http:listener-config name="listenerEncodedBaseConfig" basePath="a p i">
+        <http:listener-connection host="localhost" port="${port3}"/>
+    </http:listener-config>
 
     <flow name="generalFlow">
         <http:listener  path="/*" config-ref="listenerConfig"/>
@@ -35,6 +38,12 @@
 
     <flow name="basePathConfig">
         <http:listener config-ref="listenerBaseConfig" path="*" />
+        <set-payload value="#[attributes]"/>
+        <test:queue name="out"/>
+    </flow>
+
+    <flow name="baseEncodedPathConfig">
+        <http:listener config-ref="listenerEncodedBaseConfig" path="*" />
         <set-payload value="#[attributes]"/>
         <test:queue name="out"/>
     </flow>

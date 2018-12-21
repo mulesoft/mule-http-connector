@@ -22,6 +22,8 @@ import java.net.URI;
  */
 public class HttpRequestAttributesResolver {
 
+  private static final String QUERY = "?";
+
   private HttpRequestContext requestContext;
   private ListenerPath listenerPath;
 
@@ -42,14 +44,18 @@ public class HttpRequestAttributesResolver {
 
     URI uri = request.getUri();
     String path = uri.getPath();
+    String rawPath = uri.getRawPath();
     String uriString = path;
+    String rawUriString = rawPath;
     String relativePath = this.listenerPath.getRelativePath(path);
 
     ClientConnection clientConnection = requestContext.getClientConnection();
 
     String queryString = uri.getQuery();
+    String rawQuery = uri.getRawQuery();
     if (queryString != null) {
-      uriString += "?" + queryString;
+      uriString += QUERY + queryString;
+      rawUriString += QUERY + rawQuery;
     } else {
       queryString = "";
     }
@@ -58,14 +64,16 @@ public class HttpRequestAttributesResolver {
         .listenerPath(listenerPath)
         .relativePath(relativePath)
         .requestPath(path)
+        .rawRequestPath(rawPath)
         .requestUri(uriString)
+        .rawRequestUri(rawUriString)
         .method(request.getMethod())
         .scheme(requestContext.getScheme())
         .version(request.getProtocol().asString())
         .headers(request.getHeaders())
-        .uriParams(decodeUriParams(listenerPath, uri.getRawPath()))
+        .uriParams(decodeUriParams(listenerPath, rawPath))
         .queryString(queryString)
-        .queryParams(decodeQueryString(uri.getRawQuery()))
+        .queryParams(decodeQueryString(rawQuery))
         .localAddress(requestContext.getServerConnection().getLocalHostAddress().getAddress().getHostAddress().concat(":")
             .concat(Integer.toString(requestContext.getServerConnection().getLocalHostAddress().getPort())))
         .remoteAddress(clientConnection.getRemoteHostAddress().getHostString().concat(":")
