@@ -64,6 +64,7 @@ public class HttpRequestAttributesResolver {
         .listenerPath(listenerPath)
         .relativePath(relativePath)
         .requestPath(path)
+        .rawRequestPath(rawPath)
         .requestUri(uriString)
         .rawRequestUri(rawUriString)
         .method(request.getMethod())

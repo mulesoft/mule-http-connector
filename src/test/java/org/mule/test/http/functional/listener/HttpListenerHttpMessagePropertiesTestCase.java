@@ -158,6 +158,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
     HttpRequestAttributes attributes = getAttributes(message);
     assertThat(attributes.getListenerPath(), is("/*"));
     assertThat(attributes.getRequestPath(), is("/a path%"));
+    assertThat(attributes.getRawRequestPath(), is("/a%20path%25"));
     assertThat(attributes.getRequestUri(), is("/a path%?queryParam=param+Value&encoded=%&%24=encodeMe"));
     assertThat(attributes.getRawRequestUri(), is("/a%20path%25?queryParam=param+Value&encoded=%25&%2524=encodeMe"));
     assertThat(attributes.getQueryString(), is("queryParam=param+Value&encoded=%&%24=encodeMe"));

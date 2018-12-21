@@ -31,6 +31,7 @@ public class HttpRequestAttributesBuilder {
   private MultiMap<String, String> queryParams = emptyMultiMap();
   private Map<String, String> uriParams = emptyMap();
   private String requestPath;
+  private String rawRequestPath;
   private String listenerPath;
   private String relativePath;
   private String maskedRequestPath;
@@ -87,6 +88,11 @@ public class HttpRequestAttributesBuilder {
   public HttpRequestAttributesBuilder requestPath(String requestPath) {
     this.requestPath = requestPath;
     resolveMaskedRequestPath = true;
+    return this;
+  }
+
+  public HttpRequestAttributesBuilder rawRequestPath(String rawRequestPath) {
+    this.rawRequestPath = rawRequestPath;
     return this;
   }
 
@@ -174,8 +180,8 @@ public class HttpRequestAttributesBuilder {
     }
     resolveMaskedRequestPath = false;
     return new HttpRequestAttributes(headers, listenerPath, relativePath, maskedRequestPath, version, scheme, method, requestPath,
-                                     requestUri, rawRequestUri, queryString, queryParams, uriParams, localAddress, remoteAddress,
-                                     clientCertificate);
+                                     rawRequestPath, requestUri, rawRequestUri, queryString, queryParams, uriParams, localAddress,
+                                     remoteAddress, clientCertificate);
   }
 
   private String maskRequestPath() {
