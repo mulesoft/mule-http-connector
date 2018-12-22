@@ -54,6 +54,7 @@ public class HttpRequestAttributesBuilder {
     this.queryParams = requestAttributes.getQueryParams();
     this.uriParams = requestAttributes.getUriParams();
     this.requestPath = requestAttributes.getRequestPath();
+    this.rawRequestPath = requestAttributes.getRawRequestPath();
     this.listenerPath = requestAttributes.getListenerPath();
     this.relativePath = requestAttributes.getRelativePath();
     this.maskedRequestPath = requestAttributes.getMaskedRequestPath();
@@ -61,6 +62,7 @@ public class HttpRequestAttributesBuilder {
     this.scheme = requestAttributes.getScheme();
     this.method = requestAttributes.getMethod();
     this.requestUri = requestAttributes.getRequestUri();
+    this.rawRequestUri = requestAttributes.getRawRequestUri();
     this.queryString = requestAttributes.getQueryString();
     this.localAddress = requestAttributes.getLocalAddress();
     this.remoteAddress = requestAttributes.getRemoteAddress();
@@ -88,6 +90,9 @@ public class HttpRequestAttributesBuilder {
   public HttpRequestAttributesBuilder requestPath(String requestPath) {
     this.requestPath = requestPath;
     resolveMaskedRequestPath = true;
+    if (this.rawRequestPath == null) {
+      this.rawRequestPath = requestPath;
+    }
     return this;
   }
 
@@ -124,6 +129,9 @@ public class HttpRequestAttributesBuilder {
 
   public HttpRequestAttributesBuilder requestUri(String requestUri) {
     this.requestUri = requestUri;
+    if (this.rawRequestUri == null) {
+      this.rawRequestUri = requestUri;
+    }
     return this;
   }
 

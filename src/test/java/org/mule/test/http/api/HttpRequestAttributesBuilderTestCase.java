@@ -27,6 +27,42 @@ public class HttpRequestAttributesBuilderTestCase extends AbstractMuleTestCase {
   private HttpRequestAttributesBuilder builder = new HttpRequestAttributesBuilder();
 
   @Test
+  public void copy() {
+    MultiMap<String, String> params = new MultiMap<>();
+    params.put("from", "ITA");
+
+    HttpRequestAttributes attributes = builder.remoteAddress("not_localhost")
+        .relativePath("clients")
+        .version("1.1")
+        .scheme("https")
+        .method("GET")
+        .queryString("from=ITA")
+        .queryParams(params)
+        .requestUri("api/v2/cli ents?from=ITA")
+        .rawRequestUri("api/v2/cli%20ents?from=ITA")
+        .localAddress("localhost/127.0.0.1:8081")
+        .listenerPath("/api/v2/*")
+        .requestPath("/api/v2/cli ents")
+        .rawRequestPath("/api/v2/cli%20ents")
+        .build();
+
+    HttpRequestAttributes copy = new HttpRequestAttributesBuilder(attributes).build();
+
+    assertThat(copy.getRemoteAddress(), equalTo(attributes.getRemoteAddress()));
+    assertThat(copy.getLocalAddress(), equalTo(attributes.getLocalAddress()));
+    assertThat(copy.getVersion(), equalTo(attributes.getVersion()));
+    assertThat(copy.getScheme(), equalTo(attributes.getScheme()));
+    assertThat(copy.getMethod(), equalTo(attributes.getMethod()));
+    assertThat(copy.getQueryString(), equalTo(attributes.getQueryString()));
+    assertThat(copy.getQueryParams(), equalTo(attributes.getQueryParams()));
+    assertThat(copy.getRequestUri(), equalTo(attributes.getRequestUri()));
+    assertThat(copy.getRawRequestUri(), equalTo(attributes.getRawRequestUri()));
+    assertThat(copy.getListenerPath(), equalTo(attributes.getListenerPath()));
+    assertThat(copy.getRequestPath(), equalTo(attributes.getRequestPath()));
+    assertThat(copy.getRawRequestPath(), equalTo(attributes.getRawRequestPath()));
+  }
+
+  @Test
   public void headers() {
     assertFailure(() -> builder.headers(null), "HTTP headers cannot be null.");
   }
