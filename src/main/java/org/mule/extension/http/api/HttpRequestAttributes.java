@@ -218,6 +218,7 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
     StringBuilder builder = new StringBuilder();
     builder.append(this.getClass().getName()).append(lineSeparator()).append("{").append(lineSeparator())
         .append(TAB).append("Request path=").append(requestPath).append(lineSeparator())
+        .append(TAB).append("Raw request path=").append(rawRequestPath).append(lineSeparator())
         .append(TAB).append("Method=").append(method).append(lineSeparator())
         .append(TAB).append("Listener path=").append(this.listenerPath).append(lineSeparator())
         .append(TAB).append("Local Address=").append(localAddress).append(lineSeparator())
@@ -226,6 +227,7 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
         .append(TAB).append("Masked Request Path=").append(this.maskedRequestPath).append(lineSeparator())
         .append(TAB).append("Remote Address=").append(this.remoteAddress).append(lineSeparator())
         .append(TAB).append("Request Uri=").append(this.requestUri).append(lineSeparator())
+        .append(TAB).append("Raw request Uri=").append(this.rawRequestUri).append(lineSeparator())
         .append(TAB).append("Scheme=").append(scheme).append(lineSeparator())
         .append(TAB).append("Version=").append(this.version).append(lineSeparator());
 

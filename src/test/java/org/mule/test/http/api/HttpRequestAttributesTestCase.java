@@ -23,6 +23,7 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
   private static final String TO_STRING_COMPLETE = "org.mule.extension.http.api.HttpRequestAttributes" + lineSeparator() +
       "{" + lineSeparator() +
       "   Request path=/request/path" + lineSeparator() +
+      "   Raw request path=/request/path" + lineSeparator() +
       "   Method=GET" + lineSeparator() +
       "   Listener path=/listener/path" + lineSeparator() +
       "   Local Address=http://127.0.0.1:8080/" + lineSeparator() +
@@ -31,6 +32,7 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
       "   Masked Request Path=null" + lineSeparator() +
       "   Remote Address=http://10.1.2.5:8080/" + lineSeparator() +
       "   Request Uri=http://127.0.0.1/gateway" + lineSeparator() +
+      "   Raw request Uri=http://127.0.0.1/gateway" + lineSeparator() +
       "   Scheme=scheme" + lineSeparator() +
       "   Version=1.0" + lineSeparator() +
       "   Headers=[" + lineSeparator() +
@@ -50,6 +52,7 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
   private static final String TO_STRING_EMPTY = "org.mule.extension.http.api.HttpRequestAttributes" + lineSeparator() +
       "{" + lineSeparator() +
       "   Request path=/request/path" + lineSeparator() +
+      "   Raw request path=/request/path" + lineSeparator() +
       "   Method=GET" + lineSeparator() +
       "   Listener path=/listener/path" + lineSeparator() +
       "   Local Address=http://127.0.0.1:8080/" + lineSeparator() +
@@ -58,6 +61,7 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
       "   Masked Request Path=null" + lineSeparator() +
       "   Remote Address=http://10.1.2.5:8080/" + lineSeparator() +
       "   Request Uri=http://127.0.0.1/gateway" + lineSeparator() +
+      "   Raw request Uri=http://127.0.0.1/gateway" + lineSeparator() +
       "   Scheme=scheme" + lineSeparator() +
       "   Version=1.0" + lineSeparator() +
       "   Headers=[]" + lineSeparator() +
@@ -69,6 +73,7 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
       "org.mule.extension.http.api.HttpRequestAttributes" + lineSeparator() +
           "{" + lineSeparator() +
           "   Request path=/request/path/proxy" + lineSeparator() +
+          "   Raw request path=/request/path" + lineSeparator() +
           "   Method=GET" + lineSeparator() +
           "   Listener path=/listener/path/*" + lineSeparator() +
           "   Local Address=http://127.0.0.1:8080/" + lineSeparator() +
@@ -77,6 +82,7 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
           "   Masked Request Path=/proxy" + lineSeparator() +
           "   Remote Address=http://10.1.2.5:8080/" + lineSeparator() +
           "   Request Uri=http://127.0.0.1/gateway" + lineSeparator() +
+          "   Raw request Uri=http://127.0.0.1/gateway" + lineSeparator() +
           "   Scheme=scheme" + lineSeparator() +
           "   Version=1.0" + lineSeparator() +
           "   Headers=[]" + lineSeparator() +
@@ -87,6 +93,7 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
   private static final String TO_STRING_QUERY_PARAMS = "org.mule.extension.http.api.HttpRequestAttributes" + lineSeparator() +
       "{" + lineSeparator() +
       "   Request path=/request/path" + lineSeparator() +
+      "   Raw request path=/request/path" + lineSeparator() +
       "   Method=GET" + lineSeparator() +
       "   Listener path=/listener/path" + lineSeparator() +
       "   Local Address=http://127.0.0.1:8080/" + lineSeparator() +
@@ -95,6 +102,7 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
       "   Masked Request Path=null" + lineSeparator() +
       "   Remote Address=http://10.1.2.5:8080/" + lineSeparator() +
       "   Request Uri=http://127.0.0.1/gateway" + lineSeparator() +
+      "   Raw request Uri=http://127.0.0.1/gateway" + lineSeparator() +
       "   Scheme=scheme" + lineSeparator() +
       "   Version=1.0" + lineSeparator() +
       "   Headers=[]" + lineSeparator() +
@@ -108,6 +116,7 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
   private static final String TO_STRING_URI_PARAMS = "org.mule.extension.http.api.HttpRequestAttributes" + lineSeparator() +
       "{" + lineSeparator() +
       "   Request path=/request/path" + lineSeparator() +
+      "   Raw request path=/request/path" + lineSeparator() +
       "   Method=GET" + lineSeparator() +
       "   Listener path=/listener/path" + lineSeparator() +
       "   Local Address=http://127.0.0.1:8080/" + lineSeparator() +
@@ -116,6 +125,7 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
       "   Masked Request Path=null" + lineSeparator() +
       "   Remote Address=http://10.1.2.5:8080/" + lineSeparator() +
       "   Request Uri=http://127.0.0.1/gateway" + lineSeparator() +
+      "   Raw request Uri=http://127.0.0.1/gateway" + lineSeparator() +
       "   Scheme=scheme" + lineSeparator() +
       "   Version=1.0" + lineSeparator() +
       "   Headers=[]" + lineSeparator() +
@@ -129,6 +139,7 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
   private static final String TO_STRING_OBFUSCATED = "org.mule.extension.http.api.HttpRequestAttributes" + lineSeparator() +
       "{" + lineSeparator() +
       "   Request path=/request/path" + lineSeparator() +
+      "   Raw request path=/request/path" + lineSeparator() +
       "   Method=GET" + lineSeparator() +
       "   Listener path=/listener/path" + lineSeparator() +
       "   Local Address=http://127.0.0.1:8080/" + lineSeparator() +
@@ -137,6 +148,7 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
       "   Masked Request Path=null" + lineSeparator() +
       "   Remote Address=http://10.1.2.5:8080/" + lineSeparator() +
       "   Request Uri=http://127.0.0.1/gateway" + lineSeparator() +
+      "   Raw request Uri=http://127.0.0.1/gateway" + lineSeparator() +
       "   Scheme=scheme" + lineSeparator() +
       "   Version=1.0" + lineSeparator() +
       "   Headers=[" + lineSeparator() +
