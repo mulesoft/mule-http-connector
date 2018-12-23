@@ -47,7 +47,7 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
   @Rule
   public DynamicPort port3 = new DynamicPort("port3");
   @Rule
-  public SystemProperty cipherSuites = new SystemProperty("cipherSuites", "TLS_DHE_DSS_WITH_AES_128_CBC_SHA");
+  public SystemProperty cipherSuites = new SystemProperty("cipherSuites", "TLS_DHE_RSA_WITH_AES_128_CBC_SHA");
   @Rule
   public SystemProperty protocol = new SystemProperty("protocol", "HTTPS");
   @Rule
@@ -101,7 +101,7 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
     tlsContextFactory = tlsContextFactoryBuilder.build();
     createHttpClient();
 
-    // Forces TLS_DHE_DSS_WITH_AES_128_CBC_SHA
+    // Forces TLS_DHE_RSA_WITH_AES_128_CBC_SHA
     HttpRequest request = HttpRequest.builder().uri(format("https://localhost:%s", port3.getValue())).method(POST)
         .entity(new ByteArrayHttpEntity(TEST_PAYLOAD.getBytes())).build();
     final HttpResponse response = httpClientWithCertificate.send(request, RECEIVE_TIMEOUT, false, null);

@@ -11,11 +11,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.HTTPS;
 import static org.mule.test.http.functional.TlsConstants.DEFAULT_SECURITY_MODEL;
 import static org.mule.test.http.functional.TlsConstants.PROPERTIES_FILE_PATTERN;
-
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -30,6 +25,10 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
 import io.qameta.allure.Story;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
 
 @Story(HTTPS)
 public abstract class AbstractServerTlsRestrictedProtocolsAndCiphersTestCase
@@ -38,8 +37,8 @@ public abstract class AbstractServerTlsRestrictedProtocolsAndCiphersTestCase
   @Rule
   public DynamicPort httpsPort = new DynamicPort("port");
 
-  private static final String SERVER_CIPHER_SUITE_ENABLED = "TLS_DHE_DSS_WITH_AES_128_CBC_SHA256";
-  private static final String SERVER_CIPHER_SUITE_DISABLED = "TLS_DHE_DSS_WITH_AES_128_CBC_SHA";
+  private static final String SERVER_CIPHER_SUITE_ENABLED = "TLS_DHE_RSA_WITH_AES_128_CBC_SHA256";
+  private static final String SERVER_CIPHER_SUITE_DISABLED = "TLS_DHE_RSA_WITH_AES_128_CBC_SHA";
 
   private static final String SERVER_PROTOCOL_ENABLED = "TLSv1.2";
   private static final String SERVER_PROTOCOL_DISABLED = "TLSv1";
