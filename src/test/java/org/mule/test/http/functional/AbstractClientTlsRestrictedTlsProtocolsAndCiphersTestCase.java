@@ -41,8 +41,8 @@ import org.junit.Test;
 public abstract class AbstractClientTlsRestrictedTlsProtocolsAndCiphersTestCase
     extends AbstractHttpTestCase {
 
-  private static final String CLIENT_CIPHER_SUITE_ENABLED = "TLS_DHE_DSS_WITH_AES_128_CBC_SHA256";
-  private static final String CLIENT_CIPHER_SUITE_DISABLED = "TLS_DHE_DSS_WITH_AES_128_CBC_SHA";
+  private static final String CLIENT_CIPHER_SUITE_ENABLED = "TLS_DHE_RSA_WITH_AES_128_CBC_SHA256";
+  private static final String CLIENT_CIPHER_SUITE_DISABLED = "TLS_DHE_RSA_WITH_AES_128_CBC_SHA";
 
   private static final String CLIENT_PROTOCOL_ENABLED = "TLSv1.2";
   private static final String CLIENT_PROTOCOL_DISABLED = "TLSv1";
