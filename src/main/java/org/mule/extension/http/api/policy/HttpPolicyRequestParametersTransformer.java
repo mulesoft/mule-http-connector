@@ -48,8 +48,8 @@ public class HttpPolicyRequestParametersTransformer implements OperationPolicyPa
 
     return Message.builder().payload(body)
         .attributes(new TypedValue<>(new HttpPolicyRequestAttributes(getMultiMap(parameters, HEADERS),
-                                                         getMultiMap(parameters, QUERY_PARAMS),
-                                                         getMap(parameters, URI_PARAMS),
+                                                                     getMultiMap(parameters, QUERY_PARAMS),
+                                                                     getMap(parameters, URI_PARAMS),
                                                                      (String) parameters.get(PATH)),
                                      HTTP_POLICY_REQUEST_ATTRIBUTES_DATATYPE))
         .build();
