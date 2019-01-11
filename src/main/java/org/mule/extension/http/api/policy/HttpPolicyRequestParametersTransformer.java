@@ -7,11 +7,13 @@
 package org.mule.extension.http.api.policy;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
+import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 
 import org.mule.extension.http.api.BaseHttpRequestAttributes;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
@@ -27,6 +29,8 @@ import java.util.Map;
  */
 public class HttpPolicyRequestParametersTransformer implements OperationPolicyParametersTransformer {
 
+  private static final DataType HTTP_POLICY_REQUEST_ATTRIBUTES_DATATYPE = DataType.fromType(HttpPolicyRequestAttributes.class);
+
   private static final String BODY = "body";
   private static final String PATH = "path";
   private static final String HEADERS = "headers";
@@ -40,15 +44,14 @@ public class HttpPolicyRequestParametersTransformer implements OperationPolicyPa
 
   @Override
   public Message fromParametersToMessage(Map<String, Object> parameters) {
-    String path = (String) parameters.get(PATH);
-    TypedValue<Object> body = (TypedValue<Object>) parameters.getOrDefault(BODY, TypedValue.of(null));
+    TypedValue<Object> body = (TypedValue<Object>) parameters.getOrDefault(BODY, new TypedValue<Object>(null, OBJECT));
 
-    return Message.builder().value(body.getValue())
-        .attributesValue(new HttpPolicyRequestAttributes(getMultiMap(parameters, HEADERS),
+    return Message.builder().payload(body)
+        .attributes(new TypedValue<>(new HttpPolicyRequestAttributes(getMultiMap(parameters, HEADERS),
                                                          getMultiMap(parameters, QUERY_PARAMS),
                                                          getMap(parameters, URI_PARAMS),
-                                                         path))
-        .mediaType(body.getDataType().getMediaType())
+                                                                     (String) parameters.get(PATH)),
+                                     HTTP_POLICY_REQUEST_ATTRIBUTES_DATATYPE))
         .build();
   }
 
