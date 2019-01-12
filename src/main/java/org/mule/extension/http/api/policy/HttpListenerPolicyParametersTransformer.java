@@ -18,7 +18,6 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 
 import com.google.common.collect.ImmutableMap;
