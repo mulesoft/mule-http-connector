@@ -10,16 +10,15 @@ import static org.mule.extension.http.api.policy.HttpListenerPolicyParametersTra
 import static org.mule.extension.http.api.policy.HttpListenerPolicyParametersTransformer.ResponseType.SUCCESS;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 
-import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.listener.builder.HttpListenerErrorResponseBuilder;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.api.listener.builder.HttpListenerSuccessResponseBuilder;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
-import org.mule.runtime.api.util.MultiMap;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -32,6 +31,8 @@ import java.util.Map;
  * @since 1.0
  */
 public class HttpListenerPolicyParametersTransformer implements SourcePolicyParametersTransformer {
+
+  private static final DataType HTTP_RESPONSE_ATTRIBUTES_DATATYPE = DataType.fromType(HttpResponseAttributes.class);
 
   @Override
   public boolean supports(ComponentIdentifier componentIdentifier) {
@@ -53,11 +54,12 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
   }
 
   private Message responseParametersToMessage(HttpListenerResponseBuilder responseBuilder, int defaultStatusCode) {
-    MultiMap<String, String> headers = new MultiMap<>(responseBuilder.getHeaders());
     int statusCode = responseBuilder.getStatusCode() == null ? defaultStatusCode : responseBuilder.getStatusCode();
     return Message.builder()
         .payload(responseBuilder.getBody())
-        .attributesValue(new HttpResponseAttributes(statusCode, responseBuilder.getReasonPhrase(), headers))
+        .attributes(new TypedValue<>(new HttpResponseAttributes(statusCode, responseBuilder.getReasonPhrase(),
+                                                                responseBuilder.getHeaders()),
+                                     HTTP_RESPONSE_ATTRIBUTES_DATATYPE))
         .build();
   }
 
@@ -105,15 +107,15 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
   enum ResponseType {
     SUCCESS(200, "response"), FAILURE(500, "errorResponse");
 
-    private int statusCode;
-    private String responseBuilderParameterName;
+    private final Integer statusCode;
+    private final String responseBuilderParameterName;
 
-    ResponseType(int statusCode, String responseBuilderParameterName) {
+    ResponseType(Integer statusCode, String responseBuilderParameterName) {
       this.statusCode = statusCode;
       this.responseBuilderParameterName = responseBuilderParameterName;
     }
 
-    public int getStatusCode() {
+    public Integer getStatusCode() {
       return statusCode;
     }
 
