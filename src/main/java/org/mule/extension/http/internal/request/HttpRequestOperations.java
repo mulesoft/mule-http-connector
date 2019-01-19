@@ -55,10 +55,13 @@ import java.io.InputStream;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class HttpRequestOperations implements Initialisable, Disposable {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(HttpRequestOperations.class);
   private static final int WAIT_FOR_EVER = MAX_VALUE;
-
   private static final SuccessStatusCodeValidator DEFAULT_STATUS_CODE_VALIDATOR = new SuccessStatusCodeValidator("0..399");
   private static final HttpRequesterRequestBuilder DEFAULT_REQUEST_BUILDER = new HttpRequesterRequestBuilder();
   private static final HttpRequester REQUESTER = new HttpRequester();
@@ -124,6 +127,7 @@ public class HttpRequestOperations implements Initialisable, Disposable {
       ResponseValidator responseValidator = responseValidationSettings.getResponseValidator();
       responseValidator = responseValidator != null ? responseValidator : DEFAULT_STATUS_CODE_VALIDATOR;
 
+      LOGGER.debug("Sending '{}' request to '{}'.", method, resolvedUri);
       REQUESTER.doRequest(client, config, resolvedUri, method, overrides.getRequestStreamingMode(), overrides.getSendBodyMode(),
                           overrides.getFollowRedirects(), client.getDefaultAuthentication(), resolvedTimeout, responseValidator,
                           transformationService, resolvedBuilder, true, muleContext, scheduler, notificationEmitter,
