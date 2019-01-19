@@ -16,7 +16,7 @@
     </http:request-config>
 
     <flow name="proxyPolicyTemplate">
-        <http:listener config-ref="proxyConfig" path="/policy" responseStreamingMode="AUTO">
+        <http:listener config-ref="proxyConfig" path="/policy/*">
             <http:response statusCode="#[attributes.statusCode]" reasonPhrase="#[attributes.reasonPhrase]" >
                 <http:headers>#[attributes.headers]</http:headers>
             </http:response>
@@ -37,7 +37,7 @@
     </flow>
 
     <flow name="proxyTemplate">
-        <http:listener config-ref="proxyConfig" path="/*" responseStreamingMode="AUTO">
+        <http:listener config-ref="proxyConfig" path="/*">
             <http:response statusCode="#[attributes.statusCode]" reasonPhrase="#[attributes.reasonPhrase]" >
                 <http:headers>#[attributes.headers]</http:headers>
             </http:response>

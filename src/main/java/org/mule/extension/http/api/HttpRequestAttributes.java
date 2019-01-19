@@ -47,7 +47,8 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
   private final String relativePath;
 
   /**
-   * Path computed from masking the {@code requestPath} with the {@code listenerPath} and taking the difference.
+   * Path computed from masking the {@code rawRequestPath} with the {@code listenerPath} and taking the difference. Note that this
+   * is only calculated when the {@code listenerPath} is open (ends with a wildcard) and will be {@code null} otherwise.
    *
    * @since 1.4.0
    */
