@@ -293,16 +293,17 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
 
   @Test
   public void getBasePath() throws Exception {
-    checkBasePath(listenBasePort, API_CONTEXT_PATH, "/api/*", API_CONTEXT_PATH, CONTEXT_PATH);
+    checkBasePath(listenBasePort, API_CONTEXT_PATH, "/api/*", API_CONTEXT_PATH, CONTEXT_PATH, CONTEXT_PATH);
   }
 
   @Test
   public void getBasePathEncoded() throws Exception {
-    checkBasePath(listenEncodedBasePort, API_CONTEXT_ENCODED_PATH, "/a p i/*", "/a p i/context path%", "/context path%");
+    checkBasePath(listenEncodedBasePort, API_CONTEXT_ENCODED_PATH, "/a p i/*", "/a p i/context path%", "/context path%",
+                  "/context%20path%25");
   }
 
   private void checkBasePath(DynamicPort listenEncodedBasePort, String apiContextEncodedPath, String expectedListenerPath,
-                             String expectedRequestPath, String expectedRelativePath)
+                             String expectedRequestPath, String expectedRelativePath, String expectedMaskedPath)
       throws IOException {
     final String url = format("http://localhost:%s%s", listenEncodedBasePort.getNumber(), apiContextEncodedPath);
     Request.Get(url).connectTimeout(RECEIVE_TIMEOUT).execute();
@@ -311,6 +312,7 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
     assertThat(attributes.getListenerPath(), is(expectedListenerPath));
     assertThat(attributes.getRequestPath(), is(expectedRequestPath));
     assertThat(attributes.getRelativePath(), is(expectedRelativePath));
+    assertThat(attributes.getMaskedRequestPath(), is(expectedMaskedPath));
     Map<String, String> uriParams = attributes.getUriParams();
     assertThat(uriParams, notNullValue());
     assertThat(uriParams.isEmpty(), is(true));

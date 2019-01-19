@@ -72,8 +72,8 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
   private static final String TO_STRING_EMPTY_WITH_MASKED_REQUEST_PATH =
       "org.mule.extension.http.api.HttpRequestAttributes" + lineSeparator() +
           "{" + lineSeparator() +
-          "   Request path=/request/path/proxy" + lineSeparator() +
-          "   Raw request path=/request/path" + lineSeparator() +
+          "   Request path=/request/path" + lineSeparator() +
+          "   Raw request path=/request/path/proxy" + lineSeparator() +
           "   Method=GET" + lineSeparator() +
           "   Listener path=/listener/path/*" + lineSeparator() +
           "   Local Address=http://127.0.0.1:8080/" + lineSeparator() +
@@ -230,7 +230,7 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
 
   @Test
   public void withMaskedRequestPath() throws Exception {
-    assertThat(baseBuilder.listenerPath("/listener/path/*").requestPath("/request/path/proxy").build().toString(),
+    assertThat(baseBuilder.listenerPath("/listener/path/*").rawRequestPath("/request/path/proxy").build().toString(),
                is(TO_STRING_EMPTY_WITH_MASKED_REQUEST_PATH));
   }
 
