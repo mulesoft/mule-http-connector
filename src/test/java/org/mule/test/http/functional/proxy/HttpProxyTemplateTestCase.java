@@ -22,7 +22,6 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpHeaders.Names.X_FORWARDED_FOR;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.PROXY;
-
 import org.mule.extension.http.api.HttpAttributes;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpRequestAttributesBuilder;
@@ -38,18 +37,6 @@ import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.TestInputStream;
 import org.mule.test.http.functional.requester.AbstractHttpRequestTestCase;
-
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpVersion;
-import org.apache.http.client.fluent.Request;
-import org.apache.http.client.fluent.Response;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.InputStreamEntity;
-import org.apache.http.entity.StringEntity;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
 
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
@@ -69,10 +56,22 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import io.qameta.allure.Story;
+import org.apache.http.Header;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
+import org.apache.http.client.fluent.Request;
+import org.apache.http.client.fluent.Response;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.entity.StringEntity;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
 
 @Story(PROXY)
 public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
 
+  public static final String ENCODED_PATH = "hello%2C%20is%20anyone%20there%3F%21";
   @Rule
   public DynamicPort proxyPort = new DynamicPort("proxyPort");
 
@@ -80,7 +79,6 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
   private static final String MULTIPLE_KEY_QUERY = "/test?key=value&key=value%202";
   private RequestHandlerExtender handlerExtender;
   private boolean consumeAllRequest = true;
-  private static String IO_THREAD_PREFIX = "[MuleRuntime].io";
   private static Function<Message.Builder, Message.Builder> policy;
 
   @Override
@@ -93,6 +91,13 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
     handlerExtender = null;
     assertRequestOk(getProxyUrl(""), null);
     assertRequestOk(getProxyUrl("test"), null);
+  }
+
+  @Test
+  public void proxyEncodedRequest() throws Exception {
+    handlerExtender = null;
+    assertRequestOk(getProxyUrl(ENCODED_PATH), null);
+    assertThat(uri, is("/" + ENCODED_PATH));
   }
 
   @Test

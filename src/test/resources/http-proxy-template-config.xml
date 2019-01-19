@@ -27,7 +27,7 @@
 
         <custom-processor class="org.mule.test.http.functional.proxy.HttpProxyTemplateTestCase$ProxyPolicyProcessor"/>
 
-        <http:request config-ref="requestConfig" method="#[attributes.method]" path="#[attributes.requestPath]">
+        <http:request config-ref="requestConfig" method="#[attributes.method]" path="#[attributes.maskedRequestPath]">
             <http:headers>#[attributes.headers ++ {'X-Forwarded-For':attributes.remoteAddress}]</http:headers>
             <http:query-params>#[attributes.queryParams]</http:query-params>
         </http:request>
@@ -48,7 +48,7 @@
 
         <custom-processor class="org.mule.test.http.functional.proxy.HttpProxyTemplateTestCase$ProxyProcessor"/>
 
-        <http:request config-ref="requestConfig" method="#[attributes.method]" path="#[attributes.requestPath]">
+        <http:request config-ref="requestConfig" method="#[attributes.method]" path="#[attributes.maskedRequestPath]">
             <http:headers>#[attributes.headers ++ {'X-Forwarded-For':attributes.remoteAddress}]</http:headers>
             <http:query-params>#[attributes.queryParams]</http:query-params>
         </http:request>
