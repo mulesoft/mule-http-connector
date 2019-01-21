@@ -62,7 +62,8 @@ public class HttpListenerConfig implements Initialisable {
   }
 
   public String sanitizePathWithStartSlash(String path) {
-    if (path == null) {
+    if (path == null) 
+    {
       return null;
     }
     return path.startsWith("/") ? path : "/" + path;
