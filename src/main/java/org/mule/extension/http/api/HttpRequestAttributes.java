@@ -58,6 +58,7 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
    */
   @Parameter
   private final String maskedRequestPath;
+  
 
   /**
    * HTTP version of the request. Former 'http.version'.
