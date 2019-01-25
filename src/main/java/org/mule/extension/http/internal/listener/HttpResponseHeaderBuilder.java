@@ -12,20 +12,19 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 public class HttpResponseHeaderBuilder {
 
   // This is a Map instead of a Set because of MULE-15249
   // While already fixed, it might be present in older versions of the runtime used with this connector
-  private static final Map<String, String> uniqueHeadersNames;
+  private static final Set<String> uniqueHeadersNames;
 
   static {
     CaseInsensitiveMultiMap uniqueHeadersMap = new CaseInsensitiveMultiMap();
@@ -33,7 +32,7 @@ public class HttpResponseHeaderBuilder {
     uniqueHeadersMap.put(CONTENT_LENGTH, "");
     uniqueHeadersMap.put(CONTENT_TYPE, "");
     uniqueHeadersMap.put(ACCESS_CONTROL_ALLOW_ORIGIN, "");
-    uniqueHeadersNames = uniqueHeadersMap;
+    uniqueHeadersNames = uniqueHeadersMap.keySet();
   }
 
   private MultiMap<String, String> headers = new CaseInsensitiveMultiMap(!PRESERVE_HEADER_CASE);
@@ -61,7 +60,7 @@ public class HttpResponseHeaderBuilder {
   }
 
   private void failIfHeaderDoesNotSupportMultipleValues(String headerName) {
-    if (uniqueHeadersNames.containsKey(headerName)) {
+    if (uniqueHeadersNames.contains(headerName)) {
       throw new MuleRuntimeException(createStaticMessage("Header " + headerName + " does not support multiple values"));
     }
   }
