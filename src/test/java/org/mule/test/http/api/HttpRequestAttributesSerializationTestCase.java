@@ -12,12 +12,14 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotLoadFromClasspath;
+import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpRequestAttributesBuilder;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.security.KeyStore;
 import java.security.cert.Certificate;
 
 import io.qameta.allure.Description;
@@ -26,9 +28,7 @@ import org.junit.Test;
 
 public class HttpRequestAttributesSerializationTestCase extends AbstractHttpAttributesTestCase {
 
-  private static final String CERTIFICATE = "TEST_CERTIFICATE";
-
-  private static Certificate certificateMock;
+  private static Certificate certificate;
 
   private HttpRequestAttributesBuilder baseBuilder =
       new HttpRequestAttributesBuilder()
@@ -47,9 +47,16 @@ public class HttpRequestAttributesSerializationTestCase extends AbstractHttpAttr
           .uriParams(getUriParams());
 
   @BeforeClass
-  public static void setup() {
-    certificateMock = mock(Certificate.class, withSettings().serializable());
-    when(certificateMock.toString()).thenReturn(CERTIFICATE);
+  public static void setup() throws Exception {
+    KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+
+    InputStream is = getResourceAsStream("tls/serverKeystore", HttpRequestAttributesSerializationTestCase.class);
+    if (null == is) {
+      throw new FileNotFoundException(cannotLoadFromClasspath("serverKeystore").getMessage());
+    }
+
+    keyStore.load(is, "mulepassword".toCharArray());
+    certificate = keyStore.getCertificate("muleserver");
   }
 
   @Test
@@ -62,15 +69,15 @@ public class HttpRequestAttributesSerializationTestCase extends AbstractHttpAttr
   @Test
   @Description("HttpRequestAttributes are correctly serialized and deserialized with an explicit certificate. Certificate can be recover after deserialization")
   public void withResolvedCertificate() {
-    HttpRequestAttributes processed = assertSerialization(baseBuilder.clientCertificate(certificateMock).build());
-    assertThat(processed.getClientCertificate().toString(), is(CERTIFICATE));
+    HttpRequestAttributes processed = assertSerialization(baseBuilder.clientCertificate(certificate).build());
+    assertThat(processed.getClientCertificate(), is(certificate));
   }
 
   @Test
   @Description("HttpRequestAttributes are correctly serialized and deserialized with a certificate supplier. Certificate can be recover after deserialization")
   public void withLazyCertificate() {
-    HttpRequestAttributes processed = assertSerialization(baseBuilder.clientCertificate(() -> certificateMock).build());
-    assertThat(processed.getClientCertificate().toString(), is(CERTIFICATE));
+    HttpRequestAttributes processed = assertSerialization(baseBuilder.clientCertificate(() -> certificate).build());
+    assertThat(processed.getClientCertificate(), equalTo(certificate));
   }
 
   private HttpRequestAttributes assertSerialization(HttpRequestAttributes original) {

@@ -11,6 +11,7 @@ import static org.apache.http.HttpStatus.SC_OK;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.anyOf;
 import static org.mule.test.http.functional.matcher.HttpResponseContentStringMatcher.body;
 import static org.mule.test.http.functional.matcher.HttpResponseStatusCodeMatcher.hasStatusCode;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -41,7 +42,6 @@ public class HttpTlsContextInsecureModeTestCase extends AbstractHttpTlsContextTe
   private static final String defaultModeUrl = urlPrefix + "/test/defaultPass";
   private static final String defaultModeInvalidUrl = urlPrefix + "/test/defaultFails";
   private static final String OK_RESPONSE = "ok";
-  private static final String ERROR_RESPONSE = "General SSLEngine problem";
 
   @Override
   protected String getConfigFile() {
@@ -69,7 +69,7 @@ public class HttpTlsContextInsecureModeTestCase extends AbstractHttpTlsContextTe
     HttpResponse response = executeGetRequest(secureModeInvalidUrl);
 
     assertThat(response, hasStatusCode(SC_INTERNAL_SERVER_ERROR));
-    assertThat(response, body(containsString(ERROR_RESPONSE)));
+    assertThat(response, body(anyOf(containsString(J8_SSL_ERROR_RESPONSE), containsString(J11_SSL_ERROR_RESPONSE))));
   }
 
   @Test
@@ -85,7 +85,7 @@ public class HttpTlsContextInsecureModeTestCase extends AbstractHttpTlsContextTe
     HttpResponse response = executeGetRequest(defaultModeInvalidUrl);
 
     assertThat(response, hasStatusCode(SC_INTERNAL_SERVER_ERROR));
-    assertThat(response, body(containsString(ERROR_RESPONSE)));
+    assertThat(response, body(anyOf(containsString(J8_SSL_ERROR_RESPONSE), containsString(J11_SSL_ERROR_RESPONSE))));
   }
 
 }

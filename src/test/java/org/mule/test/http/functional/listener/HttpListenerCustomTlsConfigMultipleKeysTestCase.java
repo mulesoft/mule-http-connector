@@ -7,6 +7,7 @@
 package org.mule.test.http.functional.listener;
 
 
+import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -26,6 +27,7 @@ public class HttpListenerCustomTlsConfigMultipleKeysTestCase extends AbstractHtt
   @Rule
   public DynamicPort port = new DynamicPort("port");
 
+
   @Override
   protected String getConfigFile() {
     return "http-listener-custom-tls-multiple-keys-config.xml";
@@ -39,7 +41,7 @@ public class HttpListenerCustomTlsConfigMultipleKeysTestCase extends AbstractHtt
 
   @Test
   public void rejectsConnectionWithInvalidCertificate() throws Exception {
-    expectedException.expectMessage(containsString("General SSLEngine problem"));
+    expectedException.expectMessage(anyOf(containsString(J8_SSL_ERROR_RESPONSE), containsString("PKIX path validation failed")));
     flowRunner("testFlowClientWithoutCertificate").withPayload(TEST_MESSAGE).run();
   }
 
