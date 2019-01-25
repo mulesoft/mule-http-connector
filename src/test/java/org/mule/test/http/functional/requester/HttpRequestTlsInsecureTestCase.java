@@ -6,6 +6,7 @@
  */
 package org.mule.test.http.functional.requester;
 
+import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.core.Is.is;
@@ -67,7 +68,9 @@ public class HttpRequestTlsInsecureTestCase extends AbstractHttpTestCase {
   @Test
   public void secureRequest() throws Exception {
     expectedError.expectCause(instanceOf(IOException.class));
-    expectedError.expectCause(hasMessage(containsString("General SSLEngine problem")));
+    expectedError
+        .expectCause(anyOf(hasMessage(containsString(J8_SSL_ERROR_RESPONSE)),
+                           hasMessage(containsString(J11_SSL_ERROR_RESPONSE))));
     flowRunner("testSecureRequest").withPayload(TEST_PAYLOAD).run();
   }
 

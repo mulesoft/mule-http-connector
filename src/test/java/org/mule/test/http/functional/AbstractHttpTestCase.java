@@ -18,6 +18,8 @@ import org.junit.Rule;
 public abstract class AbstractHttpTestCase extends MuleArtifactFunctionalTestCase {
 
   protected static final int DEFAULT_TIMEOUT = 1000;
+  protected static final String J8_SSL_ERROR_RESPONSE = "General SSLEngine problem";
+  protected static final String J11_SSL_ERROR_RESPONSE = "PKIX path building failed";
 
   @Rule
   public TestHttpClient httpClient = new TestHttpClient.Builder(getService(HttpService.class)).build();

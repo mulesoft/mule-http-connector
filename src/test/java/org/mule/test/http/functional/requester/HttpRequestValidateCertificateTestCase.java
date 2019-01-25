@@ -7,6 +7,7 @@
 package org.mule.test.http.functional.requester;
 
 
+import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -36,7 +37,7 @@ public class HttpRequestValidateCertificateTestCase extends AbstractHttpRequestT
 
   @Test
   public void rejectsMissingCertificate() throws Exception {
-    expectedException.expectMessage(containsString("General SSLEngine problem"));
+    expectedException.expectMessage(anyOf(containsString(J8_SSL_ERROR_RESPONSE), containsString(J11_SSL_ERROR_RESPONSE)));
     flowRunner("missingCertFlow").withPayload(TEST_MESSAGE).run();
   }
 

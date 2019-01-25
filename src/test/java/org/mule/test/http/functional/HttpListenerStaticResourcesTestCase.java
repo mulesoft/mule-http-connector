@@ -28,6 +28,7 @@ import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -177,7 +178,7 @@ public class HttpListenerStaticResourcesTestCase extends AbstractHttpTestCase {
   }
 
   private void executeRequest(String url) throws Exception {
-    try (CloseableHttpClient httpClient = create().setSslcontext(tlsContextFactory.createSslContext()).build()) {
+    try (CloseableHttpClient httpClient = buildClient(url.startsWith("https"))) {
       HttpGet httpGet = new HttpGet(url);
       try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
         responseCode = response.getStatusLine().getStatusCode();
@@ -188,6 +189,14 @@ public class HttpListenerStaticResourcesTestCase extends AbstractHttpTestCase {
         }
       }
     }
+  }
+
+  private CloseableHttpClient buildClient(boolean isHttps) throws Exception {
+    HttpClientBuilder builder = create();
+    if (isHttps) {
+      builder.setSSLContext(tlsContextFactory.createSslContext());
+    }
+    return builder.build();
   }
 
 }
