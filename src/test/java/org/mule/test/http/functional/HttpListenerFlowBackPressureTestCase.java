@@ -122,7 +122,6 @@ public class HttpListenerFlowBackPressureTestCase extends AbstractHttpTestCase {
     keepProcessorsActive.release();
     allResponseLatch.await();
     assertThat(overloadResponses.get(), greaterThanOrEqualTo(OVERLOAD_COUNT));
-    System.err.println(okResponses.get());
     assertThat(okResponses.get(), between(1, MAX_EXPECTED_OK_RESPONSES));
     assertThat(numProcessedRequests.get(), is(okResponses.get()));
 
