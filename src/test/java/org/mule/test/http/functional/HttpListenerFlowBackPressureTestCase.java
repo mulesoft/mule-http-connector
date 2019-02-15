@@ -23,6 +23,8 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.tck.junit4.FlakinessDetectorTestRunner;
+import org.mule.tck.junit4.FlakyTest;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.After;
@@ -42,8 +44,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.qameta.allure.Story;
+import org.mule.test.runner.RunnerDelegateTo;
 
 @Story("Source overload handling")
+@RunnerDelegateTo(FlakinessDetectorTestRunner.class)
 public class HttpListenerFlowBackPressureTestCase extends AbstractHttpTestCase {
 
   @Rule
@@ -61,8 +65,9 @@ public class HttpListenerFlowBackPressureTestCase extends AbstractHttpTestCase {
   private AsyncHttpClient client;
   private ExecutorService executorService;
 
-  private static int BUFFER_SIZE = 256;
-  private static int OVERLOAD_COUNT = 44;
+  private final static int BUFFER_SIZE = 256;
+  private final static int OVERLOAD_COUNT = 44;
+  private final static int MAX_EXPECTED_OK_RESPONSES = 50;
 
   @Override
   protected String getConfigFile() {
@@ -97,6 +102,7 @@ public class HttpListenerFlowBackPressureTestCase extends AbstractHttpTestCase {
    * Verify that all requests were processed and no errors were thrown.
    */
   @Test
+  @FlakyTest
   public void overloadScenario() throws Exception {
     final String url = format("http://localhost:%s/", listenPort.getNumber());
 
@@ -116,8 +122,9 @@ public class HttpListenerFlowBackPressureTestCase extends AbstractHttpTestCase {
     keepProcessorsActive.release();
     allResponseLatch.await();
     assertThat(overloadResponses.get(), greaterThanOrEqualTo(OVERLOAD_COUNT));
-    assertThat(okResponses.get(), between(1, BUFFER_SIZE));
-    assertThat(numProcessedRequests.get(), between(1, BUFFER_SIZE));
+    System.err.println(okResponses.get());
+    assertThat(okResponses.get(), between(1, MAX_EXPECTED_OK_RESPONSES));
+    assertThat(numProcessedRequests.get(), is(okResponses.get()));
 
     assertThat(accumulatedErrors, empty());
   }
