@@ -8,17 +8,23 @@ package org.mule.test.http.functional;
 
 import static java.lang.String.format;
 import static java.util.concurrent.Executors.newFixedThreadPool;
+import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
 
+import org.hamcrest.Matcher;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.tck.junit4.FlakinessDetectorTestRunner;
+import org.mule.tck.junit4.FlakyTest;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.After;
@@ -38,8 +44,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.qameta.allure.Story;
+import org.mule.test.runner.RunnerDelegateTo;
 
 @Story("Source overload handling")
+@RunnerDelegateTo(FlakinessDetectorTestRunner.class)
 public class HttpListenerFlowBackPressureTestCase extends AbstractHttpTestCase {
 
   @Rule
@@ -47,7 +55,6 @@ public class HttpListenerFlowBackPressureTestCase extends AbstractHttpTestCase {
 
   private static AtomicInteger numProcessedRequests;
   private static Latch keepProcessorsActive;
-  private static CountDownLatch processedLatch;
   private static ConcurrentLinkedQueue<Throwable> accumulatedErrors;
 
   private AtomicInteger okResponses;
@@ -58,8 +65,9 @@ public class HttpListenerFlowBackPressureTestCase extends AbstractHttpTestCase {
   private AsyncHttpClient client;
   private ExecutorService executorService;
 
-  private static int BUFFER_SIZE = 256;
-  private static int OVERLOAD_COUNT = 44;
+  private final static int BUFFER_SIZE = 256;
+  private final static int OVERLOAD_COUNT = 44;
+  private final static int MAX_EXPECTED_OK_RESPONSES = 50;
 
   @Override
   protected String getConfigFile() {
@@ -76,7 +84,6 @@ public class HttpListenerFlowBackPressureTestCase extends AbstractHttpTestCase {
     sentLatch = new CountDownLatch(BUFFER_SIZE + OVERLOAD_COUNT);
     overloadResponseLatch = new CountDownLatch(OVERLOAD_COUNT);
     allResponseLatch = new CountDownLatch(BUFFER_SIZE + OVERLOAD_COUNT);
-    processedLatch = new CountDownLatch(BUFFER_SIZE);
     client = new AsyncHttpClient(new GrizzlyAsyncHttpProvider(new AsyncHttpClientConfig.Builder().build()));
 
     executorService = newFixedThreadPool(1);
@@ -95,6 +102,7 @@ public class HttpListenerFlowBackPressureTestCase extends AbstractHttpTestCase {
    * Verify that all requests were processed and no errors were thrown.
    */
   @Test
+  @FlakyTest
   public void overloadScenario() throws Exception {
     final String url = format("http://localhost:%s/", listenPort.getNumber());
 
@@ -107,18 +115,15 @@ public class HttpListenerFlowBackPressureTestCase extends AbstractHttpTestCase {
 
     // Block until we get overload responses back, other response will be pending
     overloadResponseLatch.await();
-
-    assertThat(overloadResponses.get(), equalTo(OVERLOAD_COUNT));
+    assertThat(overloadResponses.get(), greaterThanOrEqualTo(OVERLOAD_COUNT));
     assertThat(okResponses.get(), equalTo(0));
 
     // Now we've asserted back-pressure release latched processor and allow buffer to drain
     keepProcessorsActive.release();
-    processedLatch.await();
     allResponseLatch.await();
-
-    assertThat(overloadResponses.get(), equalTo(OVERLOAD_COUNT));
-    assertThat(okResponses.get(), equalTo(BUFFER_SIZE));
-    assertThat(numProcessedRequests.get(), equalTo(BUFFER_SIZE));
+    assertThat(overloadResponses.get(), greaterThanOrEqualTo(OVERLOAD_COUNT));
+    assertThat(okResponses.get(), between(1, MAX_EXPECTED_OK_RESPONSES));
+    assertThat(numProcessedRequests.get(), is(okResponses.get()));
 
     assertThat(accumulatedErrors, empty());
   }
@@ -161,7 +166,6 @@ public class HttpListenerFlowBackPressureTestCase extends AbstractHttpTestCase {
       try {
         numProcessedRequests.incrementAndGet();
         keepProcessorsActive.await();
-        processedLatch.countDown();
       } catch (Throwable e) {
         accumulatedErrors.add(e);
       }
@@ -170,4 +174,7 @@ public class HttpListenerFlowBackPressureTestCase extends AbstractHttpTestCase {
     }
   }
 
+  public static Matcher<Integer> between(int min, int max) {
+    return allOf(greaterThanOrEqualTo(min), lessThanOrEqualTo(max));
+  }
 }
