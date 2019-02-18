@@ -23,8 +23,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.tck.junit4.FlakinessDetectorTestRunner;
-import org.mule.tck.junit4.FlakyTest;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.After;
@@ -47,7 +45,6 @@ import io.qameta.allure.Story;
 import org.mule.test.runner.RunnerDelegateTo;
 
 @Story("Source overload handling")
-@RunnerDelegateTo(FlakinessDetectorTestRunner.class)
 public class HttpListenerFlowBackPressureTestCase extends AbstractHttpTestCase {
 
   @Rule
@@ -102,7 +99,6 @@ public class HttpListenerFlowBackPressureTestCase extends AbstractHttpTestCase {
    * Verify that all requests were processed and no errors were thrown.
    */
   @Test
-  @FlakyTest
   public void overloadScenario() throws Exception {
     final String url = format("http://localhost:%s/", listenPort.getNumber());
 
