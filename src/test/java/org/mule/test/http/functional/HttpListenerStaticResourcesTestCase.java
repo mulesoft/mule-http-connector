@@ -8,6 +8,7 @@ package org.mule.test.http.functional;
 
 import static java.lang.String.format;
 import static org.apache.http.impl.client.HttpClientBuilder.create;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -33,6 +34,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 @Story(STATIC_RESOURCE_LOADER)
 public class HttpListenerStaticResourcesTestCase extends AbstractHttpTestCase {
@@ -50,6 +52,8 @@ public class HttpListenerStaticResourcesTestCase extends AbstractHttpTestCase {
   @Rule
   public SystemProperty testRoot = new SystemProperty(TESTING_ROOT_FOLDER_SYSTEM_PROPERTY,
                                                       getClassPathRoot(HttpListenerStaticResourcesTestCase.class).getPath());
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
   private int responseCode;
   private String payload;
@@ -175,6 +179,13 @@ public class HttpListenerStaticResourcesTestCase extends AbstractHttpTestCase {
     executeRequest(url);
     assertThat(OK.getStatusCode(), is(responseCode));
     assertThat(payload, is(INDEX_HTML_CONTENT));
+  }
+
+  @Test
+  public void nullHttpAttributes() throws Exception {
+    expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+    expectedException.expectMessage("There are no HTTP attributes defined.");
+    flowRunner("null-http").run();
   }
 
   private void executeRequest(String url) throws Exception {
