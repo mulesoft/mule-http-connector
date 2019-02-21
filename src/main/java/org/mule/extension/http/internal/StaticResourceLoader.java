@@ -11,6 +11,7 @@ import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.mule.extension.http.api.error.HttpError.NOT_FOUND;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.error.ResourceNotFoundException;
 import org.mule.runtime.api.i18n.I18nMessage;
@@ -57,6 +58,7 @@ public class StaticResourceLoader {
 
   public Result load() throws ResourceNotFoundException {
     // TODO: MULE-10163 - Analyse removing the static resource loader in favor of file read
+    checkArgument(attributes != null, "There are no HTTP attributes defined.");
     String path = attributes.getRequestPath();
     String contextPath = attributes.getListenerPath();
 
