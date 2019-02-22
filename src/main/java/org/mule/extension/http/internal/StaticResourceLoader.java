@@ -8,9 +8,11 @@
 package org.mule.extension.http.internal;
 
 import static java.lang.String.format;
+import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.mule.extension.http.api.error.HttpError.NOT_FOUND;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.error.ResourceNotFoundException;
 import org.mule.runtime.api.i18n.I18nMessage;
@@ -28,8 +30,11 @@ import java.io.InputStream;
 
 import javax.activation.MimetypesFileTypeMap;
 
+import org.slf4j.Logger;
+
 public class StaticResourceLoader {
 
+  private static final Logger LOGGER = getLogger(StaticResourceLoader.class);
   private static final String ANY_PATH = "/*";
   private static final String ROOT_PATH = "/";
   private static final String DEFAULT_MIME_TYPE = "application/octet-stream";
@@ -101,6 +106,9 @@ public class StaticResourceLoader {
       result = Result.builder().output(buffer).mediaType(MediaType.parse(mimeType)).build();
       return result;
     } catch (IOException e) {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("The file: '{}' was not found.", resourceBasePath + path);
+      }
       throw new ResourceNotFoundException(e, NOT_FOUND, getExceptionMessage(path));
     } finally {
       IOUtils.closeQuietly(in);
@@ -108,7 +116,7 @@ public class StaticResourceLoader {
   }
 
   private I18nMessage getExceptionMessage(String path) {
-    return createStaticMessage(format("The file: %s was not found.", resourceBasePath + path));
+    return createStaticMessage(format("Resource '%s' was not found.", escapeHtml4(path)));
   }
 
 }
