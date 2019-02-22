@@ -90,6 +90,16 @@ public class HttpListenerStaticResourcesTestCase extends AbstractHttpTestCase {
     String url = format("http://localhost:%d/static/foo.html", port1.getNumber());
     executeRequest(url);
     assertThat(responseCode, is(NOT_FOUND.getStatusCode()));
+    assertThat(payload, is("Resource '/foo.html' was not found."));
+  }
+
+  @Test
+  public void notFoundResourcesAreEscaped() throws Exception {
+    String url =
+        format("http://localhost:%d/static/%s", port1.getNumber(), "%3Cscript%3Ealert%28%27hello%27%29%3B%3C%2Fscript%3E.html");
+    executeRequest(url);
+    assertThat(responseCode, is(NOT_FOUND.getStatusCode()));
+    assertThat(payload, is("Resource '/&lt;script&gt;alert('hello');&lt;/script&gt;.html' was not found."));
   }
 
   @Test
@@ -140,6 +150,7 @@ public class HttpListenerStaticResourcesTestCase extends AbstractHttpTestCase {
     String url = format("https://localhost:%d/static/foo.html", port2.getNumber());
     executeRequest(url);
     assertThat(NOT_FOUND.getStatusCode(), is(responseCode));
+    assertThat(payload, is("Resource '/foo.html' was not found."));
   }
 
   private void assertResponseContentType(String expectedContentType) {
