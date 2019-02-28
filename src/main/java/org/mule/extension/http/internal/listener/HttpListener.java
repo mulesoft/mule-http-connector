@@ -19,6 +19,7 @@ import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE;
 import static org.mule.extension.http.internal.listener.HttpRequestToResult.transform;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SECURITY;
@@ -32,10 +33,10 @@ import static org.mule.runtime.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAIL
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.getReasonPhraseForStatusCode;
 import static org.mule.runtime.http.api.HttpHeaders.Names.X_CORRELATION_ID;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
+import org.mule.extension.http.api.listener.HttpPush;
 import org.mule.extension.http.api.listener.builder.HttpListenerErrorResponseBuilder;
 import org.mule.extension.http.api.listener.builder.HttpListenerSuccessResponseBuilder;
 import org.mule.extension.http.api.listener.server.HttpListenerConfig;
@@ -45,6 +46,7 @@ import org.mule.extension.http.internal.listener.intercepting.InterceptingExcept
 import org.mule.extension.http.internal.listener.server.ModuleRequestHandler;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
@@ -56,10 +58,12 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.exception.DisjunctiveErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
@@ -68,6 +72,7 @@ import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
+import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -92,12 +97,11 @@ import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.mule.runtime.http.api.domain.message.response.HttpResponseBuilder;
 import org.mule.runtime.http.api.domain.request.HttpRequestContext;
 import org.mule.runtime.http.api.server.HttpServer;
+import org.mule.runtime.http.api.server.PushHandler;
 import org.mule.runtime.http.api.server.RequestHandler;
 import org.mule.runtime.http.api.server.RequestHandlerManager;
 import org.mule.runtime.http.api.server.async.HttpResponseReadyCallback;
 import org.mule.runtime.http.api.server.async.ResponseStatusCallback;
-
-import org.slf4j.Logger;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -105,6 +109,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
 
 /**
  * Represents a listener for HTTP requests.
@@ -135,6 +141,9 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
 
   @Inject
   private MuleContext muleContext;
+
+  @Inject
+  private ExpressionManager expressionManager;
 
   @Config
   private HttpListenerConfig config;
@@ -168,6 +177,16 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   @Optional(defaultValue = "AUTO")
   @Placement(tab = ADVANCED_TAB)
   private HttpStreamingType responseStreamingMode;
+
+  /**
+   * Defines the resources to push when a request is received.
+   */
+  @Parameter
+  @Optional
+  @NullSafe
+  @Expression(NOT_SUPPORTED)
+  @Placement(tab = ADVANCED_TAB)
+  private List<HttpPush> pushResources;
 
   private HttpServer server;
   private HttpListenerResponseSender responseSender;
@@ -359,11 +378,29 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
       }
 
       @Override
+      public void handleRequest(HttpRequestContext requestContext, HttpResponseReadyCallback responseCallback,
+                                PushHandler pushHandler) {
+        Result<InputStream, HttpRequestAttributes> result = createResult(requestContext);
+        BindingContext.Builder context = BindingContext.builder();
+        result.getAttributes().get().getUriParams()
+          .forEach((key, value) -> context.addBinding(key, new TypedValue(value, STRING)));
+        BindingContext uriParamsContext = context.build();
+        for (HttpPush push : pushResources) {
+          pushHandler.push(resolveResource(push.getResource(), uriParamsContext));
+        }
+        handleRequest(requestContext, responseCallback, result);
+      }
+
+      @Override
       public void handleRequest(HttpRequestContext requestContext, HttpResponseReadyCallback responseCallback) {
         // TODO: MULE-9698 Analyse adding security here to reject the DefaultHttpRequestContext and avoid creating a Message
-        try {
-          Result<InputStream, HttpRequestAttributes> result = createResult(requestContext);
+        Result<InputStream, HttpRequestAttributes> result = createResult(requestContext);
+        handleRequest(requestContext, responseCallback, result);
+      }
 
+      private void handleRequest(HttpRequestContext requestContext, HttpResponseReadyCallback responseCallback,
+                                 Result<InputStream, HttpRequestAttributes> result) {
+        try {
           HttpResponseContext responseContext = new HttpResponseContext();
           final String httpVersion = requestContext.getRequest().getProtocol().asString();
           responseContext.setHttpVersion(httpVersion);
@@ -569,6 +606,28 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
                                                                     this.path)));
         }
       }
+    }
+  }
+
+  private String resolveResource(String resource, BindingContext context) {
+    if (resource.contains("{")) {
+      StringBuilder builder = new StringBuilder();
+
+      final String[] resourcePathParts = resource.split("/");
+      for (int i = 1; i < resourcePathParts.length; i++) {
+        final String resourcePart = resourcePathParts[i];
+        builder.append("/");
+        if (resourcePart.startsWith("{") && resourcePart.endsWith("}")) {
+          String resourceExpression = resourcePart.substring(1, resourcePart.length() - 1);
+          String resolvedResourcePart = (String) expressionManager.evaluate(resourceExpression, STRING, context).getValue();
+          builder.append(resolvedResourcePart);
+        } else {
+          builder.append(resourcePart);
+        }
+      }
+      return builder.toString();
+    } else {
+      return resource;
     }
   }
 
