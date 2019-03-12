@@ -36,7 +36,6 @@ import org.mule.runtime.http.api.domain.message.response.HttpResponseBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,7 +77,7 @@ public class HttpResponseFactory {
                              boolean supportsTransferEncoding)
       throws IOException {
 
-    final HttpResponseHeaderBuilder httpResponseHeaderBuilder = new HttpResponseHeaderBuilder();
+    final HttpResponseHeaderBuilder httpResponseHeaderBuilder = new HttpResponseHeaderBuilder(responseBuilder);
 
     addInterceptingHeaders(interception, httpResponseHeaderBuilder);
     addUserHeaders(listenerResponseBuilder, supportsTransferEncoding, httpResponseHeaderBuilder);
@@ -146,14 +145,6 @@ public class HttpResponseFactory {
     String reasonPhrase = resolveReasonPhrase(listenerResponseBuilder.getReasonPhrase(), statusCode);
     if (reasonPhrase != null) {
       responseBuilder.reasonPhrase(reasonPhrase);
-    }
-
-    Collection<String> headerNames = httpResponseHeaderBuilder.getHeaderNames();
-    for (String headerName : headerNames) {
-      Collection<String> values = httpResponseHeaderBuilder.getHeader(headerName);
-      for (String value : values) {
-        responseBuilder.addHeader(headerName, value);
-      }
     }
 
     responseBuilder.entity(httpEntity);

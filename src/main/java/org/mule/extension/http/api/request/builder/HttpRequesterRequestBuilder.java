@@ -99,7 +99,7 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
 
   @Override
   public MultiMap<String, String> getHeaders() {
-    return headers.toImmutableMultiMap();
+    return headers;
   }
 
   @Override

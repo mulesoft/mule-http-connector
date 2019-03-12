@@ -88,7 +88,7 @@ public class HttpListenerSuccessResponseBuilder extends HttpListenerResponseBuil
 
   @Override
   public MultiMap<String, String> getHeaders() {
-    return headers.toImmutableMultiMap();
+    return headers;
   }
 
   @Override

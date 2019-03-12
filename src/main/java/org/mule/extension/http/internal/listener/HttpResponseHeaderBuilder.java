@@ -11,14 +11,11 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.ACCESS_CONTROL_ALLOW_O
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
-import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
+import org.mule.runtime.http.api.domain.message.response.HttpResponseBuilder;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 public class HttpResponseHeaderBuilder {
@@ -36,27 +33,30 @@ public class HttpResponseHeaderBuilder {
     uniqueHeadersNames = uniqueHeadersMap;
   }
 
-  private MultiMap<String, String> headers = new CaseInsensitiveMultiMap(!PRESERVE_HEADER_CASE);
+  private final HttpResponseBuilder responseBuilder;
+
+  public HttpResponseHeaderBuilder(HttpResponseBuilder responseBuilder) {
+    this.responseBuilder = responseBuilder;
+  }
 
   public void addHeader(String headerName, Collection<String> headerValue) {
-    if (headerValue.size() > 1 || headers.containsKey(headerName)) {
+    if (headerValue.size() > 1 || responseBuilder.getHeaderValue(headerName).isPresent()) {
       failIfHeaderDoesNotSupportMultipleValues(headerName);
     }
 
-    headers.put(headerName, headerValue);
+    responseBuilder.addHeaders(headerName, headerValue);
   }
 
   public void addHeader(String headerName, String headerValue) {
-    if (headers.containsKey(headerName)) {
-      failIfHeaderDoesNotSupportMultipleValues(headerName);
-    }
+    responseBuilder.getHeaderValue(headerName)
+        .ifPresent(value -> failIfHeaderDoesNotSupportMultipleValues(headerName));
 
-    headers.put(headerName, headerValue);
+    responseBuilder.addHeader(headerName, headerValue);
   }
 
   public Collection<String> removeHeader(String headerName) {
-    List<String> values = headers.getAll(headerName);
-    headers.remove(headerName);
+    Collection<String> values = responseBuilder.getHeaderValues(headerName);
+    responseBuilder.removeHeader(headerName);
     return values;
   }
 
@@ -79,10 +79,7 @@ public class HttpResponseHeaderBuilder {
   }
 
   private String getSimpleValue(String header) {
-    if (!headers.containsKey(header)) {
-      return null;
-    }
-    return headers.get(header);
+    return responseBuilder.getHeaderValue(header).orElse(null);
   }
 
   public void addContentType(String multipartFormData) {
@@ -94,11 +91,4 @@ public class HttpResponseHeaderBuilder {
     addHeader(CONTENT_LENGTH, calculatedContentLength);
   }
 
-  public Collection<String> getHeaderNames() {
-    return headers.keySet();
-  }
-
-  public Collection<String> getHeader(String headerName) {
-    return headers.getAll(headerName);
-  }
 }
