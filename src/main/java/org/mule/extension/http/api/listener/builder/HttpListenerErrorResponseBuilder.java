@@ -89,7 +89,7 @@ public class HttpListenerErrorResponseBuilder extends HttpListenerResponseBuilde
 
   @Override
   public MultiMap<String, String> getHeaders() {
-    return headers.toImmutableMultiMap();
+    return headers;
   }
 
   @Override
