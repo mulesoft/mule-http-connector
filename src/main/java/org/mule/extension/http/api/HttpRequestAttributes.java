@@ -7,7 +7,6 @@
 package org.mule.extension.http.api;
 
 import static java.lang.System.lineSeparator;
-import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 import org.mule.extension.http.internal.certificate.CertificateProvider;
 import org.mule.extension.http.internal.certificate.CertificateProviderFactory;
 import org.mule.runtime.api.util.MultiMap;
@@ -128,15 +127,6 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
    * That way, the certificate will be resolved and serialization will work.
    */
   private final CertificateProvider lazyClientCertificateProvider;
-
-  /**
-   * This constructor is for internal use only.
-   *
-   * @since 1.6.0
-   */
-  public HttpRequestAttributes() {
-    this(emptyMultiMap(), null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, () -> null);
-  }
 
   /**
    * @deprecated use {@link HttpRequestAttributesBuilder} instead
