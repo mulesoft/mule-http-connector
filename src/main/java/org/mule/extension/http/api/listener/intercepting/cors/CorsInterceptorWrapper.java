@@ -9,6 +9,8 @@ package org.mule.extension.http.api.listener.intercepting.cors;
 import org.mule.extension.http.internal.listener.intercepting.HttpListenerInterceptor;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
+import java.util.Objects;
+
 /**
  * The HTTP Connector MAY allow (in the future) a collection of interceptors in the listener. If this is implemented, we would
  * like to have the XML config structure backward compatible.
@@ -26,5 +28,22 @@ public class CorsInterceptorWrapper {
 
   public HttpListenerInterceptor getInterceptor() {
     return corsInterceptor;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    CorsInterceptorWrapper that = (CorsInterceptorWrapper) o;
+    return Objects.equals(corsInterceptor, that.corsInterceptor);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(corsInterceptor);
   }
 }
