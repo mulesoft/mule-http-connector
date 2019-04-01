@@ -36,7 +36,7 @@
         <formatterConfigPath>formatter.xml</formatterConfigPath>
 
         <muleSocketsConnectorVersion>1.1.5</muleSocketsConnectorVersion>
-        <muleCorsKernelVersion>1.1.0</muleCorsKernelVersion>
+        <muleCorsKernelVersion>1.1.2</muleCorsKernelVersion>
 
         <!-- This dependencies must be explicitly defined as long as HTTP supports runtimes prior to 4.1.2 -->
         <muleHttpPolicyApiVersion>1.1.2</muleHttpPolicyApiVersion>
