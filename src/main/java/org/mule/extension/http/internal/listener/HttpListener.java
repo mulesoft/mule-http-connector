@@ -32,7 +32,6 @@ import static org.mule.runtime.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAIL
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.getReasonPhraseForStatusCode;
 import static org.mule.runtime.http.api.HttpHeaders.Names.X_CORRELATION_ID;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
@@ -97,14 +96,14 @@ import org.mule.runtime.http.api.server.RequestHandlerManager;
 import org.mule.runtime.http.api.server.async.HttpResponseReadyCallback;
 import org.mule.runtime.http.api.server.async.ResponseStatusCallback;
 
-import org.slf4j.Logger;
-
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
 
 /**
  * Represents a listener for HTTP requests.
@@ -529,6 +528,12 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
         // responseCompletationCallback.responseSentSuccessfully();
         if (completionCallback != null) {
           completionCallback.success();
+        }
+      }
+
+      public void responseSendError(Throwable throwable) {
+        if (completionCallback != null) {
+          completionCallback.error(throwable);
         }
       }
     };

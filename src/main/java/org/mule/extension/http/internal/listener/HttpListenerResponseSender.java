@@ -76,6 +76,10 @@ public class HttpListenerResponseSender {
         // responseCompletationCallback.responseSentSuccessfully();
         completionCallback.success();
       }
+
+      public void responseSendError(Throwable throwable) {
+        completionCallback.error(throwable);
+      }
     };
   }
 
