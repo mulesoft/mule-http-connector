@@ -77,7 +77,7 @@ public class HttpListenerResponseSender {
         completionCallback.success();
       }
 
-      public void responseSendError(Throwable throwable) {
+      public void onErrorSendingResponse(Throwable throwable) {
         completionCallback.error(throwable);
       }
     };

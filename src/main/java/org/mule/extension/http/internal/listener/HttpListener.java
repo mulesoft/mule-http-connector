@@ -531,7 +531,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
         }
       }
 
-      public void responseSendError(Throwable throwable) {
+      public void onErrorSendingResponse(Throwable throwable) {
         if (completionCallback != null) {
           completionCallback.error(throwable);
         }
