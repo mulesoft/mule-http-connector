@@ -6,7 +6,10 @@
  */
 package org.mule.extension.http.api.request.builder;
 
+import static java.util.Objects.hash;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+
+import java.util.Objects;
 
 /**
  * Represents an HTTP Query Parameter
@@ -29,4 +32,18 @@ public class QueryParam {
     return value;
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof QueryParam) {
+      QueryParam other = (QueryParam) obj;
+      return Objects.equals(key, other.key) && Objects.equals(value, other.value);
+    }
+
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return hash(key, value);
+  }
 }
