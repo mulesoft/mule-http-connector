@@ -19,6 +19,7 @@ import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 
 import java.io.InputStream;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
@@ -117,4 +118,17 @@ public abstract class RangeStatusCodeValidator implements ResponseValidator {
         .build();
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof RangeStatusCodeValidator) {
+      return Objects.equals(values, ((RangeStatusCodeValidator) obj).values);
+    }
+
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(values);
+  }
 }
