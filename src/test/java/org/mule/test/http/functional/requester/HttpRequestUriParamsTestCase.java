@@ -63,4 +63,19 @@ public class HttpRequestUriParamsTestCase extends AbstractHttpRequestTestCase {
     flowRunner("uriParamNull").run();
   }
 
+  @Test
+  public void uriParamsContainsReservedUriCharacter() throws Exception {
+    flowRunner("reservedUriCharacter").withPayload(AbstractMuleContextTestCase.TEST_MESSAGE)
+        .withVariable("paramName", "testParam").withVariable("paramValue", "$a").run();
+
+    assertThat(uri, equalTo("/testPath/$a"));
+  }
+
+  @Test
+  public void uriParamsWithRegEx() throws Exception {
+    flowRunner("regEx").withPayload(AbstractMuleContextTestCase.TEST_MESSAGE)
+        .withVariable("paramName", "[1-9]").withVariable("paramValue", "abc").run();
+
+    assertThat(uri, equalTo("/testPath/abc"));
+  }
 }
