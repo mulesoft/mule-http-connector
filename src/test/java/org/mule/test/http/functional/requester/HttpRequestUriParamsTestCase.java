@@ -10,7 +10,6 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +30,7 @@ public class HttpRequestUriParamsTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void sendsUriParamsFromList() throws Exception {
-    flowRunner("uriParamList").withPayload(AbstractMuleContextTestCase.TEST_MESSAGE).withVariable("paramName", "testParam2")
+    flowRunner("uriParamList").withPayload(TEST_MESSAGE).withVariable("paramName", "testParam2")
         .withVariable("paramValue", "testValue2").run();
     assertThat(uri, equalTo("/testPath/testValue1/testValue2"));
   }
@@ -41,7 +40,7 @@ public class HttpRequestUriParamsTestCase extends AbstractHttpRequestTestCase {
     Map<String, String> params = new HashMap<>();
     params.put("testParam1", "testValue1");
     params.put("testParam2", "testValue2");
-    flowRunner("uriParamMap").withPayload(AbstractMuleContextTestCase.TEST_MESSAGE).withVariable("params", params).run();
+    flowRunner("uriParamMap").withPayload(TEST_MESSAGE).withVariable("params", params).run();
 
     assertThat(uri, equalTo("/testPath/testValue1/testValue2"));
   }
@@ -51,7 +50,7 @@ public class HttpRequestUriParamsTestCase extends AbstractHttpRequestTestCase {
     Map<String, String> params = new HashMap<>();
     params.put("testParam1", "testValueNew");
     params.put("testParam2", "testValue2");
-    flowRunner("uriParamOverride").withPayload(AbstractMuleContextTestCase.TEST_MESSAGE).withVariable("params", params).run();
+    flowRunner("uriParamOverride").withPayload(TEST_MESSAGE).withVariable("params", params).run();
 
     assertThat(uri, equalTo("/testPath/testValueNew/testValue2"));
   }
@@ -65,7 +64,7 @@ public class HttpRequestUriParamsTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void uriParamsContainsReservedUriCharacter() throws Exception {
-    flowRunner("reservedUriCharacter").withPayload(AbstractMuleContextTestCase.TEST_MESSAGE)
+    flowRunner("reservedUriCharacter").withPayload(TEST_MESSAGE)
         .withVariable("paramName", "testParam").withVariable("paramValue", "$a").run();
 
     assertThat(uri, equalTo("/testPath/$a"));
@@ -73,7 +72,7 @@ public class HttpRequestUriParamsTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void uriParamsWithRegEx() throws Exception {
-    flowRunner("regEx").withPayload(AbstractMuleContextTestCase.TEST_MESSAGE)
+    flowRunner("regEx").withPayload(TEST_MESSAGE)
         .withVariable("paramName", "[1-9]").withVariable("paramValue", "abc").run();
 
     assertThat(uri, equalTo("/testPath/abc"));
