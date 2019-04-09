@@ -116,7 +116,7 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
         throw new NullPointerException(format("Expression {%s} evaluated to null.", uriParamName));
       }
 
-      path = path.replaceAll("\\{" + uriParamName + "}", quoteReplacement(uriParamValue));
+      path = path.replaceAll("\\{" + uriParamName + "\\}", quoteReplacement(uriParamValue));
     }
     return path;
   }
