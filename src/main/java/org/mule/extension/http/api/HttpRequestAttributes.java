@@ -7,6 +7,7 @@
 package org.mule.extension.http.api;
 
 import static java.lang.System.lineSeparator;
+import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.api.util.SerializableLazyValue;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -115,6 +116,15 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
    * Actual {@link Certificate} to use, avoid any processing until it's actually needed.
    */
   private final SerializableLazyValue<Certificate> lazyClientCertificate;
+
+  /**
+   * This constructor is for internal use only.
+   *
+   * @since 1.6.0
+   */
+  public HttpRequestAttributes() {
+    this(emptyMultiMap(), null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, () -> null);
+  }
 
   /**
    * @deprecated use {@link HttpRequestAttributesBuilder} instead
