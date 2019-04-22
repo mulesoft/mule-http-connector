@@ -9,11 +9,9 @@ package org.mule.test.http.api;
 import static java.lang.System.lineSeparator;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-
 import org.mule.extension.http.api.HttpRequestAttributesBuilder;
 import org.mule.runtime.api.util.MultiMap;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
 import org.junit.Test;
@@ -152,6 +150,7 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
       "   Scheme=scheme" + lineSeparator() +
       "   Version=1.0" + lineSeparator() +
       "   Headers=[" + lineSeparator() +
+      "      authorization=****" + lineSeparator() +
       "      password=****" + lineSeparator() +
       "      pass=****" + lineSeparator() +
       "      client_secret=****" + lineSeparator() +
@@ -161,9 +160,11 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
       "      password=****" + lineSeparator() +
       "      pass=****" + lineSeparator() +
       "      client_secret=****" + lineSeparator() +
+      "      authorization=****" + lineSeparator() +
       "      regular=show me" + lineSeparator() +
       "   ]" + lineSeparator() +
       "   URI Parameters=[" + lineSeparator() +
+      "      authorization=****" + lineSeparator() +
       "      password=****" + lineSeparator() +
       "      pass=****" + lineSeparator() +
       "      client_secret=****" + lineSeparator() +
@@ -185,7 +186,7 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
   private Object requestAttributes;
 
   @Test
-  public void completeToString() throws IllegalAccessException, InvocationTargetException, InstantiationException {
+  public void completeToString() {
     requestAttributes = baseBuilder
         .headers(getHeaders())
         .queryString("queryParam1=queryParam1&queryParam2=queryParam2")
@@ -197,12 +198,12 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
   }
 
   @Test
-  public void defaultToString() throws IllegalAccessException, InvocationTargetException, InstantiationException {
+  public void defaultToString() {
     assertThat(baseBuilder.build().toString(), is(TO_STRING_EMPTY));
   }
 
   @Test
-  public void onlyQueryParamToString() throws IllegalAccessException, InvocationTargetException, InstantiationException {
+  public void onlyQueryParamToString() {
     assertThat(baseBuilder
         .queryParams(getQueryParams())
         .queryString("queryParam1=queryParam1&queryParam2=queryParam2")
@@ -212,7 +213,7 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
   }
 
   @Test
-  public void onlyUriParamToString() throws IllegalAccessException, InvocationTargetException, InstantiationException {
+  public void onlyUriParamToString() {
     assertThat(baseBuilder.uriParams(getUriParams()).build().toString(), is(TO_STRING_URI_PARAMS));
   }
 
@@ -229,7 +230,7 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
   }
 
   @Test
-  public void withMaskedRequestPath() throws Exception {
+  public void withMaskedRequestPath() {
     assertThat(baseBuilder.listenerPath("/listener/path/*").rawRequestPath("/request/path/proxy").build().toString(),
                is(TO_STRING_EMPTY_WITH_MASKED_REQUEST_PATH));
   }

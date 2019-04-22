@@ -53,6 +53,7 @@ public class HttpResponseAttributesTestCase extends AbstractHttpAttributesTestCa
       "   Status Code=401" + lineSeparator() +
       "   Reason Phrase=Unauthorised" + lineSeparator() +
       "   Headers=[" + lineSeparator() +
+      "      authorization=****" + lineSeparator() +
       "      password=****" + lineSeparator() +
       "      pass=****" + lineSeparator() +
       "      client_secret=****" + lineSeparator() +
