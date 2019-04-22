@@ -57,7 +57,7 @@ public abstract class HttpAttributes implements Serializable {
 
   private static String obfuscateValueIfNecessary(Map.Entry<String, String> entry) {
     String key = entry.getKey();
-    if (key.equals("password") || key.equals("pass") || key.contains("secret")) {
+    if (key.equals("password") || key.equals("pass") || key.contains("secret") || key.contains("authorization")) {
       return "****";
     } else {
       return entry.getValue();

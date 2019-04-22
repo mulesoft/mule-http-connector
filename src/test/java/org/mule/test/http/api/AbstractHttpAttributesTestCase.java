@@ -39,6 +39,7 @@ public class AbstractHttpAttributesTestCase extends AbstractMuleTestCase {
     params.put("password", "4n3zP4SSW0rd");
     params.put("pass", "s0m3P4zz");
     params.put("client_secret", "myPr3c10us");
+    params.put("authorization", "1234");
     params.put("regular", "show me");
     return params;
   }
