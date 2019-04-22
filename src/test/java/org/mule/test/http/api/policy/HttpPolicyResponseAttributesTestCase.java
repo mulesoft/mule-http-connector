@@ -40,6 +40,7 @@ public class HttpPolicyResponseAttributesTestCase extends AbstractHttpAttributes
           "   ]" + lineSeparator() +
           "}";
 
+
   private static final String TO_STRING_WITHOUT_HEADERS =
       "org.mule.extension.http.api.policy.HttpPolicyResponseAttributes" + lineSeparator() +
           "{" + lineSeparator() +
@@ -68,6 +69,7 @@ public class HttpPolicyResponseAttributesTestCase extends AbstractHttpAttributes
           "      password=****" + lineSeparator() +
           "      pass=****" + lineSeparator() +
           "      client_secret=****" + lineSeparator() +
+          "      authorization=****" + lineSeparator() +
           "      regular=show me" + lineSeparator() +
           "   ]" + lineSeparator() +
           "}";
