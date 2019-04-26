@@ -34,8 +34,8 @@ public class HttpRequestUriParamsEncodingTestCase extends HttpRequestUriParamsTe
   @Override
   public void uriParamsContainsReservedUriCharacter() throws Exception {
     flowRunner("reservedUriCharacter").withPayload(TEST_MESSAGE)
-        .withVariable("paramName", "testParam").withVariable("paramValue", "$a/word%here").run();
+        .withVariable("paramName", "testParam").withVariable("paramValue", "$a/word%here\\").run();
 
-    assertThat(uri, equalTo("/testPath/%24a%2Fword%25here"));
+    assertThat(uri, equalTo("/testPath/%24a%2Fword%25here%5C"));
   }
 }
