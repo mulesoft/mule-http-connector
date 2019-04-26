@@ -29,7 +29,7 @@ public interface HttpConnectorConstants {
   String REMOTELY_CLOSED = "Remotely closed";
   String RETRY_ATTEMPTS_PROPERTY = SYSTEM_PROPERTY_PREFIX + "http.client.maxRetries";
   String RETRY_ON_ALL_METHODS_PROPERTY = SYSTEM_PROPERTY_PREFIX + "http.client.retryOnAllMethods";
-  String ENCODE_URI_PARAMS_PROPERTY = SYSTEM_PROPERTY_PREFIX + ".http.client.encodeUriParams";
+  String ENCODE_URI_PARAMS_PROPERTY = SYSTEM_PROPERTY_PREFIX + "http.client.encodeUriParams";
   int DEFAULT_RETRY_ATTEMPTS = 3;
 
 }
