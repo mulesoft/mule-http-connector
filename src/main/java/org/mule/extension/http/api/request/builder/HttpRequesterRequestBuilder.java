@@ -6,16 +6,21 @@
  */
 package org.mule.extension.http.api.request.builder;
 
+import static java.lang.Boolean.getBoolean;
 import static java.lang.String.format;
+import static java.net.URLEncoder.encode;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.regex.Matcher.quoteReplacement;
+import static org.mule.extension.http.internal.HttpConnectorConstants.ENCODE_URI_PARAMS_PROPERTY;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 import static org.mule.runtime.extension.api.runtime.parameter.OutboundCorrelationStrategy.AUTO;
 import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
-
 import org.mule.extension.http.api.HttpMessageBuilder;
 import org.mule.extension.http.internal.request.HttpRequesterConfig;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
@@ -28,6 +33,7 @@ import org.mule.runtime.extension.api.runtime.parameter.OutboundCorrelationStrat
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 /**
@@ -36,6 +42,8 @@ import java.util.Map;
  * @since 1.0
  */
 public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
+
+  private static boolean ENCODE_URI_PARAMS = getBoolean(ENCODE_URI_PARAMS_PROPERTY);
 
   /**
    * The body of the response message
@@ -115,7 +123,13 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
       if (uriParamValue == null) {
         throw new NullPointerException(format("Expression {%s} evaluated to null.", uriParamName));
       }
-
+      if (ENCODE_URI_PARAMS) {
+        try {
+          uriParamValue = encode(uriParamValue, UTF_8.displayName());
+        } catch (UnsupportedEncodingException e) {
+          throw new MuleRuntimeException(createStaticMessage("Could not encode URI parameter '%s'", uriParamValue), e);
+        }
+      }
       path = path.replaceAll("\\{" + uriParamName + "\\}", quoteReplacement(uriParamValue));
     }
     return path;
@@ -158,5 +172,10 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
         .headers(headers)
         .queryParams(queryParams);
   }
+
+  public static void refreshSystemProperties() {
+    ENCODE_URI_PARAMS = getBoolean(ENCODE_URI_PARAMS_PROPERTY);
+  }
+
 
 }

@@ -7,6 +7,7 @@
 package org.mule.extension.http.api;
 
 import org.mule.api.annotation.NoExtend;
+import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.internal.request.HttpRequester;
 import org.mule.extension.http.internal.request.HttpResponseToResult;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -36,5 +37,6 @@ public abstract class HttpMessageBuilder {
     HttpRequester.refreshSystemProperties();
     HttpResponseToResult.refreshSystemProperties();
     HttpServerProperties.refreshSystemProperties();
+    HttpRequesterRequestBuilder.refreshSystemProperties();
   }
 }
