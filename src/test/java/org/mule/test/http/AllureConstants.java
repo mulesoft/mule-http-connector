@@ -14,7 +14,7 @@ public interface AllureConstants {
 
     interface HttpStory {
 
-      String CONTENT = "Content Type";
+      String CONTENT = "Content Type"
       String ERRORS = "Errors";
       String ERROR_HANDLING = "Error Handling";
       String ERROR_MAPPINGS = "Error Mappings";
