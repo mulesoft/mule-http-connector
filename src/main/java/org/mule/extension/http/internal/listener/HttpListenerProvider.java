@@ -16,15 +16,14 @@ import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.ADV
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.SECURITY_TAB;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTP;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
-
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -96,9 +95,12 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
     /**
      * The number of milliseconds that a connection can remain idle before it is closed. The value of this attribute is only used
      * when persistent connections are enabled.
+     *
+     * The listener default timeout is bigger than our requester default timeout to avoid 'Remotely closed' exception
+     * when you start sending a request on an existing connection just before the timeout occurs.
      */
     @Parameter
-    @Optional(defaultValue = "30000")
+    @Optional(defaultValue = "40000")
     @Expression(NOT_SUPPORTED)
     @Placement(tab = ADVANCED, order = 2)
     private Integer connectionIdleTimeout;
