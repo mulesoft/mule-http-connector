@@ -21,7 +21,6 @@
     <description>A Mule extension that provides HTTP server and client functionality</description>
 
     <properties>
-        <commonsCodecVersion>1.11</commonsCodecVersion>
         <fluentHcVersion>4.5.2</fluentHcVersion>
         <grizzlyVersion>2.3.36-MULE-006</grizzlyVersion>
         <grizzlyAhcVersion>1.14-MULE-007</grizzlyAhcVersion>
@@ -107,11 +106,6 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-cors-kernel</artifactId>
             <version>${muleCorsKernelVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-            <version>${commonsCodecVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
