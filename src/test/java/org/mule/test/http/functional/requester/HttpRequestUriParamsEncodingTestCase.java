@@ -12,8 +12,8 @@ import static org.mule.extension.http.api.HttpMessageBuilder.refreshSystemProper
 import static org.mule.extension.http.internal.HttpConnectorConstants.ENCODE_URI_PARAMS_PROPERTY;
 import org.mule.tck.junit4.rule.SystemProperty;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 
 public class HttpRequestUriParamsEncodingTestCase extends HttpRequestUriParamsTestCase {
@@ -21,12 +21,12 @@ public class HttpRequestUriParamsEncodingTestCase extends HttpRequestUriParamsTe
   @Rule
   public SystemProperty uriParamsEncoding = new SystemProperty(ENCODE_URI_PARAMS_PROPERTY, "true");
 
-  @Before
+  @BeforeClass
   public void setUp() {
     refreshSystemProperties();
   }
 
-  @After
+  @AfterClass
   public void tearDown() {
     refreshSystemProperties();
   }
