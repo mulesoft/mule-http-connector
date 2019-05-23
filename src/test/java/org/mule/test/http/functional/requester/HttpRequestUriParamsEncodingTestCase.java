@@ -13,7 +13,7 @@ import static org.mule.extension.http.internal.HttpConnectorConstants.ENCODE_URI
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Rule;
 
 public class HttpRequestUriParamsEncodingTestCase extends HttpRequestUriParamsTestCase {
@@ -21,8 +21,8 @@ public class HttpRequestUriParamsEncodingTestCase extends HttpRequestUriParamsTe
   @Rule
   public SystemProperty uriParamsEncoding = new SystemProperty(ENCODE_URI_PARAMS_PROPERTY, "true");
 
-  @BeforeClass
-  public static void setUp() {
+  @Before
+  public void setUp() {
     refreshSystemProperties();
   }
 
