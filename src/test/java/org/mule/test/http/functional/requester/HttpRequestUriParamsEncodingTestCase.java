@@ -22,12 +22,12 @@ public class HttpRequestUriParamsEncodingTestCase extends HttpRequestUriParamsTe
   public SystemProperty uriParamsEncoding = new SystemProperty(ENCODE_URI_PARAMS_PROPERTY, "true");
 
   @BeforeClass
-  public void setUp() {
+  public static void setUp() {
     refreshSystemProperties();
   }
 
   @AfterClass
-  public void tearDown() {
+  public static void tearDown() {
     refreshSystemProperties();
   }
 
