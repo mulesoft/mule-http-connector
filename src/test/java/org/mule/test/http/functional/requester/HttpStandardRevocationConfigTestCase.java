@@ -6,13 +6,13 @@
  */
 package org.mule.test.http.functional.requester;
 
+import static org.hamcrest.CoreMatchers.both;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeTrue;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
-
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -54,6 +54,6 @@ public class HttpStandardRevocationConfigTestCase extends MuleArtifactFunctional
     CoreEvent event = flowRunner("test").keepStreamsOpen().run();
     MatcherAssert.assertThat(((HttpResponseAttributes) event.getMessage().getAttributes().getValue()).getStatusCode(),
                              is(OK.getStatusCode()));
-    assertThat(event.getMessage(), hasPayload(containsString("webcache.googleusercontent.com")));
+    assertThat(event.getMessage(), hasPayload(both(containsString("test")).and(containsString("google"))));
   }
 }
