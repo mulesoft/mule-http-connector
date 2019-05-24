@@ -6,8 +6,10 @@
  */
 package org.mule.extension.http.api.listener;
 
+import static java.lang.Boolean.getBoolean;
 import static org.mule.extension.http.api.HttpHeaders.Names.AUTHORIZATION;
 import static org.mule.extension.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
+import static org.mule.extension.http.internal.HttpConnectorConstants.BASIC_LAX_DECODING_PROPERTY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.authFailedForUser;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
@@ -42,7 +44,9 @@ import org.slf4j.LoggerFactory;
 public class HttpBasicAuthenticationFilter {
 
   private static final String HEADER_AUTHORIZATION = AUTHORIZATION.toLowerCase();
+  private static final char PADDING = '=';
   private static final Decoder DECODER = Base64.getDecoder();
+  private static boolean LAX_DECODING = getBoolean(BASIC_LAX_DECODING_PROPERTY);
 
   protected static final Logger logger = LoggerFactory.getLogger(HttpBasicAuthenticationFilter.class);
 
@@ -83,7 +87,20 @@ public class HttpBasicAuthenticationFilter {
 
     if ((header != null) && header.startsWith("Basic ")) {
       String base64Token = header.substring(6);
-      String token = new String(DECODER.decode(base64Token.getBytes()));
+      if (LAX_DECODING) {
+        // commons-codec ignored the characters beyond the padding
+        base64Token = base64Token.substring(0, base64Token.lastIndexOf(PADDING) + 1);
+      }
+      String token;
+      try {
+        token = new String(DECODER.decode(base64Token.getBytes()));
+      } catch (Exception e) {
+        if (logger.isDebugEnabled()) {
+          logger.debug("Authentication request failed: " + e.toString());
+        }
+        throw new BasicUnauthorisedException(createStaticMessage("Could not decode authorization header."), e,
+                                             createUnauthenticatedMessage());
+      }
 
       String username = "";
       String password = "";
@@ -131,6 +148,10 @@ public class HttpBasicAuthenticationFilter {
                                                                                             UNAUTHORIZED.getReasonPhrase(),
                                                                                             headers))
         .build();
+  }
+
+  public static void refreshSystemProperties() {
+    LAX_DECODING = getBoolean(BASIC_LAX_DECODING_PROPERTY);
   }
 
 }
