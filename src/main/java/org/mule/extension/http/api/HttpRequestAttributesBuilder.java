@@ -183,7 +183,7 @@ public class HttpRequestAttributesBuilder {
     requireNonNull(requestUri, "Request URI cannot be null.");
     requireNonNull(localAddress, "Local address cannot be null.");
     requireNonNull(remoteAddress, "Remote address cannot be null.");
-    if (resolveMaskedRequestPath && listenerPath != null && requestPath != null) {
+    if (resolveMaskedRequestPath) {
       maskedRequestPath = maskRequestPath();
     }
     resolveMaskedRequestPath = false;

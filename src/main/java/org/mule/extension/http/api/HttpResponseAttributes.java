@@ -59,7 +59,7 @@ public class HttpResponseAttributes extends HttpAttributes {
         .append(TAB).append("Status Code=").append(statusCode).append(lineSeparator())
         .append(TAB).append("Reason Phrase=").append(reasonPhrase).append(lineSeparator());
 
-    buildMapToString(headers, "Headers", headers == null ? null : headers.entryList().stream(), builder);
+    buildMapToString(headers, "Headers", headers.entryList().stream(), builder);
 
     builder.append("}");
 

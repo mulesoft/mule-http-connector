@@ -16,6 +16,7 @@ import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.POLICY_SU
 
 import org.mule.extension.http.api.HttpRequestAttributesBuilder;
 import org.mule.extension.http.api.HttpResponseAttributes;
+import org.mule.extension.http.api.HttpResponseAttributesBuilder;
 import org.mule.extension.http.api.listener.builder.HttpListenerErrorResponseBuilder;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.api.policy.HttpListenerPolicyParametersTransformer;
@@ -92,6 +93,22 @@ public class HttpListenerPolicyParametersTransformerTestCase extends AbstractMul
                is(EXPECTED_PAYLOAD));
     assertThat(((HttpListenerErrorResponseBuilder) result.get("errorResponse")).getBody().getDataType().getMediaType().toString(),
                is(EXPECTED_MEDIA_TYPE.toString()));
+  }
+
+  @Test
+  public void statusCodeIsUpdatedWhenIs0() {
+    Message message = Message.builder().value(EXPECTED_PAYLOAD)
+        .mediaType(EXPECTED_MEDIA_TYPE)
+        .attributesValue(new HttpResponseAttributesBuilder()
+            .headers(HEADERS)
+            .statusCode(0)
+            .build())
+        .build();
+
+    Map<String, Object> result = transformer.fromMessageToErrorResponseParameters(message);
+
+    assertThat(result, is(notNullValue()));
+    assertThat(((HttpListenerErrorResponseBuilder) result.get("errorResponse")).getStatusCode(), is(500));
   }
 
   @Test
