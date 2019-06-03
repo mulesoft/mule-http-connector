@@ -83,7 +83,9 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
     if (message.getAttributes().getValue() instanceof HttpResponseAttributes) {
       HttpResponseAttributes httpResponseAttributes = (HttpResponseAttributes) message.getAttributes().getValue();
       httpListenerResponseBuilder.setBody(message.getPayload());
-      httpListenerResponseBuilder.setStatusCode(httpResponseAttributes.getStatusCode());
+      httpListenerResponseBuilder.setStatusCode(
+                                                httpResponseAttributes.getStatusCode() == 0 ? responseType.getStatusCode()
+                                                    : httpResponseAttributes.getStatusCode());
       httpListenerResponseBuilder.setHeaders(httpResponseAttributes.getHeaders());
       httpListenerResponseBuilder.setReasonPhrase(httpResponseAttributes.getReasonPhrase());
       return mapBuilder.build();
