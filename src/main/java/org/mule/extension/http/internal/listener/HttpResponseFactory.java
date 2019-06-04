@@ -20,22 +20,15 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
-import org.mule.extension.http.api.error.HttpError;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
-import com.github.benmanes.caffeine.cache.Cache;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.api.streaming.HttpStreamingType;
 import org.mule.extension.http.internal.listener.intercepting.Interception;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.api.util.MultiMap;
-import org.mule.runtime.core.internal.streaming.object.ManagedCursorIteratorProvider;
 import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.runtime.http.api.domain.entity.EmptyHttpEntity;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
@@ -45,13 +38,10 @@ import org.mule.runtime.http.api.domain.message.response.HttpResponseBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.function.BiFunction;
 import org.slf4j.Logger;
-import java.util.stream.Stream;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -67,15 +57,20 @@ public class HttpResponseFactory {
 
   private HttpStreamingType responseStreaming = AUTO;
   private TransformationService transformationService;
-  private Map<Class, BiFunction<Pair<TypedValue, Boolean>, HttpResponseHeaderBuilder, HttpEntity>> payloadHandlerMapper;
+  private Map<Class, TriFunction<TypedValue, Boolean, HttpResponseHeaderBuilder, HttpEntity>> payloadHandlerMapper;
 
   public HttpResponseFactory(HttpStreamingType responseStreaming,
                              TransformationService transformationService) {
     this.responseStreaming = responseStreaming;
     this.transformationService = transformationService;
-    this.payloadHandlerMapper =
-        new HashMap<Class, BiFunction<Pair<TypedValue, Boolean>, HttpResponseHeaderBuilder, HttpEntity>>();
+    this.payloadHandlerMapper = new HashMap<>();
     initResponsePayloadHandlers();
+  }
+
+  @FunctionalInterface
+  interface TriFunction<A, B, C, R> {
+
+    R apply(A a, B b, C c);
   }
 
   private void initResponsePayloadHandlers() {
@@ -84,11 +79,10 @@ public class HttpResponseFactory {
     payloadHandlerMapper.put(CursorIteratorProvider.class, this::handleInvalidType);
   }
 
-  private BiFunction<Pair<TypedValue, Boolean>, HttpResponseHeaderBuilder, HttpEntity> getHandler(Class key) {
-    List<Class> filteredKeys = this.payloadHandlerMapper.keySet().stream()
-        .filter((s) -> (s.isAssignableFrom(key))).collect(Collectors.toList());
-    Class filteredKey = (!filteredKeys.isEmpty()) ? filteredKeys.get(0) : null;
-    return this.payloadHandlerMapper.getOrDefault(filteredKey, null);
+  private Optional<TriFunction<TypedValue, Boolean, HttpResponseHeaderBuilder, HttpEntity>> getHandler(Class key) {
+    Class classKey = this.payloadHandlerMapper.keySet().stream()
+        .filter((s) -> (s.isAssignableFrom(key))).findFirst().orElse(null);
+    return Optional.ofNullable(this.payloadHandlerMapper.getOrDefault(classKey, null));
   }
 
   /**
@@ -124,13 +118,13 @@ public class HttpResponseFactory {
 
     HttpEntity httpEntity;
     Object payload = body.getValue();
-    BiFunction<Pair<TypedValue, Boolean>, HttpResponseHeaderBuilder, HttpEntity> payloadHandler = null;
+    Optional<TriFunction<TypedValue, Boolean, HttpResponseHeaderBuilder, HttpEntity>> payloadHandler;
 
     if (payload == null) {
       setupContentLengthEncoding(httpResponseHeaderBuilder, 0);
       httpEntity = new EmptyHttpEntity();
-    } else if ((payloadHandler = getHandler(payload.getClass())) != null) {
-      httpEntity = payloadHandler.apply(new Pair(body, supportsTransferEncoding), httpResponseHeaderBuilder);
+    } else if ((payloadHandler = getHandler(payload.getClass())).isPresent()) {
+      httpEntity = payloadHandler.get().apply(body, supportsTransferEncoding, httpResponseHeaderBuilder);
     } else {
       ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(getMessageAsBytes(body));
 
@@ -254,21 +248,19 @@ public class HttpResponseFactory {
     }
   }
 
-  public HttpEntity handleCursorStreamProvider(Pair<TypedValue, Boolean> bodyData,
+  public HttpEntity handleCursorStreamProvider(TypedValue body, Boolean supportsTransferEncoding,
                                                HttpResponseHeaderBuilder responseHeaderBuilder) {
-    TypedValue body = bodyData.getFirst();
-    boolean supportsTransferEncoding = bodyData.getSecond();
     Object payload = ((CursorStreamProvider) body.getValue()).openCursor();
     return handleStreamProvider(responseHeaderBuilder, body, payload, supportsTransferEncoding);
   }
 
-  public HttpEntity handlePayload(Pair<TypedValue, Boolean> bodyData, HttpResponseHeaderBuilder responseHeaderBuilder) {
-    TypedValue body = bodyData.getFirst();
-    boolean supportsTransferEncoding = bodyData.getSecond();
+  public HttpEntity handlePayload(TypedValue body, Boolean supportsTransferEncoding,
+                                  HttpResponseHeaderBuilder responseHeaderBuilder) {
     return handleStreamProvider(responseHeaderBuilder, body, body.getValue(), supportsTransferEncoding);
   }
 
-  public HttpEntity handleInvalidType(Pair<TypedValue, Boolean> bodyData, HttpResponseHeaderBuilder responseHeaderBuilder) {
+  public HttpEntity handleInvalidType(TypedValue body, Boolean supportsTransferEncoding,
+                                      HttpResponseHeaderBuilder responseHeaderBuilder) {
     throw new RuntimeException("Attempted to send invalid data through http response.");
   }
 
