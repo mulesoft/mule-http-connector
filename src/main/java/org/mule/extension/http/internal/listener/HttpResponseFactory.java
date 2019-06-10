@@ -19,6 +19,8 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
+
+import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.api.streaming.HttpStreamingType;
 import org.mule.extension.http.internal.listener.intercepting.Interception;
@@ -38,6 +40,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 
+import java.util.Optional;
+import java.util.Map;
+import java.util.HashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,11 +59,34 @@ public class HttpResponseFactory {
 
   private HttpStreamingType responseStreaming = AUTO;
   private TransformationService transformationService;
+  private Map<Class, TriFunction<TypedValue, Boolean, HttpResponseHeaderBuilder, HttpEntity>> payloadHandlerMapper;
+
+  private static final String INVALID_DATA_MSG = "Attempted to send invalid data through http response.";
 
   public HttpResponseFactory(HttpStreamingType responseStreaming,
                              TransformationService transformationService) {
     this.responseStreaming = responseStreaming;
     this.transformationService = transformationService;
+    this.payloadHandlerMapper = new HashMap<>();
+    initResponsePayloadHandlers();
+  }
+
+  @FunctionalInterface
+  interface TriFunction<A, B, C, R> {
+
+    R apply(A a, B b, C c);
+  }
+
+  private void initResponsePayloadHandlers() {
+    payloadHandlerMapper.put(CursorStreamProvider.class, this::handleCursorStreamProvider);
+    payloadHandlerMapper.put(InputStream.class, this::handlePayload);
+    payloadHandlerMapper.put(CursorIteratorProvider.class, this::handleInvalidType);
+  }
+
+  private Optional<TriFunction<TypedValue, Boolean, HttpResponseHeaderBuilder, HttpEntity>> getHandler(Class key) {
+    return this.payloadHandlerMapper.keySet().stream()
+        .filter((s) -> (s.isAssignableFrom(key))).findFirst()
+        .map(classKey -> this.payloadHandlerMapper.get(classKey));
   }
 
   /**
@@ -95,38 +123,20 @@ public class HttpResponseFactory {
     HttpEntity httpEntity;
     Object payload = body.getValue();
 
+
     if (payload == null) {
       setupContentLengthEncoding(httpResponseHeaderBuilder, 0);
       httpEntity = new EmptyHttpEntity();
-    } else if (payload instanceof CursorStreamProvider || payload instanceof InputStream) {
-      payload = payload instanceof CursorStreamProvider ? ((CursorStreamProvider) payload).openCursor() : payload;
-      if (responseStreaming == ALWAYS) {
-        httpEntity = guaranteeStreamingIfPossible(supportsTransferEncoding, httpResponseHeaderBuilder, payload);
-      } else if (responseStreaming == AUTO) {
-        if (existingContentLength != null) {
-          // We can't guarantee the length is right, but we know that was desired
-          httpEntity = consumePayload(httpResponseHeaderBuilder, body);
-        } else if (CHUNKED.equals(existingTransferEncoding) || !hasLength) {
-          // Either chunking was explicit or we have no choice
-          httpEntity = guaranteeStreamingIfPossible(supportsTransferEncoding, httpResponseHeaderBuilder, payload);
-        } else {
-          // No explicit desire but we have a length to take advantage of
-          httpEntity = avoidConsumingPayload(httpResponseHeaderBuilder, payload, body.getByteLength().getAsLong());
-        }
-      } else {
-        // NEVER was selected but we could take advantage of the length
-        if (hasLength) {
-          httpEntity = avoidConsumingPayload(httpResponseHeaderBuilder, payload, body.getByteLength().getAsLong());
-        } else {
-          httpEntity = consumePayload(httpResponseHeaderBuilder, body);
-        }
-      }
     } else {
-      ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(getMessageAsBytes(body));
+      httpEntity = getHandler(payload.getClass())
+          .map(payloadHandler -> payloadHandler.apply(body, supportsTransferEncoding, httpResponseHeaderBuilder))
+          .orElseGet(() -> {
+            ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(getMessageAsBytes(body));
 
-      resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding,
-                      byteArrayHttpEntity);
-      httpEntity = byteArrayHttpEntity;
+            resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding,
+                            byteArrayHttpEntity);
+            return byteArrayHttpEntity;
+          });
     }
 
     Integer statusCode = listenerResponseBuilder.getStatusCode();
@@ -250,6 +260,54 @@ public class HttpResponseFactory {
     if (!CHUNKED.equals(existingTransferEncoding)) {
       httpResponseHeaderBuilder.addHeader(HEADER_TRANSFER_ENCODING, CHUNKED);
     }
+  }
+
+  public HttpEntity handleCursorStreamProvider(TypedValue body, Boolean supportsTransferEncoding,
+                                               HttpResponseHeaderBuilder responseHeaderBuilder) {
+    Object payload = ((CursorStreamProvider) body.getValue()).openCursor();
+    return handleStreamProvider(responseHeaderBuilder, body, payload, supportsTransferEncoding);
+  }
+
+  public HttpEntity handlePayload(TypedValue body, Boolean supportsTransferEncoding,
+                                  HttpResponseHeaderBuilder responseHeaderBuilder) {
+    return handleStreamProvider(responseHeaderBuilder, body, body.getValue(), supportsTransferEncoding);
+  }
+
+  public HttpEntity handleInvalidType(TypedValue body, Boolean supportsTransferEncoding,
+                                      HttpResponseHeaderBuilder responseHeaderBuilder) {
+    throw new RuntimeException(INVALID_DATA_MSG);
+  }
+
+  public HttpEntity handleStreamProvider(HttpResponseHeaderBuilder headerBuilder, TypedValue body, Object payload,
+                                         boolean supportsTransferEncoding) {
+    HttpEntity httpEntity;
+    final boolean hasLength = body.getLength().isPresent();
+
+    final String existingTransferEncoding = headerBuilder.getTransferEncoding();
+    final String existingContentLength = headerBuilder.getContentLength();
+
+    if (responseStreaming == ALWAYS) {
+      httpEntity = guaranteeStreamingIfPossible(supportsTransferEncoding, headerBuilder, payload);
+    } else if (responseStreaming == AUTO) {
+      if (existingContentLength != null) {
+        // We can't guarantee the length is right, but we know that was desired
+        httpEntity = consumePayload(headerBuilder, body);
+      } else if (CHUNKED.equals(existingTransferEncoding) || !hasLength) {
+        // Either chunking was explicit or we have no choice
+        httpEntity = guaranteeStreamingIfPossible(supportsTransferEncoding, headerBuilder, payload);
+      } else {
+        // No explicit desire but we have a length to take advantage of
+        httpEntity = avoidConsumingPayload(headerBuilder, payload, body.getByteLength().getAsLong());
+      }
+    } else {
+      // NEVER was selected but we could take advantage of the length
+      if (hasLength) {
+        httpEntity = avoidConsumingPayload(headerBuilder, payload, body.getByteLength().getAsLong());
+      } else {
+        httpEntity = consumePayload(headerBuilder, body);
+      }
+    }
+    return httpEntity;
   }
 
 }
