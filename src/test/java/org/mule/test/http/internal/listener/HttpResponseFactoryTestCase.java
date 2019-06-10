@@ -15,20 +15,27 @@ import static org.mule.extension.http.api.streaming.HttpStreamingType.AUTO;
 import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
+
+import org.eclipse.jetty.http.HttpStatus;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.internal.listener.HttpResponseFactory;
 import org.mule.extension.http.internal.listener.intercepting.NoInterception;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Test;
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
 
 @Feature(HTTP_EXTENSION)
 @Story("Issues")
@@ -36,6 +43,10 @@ public class HttpResponseFactoryTestCase extends AbstractMuleContextTestCase {
 
   private static final String EXAMPLE_STRING = "exampleString";
   private static final String WRONG_CONTENT_LENGTH = "12";
+  private static final String INVALID_DATA_MSG = "Attempted to send invalid data through http response.";
+
+  @Rule
+  public ExpectedException exceptionGrabber = ExpectedException.none();
 
   @Test
   @Description("Verifies that the correct Content-Length is sent even when a wrong one is set as header.")
@@ -46,12 +57,30 @@ public class HttpResponseFactoryTestCase extends AbstractMuleContextTestCase {
     MultiMap<String, String> headers = new MultiMap<>();
     headers.put(CONTENT_LENGTH, WRONG_CONTENT_LENGTH);
     when(listenerResponseBuilder.getHeaders()).thenReturn(headers);
-    when(listenerResponseBuilder.getStatusCode()).thenReturn(200);
+    when(listenerResponseBuilder.getStatusCode()).thenReturn(OK.getStatusCode());
     HttpResponseFactory httpResponseBuilder = new HttpResponseFactory(AUTO, muleContext.getTransformationService());
 
     HttpResponse httpResponse =
         httpResponseBuilder.create(HttpResponse.builder(), new NoInterception(), listenerResponseBuilder, true);
     assertThat(httpResponse.getHeaderValue(CONTENT_LENGTH), is(String.valueOf(EXAMPLE_STRING.length())));
+  }
+
+  @Test
+  @Description("Trigger exception when invalid type is sent through http response.")
+  public void testCursorIteratorCausesInvalidTypeForHttpResponseError() throws RuntimeException, IOException {
+    HttpListenerResponseBuilder listenerResponseBuilder = mock(HttpListenerResponseBuilder.class);
+    CursorIteratorProvider cursorProvider = mock(CursorIteratorProvider.class);
+    TypedValue<Object> payload = new TypedValue<>(cursorProvider, INPUT_STREAM);
+
+    when(listenerResponseBuilder.getBody()).thenReturn(payload);
+    when(listenerResponseBuilder.getHeaders()).thenReturn(new MultiMap<>());
+    when(listenerResponseBuilder.getStatusCode()).thenReturn(OK.getStatusCode());
+
+    HttpResponseFactory httpResponseBuilder = new HttpResponseFactory(AUTO, muleContext.getTransformationService());
+
+    exceptionGrabber.expect(RuntimeException.class);
+    exceptionGrabber.expectMessage(INVALID_DATA_MSG);
+    httpResponseBuilder.create(HttpResponse.builder(), new NoInterception(), listenerResponseBuilder, true);
   }
 
 }
