@@ -43,6 +43,7 @@ public class HttpResponseFactoryTestCase extends AbstractMuleContextTestCase {
 
   private static final String EXAMPLE_STRING = "exampleString";
   private static final String WRONG_CONTENT_LENGTH = "12";
+  private static final String INVALID_DATA_MSG = "Attempted to send invalid data through http response.";
 
   @Rule
   public ExpectedException exceptionGrabber = ExpectedException.none();
@@ -78,7 +79,7 @@ public class HttpResponseFactoryTestCase extends AbstractMuleContextTestCase {
     HttpResponseFactory httpResponseBuilder = new HttpResponseFactory(AUTO, muleContext.getTransformationService());
 
     exceptionGrabber.expect(RuntimeException.class);
-    exceptionGrabber.expectMessage("Attempted to send invalid data through http response.");
+    exceptionGrabber.expectMessage(INVALID_DATA_MSG);
     httpResponseBuilder.create(HttpResponse.builder(), new NoInterception(), listenerResponseBuilder, true);
   }
 

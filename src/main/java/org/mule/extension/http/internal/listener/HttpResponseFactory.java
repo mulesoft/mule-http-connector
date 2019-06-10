@@ -59,6 +59,8 @@ public class HttpResponseFactory {
   private TransformationService transformationService;
   private Map<Class, TriFunction<TypedValue, Boolean, HttpResponseHeaderBuilder, HttpEntity>> payloadHandlerMapper;
 
+  private static final String INVALID_DATA_MSG = "Attempted to send invalid data through http response.";
+
   public HttpResponseFactory(HttpStreamingType responseStreaming,
                              TransformationService transformationService) {
     this.responseStreaming = responseStreaming;
@@ -80,9 +82,9 @@ public class HttpResponseFactory {
   }
 
   private Optional<TriFunction<TypedValue, Boolean, HttpResponseHeaderBuilder, HttpEntity>> getHandler(Class key) {
-    Class classKey = this.payloadHandlerMapper.keySet().stream()
-        .filter((s) -> (s.isAssignableFrom(key))).findFirst().orElse(null);
-    return Optional.ofNullable(this.payloadHandlerMapper.getOrDefault(classKey, null));
+    return this.payloadHandlerMapper.keySet().stream()
+        .filter((s) -> (s.isAssignableFrom(key))).findFirst()
+        .map(classKey -> this.payloadHandlerMapper.get(classKey));
   }
 
   /**
@@ -118,19 +120,22 @@ public class HttpResponseFactory {
 
     HttpEntity httpEntity;
     Object payload = body.getValue();
-    Optional<TriFunction<TypedValue, Boolean, HttpResponseHeaderBuilder, HttpEntity>> payloadHandler;
+
 
     if (payload == null) {
       setupContentLengthEncoding(httpResponseHeaderBuilder, 0);
       httpEntity = new EmptyHttpEntity();
-    } else if ((payloadHandler = getHandler(payload.getClass())).isPresent()) {
-      httpEntity = payloadHandler.get().apply(body, supportsTransferEncoding, httpResponseHeaderBuilder);
     } else {
-      ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(getMessageAsBytes(body));
+      Optional<TriFunction<TypedValue, Boolean, HttpResponseHeaderBuilder, HttpEntity>> handler = getHandler(payload.getClass());
+      if (handler.isPresent()) {
+        httpEntity = handler.get().apply(body, supportsTransferEncoding, httpResponseHeaderBuilder);
+      } else {
+        ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(getMessageAsBytes(body));
 
-      resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding,
-                      byteArrayHttpEntity);
-      httpEntity = byteArrayHttpEntity;
+        resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding,
+                        byteArrayHttpEntity);
+        httpEntity = byteArrayHttpEntity;
+      }
     }
 
     Integer statusCode = listenerResponseBuilder.getStatusCode();
@@ -261,7 +266,7 @@ public class HttpResponseFactory {
 
   public HttpEntity handleInvalidType(TypedValue body, Boolean supportsTransferEncoding,
                                       HttpResponseHeaderBuilder responseHeaderBuilder) {
-    throw new RuntimeException("Attempted to send invalid data through http response.");
+    throw new RuntimeException(INVALID_DATA_MSG);
   }
 
   public HttpEntity handleStreamProvider(HttpResponseHeaderBuilder headerBuilder, TypedValue body, Object payload,
