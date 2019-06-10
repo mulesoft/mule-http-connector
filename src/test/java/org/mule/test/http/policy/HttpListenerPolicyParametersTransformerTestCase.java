@@ -13,7 +13,6 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.mule.runtime.api.metadata.DataType.ATOM_STRING;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.POLICY_SUPPORT;
-
 import org.mule.extension.http.api.HttpRequestAttributesBuilder;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.HttpResponseAttributesBuilder;

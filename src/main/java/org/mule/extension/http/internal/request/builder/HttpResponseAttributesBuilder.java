@@ -7,6 +7,7 @@
 package org.mule.extension.http.internal.request.builder;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 
 /**
@@ -25,6 +26,7 @@ public class HttpResponseAttributesBuilder {
     int statusCode = response.getStatusCode();
     String reasonPhrase = response.getReasonPhrase();
 
-    return new HttpResponseAttributes(statusCode, reasonPhrase, response.getHeaders());
+    return new HttpResponseAttributes(statusCode, reasonPhrase,
+                                      new CaseInsensitiveMultiMap(response.getHeaders()));
   }
 }

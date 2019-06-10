@@ -11,6 +11,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 
 import java.security.cert.Certificate;
 import java.util.Map;
@@ -70,7 +71,7 @@ public class HttpRequestAttributesBuilder {
 
   public HttpRequestAttributesBuilder headers(MultiMap<String, String> headers) {
     requireNonNull(headers, "HTTP headers cannot be null.");
-    this.headers = headers;
+    this.headers = new CaseInsensitiveMultiMap(headers);
     return this;
   }
 

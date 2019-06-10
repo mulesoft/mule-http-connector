@@ -34,8 +34,8 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
       "   Scheme=scheme" + lineSeparator() +
       "   Version=1.0" + lineSeparator() +
       "   Headers=[" + lineSeparator() +
-      "      header2=headerValue2" + lineSeparator() +
       "      header1=headerValue1" + lineSeparator() +
+      "      header2=headerValue2" + lineSeparator() +
       "   ]" + lineSeparator() +
       "   Query Parameters=[" + lineSeparator() +
       "      queryParam1=queryParamValue1" + lineSeparator() +

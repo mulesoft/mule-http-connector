@@ -10,12 +10,10 @@ import static java.lang.Boolean.getBoolean;
 import static java.lang.String.format;
 import static java.net.URLEncoder.encode;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.regex.Matcher.quoteReplacement;
 import static org.mule.extension.http.internal.HttpConnectorConstants.ENCODE_URI_PARAMS_PROPERTY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 import static org.mule.runtime.extension.api.runtime.parameter.OutboundCorrelationStrategy.AUTO;
 import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
 import org.mule.extension.http.api.HttpMessageBuilder;
@@ -25,11 +23,13 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
 import org.mule.runtime.extension.api.annotation.param.Content;
+import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
 import org.mule.runtime.extension.api.runtime.parameter.OutboundCorrelationStrategy;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
 
@@ -58,7 +58,8 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
   @Parameter
   @Optional
   @Content
-  protected MultiMap<String, String> headers = emptyMultiMap();
+  @NullSafe
+  protected CaseInsensitiveMultiMap headers;
 
   /**
    * URI parameters that should be used to create the request.
@@ -67,7 +68,8 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
   @Optional
   @Content
   @DisplayName("URI Parameters")
-  private Map<String, String> uriParams = emptyMap();
+  @NullSafe
+  private Map<String, String> uriParams;
 
   /**
    * Query parameters the request should include.
@@ -76,7 +78,8 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
   @Optional
   @Content
   @DisplayName("Query Parameters")
-  private MultiMap<String, String> queryParams = emptyMultiMap();
+  @NullSafe
+  private MultiMap<String, String> queryParams;
 
   /**
    * Options on whether to include an outbound correlation id or not
@@ -113,7 +116,11 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
 
   @Override
   public void setHeaders(MultiMap<String, String> headers) {
-    this.headers = headers;
+    if (headers instanceof CaseInsensitiveMultiMap) {
+      this.headers = (CaseInsensitiveMultiMap) headers;
+    } else {
+      this.headers = new CaseInsensitiveMultiMap(headers);
+    }
   }
 
   public String replaceUriParams(String path) {
