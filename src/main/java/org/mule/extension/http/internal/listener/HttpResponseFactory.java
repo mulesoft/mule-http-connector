@@ -126,16 +126,15 @@ public class HttpResponseFactory {
       setupContentLengthEncoding(httpResponseHeaderBuilder, 0);
       httpEntity = new EmptyHttpEntity();
     } else {
-      Optional<TriFunction<TypedValue, Boolean, HttpResponseHeaderBuilder, HttpEntity>> handler = getHandler(payload.getClass());
-      if (handler.isPresent()) {
-        httpEntity = handler.get().apply(body, supportsTransferEncoding, httpResponseHeaderBuilder);
-      } else {
-        ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(getMessageAsBytes(body));
+      httpEntity = getHandler(payload.getClass())
+          .map(payloadHandler -> payloadHandler.apply(body, supportsTransferEncoding, httpResponseHeaderBuilder))
+          .orElseGet(() -> {
+            ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(getMessageAsBytes(body));
 
-        resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding,
-                        byteArrayHttpEntity);
-        httpEntity = byteArrayHttpEntity;
-      }
+            resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding,
+                            byteArrayHttpEntity);
+            return byteArrayHttpEntity;
+          });
     }
 
     Integer statusCode = listenerResponseBuilder.getStatusCode();
