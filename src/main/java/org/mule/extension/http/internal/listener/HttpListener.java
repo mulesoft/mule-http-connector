@@ -128,6 +128,8 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
 
   private static final String HEADER_X_CORRELATION_ID = X_CORRELATION_ID.toLowerCase();
   private static final String HEADER_MULE_CORRELATION_ID = MULE_CORRELATION_ID_PROPERTY.toLowerCase();
+  private static final String REPEATED_HEADERS_LOG_FORMAT =
+      "'X-Correlation-ID: {}' and 'MULE_CORRELATION_ID: {}' headers found. 'X-Correlation-ID' will be used.";
 
   @Inject
   private TransformationService transformationService;
@@ -406,8 +408,11 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
         String muleCorrelationId = headers.get(HEADER_MULE_CORRELATION_ID);
         if (xCorrelationId != null) {
           if (muleCorrelationId != null) {
-            LOGGER.warn("'X-Correlation-ID: {}' and 'MULE_CORRELATION_ID: {}' headers found. 'X-Correlation-ID' will be used.",
-                        xCorrelationId, muleCorrelationId);
+            if (xCorrelationId.equals(muleCorrelationId)) {
+              LOGGER.debug(REPEATED_HEADERS_LOG_FORMAT, xCorrelationId, muleCorrelationId);
+            } else {
+              LOGGER.warn(REPEATED_HEADERS_LOG_FORMAT, xCorrelationId, muleCorrelationId);
+            }
           }
           context.setCorrelationId(xCorrelationId);
         } else if (muleCorrelationId != null) {
