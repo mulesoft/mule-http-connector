@@ -12,6 +12,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
 
@@ -28,14 +29,14 @@ public abstract class UsernamePasswordAuthentication implements HttpAuthenticati
    * The username to authenticate.
    */
   @Parameter
-  private String username;
+  private ParameterResolver<String> username;
 
   /**
    * The password to authenticate.
    */
   @Parameter
   @Password
-  private String password;
+  private ParameterResolver<String> password;
 
   /**
    * Configures if authentication should be preemptive or not. Preemptive authentication will send the authentication header in
@@ -57,17 +58,21 @@ public abstract class UsernamePasswordAuthentication implements HttpAuthenticati
 
   @Override
   public String getUsername() {
-    return username;
+    return username.resolve();
   }
 
   @Override
   public String getPassword() {
-    return password;
+    return password.resolve();
   }
 
   @Override
   public boolean isPreemptive() {
     return preemptive;
+  }
+
+  public boolean forceConnectionClose() {
+    return username.getExpression().isPresent() || password.getExpression().isPresent();
   }
 
   @Override
