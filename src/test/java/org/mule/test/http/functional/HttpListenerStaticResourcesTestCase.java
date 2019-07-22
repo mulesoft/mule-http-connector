@@ -199,6 +199,14 @@ public class HttpListenerStaticResourcesTestCase extends AbstractHttpTestCase {
     flowRunner("null-http").run();
   }
 
+  @Test
+  public void onlyServeFilesWithinBasePath() throws Exception {
+    String url = format("http://localhost:%d/static/../http-listener-static-resource-test.xml", port1.getNumber());
+    executeRequest(url);
+    assertThat(NOT_FOUND.getStatusCode(), is(responseCode));
+    assertThat(payload, is("Resource '/../http-listener-static-resource-test.xml' was not found."));
+  }
+
   private void executeRequest(String url) throws Exception {
     try (CloseableHttpClient httpClient = buildClient(url.startsWith("https"))) {
       HttpGet httpGet = new HttpGet(url);
