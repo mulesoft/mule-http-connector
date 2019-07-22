@@ -25,6 +25,11 @@ public class ResourceNotFoundException extends ModuleException implements ErrorM
 
   private static final long serialVersionUID = 3137973689262542839L;
 
+  public <T extends Enum<T>> ResourceNotFoundException(ErrorTypeDefinition<T> errorTypeDefinition,
+                                                       I18nMessage message) {
+    super(message, errorTypeDefinition);
+  }
+
   public <T extends Enum<T>> ResourceNotFoundException(Exception exception,
                                                        ErrorTypeDefinition<T> errorTypeDefinition,
                                                        I18nMessage message) {
