@@ -99,7 +99,7 @@ public class HttpListenerStaticResourcesTestCase extends AbstractHttpTestCase {
         format("http://localhost:%d/static/%s", port1.getNumber(), "%3Cscript%3Ealert%28%27hello%27%29%3B%3C%2Fscript%3E.html");
     executeRequest(url);
     assertThat(responseCode, is(NOT_FOUND.getStatusCode()));
-    assertThat(payload, is("Resource '/&lt;script&gt;alert('hello');&lt;/script&gt;.html' was not found."));
+    assertThat(payload, is("Resource '/%3Cscript%3Ealert%28%27hello%27%29%3B%3C%2Fscript%3E.html' was not found."));
   }
 
   @Test
@@ -185,6 +185,14 @@ public class HttpListenerStaticResourcesTestCase extends AbstractHttpTestCase {
     executeRequest(url);
     assertThat(OK.getStatusCode(), is(responseCode));
     assertThat(payload, is(INDEX_HTML_CONTENT));
+  }
+
+  @Test
+  public void onlyServeFilesWithinBasePath() throws Exception {
+    String url = format("http://localhost:%d/static/../http-listener-static-resource-test.xml", port1.getNumber());
+    executeRequest(url);
+    assertThat(NOT_FOUND.getStatusCode(), is(responseCode));
+    assertThat(payload, is("Resource '/../http-listener-static-resource-test.xml' was not found."));
   }
 
   private void executeRequest(String url) throws Exception {
