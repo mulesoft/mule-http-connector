@@ -28,6 +28,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.activation.MimetypesFileTypeMap;
 
@@ -80,7 +82,13 @@ public class StaticResourceLoader {
       path = path.substring(contextPath.length());
     }
 
-    File file = new File(resourceBasePath + path);
+    Path normalizedPath = Paths.get(resourceBasePath + path).normalize();
+    if (!normalizedPath.startsWith(resourceBasePath)) {
+      LOGGER.debug("Requested resource is not within base path limits.");
+      throw new ResourceNotFoundException(NOT_FOUND, getExceptionMessage(path));
+    }
+
+    File file = normalizedPath.toFile();
     Result result;
 
     if (file.isDirectory()) {
