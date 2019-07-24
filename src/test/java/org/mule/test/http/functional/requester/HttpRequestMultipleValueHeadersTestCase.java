@@ -8,6 +8,7 @@ package org.mule.test.http.functional.requester;
 
 import static org.hamcrest.CoreMatchers.isA;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.equalToIgnoringCase;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
@@ -55,9 +56,9 @@ public class HttpRequestMultipleValueHeadersTestCase extends AbstractHttpRequest
   public void sendsMultipleValuedHeader() throws Exception {
     runFlow("out");
 
-    assertThat(headers.asMap(), hasKey("multipleHeader"));
-    assertThat(headers.asMap().get("multipleHeader"), isA(Iterable.class));
-    assertThat(headers.asMap().get("multipleHeader"), contains("1", "2", "3"));
+    assertThat(headers.asMap(), hasKey(equalToIgnoringCase("multipleHeader")));
+    assertThat(headers.asMap().get("multipleHeader".toLowerCase()), isA(Iterable.class));
+    assertThat(headers.asMap().get("multipleHeader".toLowerCase()), contains("1", "2", "3"));
   }
 
   @Test
