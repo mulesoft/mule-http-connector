@@ -10,6 +10,7 @@ package org.mule.test.http.functional.requester;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertThat;
+import static org.mule.extension.http.api.HttpMessageBuilder.refreshSystemProperties;
 import static org.mule.extension.http.internal.HttpConnectorConstants.DEFAULT_RETRY_ATTEMPTS;
 import static org.mule.extension.http.internal.HttpConnectorConstants.REMOTELY_CLOSED;
 import static org.mule.extension.http.internal.HttpConnectorConstants.RETRY_ATTEMPTS_PROPERTY;
@@ -21,6 +22,8 @@ import org.mule.test.http.utils.TestServerSocket;
 import org.mule.test.runner.RunnerDelegateTo;
 
 import io.qameta.allure.Story;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.internal.matchers.ThrowableMessageMatcher;
@@ -61,6 +64,16 @@ public class HttpRetryRequestTestCase extends AbstractHttpTestCase {
   @Override
   protected String getConfigFile() {
     return "http-retry-policy-config.xml";
+  }
+
+  @Before
+  public void setUp() {
+    refreshSystemProperties();
+  }
+
+  @After
+  public void tearDown() {
+    refreshSystemProperties();
   }
 
   @Test

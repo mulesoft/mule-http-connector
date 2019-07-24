@@ -13,6 +13,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.mule.extension.http.api.HttpMessageBuilder.refreshSystemProperties;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.BINARY;
 import static org.mule.runtime.api.metadata.MediaType.HTML;
@@ -28,6 +29,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
 
 import io.qameta.allure.Story;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -51,6 +53,11 @@ public class HttpRequestContentTypeTestCase extends AbstractHttpRequestTestCase 
   @Before
   public void setUp() {
     responder = super::writeResponse;
+  }
+
+  @After
+  public void tearDown() {
+    refreshSystemProperties();
   }
 
   @Test

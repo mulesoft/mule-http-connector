@@ -8,6 +8,7 @@ package org.mule.extension.http.internal.request;
 
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.extension.api.runtime.parameter.OutboundCorrelationStrategy.AUTO;
+
 import org.mule.extension.http.api.request.HttpSendBodyMode;
 import org.mule.extension.http.api.request.builder.QueryParam;
 import org.mule.extension.http.api.request.builder.RequestHeader;
@@ -55,8 +56,8 @@ public final class RequestSettings {
       + "the behavior will depend on the type of the payload (it will stream only for InputStream).")
   private HttpStreamingType requestStreamingMode;
 
-  /**       
-   * If true, cookies received in HTTP responses will be stored, and sent in subsequent HTTP requests.        
+  /**
+   * If true, cookies received in HTTP responses will be stored, and sent in subsequent HTTP requests.
    */
   @Parameter
   @Optional(defaultValue = "true")
@@ -115,4 +116,5 @@ public final class RequestSettings {
   public OutboundCorrelationStrategy getSendCorrelationId() {
     return sendCorrelationId;
   }
+
 }

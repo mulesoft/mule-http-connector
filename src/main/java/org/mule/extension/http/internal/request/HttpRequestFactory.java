@@ -22,6 +22,7 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.COOKIE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpHeaders.Names.X_CORRELATION_ID;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
+import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
 import org.mule.extension.http.api.request.HttpSendBodyMode;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
@@ -95,7 +96,8 @@ public class HttpRequestFactory {
    * @throws MuleException if the request creation fails.
    */
   public HttpRequest create(HttpRequesterRequestBuilder requestBuilder, HttpRequestAuthentication authentication) {
-    HttpRequestBuilder builder = HttpRequest.builder();
+    HttpRequestBuilder builder = HttpRequest.builder(PRESERVE_HEADER_CASE);
+
 
     builder.uri(this.uri)
         .method(this.method)

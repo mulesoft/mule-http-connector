@@ -8,6 +8,7 @@ package org.mule.extension.http.api;
 
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.http.api.server.HttpServerProperties;
 
 /**
  * Base component to create HTTP messages.
@@ -23,4 +24,11 @@ public abstract class HttpMessageBuilder {
   public abstract TypedValue<Object> getBody();
 
   public abstract void setBody(TypedValue<Object> body);
+
+  /**
+   * Forces a re-read of any system properties that affect HTTP messages building logic.
+   */
+  public static void refreshSystemProperties() {
+    HttpServerProperties.refreshSystemProperties();
+  }
 }

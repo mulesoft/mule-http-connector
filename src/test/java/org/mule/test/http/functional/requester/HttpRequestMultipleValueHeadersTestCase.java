@@ -55,9 +55,9 @@ public class HttpRequestMultipleValueHeadersTestCase extends AbstractHttpRequest
   public void sendsMultipleValuedHeader() throws Exception {
     runFlow("out");
 
-    assertThat(headers.asMap(), hasKey("multipleheader"));
-    assertThat(headers.asMap().get("multipleheader"), isA(Iterable.class));
-    assertThat(headers.asMap().get("multipleheader"), contains("1", "2", "3"));
+    assertThat(headers.asMap(), hasKey("multipleHeader"));
+    assertThat(headers.asMap().get("multipleHeader"), isA(Iterable.class));
+    assertThat(headers.asMap().get("multipleHeader"), contains("1", "2", "3"));
   }
 
   @Test
