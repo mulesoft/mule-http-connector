@@ -94,7 +94,6 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
   @Optional
   @Summary("Reusable configuration element for outbound connections through a proxy")
   @Placement(tab = "Proxy")
-  @Expression(NOT_SUPPORTED)
   private HttpProxyConfig proxyConfig;
 
   /**
