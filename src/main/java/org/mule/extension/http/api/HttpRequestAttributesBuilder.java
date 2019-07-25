@@ -9,7 +9,6 @@ package org.mule.extension.http.api;
 import static java.util.Collections.emptyMap;
 import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
-
 import org.mule.runtime.api.util.MultiMap;
 
 import java.security.cert.Certificate;
