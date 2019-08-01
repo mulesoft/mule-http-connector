@@ -118,7 +118,8 @@ public class HttpRequestOperations implements Initialisable, Disposable {
         UriParameters uriParameters = client.getDefaultUriParameters();
         String resolvedBasePath = config.getBasePath();
         String resolvedPath = resolvedBuilder.replaceUriParams(buildPath(resolvedBasePath, uriSettings.getPath()));
-        resolvedUri = resolveUri(uriParameters.getScheme(), uriParameters.getHost(), uriParameters.getPort(), resolvedPath);
+        resolvedUri =
+            resolveUri(uriParameters.getScheme(), uriParameters.getHost().trim(), uriParameters.getPort(), resolvedPath);
       } else {
         resolvedUri = resolvedBuilder.replaceUriParams(uriSettings.getUrl());
       }
