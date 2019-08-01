@@ -8,10 +8,6 @@ package org.mule.test.http.functional.requester;
 
 import org.junit.Test;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -26,7 +22,7 @@ public class HttpRequestHostTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void sendRequestHostStartsWithWhiteSpace() throws Exception {
-    CoreEvent response = flowRunner("hostNameWithSpacesFlow").withPayload(AbstractMuleTestCase.TEST_PAYLOAD).run();
+    CoreEvent response = flowRunner("hostNameWithSpacesFlow").withPayload(TEST_PAYLOAD).run();
     assertThat(response.getMessage(), hasPayload(equalTo((DEFAULT_RESPONSE))));
   }
 }
