@@ -7,11 +7,14 @@
 
 package org.mule.extension.http.api.request.proxy;
 
+import org.mule.extension.http.api.stereotype.ProxyConfigStereotype;
+import org.mule.runtime.extension.api.annotation.param.stereotype.Stereotype;
 import org.mule.runtime.http.api.client.proxy.ProxyConfig;
 
 /**
  * Marker interface for exposing the proxy configuration as an imported type.
  */
+@Stereotype(ProxyConfigStereotype.class)
 public interface HttpProxyConfig extends ProxyConfig {
 
   interface HttpNtlmProxyConfig extends HttpProxyConfig, NtlmProxyConfig {

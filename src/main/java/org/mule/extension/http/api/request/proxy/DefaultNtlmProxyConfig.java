@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.api.request.proxy;
 
-import static org.mule.extension.http.api.request.proxy.HttpProxyConfig.HttpNtlmProxyConfig;
+import org.mule.extension.http.api.request.proxy.HttpProxyConfig.HttpNtlmProxyConfig;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -30,6 +30,7 @@ public class DefaultNtlmProxyConfig extends DefaultProxyConfig implements HttpNt
   @DisplayName("NTLM Domain")
   private String ntlmDomain;
 
+  @Override
   public String getNtlmDomain() {
     return ntlmDomain;
   }
