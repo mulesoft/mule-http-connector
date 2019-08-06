@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PR
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
+import org.mule.extension.http.api.listener.server.RemoteAddressFormat;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
@@ -36,7 +37,8 @@ public class HttpRequestToResult {
 
   public static Result<InputStream, HttpRequestAttributes> transform(final HttpRequestContext requestContext,
                                                                      final Charset encoding,
-                                                                     ListenerPath listenerPath) {
+                                                                     ListenerPath listenerPath,
+                                                                     final RemoteAddressFormat remoteAddressFormat) {
     final HttpRequest request = requestContext.getRequest();
 
     MediaType mediaType = getMediaType(request.getHeaderValue(CONTENT_TYPE), encoding);
@@ -45,7 +47,11 @@ public class HttpRequestToResult {
     InputStream payload = entity.getContent();
 
     HttpRequestAttributes attributes =
-        new HttpRequestAttributesResolver().setRequestContext(requestContext).setListenerPath(listenerPath).resolve();
+        new HttpRequestAttributesResolver()
+            .setRequestContext(requestContext)
+            .setListenerPath(listenerPath)
+            .setRemoteAddressFormat(remoteAddressFormat)
+            .resolve();
 
     Result.Builder<InputStream, HttpRequestAttributes> resultBuilder = Result.builder();
     if (entity.getLength().isPresent()) {
