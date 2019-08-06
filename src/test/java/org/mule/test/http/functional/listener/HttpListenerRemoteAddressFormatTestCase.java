@@ -21,6 +21,9 @@ import org.mockito.internal.matchers.Matches;
 
 public class HttpListenerRemoteAddressFormatTestCase extends AbstractHttpTestCase {
 
+  private static final String NO_HOSTNAME_REGEX = "([^/]*):(.*)";
+  private static final String WITH_HOSTNAME_REGEX = "([^/]*)/(.*):(.*)";
+
   @Rule
   public DynamicPort port = new DynamicPort("port");
 
@@ -36,7 +39,7 @@ public class HttpListenerRemoteAddressFormatTestCase extends AbstractHttpTestCas
   public void addressOnly() throws Exception {
     Response response = Request.Get(url(port)).execute();
     assertThat(IOUtils.toString(response.returnResponse().getEntity().getContent()),
-               is(new Matches("([^/]*):(.*)")));
+               is(new Matches(NO_HOSTNAME_REGEX)));
   }
 
   @Test
@@ -44,7 +47,7 @@ public class HttpListenerRemoteAddressFormatTestCase extends AbstractHttpTestCas
 
     Response response = Request.Get(url(port2)).execute();
     assertThat(IOUtils.toString(response.returnResponse().getEntity().getContent()),
-               is(new Matches("([^/]*)/(.*):(.*)")));
+               is(new Matches(WITH_HOSTNAME_REGEX)));
   }
 
   private String url(DynamicPort port) {
