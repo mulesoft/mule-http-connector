@@ -8,15 +8,19 @@ package org.mule.extension.http.api.listener.server;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.mule.extension.http.api.listener.server.RequestAddressesFormatValueProvider.ADDRESS_ONLY;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
 
 import org.mule.extension.http.api.listener.intercepting.cors.CorsInterceptorWrapper;
+import org.mule.extension.http.internal.listener.address.AddressOnlyFormat;
+import org.mule.extension.http.internal.listener.address.HostnameAndAddressFormat;
 import org.mule.extension.http.internal.listener.HttpListener;
 import org.mule.extension.http.internal.listener.HttpListenerProvider;
 import org.mule.extension.http.internal.listener.ListenerPath;
 import org.mule.extension.http.internal.listener.intercepting.HttpListenerInterceptor;
+import org.mule.extension.http.internal.listener.address.RequestAddressesFormat;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Expression;
@@ -24,8 +28,8 @@ import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.extension.api.annotation.values.OfValues;
 
 /**
  * Configuration element for a {@link HttpListener}.
@@ -54,13 +58,14 @@ public class HttpListenerConfig implements Initialisable {
   private CorsInterceptorWrapper listenerInterceptors;
 
   /**
-   * Remote address format used to populate remote address property in the HTTP request attributes
+   * Addresses format used to populate local and remote address property in the HTTP request attributes
    */
   @Parameter
-  @Optional(defaultValue = "ADDRESS_ONLY")
+  @Optional(defaultValue = ADDRESS_ONLY)
   @Expression(NOT_SUPPORTED)
   @Placement(order = 1, tab = ADVANCED_TAB)
-  private RemoteAddressFormat remoteAddressFormat;
+  @OfValues(value = RequestAddressesFormatValueProvider.class)
+  private String requestAddressesFormat;
 
   @Override
   public void initialise() {
@@ -83,7 +88,7 @@ public class HttpListenerConfig implements Initialisable {
     return listenerInterceptors != null ? of(listenerInterceptors.getInterceptor()) : empty();
   }
 
-  public RemoteAddressFormat getRemoteAddressFormat() {
-    return remoteAddressFormat;
+  public RequestAddressesFormat getRequestAddressesFormat() {
+    return requestAddressesFormat.equals(ADDRESS_ONLY) ? new AddressOnlyFormat() : new HostnameAndAddressFormat();
   }
 }

@@ -19,7 +19,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.internal.matchers.Matches;
 
-public class HttpListenerRemoteAddressFormatTestCase extends AbstractHttpTestCase {
+public class HttpListenerRequestAddressesFormatTestCase extends AbstractHttpTestCase {
 
   private static final String NO_HOSTNAME_REGEX = "([^/]*):(.*)";
   private static final String WITH_HOSTNAME_REGEX = "([^/]*)/(.*):(.*)";
@@ -38,16 +38,25 @@ public class HttpListenerRemoteAddressFormatTestCase extends AbstractHttpTestCas
   @Test
   public void addressOnly() throws Exception {
     Response response = Request.Get(url(port)).execute();
-    assertThat(IOUtils.toString(response.returnResponse().getEntity().getContent()),
-               is(new Matches(NO_HOSTNAME_REGEX)));
+
+    String body = IOUtils.toString(response.returnResponse().getEntity().getContent());
+    String[] addresses = body.split(" ");
+
+    assertThat(addresses.length, is(2));
+    assertThat(addresses[0], is(new Matches(NO_HOSTNAME_REGEX)));
+    assertThat(addresses[1], is(new Matches(NO_HOSTNAME_REGEX)));
   }
 
   @Test
   public void hostnameAndAddress() throws Exception {
-
     Response response = Request.Get(url(port2)).execute();
-    assertThat(IOUtils.toString(response.returnResponse().getEntity().getContent()),
-               is(new Matches(WITH_HOSTNAME_REGEX)));
+
+    String body = IOUtils.toString(response.returnResponse().getEntity().getContent());
+    String[] addresses = body.split(" ");
+
+    assertThat(addresses.length, is(2));
+    assertThat(addresses[0], is(new Matches(WITH_HOSTNAME_REGEX)));
+    assertThat(addresses[1], is(new Matches(WITH_HOSTNAME_REGEX)));
   }
 
   private String url(DynamicPort port) {

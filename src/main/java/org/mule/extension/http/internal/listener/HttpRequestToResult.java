@@ -13,7 +13,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PR
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
-import org.mule.extension.http.api.listener.server.RemoteAddressFormat;
+import org.mule.extension.http.internal.listener.address.RequestAddressesFormat;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
@@ -38,7 +38,7 @@ public class HttpRequestToResult {
   public static Result<InputStream, HttpRequestAttributes> transform(final HttpRequestContext requestContext,
                                                                      final Charset encoding,
                                                                      ListenerPath listenerPath,
-                                                                     final RemoteAddressFormat remoteAddressFormat) {
+                                                                     final RequestAddressesFormat requestAddressesFormat) {
     final HttpRequest request = requestContext.getRequest();
 
     MediaType mediaType = getMediaType(request.getHeaderValue(CONTENT_TYPE), encoding);
@@ -50,7 +50,7 @@ public class HttpRequestToResult {
         new HttpRequestAttributesResolver()
             .setRequestContext(requestContext)
             .setListenerPath(listenerPath)
-            .setRemoteAddressFormat(remoteAddressFormat)
+            .setRequestAddressesFormat(requestAddressesFormat)
             .resolve();
 
     Result.Builder<InputStream, HttpRequestAttributes> resultBuilder = Result.builder();
