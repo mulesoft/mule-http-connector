@@ -24,4 +24,13 @@
         <set-payload value="#[attributes.remoteAddress ++ ' ' ++ attributes.localAddress]"/>
     </flow>
 
+    <http:listener-config name="listenerConfig">
+        <http:listener-connection host="localhost" port="${port3}"/>
+    </http:listener-config>
+
+    <flow name="defaultValue">
+        <http:listener path="test" config-ref="listenerConfig"/>
+        <set-payload value="#[attributes.remoteAddress ++ ' ' ++ attributes.localAddress]"/>
+    </flow>
+
 </mule>

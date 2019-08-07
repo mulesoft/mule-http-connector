@@ -30,6 +30,9 @@ public class HttpListenerRequestAddressesFormatTestCase extends AbstractHttpTest
   @Rule
   public DynamicPort port2 = new DynamicPort("port2");
 
+  @Rule
+  public DynamicPort port3 = new DynamicPort("port3");
+
   @Override
   protected String getConfigFile() {
     return "http-listener-remote-address-format-config.xml";
@@ -57,6 +60,18 @@ public class HttpListenerRequestAddressesFormatTestCase extends AbstractHttpTest
     assertThat(addresses.length, is(2));
     assertThat(addresses[0], is(new Matches(WITH_HOSTNAME_REGEX)));
     assertThat(addresses[1], is(new Matches(WITH_HOSTNAME_REGEX)));
+  }
+
+  @Test
+  public void addressOnlyIsDefaultValue() throws Exception {
+    Response response = Request.Get(url(port3)).execute();
+
+    String body = IOUtils.toString(response.returnResponse().getEntity().getContent());
+    String[] addresses = body.split(" ");
+
+    assertThat(addresses.length, is(2));
+    assertThat(addresses[0], is(new Matches(NO_HOSTNAME_REGEX)));
+    assertThat(addresses[1], is(new Matches(NO_HOSTNAME_REGEX)));
   }
 
   private String url(DynamicPort port) {
