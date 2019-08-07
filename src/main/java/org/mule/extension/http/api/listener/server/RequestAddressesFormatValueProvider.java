@@ -30,7 +30,7 @@ public class RequestAddressesFormatValueProvider implements ValueProvider {
   @Override
   public Set<Value> resolve() {
     return newHashSet(
-                      newValue(ADDRESS_ONLY).withDisplayName("Address only").build(),
-                      newValue(HOSTNAME_AND_ADDRESS).withDisplayName("Hostname and address").build());
+                      newValue(ADDRESS_ONLY).withDisplayName("Address only [ host:port ]").build(),
+                      newValue(HOSTNAME_AND_ADDRESS).withDisplayName("Hostname and address [ hostname/host:port ]").build());
   }
 }
