@@ -499,7 +499,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   }
 
   private Result<InputStream, HttpRequestAttributes> createResult(HttpRequestContext requestContext) {
-    return transform(requestContext, getDefaultEncoding(muleContext), listenerPath);
+    return transform(requestContext, getDefaultEncoding(muleContext), listenerPath, config.getRequestAddressesFormat());
     // TODO: MULE-9748 Analyse RequestContext use in HTTP extension
     // Update RequestContext ThreadLocal for backwards compatibility
     // setCurrentEvent(muleEvent);
