@@ -58,7 +58,7 @@ public class HttpListenerConfig implements Initialisable {
   private CorsInterceptorWrapper listenerInterceptors;
 
   /**
-   * Addresses format used to populate local and remote address property in the HTTP request attributes
+   * Addresses format used to populate local and remote address property in the HTTP request properties
    */
   @Parameter
   @Optional(defaultValue = ADDRESS_ONLY)
