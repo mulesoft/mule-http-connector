@@ -66,10 +66,8 @@ public class HttpRequestAttributesResolver {
         .uriParams(decodeUriParams(listenerPath, uri.getRawPath()))
         .queryString(queryString)
         .queryParams(decodeQueryString(uri.getRawQuery()))
-        .localAddress(requestContext.getServerConnection().getLocalHostAddress().getAddress().getHostAddress().concat(":")
-            .concat(Integer.toString(requestContext.getServerConnection().getLocalHostAddress().getPort())))
-        .remoteAddress(clientConnection.getRemoteHostAddress().getHostString().concat(":")
-            .concat(Integer.toString(clientConnection.getRemoteHostAddress().getPort())))
+        .localAddress(requestContext.getServerConnection().getLocalHostAddress().toString())
+        .remoteAddress(clientConnection.getRemoteHostAddress().toString())
         .clientCertificate(clientConnection::getClientCertificate)
         .build();
   }

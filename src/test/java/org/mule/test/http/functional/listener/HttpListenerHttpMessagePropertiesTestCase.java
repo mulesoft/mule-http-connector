@@ -98,8 +98,8 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
     assertThat(queryParams.size(), is(0));
     assertThat(attributes.getMethod(), is("GET"));
     assertThat(attributes.getVersion(), is(HTTP_1_1.asString()));
-    assertThat(attributes.getLocalAddress(), containsString("127.0.0.1"));
-    assertThat(attributes.getRemoteAddress(), is(startsWith("127.0.0.1")));
+    assertThat(attributes.getLocalAddress(), containsString("/127.0.0.1"));
+    assertThat(attributes.getRemoteAddress(), is(startsWith("/127.0.0.1")));
   }
 
   @Test
@@ -231,13 +231,13 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
     Post(url).connectTimeout(RECEIVE_TIMEOUT).execute();
     final Message message = queueHandler.read("out", RECEIVE_TIMEOUT).getMessage();
     HttpRequestAttributes attributes = getAttributes(message);
-    assertThat(attributes.getRemoteAddress(), startsWith("127.0.0.1:"));
+    assertThat(attributes.getRemoteAddress(), startsWith("/127.0.0.1:"));
     assertThat(attributes.getHeaders().get(X_FORWARDED_FOR), nullValue());
 
     Post(url).addHeader(X_FORWARDED_FOR, "clientIp, proxy1Ip").connectTimeout(RECEIVE_TIMEOUT).execute();
     final Message forwardedMessage = queueHandler.read("out", RECEIVE_TIMEOUT).getMessage();
     HttpRequestAttributes forwardedAttributes = getAttributes(forwardedMessage);
-    assertThat(forwardedAttributes.getRemoteAddress(), startsWith("127.0.0.1:"));
+    assertThat(forwardedAttributes.getRemoteAddress(), startsWith("/127.0.0.1:"));
     assertThat(forwardedAttributes.getHeaders().get(X_FORWARDED_FOR.toLowerCase()), is("clientIp, proxy1Ip"));
   }
 
