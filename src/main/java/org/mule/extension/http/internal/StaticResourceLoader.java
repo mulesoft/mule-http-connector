@@ -44,13 +44,15 @@ public class StaticResourceLoader {
   private MimetypesFileTypeMap mimeTypes = new MimetypesFileTypeMap();
 
   /**
-   * The resource base from where documents are served up. For example: /Users/maxthemule/resources
+   * The resource base from where documents are served up. For example: /Users/maxthemule/resources. Inputs should be validated
+   * when using expressions here to avoid overexposing files.
    */
   @Parameter
   private String resourceBasePath;
 
   /**
-   * The default file to serve when a directory is specified. The default value is 'index.html'.
+   * The default file to serve when a directory is specified. The default value is 'index.html'. Inputs should be validated when
+   * using expressions here to avoid overexposing files.
    */
   @Parameter
   @Optional(defaultValue = "index.html")
