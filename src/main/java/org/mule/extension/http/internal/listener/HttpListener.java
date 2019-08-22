@@ -516,11 +516,11 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
 
   private ResponseStatusCallback getResponseFailureCallback(HttpResponseReadyCallback responseReadyCallback,
                                                             SourceCompletionCallback completionCallback) {
-    return new ResponseStatusCallback() {
+    return new BaseResponseStatusCallback(completionCallback) {
 
       @Override
       public void responseSendFailure(Throwable throwable) {
-        responseReadyCallback.responseReady(buildErrorResponse(), new ResponseStatusCallback() {
+        responseReadyCallback.responseReady(buildErrorResponse(), new BaseResponseStatusCallback(completionCallback) {
 
           @Override
           public void responseSendFailure(Throwable throwable) {
@@ -548,13 +548,22 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
           completionCallback.success();
         }
       }
-
-      public void onErrorSendingResponse(Throwable throwable) {
-        if (completionCallback != null) {
-          completionCallback.error(throwable);
-        }
-      }
     };
+  }
+
+  private abstract class BaseResponseStatusCallback implements ResponseStatusCallback {
+
+    private final SourceCompletionCallback completionCallback;
+
+    public BaseResponseStatusCallback(SourceCompletionCallback completionCallback) {
+      this.completionCallback = completionCallback;
+    }
+
+    public void onErrorSendingResponse(Throwable throwable) {
+      if (completionCallback != null) {
+        completionCallback.error(throwable);
+      }
+    }
   }
 
   private boolean supportsTransferEncoding(String httpVersion) {
