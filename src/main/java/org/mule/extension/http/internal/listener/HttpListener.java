@@ -520,10 +520,23 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
 
       @Override
       public void responseSendFailure(Throwable throwable) {
-        responseReadyCallback.responseReady(buildErrorResponse(), this);
-        if (completionCallback != null) {
-          completionCallback.error(throwable);
-        }
+        responseReadyCallback.responseReady(buildErrorResponse(), new ResponseStatusCallback() {
+
+          @Override
+          public void responseSendFailure(Throwable throwable) {
+            LOGGER.error("----> GOTCHA: " + throwable.getMessage(), throwable);
+            if (completionCallback != null) {
+              completionCallback.error(throwable);
+            }
+          }
+
+          @Override
+          public void responseSendSuccessfully() {
+            if (completionCallback != null) {
+              completionCallback.success();
+            }
+          }
+        });
       }
 
       @Override
