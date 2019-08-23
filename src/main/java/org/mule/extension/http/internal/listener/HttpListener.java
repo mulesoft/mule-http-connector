@@ -520,11 +520,12 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
 
       @Override
       public void responseSendFailure(Throwable throwable) {
+        LOGGER.error("Found exception trying to send response", throwable);
         responseReadyCallback.responseReady(buildErrorResponse(), new BaseResponseStatusCallback(completionCallback) {
 
           @Override
           public void responseSendFailure(Throwable throwable) {
-            LOGGER.error("Found exception trying to send response", throwable);
+            LOGGER.error("Found exception trying to send error response", throwable);
             if (completionCallback != null) {
               completionCallback.error(throwable);
             }
