@@ -529,24 +529,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
               completionCallback.error(throwable);
             }
           }
-
-          @Override
-          public void responseSendSuccessfully() {
-            if (completionCallback != null) {
-              completionCallback.success();
-            }
-          }
         });
-      }
-
-      @Override
-      public void responseSendSuccessfully() {
-        // TODO: MULE-9749 Figure out how to handle this. Maybe doing nothing is right since this will be executed later if
-        // everything goes right.
-        // responseCompletationCallback.responseSentSuccessfully();
-        if (completionCallback != null) {
-          completionCallback.success();
-        }
       }
     };
   }
@@ -557,6 +540,16 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
 
     public BaseResponseStatusCallback(SourceCompletionCallback completionCallback) {
       this.completionCallback = completionCallback;
+    }
+
+    @Override
+    public void responseSendSuccessfully() {
+      // TODO: MULE-9749 Figure out how to handle this. Maybe doing nothing is right since this will be executed later if
+      // everything goes right.
+      // responseCompletationCallback.responseSentSuccessfully();
+      if (completionCallback != null) {
+        completionCallback.success();
+      }
     }
 
     public void onErrorSendingResponse(Throwable throwable) {
