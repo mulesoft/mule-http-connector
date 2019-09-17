@@ -89,7 +89,12 @@ public class HttpRequesterConnectionManager implements Disposable {
 
     public void start() {
       if (usageCount.incrementAndGet() == 1) {
-        delegate.start();
+        try {
+          delegate.start();
+        } catch (Exception e) {
+          usageCount.decrementAndGet();
+          throw e;
+        }
       }
     }
 
