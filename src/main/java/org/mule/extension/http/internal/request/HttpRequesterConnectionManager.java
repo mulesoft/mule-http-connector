@@ -87,7 +87,7 @@ public class HttpRequesterConnectionManager implements Disposable {
       delegate = client;
     }
 
-    public void start() {
+    public synchronized void start() {
       if (usageCount.incrementAndGet() == 1) {
         try {
           delegate.start();
@@ -98,7 +98,7 @@ public class HttpRequesterConnectionManager implements Disposable {
       }
     }
 
-    public void stop() {
+    public synchronized void stop() {
       if (usageCount.decrementAndGet() == 0) {
         delegate.stop();
       }
