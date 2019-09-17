@@ -99,6 +99,9 @@ public class HttpRequesterConnectionManager implements Disposable {
     }
 
     public synchronized void stop() {
+      // In case this fails we do not want the usageCount to be reincremented
+      // as it will not be further used. If shouldn't be the case that more than
+      // two stops happen.
       if (--usageCount == 0) {
         delegate.stop();
       }
