@@ -81,20 +81,25 @@ public class HttpRequesterConnectionManager implements Disposable {
   public class ShareableHttpClient {
 
     private HttpClient delegate;
-    private AtomicInteger usageCount = new AtomicInteger(0);
+    private Integer usageCount = new Integer(0);
 
     ShareableHttpClient(HttpClient client) {
       delegate = client;
     }
 
-    public void start() {
-      if (usageCount.incrementAndGet() == 1) {
-        delegate.start();
+    public synchronized void start() {
+      if (++usageCount == 1) {
+        try {
+          delegate.start();
+        } catch (Exception e) {
+          usageCount--;
+          throw e;
+        }
       }
     }
 
-    public void stop() {
-      if (usageCount.decrementAndGet() == 0) {
+    public synchronized void stop() {
+      if (--usageCount == 0) {
         delegate.stop();
       }
     }

@@ -12,6 +12,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
@@ -31,6 +32,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.Mockito;
+
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 
@@ -113,6 +116,19 @@ public class HttpRequesterConnectionManagerTestCase extends AbstractMuleTestCase
     verify(otherHttpClient, never()).start();
     client1.stop();
     verify(otherHttpClient, never()).stop();
+  }
+
+  @Test
+  public void clientIsStartedAfterFirstError() {
+    doThrow(Exception.class).doNothing().when(delegateHttpClient).start();
+    ShareableHttpClient client = connectionManager.create(CONFIG_NAME, getHttpClientConfiguration(CONFIG_NAME));
+    try {
+      client.start();
+    } catch (Exception e) {
+      // Ignore first exception
+    }
+    client.start();
+    verify(delegateHttpClient, Mockito.times(2)).start();
   }
 
   private HttpClientConfiguration getHttpClientConfiguration(String configName) {
