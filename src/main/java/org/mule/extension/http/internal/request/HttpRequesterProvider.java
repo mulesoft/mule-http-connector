@@ -161,7 +161,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
   @Override
   public HttpExtensionClient connect() throws ConnectionException {
     ShareableHttpClient httpClient;
-    java.util.Optional<ShareableHttpClient> client = connectionManager.lookup(configName);
+    java.util.Optional<ShareableHttpClient> client = connectionManager.lookup(getClientId());
     if (client.isPresent()) {
       httpClient = client.get();
     } else {
@@ -179,7 +179,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
           .setName(name)
           .build();
 
-      httpClient = connectionManager.create(configName, configuration);
+      httpClient = connectionManager.create(getClientId(), configuration);
     }
     UriParameters uriParameters = new DefaultUriParameters(connectionParams.getProtocol(), connectionParams.getHost(),
                                                            connectionParams.getPort());
@@ -191,6 +191,10 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
     }
 
     return extensionClient;
+  }
+
+  private String getClientId() {
+    return muleContext.getConfiguration().getId() + "_" + configName;
   }
 
   private org.mule.runtime.http.api.tcp.TcpClientSocketProperties buildTcpProperties(TcpClientSocketProperties socketProperties) {
