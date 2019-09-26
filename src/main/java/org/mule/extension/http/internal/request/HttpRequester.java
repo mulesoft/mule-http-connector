@@ -51,15 +51,18 @@ import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.channels.UnresolvedAddressException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Component capable of performing an HTTP request given a request.
@@ -159,10 +162,32 @@ public class HttpRequester {
             logger.error(getErrorMessage(httpRequest));
             HttpError error = exception instanceof TimeoutException ? TIMEOUT : CONNECTIVITY;
             callback.error(new HttpRequestFailedException(createStaticMessage(ERROR_MESSAGE_GENERATOR
-                .createFrom(httpRequest, exception.getMessage())),
+                .createFrom(httpRequest,
+                            getExceptionMessage(exception))),
                                                           exception, error));
           }
         });
+  }
+
+  private String getExceptionMessage(Throwable t) {
+    return getExceptionMessage(t, new HashSet<>());
+  }
+
+  private String getExceptionMessage(Throwable t, Set<Throwable> causes) {
+    if (causes.add(t)) {
+      if (t.getMessage() != null) {
+        return t.getMessage();
+      }
+
+      if (t instanceof UnresolvedAddressException) {
+        return "Couldn't resolve address";
+      }
+
+      if (t.getCause() != null) {
+        return getExceptionMessage(t.getCause(), causes);
+      }
+    }
+    return t.getClass().getSimpleName();
   }
 
   private void fireNotification(NotificationEmitter notificationEmitter, NotificationActionDefinition action,
@@ -214,7 +239,8 @@ public class HttpRequester {
   private void checkIfRemotelyClosed(Throwable exception, UriParameters uriParameters) {
     if (HTTPS.equals(uriParameters.getScheme()) && containsIgnoreCase(exception.getMessage(), REMOTELY_CLOSED)) {
       logger
-          .error("Remote host closed connection. Possible SSL/TLS handshake issue. Check protocols, cipher suites and certificate set up. Use -Djavax.net.debug=ssl for further debugging.");
+          .error(
+                 "Remote host closed connection. Possible SSL/TLS handshake issue. Check protocols, cipher suites and certificate set up. Use -Djavax.net.debug=ssl for further debugging.");
     }
   }
 
