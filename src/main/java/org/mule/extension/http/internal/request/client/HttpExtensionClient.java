@@ -10,10 +10,12 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
 import org.mule.extension.http.api.request.client.UriParameters;
+import org.mule.extension.http.api.request.proxy.HttpProxyConfig;
 import org.mule.extension.http.internal.request.HttpRequesterConnectionManager.ShareableHttpClient;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.http.api.client.HttpRequestOptions;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
@@ -31,12 +33,14 @@ public class HttpExtensionClient implements Startable, Stoppable {
   private final HttpRequestAuthentication authentication;
   private final ShareableHttpClient httpClient;
   private final UriParameters uriParameters;
+  private final HttpProxyConfig proxyConfig;
 
   public HttpExtensionClient(ShareableHttpClient httpClient, UriParameters uriParameters,
-                             HttpRequestAuthentication authentication) {
+                             HttpRequestAuthentication authentication, HttpProxyConfig proxyConfig) {
     this.httpClient = httpClient;
     this.uriParameters = uriParameters;
     this.authentication = authentication;
+    this.proxyConfig = proxyConfig;
   }
 
   /**
@@ -69,6 +73,12 @@ public class HttpExtensionClient implements Startable, Stoppable {
 
   public CompletableFuture<HttpResponse> send(HttpRequest request, int responseTimeout, boolean followRedirects,
                                               HttpAuthentication authentication) {
-    return httpClient.sendAsync(request, responseTimeout, followRedirects, authentication);
+    HttpRequestOptions requestOptions = HttpRequestOptions.builder()
+        .responseTimeout(responseTimeout)
+        .followsRedirect(followRedirects)
+        .authentication(authentication)
+        .proxyConfig(proxyConfig)
+        .build();
+    return httpClient.sendAsync(request, requestOptions);
   }
 }
