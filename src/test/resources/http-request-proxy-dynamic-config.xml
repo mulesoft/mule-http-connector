@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:proxy name="secondProxyConfig" host="localhost" port="${secondProxyPort}" />
+
+    <http:request-config name="requestConfig" basePath="basePath">
+        <http:request-connection host="localhost" port="${httpPort}" >
+            <http:proxy-config>
+                <http:proxy host="localhost" port="#[vars.proxyPort]" />
+            </http:proxy-config>
+        </http:request-connection>
+
+    </http:request-config>
+
+    <flow name="theFlow">
+        <http:request config-ref="requestConfig" path="requestPath"/>
+    </flow>
+</mule>
