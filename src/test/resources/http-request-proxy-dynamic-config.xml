@@ -9,6 +9,7 @@
     <http:request-config name="requestConfig" basePath="basePath" >
         <http:request-connection host="localhost" port="${httpPort}" >
             <http:proxy-config>
+                <!--The test should run theFlow twice setting variable proxyPort to different values-->
                 <http:proxy host="localhost" port="#[vars.proxyPort]" />
             </http:proxy-config>
         </http:request-connection>
