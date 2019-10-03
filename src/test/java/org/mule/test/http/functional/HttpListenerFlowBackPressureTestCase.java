@@ -131,8 +131,8 @@ public class HttpListenerFlowBackPressureTestCase extends AbstractHttpTestCase {
         try {
           int statusCode = response.getStatusCode();
           if (statusCode == SERVICE_UNAVAILABLE.getStatusCode()) {
-            overloadResponseLatch.countDown();
             overloadResponses.incrementAndGet();
+            overloadResponseLatch.countDown();
             assertThat(response.getStatusText(), is(SERVICE_UNAVAILABLE.getReasonPhrase()));
           } else if (statusCode == OK.getStatusCode()) {
             okResponses.incrementAndGet();
