@@ -108,11 +108,6 @@ public class HttpRequesterConnectionManager implements Disposable {
       }
     }
 
-    public CompletableFuture<HttpResponse> sendAsync(HttpRequest request, int responseTimeout, boolean followRedirects,
-                                                     HttpAuthentication authentication) {
-      return delegate.sendAsync(request, responseTimeout, followRedirects, authentication);
-    }
-
     public CompletableFuture<HttpResponse> sendAsync(HttpRequest request, HttpRequestOptions options) {
       return delegate.sendAsync(request, options);
     }

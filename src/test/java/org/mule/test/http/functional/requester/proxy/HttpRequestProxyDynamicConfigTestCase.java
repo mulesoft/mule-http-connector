@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  * The software in this package is published under the terms of the CPAL v1.0
@@ -9,11 +7,8 @@
 
 package org.mule.test.http.functional.requester.proxy;
 
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.http.TestProxyServer;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.requester.AbstractHttpRequestTestCase;
