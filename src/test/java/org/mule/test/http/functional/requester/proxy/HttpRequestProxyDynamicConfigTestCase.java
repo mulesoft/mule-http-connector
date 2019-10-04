@@ -7,8 +7,12 @@
 
 package org.mule.test.http.functional.requester.proxy;
 
+import static java.lang.String.valueOf;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.extension.http.api.HttpHeaders.Names.PROXY_AUTHORIZATION;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.http.TestProxyServer;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.requester.AbstractHttpRequestTestCase;
@@ -49,7 +53,6 @@ public class HttpRequestProxyDynamicConfigTestCase extends AbstractHttpRequestTe
 
   @Test
   public void portChangesDependingOnVariable() throws Exception {
-    // Request should go through the proxy.
     flowRunner(flowName).withVariable("proxyPort", firstProxyPort.getValue()).withPayload(TEST_MESSAGE).keepStreamsOpen().run();
     assertThat(firstProxyServer.hasConnections(), is(true));
     assertThat(secondProxyServer.hasConnections(), is(false));
@@ -57,5 +60,23 @@ public class HttpRequestProxyDynamicConfigTestCase extends AbstractHttpRequestTe
     flowRunner(flowName).withVariable("proxyPort", secondProxyPort.getValue()).withPayload(TEST_MESSAGE).keepStreamsOpen().run();
     assertThat(firstProxyServer.hasConnections(), is(true));
     assertThat(secondProxyServer.hasConnections(), is(true));
+  }
+
+  @Test
+  public void dynamicAuthParameters() throws Exception {
+    sendRequestAndCheckAuthorization("user1", "password1", "Basic dXNlcjE6cGFzc3dvcmQx");
+    sendRequestAndCheckAuthorization("user2", "password2", "Basic dXNlcjI6cGFzc3dvcmQy");
+  }
+
+  private void sendRequestAndCheckAuthorization(String name, String password, String authorization) throws Exception {
+    CoreEvent event = flowRunner("basicAuthProxy")
+        .withPayload(TEST_MESSAGE)
+        .withVariable("user", name)
+        .withVariable("password", password)
+        .run();
+
+    String authorizationHeader = valueOf(headers.asMap().get(PROXY_AUTHORIZATION).toArray()[0]);
+    assertThat(authorizationHeader, is(authorization));
+    assertThat(event.getMessage().getPayload().getValue(), equalTo(DEFAULT_RESPONSE));
   }
 }
