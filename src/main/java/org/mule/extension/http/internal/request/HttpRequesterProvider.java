@@ -183,7 +183,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
     }
     UriParameters uriParameters = new DefaultUriParameters(connectionParams.getProtocol(), connectionParams.getHost(),
                                                            connectionParams.getPort());
-    HttpExtensionClient extensionClient = new HttpExtensionClient(httpClient, uriParameters, authentication);
+    HttpExtensionClient extensionClient = new HttpExtensionClient(httpClient, uriParameters, authentication, proxyConfig);
     try {
       extensionClient.start();
     } catch (MuleException e) {
