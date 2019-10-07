@@ -13,6 +13,7 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.http.api.client.HttpClient;
 import org.mule.runtime.http.api.client.HttpClientConfiguration;
+import org.mule.runtime.http.api.client.HttpRequestOptions;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
@@ -106,9 +107,8 @@ public class HttpRequesterConnectionManager implements Disposable {
       }
     }
 
-    public CompletableFuture<HttpResponse> sendAsync(HttpRequest request, int responseTimeout, boolean followRedirects,
-                                                     HttpAuthentication authentication) {
-      return delegate.sendAsync(request, responseTimeout, followRedirects, authentication);
+    public CompletableFuture<HttpResponse> sendAsync(HttpRequest request, HttpRequestOptions options) {
+      return delegate.sendAsync(request, options);
     }
   }
 }
