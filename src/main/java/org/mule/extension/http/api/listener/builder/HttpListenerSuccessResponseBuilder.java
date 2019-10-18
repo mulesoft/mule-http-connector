@@ -12,6 +12,7 @@ import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.extension.api.annotation.param.Content;
+import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
@@ -38,6 +39,7 @@ public class HttpListenerSuccessResponseBuilder extends HttpListenerResponseBuil
   @Optional
   @Content
   @Placement(tab = RESPONSES, order = 2)
+  @NullSafe
   protected MultiMap<String, String> headers = emptyMultiMap();
 
   /**
@@ -93,7 +95,7 @@ public class HttpListenerSuccessResponseBuilder extends HttpListenerResponseBuil
 
   @Override
   public void setHeaders(MultiMap<String, String> headers) {
-    this.headers = headers;
+    this.headers = headers != null ? headers : emptyMultiMap();
   }
 
 }
