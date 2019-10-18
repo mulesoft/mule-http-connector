@@ -25,6 +25,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
 import org.mule.runtime.extension.api.annotation.param.Content;
+import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
@@ -58,6 +59,7 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
   @Parameter
   @Optional
   @Content
+  @NullSafe
   protected MultiMap<String, String> headers = emptyMultiMap();
 
   /**
@@ -113,7 +115,7 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
 
   @Override
   public void setHeaders(MultiMap<String, String> headers) {
-    this.headers = headers;
+    this.headers = headers != null ? headers : emptyMultiMap();
   }
 
   public String replaceUriParams(String path) {
