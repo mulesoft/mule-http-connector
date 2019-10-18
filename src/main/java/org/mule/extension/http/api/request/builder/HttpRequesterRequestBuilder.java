@@ -108,12 +108,12 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
 
   @Override
   public MultiMap<String, String> getHeaders() {
-    return headers;
+    return headers != null ? headers : emptyMultiMap();
   }
 
   @Override
   public void setHeaders(MultiMap<String, String> headers) {
-    this.headers = headers;
+    this.headers = headers != null ? headers : emptyMultiMap();
   }
 
   public String replaceUriParams(String path) {
