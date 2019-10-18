@@ -23,10 +23,7 @@ import org.mule.extension.http.internal.request.HttpRequesterConfig;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.MultiMap;
-import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
-import org.mule.runtime.extension.api.annotation.param.Content;
-import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.*;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
 import org.mule.runtime.extension.api.runtime.parameter.OutboundCorrelationStrategy;
@@ -58,6 +55,7 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
   @Parameter
   @Optional
   @Content
+  @NullSafe
   protected MultiMap<String, String> headers = emptyMultiMap();
 
   /**
@@ -108,7 +106,7 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
 
   @Override
   public MultiMap<String, String> getHeaders() {
-    return headers != null ? headers : emptyMultiMap();
+    return headers;
   }
 
   @Override

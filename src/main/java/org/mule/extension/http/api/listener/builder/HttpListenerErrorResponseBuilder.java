@@ -12,6 +12,7 @@ import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.extension.api.annotation.param.Content;
+import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
@@ -39,6 +40,7 @@ public class HttpListenerErrorResponseBuilder extends HttpListenerResponseBuilde
   @Optional
   @Content
   @Placement(tab = RESPONSES, order = 2)
+  @NullSafe
   protected MultiMap<String, String> headers = emptyMultiMap();
 
   /**
@@ -89,7 +91,7 @@ public class HttpListenerErrorResponseBuilder extends HttpListenerResponseBuilde
 
   @Override
   public MultiMap<String, String> getHeaders() {
-    return headers != null ? headers : emptyMultiMap();
+    return headers;
   }
 
   @Override
