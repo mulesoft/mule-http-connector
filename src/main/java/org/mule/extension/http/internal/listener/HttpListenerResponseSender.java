@@ -55,40 +55,55 @@ public class HttpListenerResponseSender {
     return responseFactory.create(responseBuilder, interception, listenerResponseBuilder, supportsStreaming);
   }
 
-  private ResponseStatusCallback getResponseFailureCallback(HttpResponseReadyCallback responseReadyCallback,
-                                                            SourceCompletionCallback completionCallback) {
-    return new ResponseStatusCallback() {
-
-      @Override
-      public void responseSendFailure(Throwable throwable) {
-        try {
-          responseReadyCallback.responseReady(buildErrorResponse(), this);
-          completionCallback.success();
-        } catch (Throwable t) {
-          completionCallback.error(t);
-        }
-      }
-
-      @Override
-      public void responseSendSuccessfully() {
-        // TODO: MULE-9749 Figure out how to handle this. Maybe doing nothing is right since this will be executed later if
-        // everything goes right.
-        // responseCompletationCallback.responseSentSuccessfully();
-        completionCallback.success();
-      }
-
-      public void onErrorSendingResponse(Throwable throwable) {
-        completionCallback.error(throwable);
-      }
-    };
+  public ResponseStatusCallback getResponseFailureCallback(HttpResponseReadyCallback responseReadyCallback,
+                                                           SourceCompletionCallback completionCallback) {
+    return new FailureResponseStatusCallback(responseReadyCallback, completionCallback);
   }
 
-  protected HttpResponse buildErrorResponse() {
-    final HttpResponseBuilder errorResponseBuilder = HttpResponse.builder();
-    final HttpResponse errorResponse = errorResponseBuilder.statusCode(INTERNAL_SERVER_ERROR.getStatusCode())
-        .reasonPhrase(INTERNAL_SERVER_ERROR.getReasonPhrase())
-        .build();
-    return errorResponse;
+  /**
+   * Implemented as an inner class instead of an anonymous class so that no problem arises in case reflection is needed for
+   * retrieval of methods. This may be the case for backward compatibility concerns.
+   */
+  private static class FailureResponseStatusCallback implements ResponseStatusCallback {
+
+    private HttpResponseReadyCallback responseReadyCallback;
+    private SourceCompletionCallback completionCallback;
+
+    public FailureResponseStatusCallback(HttpResponseReadyCallback responseReadyCallback,
+                                         SourceCompletionCallback completionCallback) {
+      this.responseReadyCallback = responseReadyCallback;
+      this.completionCallback = completionCallback;
+    }
+
+    @Override
+    public void responseSendFailure(Throwable throwable) {
+      try {
+        responseReadyCallback.responseReady(buildErrorResponse(), this);
+        completionCallback.success();
+      } catch (Throwable t) {
+        completionCallback.error(t);
+      }
+    }
+
+    @Override
+    public void responseSendSuccessfully() {
+      // TODO: MULE-9749 Figure out how to handle this. Maybe doing nothing is right since this will be executed later if
+      // everything goes right.
+      // responseCompletationCallback.responseSentSuccessfully();
+      completionCallback.success();
+    }
+
+    public void onErrorSendingResponse(Throwable throwable) {
+      completionCallback.error(throwable);
+    }
+
+    protected HttpResponse buildErrorResponse() {
+      final HttpResponseBuilder errorResponseBuilder = HttpResponse.builder();
+      final HttpResponse errorResponse = errorResponseBuilder.statusCode(INTERNAL_SERVER_ERROR.getStatusCode())
+          .reasonPhrase(INTERNAL_SERVER_ERROR.getReasonPhrase())
+          .build();
+      return errorResponse;
+    }
   }
 
 }
