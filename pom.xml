@@ -25,7 +25,7 @@
         <grizzlyAhcVersion>1.14-MULE-007</grizzlyAhcVersion>
         <javaxActivationVersion>1.2.0</javaxActivationVersion>
         <javaxMailVersion>1.4.3</javaxMailVersion>
-        <jettyVersion>9.0.7.v20131107</jettyVersion>
+        <jettyVersion>9.4.22.v20191022</jettyVersion>
 
         <commonsLangVersion>3.7</commonsLangVersion>
         <commonsIoVersion>2.6</commonsIoVersion>
