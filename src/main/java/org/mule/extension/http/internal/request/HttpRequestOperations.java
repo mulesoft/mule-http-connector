@@ -32,6 +32,7 @@ import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.transformation.TransformationService;
+import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.error.Throws;
@@ -54,6 +55,7 @@ import org.mule.runtime.http.api.HttpConstants;
 import java.io.InputStream;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,6 +74,9 @@ public class HttpRequestOperations implements Initialisable, Disposable {
   private TransformationService transformationService;
   @Inject
   private SchedulerService schedulerService;
+  @Inject
+  @Named("vizualizer.workerhash")
+  private java.util.Optional<String> workerHash;
 
   private Scheduler scheduler;
 
@@ -108,6 +113,12 @@ public class HttpRequestOperations implements Initialisable, Disposable {
                       CompletionCallback<InputStream, HttpResponseAttributes> callback) {
     try {
       HttpRequesterRequestBuilder resolvedBuilder = requestBuilder != null ? requestBuilder : DEFAULT_REQUEST_BUILDER;
+
+      workerHash.ifPresent(value -> {
+        MultiMap<String, String> headers = requestBuilder.getHeaders();
+        headers.put("x-anypnt-app-worker", value);
+        requestBuilder.setHeaders(headers);
+      });
 
       handleCursor(resolvedBuilder);
 
