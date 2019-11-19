@@ -9,11 +9,15 @@ package org.mule.test.http.functional.listener;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.extension.http.api.HttpMessageBuilder.refreshSystemProperties;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.CREATED;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.test.http.functional.matcher.HttpResponseContentStringMatcher.body;
 import static org.mule.test.http.functional.matcher.HttpResponseReasonPhraseMatcher.hasReasonPhrase;
+
+import org.junit.After;
+import org.junit.Before;
 import org.mule.runtime.http.api.HttpHeaders;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -131,7 +135,7 @@ public class HttpListenerResponseBuildersTestCase extends AbstractHttpTestCase {
 
     assertThat(httpResponse, HttpResponseStatusCodeMatcher.hasStatusCode(INTERNAL_SERVER_ERROR.getStatusCode()));
     assertThat(httpResponse, hasReasonPhrase(INTERNAL_SERVER_ERROR.getReasonPhrase()));
-    assertThat(httpResponse, body(is("Header Content-Type does not support multiple values")));
+    assertThat(httpResponse, body(is("Header content-type does not support multiple values")));
   }
 
   @Test

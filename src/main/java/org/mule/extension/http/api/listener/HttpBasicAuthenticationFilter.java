@@ -27,7 +27,6 @@ import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.api.security.UnauthorisedException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.api.security.UnsupportedAuthenticationSchemeException;
-import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -39,6 +38,7 @@ import java.util.Base64.Decoder;
 import java.util.List;
 import java.util.Map;
 
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -156,7 +156,7 @@ public class HttpBasicAuthenticationFilter {
     if (realm != null) {
       realmHeader += "\"" + realm + "\"";
     }
-    MultiMap<String, String> headers = new MultiMap<>();
+    CaseInsensitiveMultiMap headers = new CaseInsensitiveMultiMap();
     headers.put(WWW_AUTHENTICATE, realmHeader);
     return Message.builder().nullValue().attributesValue(new HttpListenerResponseAttributes(UNAUTHORIZED.getStatusCode(),
                                                                                             UNAUTHORIZED.getReasonPhrase(),

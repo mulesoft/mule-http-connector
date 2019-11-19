@@ -6,8 +6,8 @@
  */
 package org.mule.extension.http.api.error;
 
-import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.NOT_FOUND;
+import static org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap.emptyCaseInsensitiveMultiMap;
 
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.runtime.api.exception.ErrorMessageAwareException;
@@ -41,7 +41,7 @@ public class ResourceNotFoundException extends ModuleException implements ErrorM
     return Message.builder()
         .nullValue()
         .attributesValue(new HttpListenerResponseAttributes(NOT_FOUND.getStatusCode(), NOT_FOUND.getReasonPhrase(),
-                                                            emptyMultiMap()))
+                                                            emptyCaseInsensitiveMultiMap()))
         .build();
   }
 

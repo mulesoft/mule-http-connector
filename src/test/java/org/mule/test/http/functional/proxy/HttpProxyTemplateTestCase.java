@@ -29,11 +29,11 @@ import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.TestInputStream;
 import org.mule.test.http.functional.requester.AbstractHttpRequestTestCase;
@@ -403,7 +403,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
     @Override
     public CoreEvent process(CoreEvent event) throws MuleException {
       HttpAttributes attributes = (HttpAttributes) event.getMessage().getAttributes().getValue();
-      MultiMap<String, String> headers = new MultiMap<>(attributes.getHeaders());
+      CaseInsensitiveMultiMap headers = new CaseInsensitiveMultiMap(attributes.getHeaders());
 
       headers.remove(CONTENT_LENGTH.toLowerCase());
       headers.remove(TRANSFER_ENCODING.toLowerCase());

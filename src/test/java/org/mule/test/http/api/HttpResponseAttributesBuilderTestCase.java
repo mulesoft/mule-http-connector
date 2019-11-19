@@ -13,7 +13,7 @@ import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.HttpResponseAttributesBuilder;
-import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import io.qameta.allure.Feature;
@@ -50,8 +50,8 @@ public class HttpResponseAttributesBuilderTestCase extends AbstractMuleTestCase 
     assertThat(copy.getHeaders(), is(headers()));
   }
 
-  private MultiMap<String, String> headers() {
-    MultiMap<String, String> headers = new MultiMap<>();
+  private CaseInsensitiveMultiMap headers() {
+    CaseInsensitiveMultiMap headers = new CaseInsensitiveMultiMap();
     headers.put("headerKey", "headerValue");
     return headers;
   }

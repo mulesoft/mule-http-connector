@@ -6,6 +6,7 @@
  */
 package org.mule.test.http.functional.requester;
 
+import static com.google.common.collect.ImmutableMap.*;
 import static java.util.Collections.singletonMap;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -15,11 +16,14 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CLOSE;
 import static org.mule.runtime.http.api.HttpHeaders.Values.KEEP_ALIVE;
+
+import com.google.common.collect.ImmutableMap;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.functional.api.flow.FlowRunner;
-import org.mule.runtime.api.util.MultiMap;
 
 import org.junit.Test;
+import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 
 public class HttpRequestKeepAliveTestCase extends AbstractHttpRequestTestCase {
 
@@ -60,7 +64,8 @@ public class HttpRequestKeepAliveTestCase extends AbstractHttpRequestTestCase {
 
     if (connectionOutboundProperty != null) {
       final HttpRequestAttributes reqAttributes = mock(HttpRequestAttributes.class);
-      when(reqAttributes.getHeaders()).thenReturn(new MultiMap<>(singletonMap(CONNECTION, connectionOutboundProperty)));
+      when(reqAttributes.getHeaders())
+          .thenReturn(new CaseInsensitiveMultiMap(new MultiMap<>(of(CONNECTION, connectionOutboundProperty))));
 
       runner = runner.withAttributes(reqAttributes);
     }

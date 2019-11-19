@@ -8,6 +8,7 @@ package org.mule.extension.http.api;
 
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 
 import java.util.Map;
 
@@ -36,7 +37,7 @@ public class BaseHttpRequestAttributes extends HttpAttributes {
   @Parameter
   protected String requestPath;
 
-  public BaseHttpRequestAttributes(MultiMap<String, String> headers, MultiMap<String, String> queryParams,
+  public BaseHttpRequestAttributes(CaseInsensitiveMultiMap headers, MultiMap<String, String> queryParams,
                                    Map<String, String> uriParams, String requestPath) {
     super(headers);
     this.queryParams = queryParams;

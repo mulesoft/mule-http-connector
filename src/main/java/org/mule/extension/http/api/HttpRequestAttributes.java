@@ -8,12 +8,13 @@ package org.mule.extension.http.api;
 
 import static java.lang.System.lineSeparator;
 
-import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
+import static org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap.emptyCaseInsensitiveMultiMap;
 
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.api.util.SerializableLazyValue;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 
 import java.security.cert.Certificate;
 import java.util.Map;
@@ -129,14 +130,15 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
    * @since 1.6.0
    */
   public HttpRequestAttributes() {
-    this(emptyMultiMap(), null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, () -> null);
+    this(emptyCaseInsensitiveMultiMap(), null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+         () -> null);
   }
 
   /**
    * @deprecated use {@link HttpRequestAttributesBuilder} instead
    */
   @Deprecated
-  public HttpRequestAttributes(MultiMap<String, String> headers, String listenerPath, String relativePath, String version,
+  public HttpRequestAttributes(CaseInsensitiveMultiMap headers, String listenerPath, String relativePath, String version,
                                String scheme, String method, String requestPath, String requestUri, String queryString,
                                MultiMap<String, String> queryParams, Map<String, String> uriParams, String remoteAddress,
                                Certificate clientCertificate) {
@@ -145,7 +147,7 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
          uriParams, "", remoteAddress, () -> clientCertificate);
   }
 
-  HttpRequestAttributes(MultiMap<String, String> headers, String listenerPath, String relativePath, String maskedRequestPath,
+  HttpRequestAttributes(CaseInsensitiveMultiMap headers, String listenerPath, String relativePath, String maskedRequestPath,
                         String version, String scheme, String method, String requestPath, String rawRequestPath,
                         String requestUri, String rawRequestUri, String queryString, MultiMap<String, String> queryParams,
                         Map<String, String> uriParams, String localAddress, String remoteAddress,

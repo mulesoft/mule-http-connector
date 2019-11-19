@@ -8,9 +8,11 @@ package org.mule.extension.http.api.policy;
 
 import static java.lang.System.lineSeparator;
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
+import static org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap.emptyCaseInsensitiveMultiMap;
 
 import org.mule.extension.http.api.BaseHttpRequestAttributes;
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 
 import java.util.Map;
 
@@ -24,16 +26,16 @@ public class HttpPolicyRequestAttributes extends BaseHttpRequestAttributes {
 
   private static final long serialVersionUID = 7856582596752161400L;
 
-  public HttpPolicyRequestAttributes(MultiMap<String, String> headers, MultiMap<String, String> queryParams,
+  public HttpPolicyRequestAttributes(CaseInsensitiveMultiMap headers, MultiMap<String, String> queryParams,
                                      Map<String, String> uriParams, String requestPath) {
     super(headers, queryParams, uriParams, requestPath);
   }
 
   public HttpPolicyRequestAttributes() {
-    super(emptyMultiMap(), emptyMultiMap(), emptyMultiMap(), "");
+    super(emptyCaseInsensitiveMultiMap(), emptyMultiMap(), emptyMultiMap(), "");
   }
 
-  public void setHeaders(MultiMap<String, String> headers) {
+  public void setHeaders(CaseInsensitiveMultiMap headers) {
     this.headers = headers;
   }
 

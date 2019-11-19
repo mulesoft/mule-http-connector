@@ -15,6 +15,7 @@ import org.mule.runtime.api.util.MultiMap;
 import java.util.HashMap;
 
 import org.junit.Test;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 
 public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCase {
 
@@ -220,7 +221,7 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
   @Test
   public void sensitiveContentIsHidden() {
     requestAttributes = baseBuilder
-        .headers(prepareSensitiveDataMap(new MultiMap<>()))
+        .headers(prepareSensitiveDataMap(new CaseInsensitiveMultiMap()))
         .queryString("password=4n3zP4SSW0rd&pass=s0m3P4zz&client_secret=myPr3c10us&regular=show+me")
         .queryParams(prepareSensitiveDataMap(new MultiMap<>()))
         .uriParams(prepareSensitiveDataMap(new HashMap<>()))

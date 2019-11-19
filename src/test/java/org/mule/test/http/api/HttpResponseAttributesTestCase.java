@@ -12,10 +12,10 @@ import static org.hamcrest.core.Is.is;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.runtime.api.util.MultiMap;
 
 import io.qameta.allure.Feature;
 import org.junit.Test;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 
 @Feature(HTTP_EXTENSION)
 public class HttpResponseAttributesTestCase extends AbstractHttpAttributesTestCase {
@@ -72,7 +72,7 @@ public class HttpResponseAttributesTestCase extends AbstractHttpAttributesTestCa
 
   @Test
   public void toStringWithoutHeaders() {
-    responseAttributes = new HttpResponseAttributes(401, "Some Reason Phrase", new MultiMap<>());
+    responseAttributes = new HttpResponseAttributes(401, "Some Reason Phrase", new CaseInsensitiveMultiMap());
 
     assertThat(responseAttributes.toString(), is(TO_STRING_WITHOUT_HEADERS));
   }
@@ -86,7 +86,7 @@ public class HttpResponseAttributesTestCase extends AbstractHttpAttributesTestCa
 
   @Test
   public void sensitiveContentIsHidden() {
-    responseAttributes = new HttpResponseAttributes(401, "Unauthorised", prepareSensitiveDataMap(new MultiMap<>()));
+    responseAttributes = new HttpResponseAttributes(401, "Unauthorised", prepareSensitiveDataMap(new CaseInsensitiveMultiMap()));
 
     assertThat(responseAttributes.toString(), is(OBFUSCATED_TO_STRING));
   }

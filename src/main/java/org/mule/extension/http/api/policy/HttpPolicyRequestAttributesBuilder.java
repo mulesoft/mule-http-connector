@@ -8,8 +8,10 @@ package org.mule.extension.http.api.policy;
 
 import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
+import static org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap.emptyCaseInsensitiveMultiMap;
 
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 
 import java.util.Map;
 
@@ -20,7 +22,7 @@ import java.util.Map;
  */
 public class HttpPolicyRequestAttributesBuilder {
 
-  private MultiMap<String, String> headers = emptyMultiMap();
+  private CaseInsensitiveMultiMap headers = emptyCaseInsensitiveMultiMap();
   private MultiMap<String, String> queryParams = emptyMultiMap();
   private Map<String, String> uriParams = emptyMultiMap();
   private String requestPath;
@@ -34,7 +36,7 @@ public class HttpPolicyRequestAttributesBuilder {
     this.requestPath = attributes.getRequestPath();
   }
 
-  public HttpPolicyRequestAttributesBuilder headers(MultiMap<String, String> headers) {
+  public HttpPolicyRequestAttributesBuilder headers(CaseInsensitiveMultiMap headers) {
     requireNonNull(headers, "HTTP headers cannot be null.");
     this.headers = headers;
     return this;

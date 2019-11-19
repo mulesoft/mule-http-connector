@@ -7,7 +7,6 @@
 package org.mule.test.http.functional.requester;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasKey;
@@ -22,8 +21,11 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.HOST;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CLOSE;
+
+import com.google.common.collect.ImmutableMap;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.Collection;
@@ -139,7 +141,7 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase {
   @Test
   public void ignoresConnectionOutboundProperty() throws Exception {
     final HttpRequestAttributes reqAttributes = mock(HttpRequestAttributes.class);
-    when(reqAttributes.getHeaders()).thenReturn(new MultiMap<>(singletonMap(CONNECTION, CLOSE)));
+    when(reqAttributes.getHeaders()).thenReturn(new CaseInsensitiveMultiMap(new MultiMap<>(ImmutableMap.of(CONNECTION, CLOSE))));
 
     flowRunner("outboundProperties").withPayload(TEST_MESSAGE).withAttributes(reqAttributes).run();
     assertThat(getFirstReceivedHeader(CONNECTION), is(not(CLOSE)));

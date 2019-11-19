@@ -17,13 +17,12 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
 
-import org.eclipse.jetty.http.HttpStatus;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.internal.listener.HttpResponseFactory;
 import org.mule.extension.http.internal.listener.intercepting.NoInterception;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
-import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -54,7 +53,7 @@ public class HttpResponseFactoryTestCase extends AbstractMuleContextTestCase {
     HttpListenerResponseBuilder listenerResponseBuilder = mock(HttpListenerResponseBuilder.class);
     TypedValue<Object> payload = new TypedValue<>(new ByteArrayInputStream(EXAMPLE_STRING.getBytes(UTF_8)), INPUT_STREAM);
     when(listenerResponseBuilder.getBody()).thenReturn(payload);
-    MultiMap<String, String> headers = new MultiMap<>();
+    CaseInsensitiveMultiMap headers = new CaseInsensitiveMultiMap();
     headers.put(CONTENT_LENGTH, WRONG_CONTENT_LENGTH);
     when(listenerResponseBuilder.getHeaders()).thenReturn(headers);
     when(listenerResponseBuilder.getStatusCode()).thenReturn(OK.getStatusCode());
@@ -73,7 +72,7 @@ public class HttpResponseFactoryTestCase extends AbstractMuleContextTestCase {
     TypedValue<Object> payload = new TypedValue<>(cursorProvider, INPUT_STREAM);
 
     when(listenerResponseBuilder.getBody()).thenReturn(payload);
-    when(listenerResponseBuilder.getHeaders()).thenReturn(new MultiMap<>());
+    when(listenerResponseBuilder.getHeaders()).thenReturn(new CaseInsensitiveMultiMap());
     when(listenerResponseBuilder.getStatusCode()).thenReturn(OK.getStatusCode());
 
     HttpResponseFactory httpResponseBuilder = new HttpResponseFactory(AUTO, muleContext.getTransformationService());
