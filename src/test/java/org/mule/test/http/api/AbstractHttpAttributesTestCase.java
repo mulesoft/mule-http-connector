@@ -7,6 +7,7 @@
 package org.mule.test.http.api;
 
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.HashMap;
@@ -14,8 +15,8 @@ import java.util.Map;
 
 public class AbstractHttpAttributesTestCase extends AbstractMuleTestCase {
 
-  protected MultiMap<String, String> getHeaders() {
-    MultiMap headers = new MultiMap();
+  protected CaseInsensitiveMultiMap getHeaders() {
+    CaseInsensitiveMultiMap headers = new CaseInsensitiveMultiMap();
     headers.put("header1", "headerValue1");
     headers.put("header2", "headerValue2");
     return headers;

@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.api;
 
-import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 
 /**
  * HTTP listener specific {@link HttpResponseAttributes}. Only this kind of attributes will be considered within an error message.
@@ -17,7 +17,7 @@ public class HttpListenerResponseAttributes extends HttpResponseAttributes {
 
   private static final long serialVersionUID = 3126130644609141675L;
 
-  public HttpListenerResponseAttributes(int statusCode, String reasonPhrase, MultiMap<String, String> headers) {
+  public HttpListenerResponseAttributes(int statusCode, String reasonPhrase, CaseInsensitiveMultiMap headers) {
     super(statusCode, reasonPhrase, headers);
   }
 

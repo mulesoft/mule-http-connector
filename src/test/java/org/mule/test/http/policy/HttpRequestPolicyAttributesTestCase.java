@@ -13,6 +13,7 @@ import static org.junit.Assert.assertThat;
 import org.mule.extension.http.api.policy.HttpPolicyRequestAttributes;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
@@ -41,7 +42,7 @@ public class HttpRequestPolicyAttributesTestCase extends AbstractHttpTestCase {
   @Test
   @Description("When setting HttpPolicyRequestAttributes through DW, pre-existent multi-value headers are preserved")
   public void multiValueHeadersArePreserved() throws Exception {
-    MultiMap<String, String> headers = new MultiMap<>();
+    CaseInsensitiveMultiMap headers = new CaseInsensitiveMultiMap();
     headers.put(HEADER, VALUES);
 
     CoreEvent response = flowRunner("multi-value-headers").withVariable("headers", headers).run();

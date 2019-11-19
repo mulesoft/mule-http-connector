@@ -11,6 +11,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import org.mule.extension.http.api.policy.HttpPolicyRequestAttributes;
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 import org.mule.test.http.api.AbstractHttpAttributesTestCase;
 
 import java.util.HashMap;
@@ -107,25 +108,25 @@ public class HttpPolicyRequestAttributesTestCase extends AbstractHttpAttributesT
 
   @Test
   public void emptyToString() {
-    requestAttributes = new HttpPolicyRequestAttributes(new MultiMap<>(), new MultiMap<>(), new HashMap<>(), null);
+    requestAttributes = new HttpPolicyRequestAttributes(new CaseInsensitiveMultiMap(), new MultiMap<>(), new HashMap<>(), null);
     assertThat(TO_STRING_EMPTY, is(requestAttributes.toString()));
   }
 
   @Test
   public void onlyQueryParamToString() {
-    requestAttributes = new HttpPolicyRequestAttributes(new MultiMap<>(), getQueryParams(), new HashMap<>(), null);
+    requestAttributes = new HttpPolicyRequestAttributes(new CaseInsensitiveMultiMap(), getQueryParams(), new HashMap<>(), null);
     assertThat(TO_STRING_QUERY_PARAMS, is(requestAttributes.toString()));
   }
 
   @Test
   public void onlyUriParamToString() {
-    requestAttributes = new HttpPolicyRequestAttributes(new MultiMap<>(), new MultiMap<>(), getUriParams(), null);
+    requestAttributes = new HttpPolicyRequestAttributes(new CaseInsensitiveMultiMap(), new MultiMap<>(), getUriParams(), null);
     assertThat(TO_STRING_URI_PARAMS, is(requestAttributes.toString()));
   }
 
   @Test
   public void sensitiveContentIsHidden() {
-    MultiMap<String, String> sensitiveDataMultiMap = prepareSensitiveDataMap(new MultiMap<>());
+    CaseInsensitiveMultiMap sensitiveDataMultiMap = prepareSensitiveDataMap(new CaseInsensitiveMultiMap());
     requestAttributes = new HttpPolicyRequestAttributes(sensitiveDataMultiMap, sensitiveDataMultiMap,
                                                         prepareSensitiveDataMap(new HashMap<>()), "/request/path");
     assertThat(TO_STRING_OBFUSCATED, is(requestAttributes.toString()));

@@ -10,7 +10,7 @@ import static java.lang.System.lineSeparator;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import org.mule.extension.http.api.policy.HttpPolicyResponseAttributes;
-import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 import org.mule.test.http.api.AbstractHttpAttributesTestCase;
 
 import org.junit.Before;
@@ -116,7 +116,7 @@ public class HttpPolicyResponseAttributesTestCase extends AbstractHttpAttributes
 
   @Test
   public void sensitiveContentIsHidden() {
-    responseAttributes.setHeaders(prepareSensitiveDataMap(new MultiMap<>()));
+    responseAttributes.setHeaders(prepareSensitiveDataMap(new CaseInsensitiveMultiMap()));
     setUpReasonPhraseToResponseAttributes(responseAttributes);
     setUpStatusCodeToResponseAttributes(responseAttributes);
 

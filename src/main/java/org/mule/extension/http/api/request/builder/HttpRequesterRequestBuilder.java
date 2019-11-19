@@ -17,6 +17,7 @@ import static org.mule.extension.http.internal.HttpConnectorConstants.ENCODE_URI
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 import static org.mule.runtime.extension.api.runtime.parameter.OutboundCorrelationStrategy.AUTO;
+import static org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap.emptyCaseInsensitiveMultiMap;
 import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
 import org.mule.extension.http.api.HttpMessageBuilder;
 import org.mule.extension.http.internal.request.HttpRequesterConfig;
@@ -31,6 +32,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
 import org.mule.runtime.extension.api.runtime.parameter.OutboundCorrelationStrategy;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
 
@@ -60,7 +62,7 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
   @Optional
   @Content
   @NullSafe
-  protected MultiMap<String, String> headers = emptyMultiMap();
+  protected CaseInsensitiveMultiMap headers = emptyCaseInsensitiveMultiMap();
 
   /**
    * URI parameters that should be used to create the request.
@@ -109,13 +111,17 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
   }
 
   @Override
-  public MultiMap<String, String> getHeaders() {
+  public CaseInsensitiveMultiMap getHeaders() {
     return headers;
   }
 
   @Override
   public void setHeaders(MultiMap<String, String> headers) {
-    this.headers = headers != null ? headers : emptyMultiMap();
+    if (headers instanceof CaseInsensitiveMultiMap) {
+      this.headers = (CaseInsensitiveMultiMap) headers;
+    } else {
+      this.headers = new CaseInsensitiveMultiMap(headers);
+    }
   }
 
   public String replaceUriParams(String path) {

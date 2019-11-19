@@ -13,6 +13,7 @@ import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import org.mule.extension.http.api.policy.HttpPolicyRequestAttributes;
 import org.mule.extension.http.api.policy.HttpPolicyRequestAttributesBuilder;
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.HashMap;
@@ -55,8 +56,8 @@ public class HttpPolicyRequestAttributesBuilderTestCase extends AbstractMuleTest
     assertThat(copy.getRequestPath(), is(PATH));
   }
 
-  private MultiMap<String, String> headers() {
-    MultiMap<String, String> headers = new MultiMap<>();
+  private CaseInsensitiveMultiMap headers() {
+    CaseInsensitiveMultiMap headers = new CaseInsensitiveMultiMap();
     headers.put("headerKey", "headerValue");
     return headers;
   }

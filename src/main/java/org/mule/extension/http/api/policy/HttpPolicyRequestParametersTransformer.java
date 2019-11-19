@@ -9,6 +9,7 @@ package org.mule.extension.http.api.policy;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
+import static org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap.emptyCaseInsensitiveMultiMap;
 
 import org.mule.extension.http.api.BaseHttpRequestAttributes;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -19,6 +20,7 @@ import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 
 import com.google.common.collect.ImmutableMap;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 
 import java.util.Map;
 
@@ -47,7 +49,7 @@ public class HttpPolicyRequestParametersTransformer implements OperationPolicyPa
     TypedValue<Object> body = (TypedValue<Object>) parameters.getOrDefault(BODY, new TypedValue<Object>(null, OBJECT));
 
     return Message.builder().payload(body)
-        .attributes(new TypedValue<>(new HttpPolicyRequestAttributes(getMultiMap(parameters, HEADERS),
+        .attributes(new TypedValue<>(new HttpPolicyRequestAttributes(getCaseInsensitiveMultiMap(parameters, HEADERS),
                                                                      getMultiMap(parameters, QUERY_PARAMS),
                                                                      getMap(parameters, URI_PARAMS),
                                                                      (String) parameters.get(PATH)),
@@ -85,5 +87,9 @@ public class HttpPolicyRequestParametersTransformer implements OperationPolicyPa
 
   private Map<String, String> getMap(Map<String, Object> parameters, String key) {
     return (Map<String, String>) parameters.getOrDefault(key, emptyMultiMap());
+  }
+
+  private CaseInsensitiveMultiMap getCaseInsensitiveMultiMap(Map<String, Object> parameters, String key) {
+    return (CaseInsensitiveMultiMap) parameters.getOrDefault(key, emptyCaseInsensitiveMultiMap());
   }
 }

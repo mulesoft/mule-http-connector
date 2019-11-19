@@ -12,6 +12,7 @@ import org.mule.extension.http.internal.request.HttpRequester;
 import org.mule.extension.http.internal.request.HttpResponseToResult;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 import org.mule.runtime.http.api.server.HttpServerProperties;
 
 /**
@@ -22,7 +23,7 @@ import org.mule.runtime.http.api.server.HttpServerProperties;
 @NoExtend
 public abstract class HttpMessageBuilder {
 
-  public abstract MultiMap<String, String> getHeaders();
+  public abstract CaseInsensitiveMultiMap getHeaders();
 
   public abstract void setHeaders(MultiMap<String, String> headers);
 

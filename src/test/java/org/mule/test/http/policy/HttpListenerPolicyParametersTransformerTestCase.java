@@ -24,6 +24,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import com.google.common.collect.ImmutableMap;
@@ -44,7 +45,7 @@ public class HttpListenerPolicyParametersTransformerTestCase extends AbstractMul
   private static final MediaType EXPECTED_MEDIA_TYPE = MediaType.APPLICATION_JSON;
 
   //HttpRequestAttributes parameters
-  private static final MultiMap<String, String> HEADERS = new MultiMap<>();
+  private static final CaseInsensitiveMultiMap HEADERS = new CaseInsensitiveMultiMap();
   private static final String LISTENER_PATH = "/test";
   private static final String RELATIVE_PATH = "/";
   private static final String VERSION = "1";

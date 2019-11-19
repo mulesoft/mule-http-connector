@@ -6,6 +6,7 @@
  */
 package org.mule.test.http.functional.listener;
 
+import static com.google.common.collect.ImmutableMap.of;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.http.client.fluent.Request.Get;
 import static org.hamcrest.Matchers.containsString;
@@ -34,6 +35,7 @@ import static org.mule.test.http.functional.matcher.HttpResponseContentStringMat
 import static org.mule.test.http.functional.matcher.HttpResponseHeaderStringMatcher.header;
 import static org.mule.test.http.functional.matcher.HttpResponseReasonPhraseMatcher.hasReasonPhrase;
 import static org.mule.test.http.functional.matcher.HttpResponseStatusCodeMatcher.hasStatusCode;
+
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.functional.junit4.rules.HttpServerRule;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -44,6 +46,7 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.HttpConstants.HttpStatus;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
@@ -199,8 +202,7 @@ public class HttpListenerErrorInterpretationTestCase extends AbstractHttpTestCas
   }
 
   void createListenerResponseAttributes(HttpStatus status) {
-    MultiMap<String, String> headers = new MultiMap<>();
-    headers.put(HEADER_NAME, HEADER_VALUE);
+    CaseInsensitiveMultiMap headers = new CaseInsensitiveMultiMap(new MultiMap<>(of(HEADER_NAME, HEADER_VALUE)));
     attributesToSend = new HttpListenerResponseAttributes(status.getStatusCode(), status.getReasonPhrase(), headers);
   }
 

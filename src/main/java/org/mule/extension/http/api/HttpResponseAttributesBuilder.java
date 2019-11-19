@@ -7,9 +7,9 @@
 package org.mule.extension.http.api;
 
 import static java.util.Objects.requireNonNull;
-import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
+import static org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap.emptyCaseInsensitiveMultiMap;
 
-import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 
 /**
  * Builder for {@link HttpResponseAttributes}.
@@ -18,7 +18,7 @@ import org.mule.runtime.api.util.MultiMap;
  */
 public class HttpResponseAttributesBuilder {
 
-  private MultiMap<String, String> headers = emptyMultiMap();
+  private CaseInsensitiveMultiMap headers = emptyCaseInsensitiveMultiMap();
   private int statusCode;
   private String reasonPhrase;
 
@@ -30,7 +30,7 @@ public class HttpResponseAttributesBuilder {
     this.reasonPhrase = attributes.getReasonPhrase();
   }
 
-  public HttpResponseAttributesBuilder headers(MultiMap<String, String> headers) {
+  public HttpResponseAttributesBuilder headers(CaseInsensitiveMultiMap headers) {
     requireNonNull(headers, "HTTP headers cannot be null.");
     this.headers = headers;
     return this;

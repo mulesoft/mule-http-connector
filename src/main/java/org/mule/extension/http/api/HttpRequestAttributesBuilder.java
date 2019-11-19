@@ -10,8 +10,10 @@ import static java.lang.String.valueOf;
 import static java.util.Collections.emptyMap;
 import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
+import static org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap.emptyCaseInsensitiveMultiMap;
 
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 
 import java.security.cert.Certificate;
 import java.util.Map;
@@ -27,7 +29,7 @@ public class HttpRequestAttributesBuilder {
   private static final char SLASH = '/';
   private static final String WILDCARD = "*";
 
-  private MultiMap<String, String> headers = emptyMultiMap();
+  private CaseInsensitiveMultiMap headers = emptyCaseInsensitiveMultiMap();
   private MultiMap<String, String> queryParams = emptyMultiMap();
   private Map<String, String> uriParams = emptyMap();
   private String requestPath;
@@ -69,7 +71,7 @@ public class HttpRequestAttributesBuilder {
     this.clientCertificate = requestAttributes::getClientCertificate;
   }
 
-  public HttpRequestAttributesBuilder headers(MultiMap<String, String> headers) {
+  public HttpRequestAttributesBuilder headers(CaseInsensitiveMultiMap headers) {
     requireNonNull(headers, "HTTP headers cannot be null.");
     this.headers = headers;
     return this;

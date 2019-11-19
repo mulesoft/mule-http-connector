@@ -14,6 +14,7 @@ import static org.mule.runtime.api.metadata.DataType.ATOM_STRING;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.api.metadata.TypedValue.of;
+import static org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap.emptyCaseInsensitiveMultiMap;
 
 import org.mule.extension.http.api.policy.HttpPolicyRequestAttributes;
 import org.mule.extension.http.api.policy.HttpPolicyRequestParametersTransformer;
@@ -21,6 +22,7 @@ import org.mule.extension.http.api.policy.HttpPolicyResponseAttributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.HashMap;
@@ -30,7 +32,7 @@ import org.junit.Test;
 
 public class HttpRequestPolicyParametersTransformerTestCase extends AbstractMuleTestCase {
 
-  private static final MultiMap<String, String> HEADERS = new MultiMap<>(of("header", "headerValue"));
+  private static final CaseInsensitiveMultiMap HEADERS = new CaseInsensitiveMultiMap(new MultiMap<>(of("header", "headerValue")));
   private static final MultiMap<String, String> QUERY_PARAMS = new MultiMap<>(of("queryParam", "queryParamValue"));
   private static final MultiMap<String, String> URI_PARAMS = new MultiMap<>(of("uriParam", "uriParamValue"));
 
@@ -122,7 +124,7 @@ public class HttpRequestPolicyParametersTransformerTestCase extends AbstractMule
   public void fromMessageToParametersMissingAttributesProperty() {
     TypedValue<Object> payload = new TypedValue<>(BODY, ATOM_STRING);
     TypedValue<HttpPolicyRequestAttributes> attributes =
-        of(new HttpPolicyRequestAttributes(emptyMultiMap(), null, null, null));
+        of(new HttpPolicyRequestAttributes(emptyCaseInsensitiveMultiMap(), null, null, null));
     Message message = Message.builder().payload(payload).attributes(attributes).build();
 
     Map<String, Object> parameters = transformer.fromMessageToParameters(message);
