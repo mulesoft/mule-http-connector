@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.hamcrest.Matchers;
 import org.junit.Rule;
@@ -154,5 +155,17 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase {
   public void acceptsTransferEncodingHeader() throws Exception {
     flowRunner("transferEncodingHeader").withPayload(TEST_MESSAGE).run();
     assertThat(getFirstReceivedHeader(TRANSFER_ENCODING), is(encoding.getValue()));
+  }
+
+  @Test
+  public void headersAddedInTheRegistryAreAddedToEachRequest() throws Exception {
+    Optional<HashMap<String, String>> headers = registry.lookupByName("http.request.fixedHeadersRegistry");
+    headers.map(hh -> hh.put("testName1", "testValue1"));
+    headers.map(hh -> hh.put("testName2", "testValue2"));
+
+    flowRunner("headerMap").withPayload(TEST_MESSAGE).run();
+
+    assertThat(getFirstReceivedHeader("testName1"), equalTo("testValue1"));
+    assertThat(getFirstReceivedHeader("testName2"), equalTo("testValue2"));
   }
 }

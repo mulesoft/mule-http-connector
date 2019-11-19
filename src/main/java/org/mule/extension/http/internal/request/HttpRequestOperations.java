@@ -52,8 +52,10 @@ import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.http.api.HttpConstants;
 
 import java.io.InputStream;
+import java.util.HashMap;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,6 +74,9 @@ public class HttpRequestOperations implements Initialisable, Disposable {
   private TransformationService transformationService;
   @Inject
   private SchedulerService schedulerService;
+  @Inject
+  @Named("http.request.fixedHeadersRegistry")
+  private HashMap<String, String> injectedHeaders;
 
   private Scheduler scheduler;
 
@@ -132,7 +137,7 @@ public class HttpRequestOperations implements Initialisable, Disposable {
       REQUESTER.doRequest(client, config, resolvedUri, method, overrides.getRequestStreamingMode(), overrides.getSendBodyMode(),
                           overrides.getFollowRedirects(), client.getDefaultAuthentication(), resolvedTimeout, responseValidator,
                           transformationService, resolvedBuilder, true, muleContext, scheduler, notificationEmitter,
-                          streamingHelper, callback);
+                          streamingHelper, callback, injectedHeaders);
     } catch (Throwable t) {
       callback.error(t instanceof Exception ? (Exception) t : new DefaultMuleException(t));
     }
