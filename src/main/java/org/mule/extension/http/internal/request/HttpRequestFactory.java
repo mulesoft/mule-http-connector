@@ -99,7 +99,7 @@ public class HttpRequestFactory {
   public HttpRequest create(HttpRequesterConfig config, String uri, String method, HttpStreamingType streamingMode,
                             HttpSendBodyMode sendBodyMode, TransformationService transformationService,
                             HttpRequesterRequestBuilder requestBuilder, HttpRequestAuthentication authentication,
-                            Map<String, String> injectedHeaders) {
+                            Map<String, List<String>> injectedHeaders) {
     HttpRequestBuilder builder = requestBuilder.configure(config)
         .uri(uri)
         .method(method);
@@ -107,7 +107,11 @@ public class HttpRequestFactory {
     config.getDefaultHeaders()
         .forEach(header -> builder.addHeader(header.getKey(), header.getValue()));
 
-    injectedHeaders.forEach(builder::addHeader);
+    injectedHeaders.forEach((headerName, headerValues) -> {
+      for (String headerValue : headerValues) {
+        builder.addHeader(headerName, headerValue);
+      }
+    });
 
     config.getDefaultQueryParams()
         .forEach(param -> builder.addQueryParam(param.getKey(), param.getValue()));
