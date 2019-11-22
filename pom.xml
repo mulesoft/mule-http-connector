@@ -27,7 +27,7 @@
         <javaxMailVersion>1.4.3</javaxMailVersion>
         <jettyVersion>9.0.7.v20131107</jettyVersion>
 
-        <commonsLangVersion>3.7</commonsLangVersion>
+        <commonsLangVersion>3.9</commonsLangVersion>
         <commonsIoVersion>2.6</commonsIoVersion>
         <guavaVersion>25.1-jre</guavaVersion>
         <formatterConfigPath>formatter.xml</formatterConfigPath>
