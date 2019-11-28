@@ -24,7 +24,6 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import java.io.IOException;
 import java.util.Collection;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
@@ -98,11 +97,7 @@ public class HttpRequestOutboundPartsTestCase extends AbstractHttpRequestTestCas
     MultiPartInputStreamParser inputStreamParser =
         new MultiPartInputStreamParser(request.getInputStream(), request.getContentType(), null, null);
 
-    try {
-      parts = inputStreamParser.getParts();
-    } catch (ServletException e) {
-      throw new IOException(e);
-    }
+    parts = inputStreamParser.getParts();
 
     response.setContentType(HTML.toString());
     response.setStatus(HttpServletResponse.SC_OK);

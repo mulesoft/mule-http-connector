@@ -119,7 +119,7 @@ public abstract class AbstractHttpRequestTestCase extends AbstractHttpTestCase {
 
   protected void extractBaseRequestParts(Request baseRequest) throws IOException {
     method = baseRequest.getMethod();
-    uri = baseRequest.getUri().getCompletePath();
+    uri = baseRequest.getHttpURI().getPathQuery();
 
     extractHeadersFromBaseRequest(baseRequest);
 

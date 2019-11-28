@@ -212,11 +212,7 @@ public class HttpListenerPartsTestCase extends AbstractHttpTestCase {
                                                                                   entity.getContentType().getValue(),
                                                                                   null, null);
     Collection<Part> parts;
-    try {
-      parts = inputStreamParser.getParts();
-    } catch (ServletException e) {
-      throw new IOException(e);
-    }
+    parts = inputStreamParser.getParts();
     return parts;
   }
 
