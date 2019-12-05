@@ -22,6 +22,8 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
 import java.io.ByteArrayInputStream;
@@ -37,7 +39,10 @@ import org.junit.Rule;
 
 public abstract class HttpListenerResponseStreamingTestCase extends AbstractHttpTestCase {
 
-  private static final int DEFAULT_TIMEOUT = 5000;
+  private static final int DEFAULT_TIMEOUT = 10000;
+
+  private static final int POOLING_FREQUENCY_MILLIS = 1000;
+  private static final int POOLING_TIMEOUT_MILLIS = 20000;
 
   public static final String TEST_BODY = RandomStringUtils.randomAlphabetic(100 * 1024);
   public static final String TEST_BODY_MAP = "one=1&two=2";
@@ -99,7 +104,18 @@ public abstract class HttpListenerResponseStreamingTestCase extends AbstractHttp
   }
 
   protected void streamIsClosed() {
-    assertThat(testStream.isClosed(), is(true));
+    new PollingProber(POOLING_TIMEOUT_MILLIS, POOLING_FREQUENCY_MILLIS).check(new Probe() {
+
+      @Override
+      public boolean isSatisfied() {
+        return testStream.isClosed();
+      }
+
+      @Override
+      public String describeFailure() {
+        return "The test stream was not closed.";
+      }
+    });
   }
 
   private HttpResponse verifyIsContentLength(String url, HttpVersion httpVersion) throws IOException {
