@@ -7,6 +7,7 @@
 package org.mule.extension.http.api.listener;
 
 import static java.lang.Boolean.getBoolean;
+import static java.util.Collections.emptyMap;
 import static org.mule.extension.http.api.HttpHeaders.Names.AUTHORIZATION;
 import static org.mule.extension.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
 import static org.mule.extension.http.internal.HttpConnectorConstants.BASIC_LAX_DECODING_PROPERTY;
@@ -14,10 +15,12 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.authFailedForUser;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
+
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.internal.filter.BasicUnauthorisedException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.Credentials;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
@@ -34,6 +37,7 @@ import org.mule.runtime.extension.api.security.AuthenticationHandler;
 import java.util.Base64;
 import java.util.Base64.Decoder;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,7 +124,10 @@ public class HttpBasicAuthenticationFilter {
           .build();
 
       try {
-        authenticationHandler.setAuthentication(securityProviders, authenticationHandler.createAuthentication(credentials));
+        authenticationHandler
+            .setAuthentication(securityProviders,
+                               authenticationHandler.createAuthentication(credentials)
+                                   .setProperties(authenticationProperties(authenticationHandler)));
       } catch (UnauthorisedException e) {
         if (logger.isDebugEnabled()) {
           logger.debug("Authentication request for user: " + username + " failed: " + e.toString());
@@ -138,6 +145,10 @@ public class HttpBasicAuthenticationFilter {
       throw new UnsupportedAuthenticationSchemeException(createStaticMessage("Http Basic filter doesn't know how to handle header "
           + header), createUnauthenticatedMessage());
     }
+  }
+
+  private Map<String, Object> authenticationProperties(AuthenticationHandler authenticationHandler) {
+    return authenticationHandler.getAuthentication().map(Authentication::getProperties).orElse(emptyMap());
   }
 
   private Message createUnauthenticatedMessage() {
