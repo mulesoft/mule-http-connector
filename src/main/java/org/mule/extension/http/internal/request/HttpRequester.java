@@ -57,6 +57,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.channels.UnresolvedAddressException;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
@@ -102,13 +104,14 @@ public class HttpRequester {
                         int responseTimeout, ResponseValidator responseValidator,
                         TransformationService transformationService, HttpRequesterRequestBuilder requestBuilder,
                         boolean checkRetry, MuleContext muleContext, Scheduler scheduler, NotificationEmitter notificationEmitter,
-                        StreamingHelper streamingHelper, CompletionCallback<InputStream, HttpResponseAttributes> callback) {
+                        StreamingHelper streamingHelper, CompletionCallback<InputStream, HttpResponseAttributes> callback,
+                        Map<String, List<String>> injectedHeaders) {
     doRequestWithRetry(client, config, uri, method, streamingMode, sendBodyMode, followRedirects, authentication, responseTimeout,
                        responseValidator, transformationService, requestBuilder, checkRetry, muleContext, scheduler,
                        notificationEmitter, streamingHelper, callback,
                        EVENT_TO_HTTP_REQUEST.create(config, uri, method, streamingMode, sendBodyMode, transformationService,
-                                                    requestBuilder, authentication),
-                       RETRY_ATTEMPTS);
+                                                    requestBuilder, authentication, injectedHeaders),
+                       RETRY_ATTEMPTS, injectedHeaders);
   }
 
   private void doRequestWithRetry(HttpExtensionClient client, HttpRequesterConfig config, String uri, String method,
@@ -120,7 +123,7 @@ public class HttpRequester {
                                   NotificationEmitter notificationEmitter,
                                   StreamingHelper streamingHelper,
                                   CompletionCallback<InputStream, HttpResponseAttributes> callback, HttpRequest httpRequest,
-                                  int retryCount) {
+                                  int retryCount, Map<String, List<String>> injectedHeaders) {
     fireNotification(notificationEmitter, REQUEST_START, () -> HttpRequestNotificationData.from(httpRequest),
                      REQUEST_NOTIFICATION_DATA_TYPE);
 
@@ -139,7 +142,7 @@ public class HttpRequester {
                 doRequest(client, config, uri, method, streamingMode, sendBodyMode, followRedirects,
                           authentication, responseTimeout, responseValidator, transformationService,
                           requestBuilder, false, muleContext, scheduler, notificationEmitter,
-                          streamingHelper, callback);
+                          streamingHelper, callback, injectedHeaders);
               }, () -> {
                 responseValidator.validate(result, httpRequest, streamingHelper);
                 callback.success(result);
@@ -155,7 +158,7 @@ public class HttpRequester {
                                  authentication, responseTimeout, responseValidator, transformationService,
                                  requestBuilder, checkRetry, muleContext, scheduler, notificationEmitter,
                                  streamingHelper, callback,
-                                 httpRequest, retryCount - 1);
+                                 httpRequest, retryCount - 1, injectedHeaders);
               return;
             }
 
