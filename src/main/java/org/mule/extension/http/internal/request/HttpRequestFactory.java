@@ -54,9 +54,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 import sun.misc.IOUtils;
 
@@ -96,13 +98,20 @@ public class HttpRequestFactory {
    */
   public HttpRequest create(HttpRequesterConfig config, String uri, String method, HttpStreamingType streamingMode,
                             HttpSendBodyMode sendBodyMode, TransformationService transformationService,
-                            HttpRequesterRequestBuilder requestBuilder, HttpRequestAuthentication authentication) {
+                            HttpRequesterRequestBuilder requestBuilder, HttpRequestAuthentication authentication,
+                            Map<String, List<String>> injectedHeaders) {
     HttpRequestBuilder builder = requestBuilder.configure(config)
         .uri(uri)
         .method(method);
 
     config.getDefaultHeaders()
         .forEach(header -> builder.addHeader(header.getKey(), header.getValue()));
+
+    injectedHeaders.forEach((headerName, headerValues) -> {
+      for (String headerValue : headerValues) {
+        builder.addHeader(headerName, headerValue);
+      }
+    });
 
     config.getDefaultQueryParams()
         .forEach(param -> builder.addQueryParam(param.getKey(), param.getValue()));
