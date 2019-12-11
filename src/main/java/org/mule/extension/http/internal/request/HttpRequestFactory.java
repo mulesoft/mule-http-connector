@@ -48,6 +48,9 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalLong;
+import java.util.Set;
+import java.util.function.BiConsumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,7 +98,8 @@ public class HttpRequestFactory {
    * @return an {@HttpRequest} configured based on the parameters.
    * @throws MuleException if the request creation fails.
    */
-  public HttpRequest create(HttpRequesterRequestBuilder requestBuilder, HttpRequestAuthentication authentication) {
+  public HttpRequest create(HttpRequesterRequestBuilder requestBuilder, HttpRequestAuthentication authentication,
+                            Map<String, List<String>> injectedHeaders) {
     HttpRequestBuilder builder = HttpRequest.builder(PRESERVE_HEADER_CASE);
 
 
@@ -106,6 +110,12 @@ public class HttpRequestFactory {
 
     config.getDefaultHeaders()
         .forEach(header -> builder.addHeader(header.getKey(), header.getValue()));
+
+    injectedHeaders.forEach((headerName, headerValues) -> {
+      for (String headerValue : headerValues) {
+        builder.addHeader(headerName, headerValue);
+      }
+    });
 
     config.getDefaultQueryParams()
         .forEach(param -> builder.addQueryParam(param.getKey(), param.getValue()));

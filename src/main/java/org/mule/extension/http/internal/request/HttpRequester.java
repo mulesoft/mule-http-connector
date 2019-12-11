@@ -48,6 +48,8 @@ import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 import org.slf4j.Logger;
@@ -91,15 +93,15 @@ public class HttpRequester {
 
   public void doRequest(HttpExtensionClient client, HttpRequesterRequestBuilder requestBuilder,
                         boolean checkRetry, MuleContext muleContext,
-                        CompletionCallback<InputStream, HttpResponseAttributes> callback) {
+                        CompletionCallback<InputStream, HttpResponseAttributes> callback, Map<String, List<String>> injectedHeaders) {
     doRequestWithRetry(client, requestBuilder, checkRetry, muleContext, callback,
-                       eventToHttpRequest.create(requestBuilder, authentication), retryAttempts);
+                       eventToHttpRequest.create(requestBuilder, authentication), retryAttempts, injectedHeaders);
   }
 
   private void doRequestWithRetry(HttpExtensionClient client, HttpRequesterRequestBuilder requestBuilder,
                                   boolean checkRetry, MuleContext muleContext,
                                   CompletionCallback<InputStream, HttpResponseAttributes> callback, HttpRequest httpRequest,
-                                  int retryCount) {
+                                  int retryCount, Map<String, List<String>> injectedHeaders) {
     notificationEmitter.fire(REQUEST_START, of(HttpRequestNotificationData.from(httpRequest)));
     client.send(httpRequest, responseTimeout, followRedirects, resolveAuthentication(authentication))
         .whenComplete(
@@ -112,7 +114,7 @@ public class HttpRequester {
                                 try {
                                   if (resendRequest(result, checkRetry, authentication)) {
                                     scheduler.submit(() -> consumePayload(result));
-                                    doRequest(client, requestBuilder, false, muleContext, callback);
+                                    doRequest(client, requestBuilder, false, muleContext, callback, injectedHeaders);
                                   } else {
                                     responseValidator.validate(result, httpRequest);
                                     callback.success(result);
@@ -128,7 +130,7 @@ public class HttpRequester {
 
                           if (shouldRetryRemotelyClosed(exception, retryCount, httpRequest.getMethod())) {
                             doRequestWithRetry(client, requestBuilder, checkRetry, muleContext, callback, httpRequest,
-                                               retryCount - 1);
+                                               retryCount - 1, injectedHeaders);
                             return;
                           }
 
