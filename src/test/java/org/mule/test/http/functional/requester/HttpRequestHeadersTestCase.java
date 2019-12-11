@@ -6,6 +6,7 @@
  */
 package org.mule.test.http.functional.requester;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -25,12 +26,12 @@ import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.tck.junit4.rule.SystemProperty;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-import org.hamcrest.Matchers;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -105,7 +106,7 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase {
     flowRunner("headerOverride").withPayload(TEST_MESSAGE).withVariable("headers", params).run();
 
     final Collection<String> values = headers.get("testName1");
-    assertThat(values, Matchers.containsInAnyOrder(Arrays.asList("testValue1", "testValueNew").toArray(new String[2])));
+    assertThat(values, containsInAnyOrder("testValue1", "testValueNew"));
     assertThat(getFirstReceivedHeader("testName2"), equalTo("testValue2"));
   }
 
@@ -154,5 +155,17 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase {
   public void acceptsTransferEncodingHeader() throws Exception {
     flowRunner("transferEncodingHeader").withPayload(TEST_MESSAGE).run();
     assertThat(getFirstReceivedHeader(TRANSFER_ENCODING), is(encoding.getValue()));
+  }
+
+  @Test
+  public void headersAddedInTheRegistryAreAddedToTheRequest() throws Exception {
+    Optional<HashMap<String, List<String>>> registryHeaders = registry.lookupByName("http.request.fixedHeadersRegistry");
+    registryHeaders.map(hh -> hh.put("testName1", asList("testValue1.1", "testValue1.2")));
+    registryHeaders.map(hh -> hh.put("testName2", asList("testValue2.1", "testValue2.2", "testValue2.3")));
+
+    flowRunner("headerMap").withPayload(TEST_MESSAGE).run();
+
+    assertThat(headers.get("testName1"), containsInAnyOrder("testValue1.1", "testValue1.2"));
+    assertThat(headers.get("testName2"), containsInAnyOrder("testValue2.1", "testValue2.2", "testValue2.3"));
   }
 }
