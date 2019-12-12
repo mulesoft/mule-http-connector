@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+      xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+                          http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+                          http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+                          http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd">
+
+    <munit:config name="attributes-created-dw" minMuleVersion="4.3.0"/>
+
+    <munit:test name="mockAuthorizationRequest" description="Validates that the authorization request can be mocked">
+        <munit:execution>
+            <set-payload value="#[{method : 'POST', headers: {Authorization: 'Basic YWRtaW46YWRtaW4='}, listenerPath: '/', relativePath: '/', version: 'HTTP/1.1', scheme: 'http', requestPath: '/', requestUri: 'localhost:8080/', localAddress: '127.0.0.1', remoteAddress: '127.0.0.1' } as Object { class : 'org.mule.extension.http.api.HttpRequestAttributes'}]"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[payload.headers['Authorization']]" is="#[MunitTools::equalTo('Basic YWRtaW46YWRtaW4=')]"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="mockAuthorizationResponse" description="Validates that the authorization response can be mocked" >
+        <munit:execution>
+            <set-payload value="#[{statusCode : 200, headers: {Authorization: 'Basic YWRtaW46YWRtaW4='} } as Object { class : 'org.mule.extension.http.api.HttpResponseAttributes'}]"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[payload.headers['Authorization']]" is="#[MunitTools::equalTo('Basic YWRtaW46YWRtaW4=')]"/>
+        </munit:validation>
+    </munit:test>
+
+</mule>
