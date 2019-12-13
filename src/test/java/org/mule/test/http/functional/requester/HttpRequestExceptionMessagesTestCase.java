@@ -7,8 +7,8 @@
 package org.mule.test.http.functional.requester;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.anyOf;
+import static org.hamcrest.Matchers.containsString;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.ERRORS;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.ERROR_HANDLING;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -32,7 +32,13 @@ public class HttpRequestExceptionMessagesTestCase extends AbstractHttpRequestTes
   @Test
   public void errorMessageIsLoadedFromCauseIfNull() throws Exception {
     Exception exception = flowRunner("requesterFlow").runExpectingException();
-    assertThat(exception.getMessage(), not(isEmptyOrNullString()));
+    String msg = exception.getMessage();
+    assertThat(msg, containsString("HTTP GET on resource 'http://notarealsite.mulesoft:124/fakeresource'"));
+
+    // Using runtime version 4.1.1, the message contains the name of the exception: "UnresolvedAddressException"
+    // Using latest, the message is "Couldn't resolve address"
+    assertThat(msg, anyOf(containsString("UnresolvedAddressException"),
+                          containsString("Couldn't resolve address")));
   }
 
 }
