@@ -7,6 +7,7 @@
 package org.mule.extension.http.api;
 
 import static java.lang.System.lineSeparator;
+
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
@@ -18,6 +19,10 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 public class HttpResponseAttributes extends HttpAttributes {
 
   private static final long serialVersionUID = -3131769059554988414L;
+
+  public static HttpResponseAttributesBuilder builder() {
+    return new HttpResponseAttributesBuilder();
+  }
 
   /**
    * HTTP status code of the response. Former 'http.status'.
@@ -45,6 +50,7 @@ public class HttpResponseAttributes extends HttpAttributes {
     return reasonPhrase;
   }
 
+  @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();
 
