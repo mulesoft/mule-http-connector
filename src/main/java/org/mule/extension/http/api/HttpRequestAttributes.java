@@ -7,7 +7,9 @@
 package org.mule.extension.http.api;
 
 import static java.lang.System.lineSeparator;
+
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
+
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.api.util.SerializableLazyValue;
 import org.mule.runtime.extension.api.annotation.param.Optional;
