@@ -18,8 +18,6 @@ import org.mule.runtime.http.api.domain.message.response.HttpResponse;
  */
 public class HttpResponseAttributesBuilder {
 
-  HttpResponse response;
-
   private MultiMap<String, String> headers = emptyMultiMap();
   private int statusCode;
   private String reasonPhrase;
@@ -29,7 +27,6 @@ public class HttpResponseAttributesBuilder {
     this.statusCode = response.getStatusCode();
     this.reasonPhrase = response.getReasonPhrase();
 
-    this.response = response;
     return this;
   }
 
