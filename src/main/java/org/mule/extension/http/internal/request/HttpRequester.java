@@ -14,6 +14,7 @@ import static org.mule.extension.http.api.error.HttpError.CONNECTIVITY;
 import static org.mule.extension.http.api.error.HttpError.TIMEOUT;
 import static org.mule.extension.http.api.notification.HttpNotificationAction.REQUEST_COMPLETE;
 import static org.mule.extension.http.api.notification.HttpNotificationAction.REQUEST_START;
+import static org.mule.extension.http.internal.ConsumerDecorator.withMdc;
 import static org.mule.extension.http.internal.HttpConnectorConstants.DEFAULT_RETRY_ATTEMPTS;
 import static org.mule.extension.http.internal.HttpConnectorConstants.IDEMPOTENT_METHODS;
 import static org.mule.extension.http.internal.HttpConnectorConstants.REMOTELY_CLOSED;
@@ -128,7 +129,7 @@ public class HttpRequester {
                      REQUEST_NOTIFICATION_DATA_TYPE);
 
     client.send(httpRequest, responseTimeout, followRedirects, resolveAuthentication(authentication))
-        .whenComplete((response, exception) -> {
+        .whenComplete(withMdc((response, exception) -> {
           if (response != null) {
             try {
               fireNotification(notificationEmitter, REQUEST_COMPLETE, () -> HttpResponseNotificationData.from(response),
@@ -169,7 +170,7 @@ public class HttpRequester {
                             getExceptionMessage(exception))),
                                                           exception, error));
           }
-        });
+        }));
   }
 
   private String getExceptionMessage(Throwable t) {
