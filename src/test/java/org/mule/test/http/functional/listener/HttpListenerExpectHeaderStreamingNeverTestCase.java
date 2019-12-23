@@ -8,6 +8,7 @@ package org.mule.test.http.functional.listener;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+import static java.util.Arrays.asList;
 import static org.apache.commons.io.IOUtils.read;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -16,6 +17,7 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.http.api.HttpHeaders.Names.EXPECT;
 import static org.mule.runtime.http.api.HttpHeaders.Names.HOST;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CONTINUE;
+
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;
@@ -26,16 +28,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.StringReader;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.Arrays;
 import java.util.Collection;
 
+import org.apache.commons.io.input.ReaderInputStream;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 @RunnerDelegateTo(Parameterized.class)
 public class HttpListenerExpectHeaderStreamingNeverTestCase extends AbstractHttpTestCase {
@@ -55,9 +59,9 @@ public class HttpListenerExpectHeaderStreamingNeverTestCase extends AbstractHttp
   private InputStream inputStream;
   private OutputStream outputStream;
 
-  @Parameterized.Parameters
-  public static Collection<Object[]> parameters() {
-    return Arrays.asList(new Object[][] {{TRUE.toString()}, {FALSE.toString()}});
+  @Parameters
+  public static Collection<Object> parameters() {
+    return asList(TRUE.toString(), FALSE.toString());
   }
 
   @Override
@@ -174,6 +178,10 @@ public class HttpListenerExpectHeaderStreamingNeverTestCase extends AbstractHttp
 
   protected String getExpectedResponseBody() {
     return TEST_MESSAGE;
+  }
+
+  public static InputStream toStream(String value) {
+    return new ReaderInputStream(new StringReader(value));
   }
 
 }
