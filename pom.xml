@@ -44,7 +44,7 @@
         <munit.output.directory>${basedir}/target/test-mule/munit</munit.output.directory>
         <munit.extensions.maven.plugin.version>1.0.0-BETA4</munit.extensions.maven.plugin.version>
         <munit.version>2.2.3-SNAPSHOT</munit.version>
-        <mtf-tools.version>1.0.0-BETA4</mtf-tools.version>
+        <mtf-tools.version>1.0.0-SNAPSHOT</mtf-tools.version>
         <mavenResources.version>3.0.2</mavenResources.version>
     </properties>
 
