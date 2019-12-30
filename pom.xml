@@ -44,6 +44,7 @@
         <munit.version>2.2.3</munit.version>
         <mtf-tools.version>1.0.0</mtf-tools.version>
         <mavenResources.version>3.0.2</mavenResources.version>
+        
     </properties>
 
     <build>
