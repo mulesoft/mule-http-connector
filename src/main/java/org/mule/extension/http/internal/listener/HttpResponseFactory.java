@@ -101,8 +101,7 @@ public class HttpResponseFactory {
   public HttpResponse create(HttpResponseBuilder responseBuilder,
                              Interception interception,
                              HttpListenerResponseBuilder listenerResponseBuilder,
-                             boolean supportsTransferEncoding)
-      throws IOException {
+                             boolean supportsTransferEncoding) {
 
     final HttpResponseHeaderBuilder httpResponseHeaderBuilder = new HttpResponseHeaderBuilder(responseBuilder);
 
@@ -116,7 +115,6 @@ public class HttpResponseFactory {
 
     final String existingTransferEncoding = httpResponseHeaderBuilder.getTransferEncoding();
     final String existingContentLength = httpResponseHeaderBuilder.getContentLength();
-    final boolean hasLength = body.getLength().isPresent();
 
     HttpEntity httpEntity;
     Object payload = body.getValue();
