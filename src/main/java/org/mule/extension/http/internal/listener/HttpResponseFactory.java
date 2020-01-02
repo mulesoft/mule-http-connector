@@ -57,7 +57,7 @@ public class HttpResponseFactory {
 
   private Logger logger = LoggerFactory.getLogger(getClass());
 
-  private HttpStreamingType responseStreaming = AUTO;
+  private HttpStreamingType responseStreaming;
   private TransformationService transformationService;
   private Map<Class, TriFunction<TypedValue, Boolean, HttpResponseHeaderBuilder, HttpEntity>> payloadHandlerMapper;
 
@@ -169,8 +169,10 @@ public class HttpResponseFactory {
 
     headers.keySet().forEach(key -> {
       if (!supportsTransferEncoding && HEADER_TRANSFER_ENCODING.equalsIgnoreCase(key)) {
-        logger.debug(
-                     "Client HTTP version is lower than 1.1 so the unsupported 'Transfer-Encoding' header has been removed and 'Content-Length' will be sent instead.");
+        if (logger.isDebugEnabled()) {
+          logger.debug(
+                       "Client HTTP version is lower than 1.1 so the unsupported 'Transfer-Encoding' header has been removed and 'Content-Length' will be sent instead.");
+        }
       } else {
         httpResponseHeaderBuilder.addHeader(key, headers.getAll(key));
       }
@@ -189,7 +191,6 @@ public class HttpResponseFactory {
     }
     return reasonPhrase;
   }
-  
 
   /**
    * Generates an {@link InputStreamHttpEntity} without length and makes chunking explicit if supported

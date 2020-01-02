@@ -17,7 +17,7 @@ public class HttpListenerRevocationOutdatedCrlTestCase extends AbstractHttpListe
   }
 
   @Test
-  public void testClientCertifiedAndOutdatedCrl() throws Exception {
+  public void testClientCertifiedAndOutdatedCrl() {
     try {
       runRevocationTestFlow();
       fail("Expected exception but nothing was thrown");
