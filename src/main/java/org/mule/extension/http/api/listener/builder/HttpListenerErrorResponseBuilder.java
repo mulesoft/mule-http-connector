@@ -17,6 +17,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
+import shapeless.PolyDefns;
 
 /**
  * Implementation of {@link HttpListenerResponseBuilder} which returns error responses
@@ -97,10 +98,14 @@ public class HttpListenerErrorResponseBuilder extends HttpListenerResponseBuilde
 
   @Override
   public void setHeaders(MultiMap<String, String> headers) {
-    if (headers instanceof CaseInsensitiveMultiMap) {
-      this.headers = (CaseInsensitiveMultiMap) headers;
+    if (headers != null) {
+      if (headers instanceof CaseInsensitiveMultiMap) {
+        this.headers = (CaseInsensitiveMultiMap) headers;
+      } else {
+        this.headers = new CaseInsensitiveMultiMap(headers);
+      }
     } else {
-      this.headers = new CaseInsensitiveMultiMap(headers);
+      this.headers = emptyCaseInsensitiveMultiMap();
     }
   }
 
