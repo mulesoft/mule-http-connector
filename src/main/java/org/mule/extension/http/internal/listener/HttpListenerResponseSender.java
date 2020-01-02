@@ -32,16 +32,14 @@ public class HttpListenerResponseSender {
 
   public void sendResponse(HttpResponseContext context,
                            HttpListenerResponseBuilder response,
-                           SourceCompletionCallback completionCallback)
-      throws Exception {
+                           SourceCompletionCallback completionCallback) {
     HttpResponse httpResponse = buildResponse(response, context.getInterception(), context.isSupportStreaming());
     final HttpResponseReadyCallback responseCallback = context.getResponseCallback();
     responseCallback.responseReady(httpResponse, getResponseFailureCallback(responseCallback, completionCallback));
   }
 
   protected HttpResponse buildResponse(HttpListenerResponseBuilder listenerResponseBuilder, Interception interception,
-                                       boolean supportStreaming)
-      throws Exception {
+                                       boolean supportStreaming) {
     HttpResponseBuilder responseBuilder = HttpResponse.builder();
 
     return doBuildResponse(responseBuilder, listenerResponseBuilder, interception, supportStreaming);
@@ -50,8 +48,7 @@ public class HttpListenerResponseSender {
   protected HttpResponse doBuildResponse(HttpResponseBuilder responseBuilder,
                                          HttpListenerResponseBuilder listenerResponseBuilder,
                                          Interception interception,
-                                         boolean supportsStreaming)
-      throws Exception {
+                                         boolean supportsStreaming) {
     return responseFactory.create(responseBuilder, interception, listenerResponseBuilder, supportsStreaming);
   }
 

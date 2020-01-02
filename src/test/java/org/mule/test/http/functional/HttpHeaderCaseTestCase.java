@@ -80,7 +80,7 @@ public class HttpHeaderCaseTestCase extends AbstractHttpTestCase {
 
     assertThat(response.getStatusLine().getStatusCode(), is(OK.getStatusCode()));
     Set<String> headerNames = stream(response.getAllHeaders()).map(Header::getName).collect(toSet());
-    assertThat(headerNames, hasItems("responseheader", TRANSFER_ENCODING));
+    assertThat(headerNames, hasItems("rEsPoNsEhEaDeR", TRANSFER_ENCODING));
   }
 
   @Test
@@ -96,11 +96,11 @@ public class HttpHeaderCaseTestCase extends AbstractHttpTestCase {
   @Test
   public void proxyPreservesRequestHeaderCase() throws IOException {
     HttpResponse response = Request.Get(format("http://localhost:%s/proxyRequest", port.getNumber()))
-        .addHeader("proxyheader", "value").execute().returnResponse();
+        .addHeader("pRoXyHeAdEr", "value").execute().returnResponse();
 
     assertThat(response.getStatusLine().getStatusCode(), is(OK.getStatusCode()));
     Set<String> headerNames = stream(response.getAllHeaders()).map(Header::getName).collect(toSet());
-    assertThat(headerNames, hasItems("proxyheader"));
+    assertThat(headerNames, hasItems("pRoXyHeAdEr"));
   }
 
   @Test
@@ -110,7 +110,7 @@ public class HttpHeaderCaseTestCase extends AbstractHttpTestCase {
 
     assertThat(response.getStatusLine().getStatusCode(), is(OK.getStatusCode()));
     Set<String> headerNames = stream(response.getAllHeaders()).map(Header::getName).collect(toSet());
-    assertThat(headerNames, hasItems("proxyheaderresponse"));
+    assertThat(headerNames, hasItems("pRoXyHeAdErReSpOnSe"));
   }
 
   public static class AssertRequestHeaderProcessor extends AbstractComponent implements Processor {
@@ -119,8 +119,7 @@ public class HttpHeaderCaseTestCase extends AbstractHttpTestCase {
     public CoreEvent process(CoreEvent event) throws MuleException {
       HttpRequestAttributes attributes = (HttpRequestAttributes) event.getMessage().getAttributes().getValue();
 
-      Set<String> lowerCaseHeaders = attributes.getHeaders().keySet().stream().map(String::toLowerCase).collect(toSet());
-      assertThat(lowerCaseHeaders, hasItems("requestheader", USER_AGENT.toLowerCase()));
+      assertThat(attributes.getHeaders().keySet(), hasItems("rEqUeStHeAdEr", USER_AGENT));
 
       return event;
     }
@@ -132,8 +131,7 @@ public class HttpHeaderCaseTestCase extends AbstractHttpTestCase {
     public CoreEvent process(CoreEvent event) throws MuleException {
       HttpResponseAttributes attributes = (HttpResponseAttributes) event.getMessage().getAttributes().getValue();
 
-      Set<String> lowerCaseHeaders = attributes.getHeaders().keySet().stream().map(String::toLowerCase).collect(toSet());
-      assertThat(lowerCaseHeaders, hasItems("responseheader", CONTENT_LENGTH.toLowerCase()));
+      assertThat(attributes.getHeaders().keySet(), hasItems("rEsPoNsEhEaDeR", CONTENT_LENGTH));
 
       return event;
     }
