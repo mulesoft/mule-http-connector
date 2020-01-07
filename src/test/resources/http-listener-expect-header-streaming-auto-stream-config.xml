@@ -12,7 +12,7 @@
 
     <flow name="defaultFlow">
         <http:listener config-ref="listenerConfig"  path="/" responseStreamingMode="AUTO"/>
-        <expression-transformer expression="mel:new StringBufferInputStream(message.payloadAs(String))"/>
+        <set-payload value="#[mel:new StringBufferInputStream(message.payloadAs(String))]"/>
     </flow>
 
 </mule>
