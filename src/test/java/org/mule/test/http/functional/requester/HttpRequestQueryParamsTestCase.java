@@ -63,7 +63,7 @@ public class HttpRequestQueryParamsTestCase extends AbstractHttpRequestTestCase 
   @Test
   public void queryParamAppendDefault() throws Exception {
     flowRunner("queryParamAppendDefault").withPayload(TEST_MESSAGE).run();
-    assertThat(uri, equalTo("/testPath?filter=username%2Capps&testName1=testValue1"));
+    assertThat(uri, equalTo("/testPath?testName1=testValue1&filter=username%2Capps"));
   }
 
   @Test
