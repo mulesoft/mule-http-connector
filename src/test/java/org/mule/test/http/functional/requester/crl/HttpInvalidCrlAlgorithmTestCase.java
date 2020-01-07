@@ -15,6 +15,7 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory.createConfigurationBuilder;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STARTED;
@@ -22,6 +23,18 @@ import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.for
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
+
+import javax.inject.Inject;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.mule.extension.http.internal.temporary.HttpConnector;
 import org.mule.extension.socket.api.SocketsExtension;
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -39,23 +52,13 @@ import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
-import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 
-import javax.inject.Inject;
-
-import org.junit.Test;
-
-
+@RunWith(MockitoJUnitRunner.class)
 public class HttpInvalidCrlAlgorithmTestCase extends AbstractMuleTestCase {
 
   @Inject
@@ -79,9 +82,7 @@ public class HttpInvalidCrlAlgorithmTestCase extends AbstractMuleTestCase {
 
       @Override
       protected void doConfigure(MuleContext muleContext) throws Exception {
-        DefaultExtensionManager defaultExtensionManager = new DefaultExtensionManager();
-        defaultExtensionManager.setMuleContext(muleContext);
-        defaultExtensionManager.initialise();
+        ExtensionManager defaultExtensionManager = mock(ExtensionManager.class);
         getRequiredExtensions().forEach(defaultExtensionManager::registerExtension);
         muleContext.setExtensionManager(defaultExtensionManager);
       }
