@@ -120,7 +120,7 @@ public class HttpRequesterConnectionManagerTestCase extends AbstractMuleTestCase
 
   @Test
   public void clientIsStartedAfterFirstError() {
-    doThrow(Exception.class).doNothing().when(delegateHttpClient).start();
+    doThrow(RuntimeException.class).doNothing().when(delegateHttpClient).start();
     ShareableHttpClient client = connectionManager.create(CONFIG_NAME, getHttpClientConfiguration(CONFIG_NAME));
     try {
       client.start();
