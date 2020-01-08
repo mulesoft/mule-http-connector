@@ -33,13 +33,13 @@ import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 
 import java.util.Base64;
 import java.util.Base64.Decoder;
 import java.util.List;
 import java.util.Map;
 
-import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
