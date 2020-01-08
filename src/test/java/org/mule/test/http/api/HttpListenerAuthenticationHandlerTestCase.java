@@ -24,7 +24,6 @@ import org.mule.extension.http.api.listener.HttpBasicAuthenticationFilter;
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.CredentialsBuilder;
 import org.mule.runtime.api.security.DefaultMuleAuthentication;
-import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.security.DefaultMuleCredentials;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
 
@@ -40,6 +39,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 
 @RunWith(MockitoJUnitRunner.class)
 public class HttpListenerAuthenticationHandlerTestCase extends AbstractHttpAttributesTestCase {
@@ -54,7 +54,7 @@ public class HttpListenerAuthenticationHandlerTestCase extends AbstractHttpAttri
   private CredentialsBuilder credentialsBuilder;
   private Authentication authentication;
   private HttpRequestAttributes attributes;
-  private MultiMap<String, String> headers;
+  private CaseInsensitiveMultiMap headers;
   private List<String> securityProviders;
 
   private static final String HEADER_AUTHORIZATION = AUTHORIZATION.toLowerCase();
@@ -73,7 +73,7 @@ public class HttpListenerAuthenticationHandlerTestCase extends AbstractHttpAttri
 
     securityProviders = new ArrayList<>();
     attributes = mock(HttpRequestAttributes.class);
-    headers = new MultiMap<String, String>() {
+    headers = new CaseInsensitiveMultiMap() {
 
       {
         put(HEADER_AUTHORIZATION, "Basic " + new String(Base64.encode("user:password".getBytes()).getBytes()));
