@@ -8,6 +8,8 @@ package org.mule.extension.http.api;
 
 import static java.lang.System.lineSeparator;
 import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
+
+import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.io.Serializable;
@@ -33,8 +35,8 @@ public abstract class HttpAttributes implements Serializable {
   @Parameter
   protected CaseInsensitiveMultiMap headers;
 
-  public HttpAttributes(CaseInsensitiveMultiMap headers) {
-    this.headers = headers.toImmutableMultiMap();
+  public HttpAttributes(MultiMap<String, String> headers) {
+    this.headers = new CaseInsensitiveMultiMap(headers).toImmutableMultiMap();
   }
 
   public CaseInsensitiveMultiMap getHeaders() {

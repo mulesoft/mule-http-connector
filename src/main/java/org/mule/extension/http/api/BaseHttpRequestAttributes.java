@@ -37,7 +37,7 @@ public class BaseHttpRequestAttributes extends HttpAttributes {
   @Parameter
   protected String requestPath;
 
-  public BaseHttpRequestAttributes(CaseInsensitiveMultiMap headers, MultiMap<String, String> queryParams,
+  public BaseHttpRequestAttributes(MultiMap<String, String> headers, MultiMap<String, String> queryParams,
                                    Map<String, String> uriParams, String requestPath) {
     super(headers);
     this.queryParams = queryParams;

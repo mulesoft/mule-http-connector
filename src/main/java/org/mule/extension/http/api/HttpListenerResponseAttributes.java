@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.api;
 
+import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 
 /**
@@ -17,7 +18,7 @@ public class HttpListenerResponseAttributes extends HttpResponseAttributes {
 
   private static final long serialVersionUID = 3126130644609141675L;
 
-  public HttpListenerResponseAttributes(int statusCode, String reasonPhrase, CaseInsensitiveMultiMap headers) {
+  public HttpListenerResponseAttributes(int statusCode, String reasonPhrase, MultiMap<String, String> headers) {
     super(statusCode, reasonPhrase, headers);
   }
 

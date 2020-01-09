@@ -18,6 +18,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 import static org.mule.runtime.extension.api.runtime.parameter.OutboundCorrelationStrategy.AUTO;
 import static org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap.emptyCaseInsensitiveMultiMap;
+import static org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap.fromMultiMap;
 import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
 import org.mule.extension.http.api.HttpMessageBuilder;
 import org.mule.extension.http.internal.request.HttpRequesterConfig;
@@ -117,11 +118,7 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
 
   @Override
   public void setHeaders(MultiMap<String, String> headers) {
-    if (headers instanceof CaseInsensitiveMultiMap) {
-      this.headers = (CaseInsensitiveMultiMap) headers;
-    } else {
-      this.headers = new CaseInsensitiveMultiMap(headers);
-    }
+    this.headers = fromMultiMap(headers);
   }
 
   public String replaceUriParams(String path) {
