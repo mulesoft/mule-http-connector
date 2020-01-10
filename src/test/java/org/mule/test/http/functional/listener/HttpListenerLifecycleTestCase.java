@@ -31,6 +31,8 @@ public class HttpListenerLifecycleTestCase extends AbstractHttpTestCase {
   @Rule
   public DynamicPort port2 = new DynamicPort("port2");
   @Rule
+  public DynamicPort port3 = new DynamicPort("port3");
+  @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
   @Override
@@ -98,6 +100,22 @@ public class HttpListenerLifecycleTestCase extends AbstractHttpTestCase {
     final HttpResponse httpResponse = response.returnResponse();
     assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
     assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is("catchAll"));
+  }
+
+  @Test
+  public void stopAndStartListenerWithBasePath() throws Exception {
+    Lifecycle httpListener =
+        (Lifecycle) locator.find(Location.builderFromStringRepresentation("listenerWithBasePath/source").build()).get();
+    Response response = Request.Get(String.format("http://localhost:%s/base/path", port3.getNumber())).execute();
+    assertThat(response.returnResponse().getStatusLine().getStatusCode(), is(200));
+
+    httpListener.stop();
+    response = Request.Get(String.format("http://localhost:%s/base/path", port3.getNumber())).execute();
+    assertThat(response.returnResponse().getStatusLine().getStatusCode(), is(404));
+
+    httpListener.start();
+    response = Request.Get(String.format("http://localhost:%s/base/path", port3.getNumber())).execute();
+    assertThat(response.returnResponse().getStatusLine().getStatusCode(), is(200));
   }
 
   private void callAndAssertResponseFromUnaffectedListener(String url, String expectedResponse) throws IOException {
