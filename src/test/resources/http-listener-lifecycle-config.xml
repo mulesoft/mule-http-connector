@@ -13,6 +13,10 @@
         <http:listener-connection host="localhost" port="${port2}"/>
     </http:listener-config>
 
+    <http:listener-config name="configWithBasePath" basePath="base">
+        <http:listener-connection host="localhost" port="${port3}"/>
+    </http:listener-config>
+
     <flow name="catchAllWithinTestPathFlow">
         <http:listener path="/path/*" config-ref="testLifecycleListenerConfig"/>
         <set-payload value="catchAll"/>
@@ -26,6 +30,11 @@
     <flow name="unchangedListenerFlow">
         <http:listener config-ref="unchangedStateListenerConfig" path="/path" />
         <set-payload value="works"/>
+    </flow>
+
+    <flow name="listenerWithBasePath">
+        <http:listener path="/path" config-ref="configWithBasePath" />
+        <set-payload value="ok"/>
     </flow>
 
 </mule>

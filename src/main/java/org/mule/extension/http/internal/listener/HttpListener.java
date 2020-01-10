@@ -298,8 +298,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   @Override
   public void onStart(SourceCallback<InputStream, HttpRequestAttributes> sourceCallback) throws MuleException {
     server = serverProvider.connect();
-    listenerPath = config.getFullListenerPath(config.sanitizePathWithStartSlash(path));
-    path = listenerPath.getResolvedPath();
+    resolveFullPath();
     responseFactory =
         new HttpResponseFactory(responseStreamingMode, transformationService);
     responseSender = new HttpListenerResponseSender(responseFactory);
@@ -321,6 +320,13 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
     }
     knownErrors = new DisjunctiveErrorTypeMatcher(createErrorMatcherList(muleContext.getErrorTypeRepository()));
     requestHandlerManager.start();
+  }
+
+  private void resolveFullPath() {
+    if (listenerPath == null) {
+      listenerPath = config.getFullListenerPath(config.sanitizePathWithStartSlash(path));
+      path = listenerPath.getResolvedPath();
+    }
   }
 
   private List<ErrorTypeMatcher> createErrorMatcherList(ErrorTypeRepository errorTypeRepository) {
