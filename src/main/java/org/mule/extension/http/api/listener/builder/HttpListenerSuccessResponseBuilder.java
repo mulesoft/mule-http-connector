@@ -8,7 +8,7 @@ package org.mule.extension.http.api.listener.builder;
 
 import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSES;
 import static org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap.emptyCaseInsensitiveMultiMap;
-import static org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap.fromMultiMap;
+import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
 
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.MultiMap;
@@ -97,7 +97,15 @@ public class HttpListenerSuccessResponseBuilder extends HttpListenerResponseBuil
 
   @Override
   public void setHeaders(MultiMap<String, String> headers) {
-    this.headers = fromMultiMap(headers);
+    if (headers != null) {
+      if (headers instanceof CaseInsensitiveMultiMap) {
+        this.headers = (CaseInsensitiveMultiMap) headers;
+      } else {
+        this.headers = new CaseInsensitiveMultiMap(headers);
+      }
+    } else {
+      this.headers = emptyCaseInsensitiveMultiMap();
+    }
   }
 
 }
