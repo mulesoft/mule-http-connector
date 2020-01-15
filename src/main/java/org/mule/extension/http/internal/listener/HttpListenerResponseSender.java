@@ -64,7 +64,7 @@ public class HttpListenerResponseSender {
    * Implemented as an inner class instead of an anonymous class so that no problem arises in case reflection is needed for
    * retrieval of methods. This may be the case for backward compatibility concerns.
    */
-  private static class FailureResponseStatusCallback implements ResponseStatusCallback {
+  public static class FailureResponseStatusCallback implements ResponseStatusCallback {
 
     private HttpResponseReadyCallback responseReadyCallback;
     private SourceCompletionCallback completionCallback;
