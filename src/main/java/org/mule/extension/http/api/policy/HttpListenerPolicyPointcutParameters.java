@@ -7,6 +7,7 @@
 package org.mule.extension.http.api.policy;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.policy.api.HttpPolicyPointcutParameters;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 
@@ -17,6 +18,8 @@ import org.mule.runtime.policy.api.PolicyPointcutParameters;
  */
 public class HttpListenerPolicyPointcutParameters extends HttpPolicyPointcutParameters {
 
+  private final MultiMap<String, String> headers;
+
   /**
    * Creates a new {@link PolicyPointcutParameters}
    *
@@ -25,7 +28,24 @@ public class HttpListenerPolicyPointcutParameters extends HttpPolicyPointcutPara
    * @param method the HTTP method of the incoming request
    */
   public HttpListenerPolicyPointcutParameters(Component component, String path, String method) {
+    this(component, path, method, MultiMap.emptyMultiMap());
+  }
+
+  /**
+   * Creates a new {@link PolicyPointcutParameters}
+   *
+   * @param component the component where the policy is being applied.
+   * @param path the target path of the incoming request
+   * @param method the HTTP method of the incoming request
+   * @param headers the HTTP headers of the incoming request
+   */
+  public HttpListenerPolicyPointcutParameters(Component component, String path, String method, MultiMap<String, String> headers) {
     super(component, path, method);
+    this.headers = headers;
+  }
+
+  public MultiMap<String, String> getHeaders() {
+    return headers;
   }
 
 }
