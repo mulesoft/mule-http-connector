@@ -71,9 +71,13 @@ public class HttpRequestAttributesBuilder {
     this.clientCertificate = requestAttributes::getClientCertificate;
   }
 
-  public HttpRequestAttributesBuilder headers(CaseInsensitiveMultiMap headers) {
+  public HttpRequestAttributesBuilder headers(MultiMap<String, String> headers) {
     requireNonNull(headers, "HTTP headers cannot be null.");
-    this.headers = headers;
+    if (headers instanceof CaseInsensitiveMultiMap) {
+      this.headers = (CaseInsensitiveMultiMap) headers;
+    } else {
+      this.headers = new CaseInsensitiveMultiMap(headers);
+    }
     return this;
   }
 

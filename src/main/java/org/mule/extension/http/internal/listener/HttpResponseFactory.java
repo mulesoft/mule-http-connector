@@ -169,10 +169,8 @@ public class HttpResponseFactory {
 
     headers.keySet().forEach(key -> {
       if (!supportsTransferEncoding && HEADER_TRANSFER_ENCODING.equalsIgnoreCase(key)) {
-        if (logger.isDebugEnabled()) {
-          logger.debug(
-                       "Client HTTP version is lower than 1.1 so the unsupported 'Transfer-Encoding' header has been removed and 'Content-Length' will be sent instead.");
-        }
+        logger.debug(
+                     "Client HTTP version is lower than 1.1 so the unsupported 'Transfer-Encoding' header has been removed and 'Content-Length' will be sent instead.");
       } else {
         httpResponseHeaderBuilder.addHeader(key, headers.getAll(key));
       }
