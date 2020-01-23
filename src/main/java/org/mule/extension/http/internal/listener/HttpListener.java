@@ -256,7 +256,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
 
     final HttpResponseReadyCallback responseCallback = context.getResponseCallback();
     callbackContext.addVariable(RESPONSE_SEND_ATTEMPT, true);
-    responseCallback.responseReady(response, getResponseFailureCallback(responseCallback, completionCallback));
+    responseCallback.responseReady(response, new ResponseFailureStatusCallback(responseCallback, completionCallback));
   }
 
   private void sendBackPressureResponse(BackPressureContext ctx, SourceCompletionCallback completionCallback) {
@@ -280,7 +280,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
 
     final HttpResponseReadyCallback responseCallback = context.getResponseCallback();
     callbackContext.addVariable(RESPONSE_SEND_ATTEMPT, true);
-    responseCallback.responseReady(response, getResponseFailureCallback(responseCallback, completionCallback));
+    responseCallback.responseReady(response, new ResponseFailureStatusCallback(responseCallback, completionCallback));
   }
 
   private HttpResponseBuilder createFailureResponseBuilder(Error error) {
@@ -524,30 +524,41 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
     return errorResponse;
   }
 
-  private ResponseStatusCallback getResponseFailureCallback(HttpResponseReadyCallback responseReadyCallback,
-                                                            SourceCompletionCallback completionCallback) {
-    return new BaseResponseStatusCallback(completionCallback) {
+  public class ResponseFailureStatusCallback extends BaseResponseStatusCallback {
 
-      @Override
-      public void responseSendFailure(Throwable throwable) {
-        LOGGER.error("Found exception trying to send response", throwable);
-        responseReadyCallback.responseReady(buildErrorResponse(), new BaseResponseStatusCallback(completionCallback) {
+    private final HttpResponseReadyCallback responseReadyCallback;
 
-          @Override
-          public void responseSendFailure(Throwable throwable) {
-            LOGGER.error("Found exception trying to send error response", throwable);
-            if (completionCallback != null) {
-              completionCallback.error(throwable);
-            }
-          }
-        });
+    public ResponseFailureStatusCallback(HttpResponseReadyCallback responseReadyCallback,
+                                         SourceCompletionCallback completionCallback) {
+      super(completionCallback);
+      this.responseReadyCallback = responseReadyCallback;
+    }
+
+    @Override
+    public void responseSendFailure(Throwable throwable) {
+      LOGGER.error("Found exception trying to send response", throwable);
+      responseReadyCallback.responseReady(buildErrorResponse(), new ResponseSendFailureStatusCallback(completionCallback));
+    }
+  }
+
+  public class ResponseSendFailureStatusCallback extends BaseResponseStatusCallback {
+
+    public ResponseSendFailureStatusCallback(SourceCompletionCallback completionCallback) {
+      super(completionCallback);
+    }
+
+    @Override
+    public void responseSendFailure(Throwable throwable) {
+      LOGGER.error("Found exception trying to send error response", throwable);
+      if (completionCallback != null) {
+        completionCallback.error(throwable);
       }
-    };
+    }
   }
 
   private abstract class BaseResponseStatusCallback implements ResponseStatusCallback {
 
-    private final SourceCompletionCallback completionCallback;
+    protected final SourceCompletionCallback completionCallback;
 
     public BaseResponseStatusCallback(SourceCompletionCallback completionCallback) {
       this.completionCallback = completionCallback;
