@@ -18,7 +18,6 @@ import org.mule.runtime.http.api.domain.message.response.HttpResponseBuilder;
 import java.util.Collection;
 import java.util.Set;
 
-
 public class HttpResponseHeaderBuilder {
 
   // This is a Map instead of a Set because of MULE-15249

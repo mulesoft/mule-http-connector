@@ -40,16 +40,7 @@ public class HttpListenerResponseSender {
 
   protected HttpResponse buildResponse(HttpListenerResponseBuilder listenerResponseBuilder, Interception interception,
                                        boolean supportStreaming) {
-    HttpResponseBuilder responseBuilder = HttpResponse.builder();
-
-    return doBuildResponse(responseBuilder, listenerResponseBuilder, interception, supportStreaming);
-  }
-
-  protected HttpResponse doBuildResponse(HttpResponseBuilder responseBuilder,
-                                         HttpListenerResponseBuilder listenerResponseBuilder,
-                                         Interception interception,
-                                         boolean supportsStreaming) {
-    return responseFactory.create(responseBuilder, interception, listenerResponseBuilder, supportsStreaming);
+    return responseFactory.create(HttpResponse.builder(), interception, listenerResponseBuilder, supportStreaming);
   }
 
   public ResponseStatusCallback getResponseFailureCallback(HttpResponseReadyCallback responseReadyCallback,
