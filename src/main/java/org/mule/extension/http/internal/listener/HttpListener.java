@@ -524,7 +524,8 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
 
     private final HttpResponseReadyCallback responseReadyCallback;
 
-    public ResponseFailureStatusCallback(HttpResponseReadyCallback responseReadyCallback, SourceCompletionCallback completionCallback) {
+    public ResponseFailureStatusCallback(HttpResponseReadyCallback responseReadyCallback,
+                                         SourceCompletionCallback completionCallback) {
       super(completionCallback);
       this.responseReadyCallback = responseReadyCallback;
     }
