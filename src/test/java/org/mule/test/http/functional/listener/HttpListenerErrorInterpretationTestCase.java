@@ -202,7 +202,8 @@ public class HttpListenerErrorInterpretationTestCase extends AbstractHttpTestCas
   }
 
   void createListenerResponseAttributes(HttpStatus status) {
-    CaseInsensitiveMultiMap headers = new CaseInsensitiveMultiMap(new MultiMap<>(of(HEADER_NAME, HEADER_VALUE)));
+    CaseInsensitiveMultiMap headers = new CaseInsensitiveMultiMap();
+    headers.put(HEADER_NAME, HEADER_VALUE);
     attributesToSend = new HttpListenerResponseAttributes(status.getStatusCode(), status.getReasonPhrase(), headers);
   }
 

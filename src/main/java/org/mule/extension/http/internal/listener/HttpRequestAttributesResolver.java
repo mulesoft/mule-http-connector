@@ -6,11 +6,13 @@
  */
 package org.mule.extension.http.internal.listener;
 
+import static org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap.fromMultiMap;
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.decodeQueryString;
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.decodeUriParams;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpRequestAttributesBuilder;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.request.ClientConnection;
 import org.mule.runtime.http.api.domain.request.HttpRequestContext;
@@ -70,7 +72,7 @@ public class HttpRequestAttributesResolver {
         .method(request.getMethod())
         .scheme(requestContext.getScheme())
         .version(request.getProtocol().asString())
-        .headers(request.getHeaders())
+        .headers(fromMultiMap(request.getHeaders()))
         .uriParams(decodeUriParams(listenerPath, rawPath))
         .queryString(queryString)
         .queryParams(decodeQueryString(rawQuery))

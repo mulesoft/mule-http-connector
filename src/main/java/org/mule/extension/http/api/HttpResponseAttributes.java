@@ -10,6 +10,7 @@ import static java.lang.System.lineSeparator;
 
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 
 /**
  * Representation of an HTTP response message attributes.
@@ -36,7 +37,7 @@ public class HttpResponseAttributes extends HttpAttributes {
   @Parameter
   private final String reasonPhrase;
 
-  public HttpResponseAttributes(int statusCode, String reasonPhrase, MultiMap<String, String> headers) {
+  public HttpResponseAttributes(int statusCode, String reasonPhrase, CaseInsensitiveMultiMap headers) {
     super(headers);
     this.statusCode = statusCode;
     this.reasonPhrase = reasonPhrase;

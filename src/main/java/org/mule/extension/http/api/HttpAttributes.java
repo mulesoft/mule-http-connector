@@ -35,12 +35,8 @@ public abstract class HttpAttributes implements Serializable {
   @Parameter
   protected CaseInsensitiveMultiMap headers;
 
-  public HttpAttributes(MultiMap<String, String> headers) {
-    if (headers instanceof CaseInsensitiveMultiMap) {
-      this.headers = ((CaseInsensitiveMultiMap) headers).toImmutableMultiMap();
-    } else {
-      this.headers = new CaseInsensitiveMultiMap(headers);
-    }
+  public HttpAttributes(CaseInsensitiveMultiMap headers) {
+    this.headers = headers.toImmutableMultiMap();
   }
 
   public CaseInsensitiveMultiMap getHeaders() {

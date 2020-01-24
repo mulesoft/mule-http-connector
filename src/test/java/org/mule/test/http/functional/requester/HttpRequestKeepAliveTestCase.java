@@ -64,8 +64,10 @@ public class HttpRequestKeepAliveTestCase extends AbstractHttpRequestTestCase {
 
     if (connectionOutboundProperty != null) {
       final HttpRequestAttributes reqAttributes = mock(HttpRequestAttributes.class);
+      CaseInsensitiveMultiMap headers = new CaseInsensitiveMultiMap();
+      headers.put(CONNECTION, connectionOutboundProperty);
       when(reqAttributes.getHeaders())
-          .thenReturn(new CaseInsensitiveMultiMap(new MultiMap<>(of(CONNECTION, connectionOutboundProperty))));
+          .thenReturn(headers);
 
       runner = runner.withAttributes(reqAttributes);
     }

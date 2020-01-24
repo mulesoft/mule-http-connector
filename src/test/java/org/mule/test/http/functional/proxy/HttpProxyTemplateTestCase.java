@@ -21,13 +21,11 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpHeaders.Names.X_FORWARDED_FOR;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
-import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.PROXY;
 import org.mule.extension.http.api.HttpAttributes;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpRequestAttributesBuilder;
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.concurrent.Latch;
@@ -402,7 +400,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
   private static class ProxyProcessor implements Processor {
 
     @Override
-    public CoreEvent process(CoreEvent event) throws MuleException {
+    public CoreEvent process(CoreEvent event) {
       HttpAttributes attributes = (HttpAttributes) event.getMessage().getAttributes().getValue();
       CaseInsensitiveMultiMap headers = new CaseInsensitiveMultiMap(attributes.getHeaders());
 

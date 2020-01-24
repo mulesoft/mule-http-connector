@@ -25,7 +25,7 @@ public abstract class HttpMessageBuilder {
 
   public abstract CaseInsensitiveMultiMap getHeaders();
 
-  public abstract void setHeaders(MultiMap<String, String> headers);
+  public abstract void setHeaders(CaseInsensitiveMultiMap headers);
 
   public abstract TypedValue<Object> getBody();
 
