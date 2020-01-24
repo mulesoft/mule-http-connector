@@ -96,13 +96,9 @@ public class HttpListenerSuccessResponseBuilder extends HttpListenerResponseBuil
   }
 
   @Override
-  public void setHeaders(MultiMap<String, String> headers) {
+  public void setHeaders(CaseInsensitiveMultiMap headers) {
     if (headers != null) {
-      if (headers instanceof CaseInsensitiveMultiMap) {
-        this.headers = (CaseInsensitiveMultiMap) headers;
-      } else {
-        this.headers = new CaseInsensitiveMultiMap(headers);
-      }
+      this.headers = headers;
     } else {
       this.headers = emptyCaseInsensitiveMultiMap();
     }

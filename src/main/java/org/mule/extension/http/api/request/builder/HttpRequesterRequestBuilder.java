@@ -116,12 +116,8 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
   }
 
   @Override
-  public void setHeaders(MultiMap<String, String> headers) {
-    if (headers instanceof CaseInsensitiveMultiMap) {
-      this.headers = (CaseInsensitiveMultiMap) headers;
-    } else {
-      this.headers = new CaseInsensitiveMultiMap(headers);
-    }
+  public void setHeaders(CaseInsensitiveMultiMap headers) {
+    this.headers = headers;
   }
 
   public String replaceUriParams(String path) {

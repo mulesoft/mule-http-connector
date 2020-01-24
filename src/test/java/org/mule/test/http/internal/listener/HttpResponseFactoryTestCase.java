@@ -27,7 +27,6 @@ import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
@@ -49,7 +48,7 @@ public class HttpResponseFactoryTestCase extends AbstractMuleContextTestCase {
 
   @Test
   @Description("Verifies that the correct Content-Length is sent even when a wrong one is set as header.")
-  public void testContentLengthIsOverridden() throws Exception {
+  public void testContentLengthIsOverridden() {
     HttpListenerResponseBuilder listenerResponseBuilder = mock(HttpListenerResponseBuilder.class);
     TypedValue<Object> payload = new TypedValue<>(new ByteArrayInputStream(EXAMPLE_STRING.getBytes(UTF_8)), INPUT_STREAM);
     when(listenerResponseBuilder.getBody()).thenReturn(payload);
@@ -66,7 +65,7 @@ public class HttpResponseFactoryTestCase extends AbstractMuleContextTestCase {
 
   @Test
   @Description("Trigger exception when invalid type is sent through http response.")
-  public void testCursorIteratorCausesInvalidTypeForHttpResponseError() throws RuntimeException, IOException {
+  public void testCursorIteratorCausesInvalidTypeForHttpResponseError() throws RuntimeException {
     HttpListenerResponseBuilder listenerResponseBuilder = mock(HttpListenerResponseBuilder.class);
     CursorIteratorProvider cursorProvider = mock(CursorIteratorProvider.class);
     TypedValue<Object> payload = new TypedValue<>(cursorProvider, INPUT_STREAM);

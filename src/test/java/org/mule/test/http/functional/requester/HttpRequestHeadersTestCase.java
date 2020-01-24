@@ -141,7 +141,9 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase {
   @Test
   public void ignoresConnectionOutboundProperty() throws Exception {
     final HttpRequestAttributes reqAttributes = mock(HttpRequestAttributes.class);
-    when(reqAttributes.getHeaders()).thenReturn(new CaseInsensitiveMultiMap(new MultiMap<>(ImmutableMap.of(CONNECTION, CLOSE))));
+    CaseInsensitiveMultiMap headers = new CaseInsensitiveMultiMap();
+    headers.put(CONNECTION, CLOSE);
+    when(reqAttributes.getHeaders()).thenReturn(headers);
 
     flowRunner("outboundProperties").withPayload(TEST_MESSAGE).withAttributes(reqAttributes).run();
     assertThat(getFirstReceivedHeader(CONNECTION), is(not(CLOSE)));
