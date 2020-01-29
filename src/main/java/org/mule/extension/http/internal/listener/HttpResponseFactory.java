@@ -8,6 +8,7 @@
 package org.mule.extension.http.internal.listener;
 
 import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 import static org.mule.extension.http.api.streaming.HttpStreamingType.ALWAYS;
 import static org.mule.extension.http.api.streaming.HttpStreamingType.AUTO;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
@@ -82,9 +83,12 @@ public class HttpResponseFactory {
   }
 
   private Optional<TriFunction<TypedValue, Boolean, HttpResponseHeaderBuilder, HttpEntity>> getHandler(Class key) {
-    return this.payloadHandlerMapper.keySet().stream()
-        .filter((s) -> (s.isAssignableFrom(key))).findFirst()
-        .map(classKey -> this.payloadHandlerMapper.get(classKey));
+    for (Class classKey : this.payloadHandlerMapper.keySet()) {
+      if (classKey.isAssignableFrom(key)) {
+        return ofNullable(this.payloadHandlerMapper.get(classKey));
+      }
+    }
+    return Optional.empty();
   }
 
   /**

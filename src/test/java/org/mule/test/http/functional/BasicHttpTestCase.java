@@ -14,8 +14,8 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
+
 import org.mule.extension.http.api.HttpRequestAttributes;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
@@ -77,7 +77,7 @@ public class BasicHttpTestCase extends AbstractHttpRequestTestCase {
   protected static class RequestCheckerMessageProcessor implements Processor {
 
     @Override
-    public CoreEvent process(CoreEvent event) throws MuleException {
+    public CoreEvent process(CoreEvent event) {
       Message message = event.getMessage();
       Object payload = message.getPayload().getValue();
       assertThat(payload, is(notNullValue()));

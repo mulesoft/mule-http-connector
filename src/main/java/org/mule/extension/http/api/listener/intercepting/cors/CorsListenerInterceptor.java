@@ -12,6 +12,7 @@ import org.mule.extension.http.internal.listener.intercepting.cors.CorsIntercept
 import org.mule.modules.cors.CorsKernel;
 import org.mule.modules.cors.response.CorsAction;
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 
 import java.util.ArrayList;
 
