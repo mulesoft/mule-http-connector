@@ -32,6 +32,7 @@ import static org.mule.runtime.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAIL
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.getReasonPhraseForStatusCode;
 import static org.mule.runtime.http.api.HttpHeaders.Names.X_CORRELATION_ID;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
@@ -217,8 +218,11 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
 
   @OnTerminate
   public void onTerminate(SourceResult sourceResult) {
-    Boolean sendingResponse = (Boolean) sourceResult.getSourceCallbackContext().getVariable(RESPONSE_SEND_ATTEMPT).orElse(false);
-    if (FALSE.equals(sendingResponse)) {
+    if (!((Boolean) sourceResult
+        .getSourceCallbackContext()
+        .getVariable(RESPONSE_SEND_ATTEMPT)
+        .orElse(FALSE))
+            .booleanValue()) {
       sourceResult
           .getInvocationError()
           .ifPresent(error -> sendErrorResponse(new HttpListenerErrorResponseBuilder(),
