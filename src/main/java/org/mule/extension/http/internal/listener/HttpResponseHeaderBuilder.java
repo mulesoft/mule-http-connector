@@ -16,8 +16,8 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.http.api.domain.message.response.HttpResponseBuilder;
 
 import java.util.Collection;
-import java.util.Set;
 import java.util.Collections;
+import java.util.Set;
 import java.util.TreeSet;
 
 public class HttpResponseHeaderBuilder {
