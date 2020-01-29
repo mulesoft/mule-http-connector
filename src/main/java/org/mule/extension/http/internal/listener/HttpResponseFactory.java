@@ -8,6 +8,7 @@
 package org.mule.extension.http.internal.listener;
 
 import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 import static org.mule.extension.http.api.streaming.HttpStreamingType.ALWAYS;
 import static org.mule.extension.http.api.streaming.HttpStreamingType.AUTO;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
@@ -82,9 +83,12 @@ public class HttpResponseFactory {
   }
 
   private Optional<TriFunction<TypedValue, Boolean, HttpResponseHeaderBuilder, HttpEntity>> getHandler(Class key) {
-    return this.payloadHandlerMapper.keySet().stream()
-        .filter((s) -> (s.isAssignableFrom(key))).findFirst()
-        .map(classKey -> this.payloadHandlerMapper.get(classKey));
+    for (Class classKey : this.payloadHandlerMapper.keySet()) {
+        if (classKey.isAssignableFrom(key)) {
+        return ofNullable(this.payloadHandlerMapper.get(classKey));
+      }
+    }
+    return Optional.empty();
   }
 
   /**
@@ -101,8 +105,7 @@ public class HttpResponseFactory {
   public HttpResponse create(HttpResponseBuilder responseBuilder,
                              Interception interception,
                              HttpListenerResponseBuilder listenerResponseBuilder,
-                             boolean supportsTransferEncoding)
-      throws IOException {
+                             boolean supportsTransferEncoding) {
 
     final HttpResponseHeaderBuilder httpResponseHeaderBuilder = new HttpResponseHeaderBuilder(responseBuilder);
 
@@ -114,13 +117,8 @@ public class HttpResponseFactory {
       httpResponseHeaderBuilder.addHeader(CONTENT_TYPE, body.getDataType().getMediaType().toRfcString());
     }
 
-    final String existingTransferEncoding = httpResponseHeaderBuilder.getTransferEncoding();
-    final String existingContentLength = httpResponseHeaderBuilder.getContentLength();
-    final boolean hasLength = body.getLength().isPresent();
-
     HttpEntity httpEntity;
     Object payload = body.getValue();
-
 
     if (payload == null) {
       setupContentLengthEncoding(httpResponseHeaderBuilder, 0);
@@ -131,8 +129,7 @@ public class HttpResponseFactory {
           .orElseGet(() -> {
             ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(getMessageAsBytes(body));
 
-            resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding,
-                            byteArrayHttpEntity);
+            resolveEncoding(httpResponseHeaderBuilder, supportsTransferEncoding, byteArrayHttpEntity);
             return byteArrayHttpEntity;
           });
     }
@@ -219,12 +216,11 @@ public class HttpResponseFactory {
     return byteArrayHttpEntity;
   }
 
-  private void resolveEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder, String existingTransferEncoding,
-                               String existingContentLength, boolean supportsTransferEncoding,
+  private void resolveEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder, boolean supportsTransferEncoding,
                                ByteArrayHttpEntity byteArrayHttpEntity) {
     if (responseStreaming == ALWAYS
-        || (responseStreaming == AUTO && existingContentLength == null
-            && CHUNKED.equals(existingTransferEncoding))) {
+        || (responseStreaming == AUTO && httpResponseHeaderBuilder.getContentLength() == null
+            && CHUNKED.equals(httpResponseHeaderBuilder.getTransferEncoding()))) {
       if (supportsTransferEncoding) {
         setupChunkedEncoding(httpResponseHeaderBuilder);
       }
@@ -246,8 +242,7 @@ public class HttpResponseFactory {
       logger.debug("Chunked encoding is being used so the 'Content-Length' header has been removed");
       httpResponseHeaderBuilder.removeHeader(CONTENT_LENGTH);
     }
-    String existingTransferEncoding = httpResponseHeaderBuilder.getTransferEncoding();
-    if (!CHUNKED.equals(existingTransferEncoding)) {
+    if (!CHUNKED.equals(httpResponseHeaderBuilder.getTransferEncoding())) {
       httpResponseHeaderBuilder.addHeader(HEADER_TRANSFER_ENCODING, CHUNKED);
     }
   }
