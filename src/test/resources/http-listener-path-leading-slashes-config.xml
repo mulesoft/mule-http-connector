@@ -14,8 +14,12 @@
         <http:listener-connection host="localhost" port="${port2}" />
     </http:listener-config>
 
-    <http:listener-config name="listenerConfigWithSlashPrefix" basePath="/prefix">
+    <http:listener-config name="listenerConfigWithPrefix2" basePath="prefix">
         <http:listener-connection host="localhost" port="${port3}"/>
+    </http:listener-config>
+
+    <http:listener-config name="listenerConfigWithSlashPrefix" basePath="/prefix">
+        <http:listener-connection host="localhost" port="${port4}"/>
     </http:listener-config>
 
     <flow name="testFlow1">
@@ -29,7 +33,7 @@
     </flow>
 
     <flow name="testFlow3">
-        <http:listener path="/${path3}" config-ref="listenerConfigWithPrefix"/>
+        <http:listener path="/${path3}" config-ref="listenerConfigWithPrefix2"/>
         <set-payload value="prefix/${path3}"/>
     </flow>
 
