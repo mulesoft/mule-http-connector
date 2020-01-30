@@ -8,6 +8,7 @@
 package org.mule.extension.http.internal.listener;
 
 import static java.lang.String.format;
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.extension.http.api.streaming.HttpStreamingType.ALWAYS;
 import static org.mule.extension.http.api.streaming.HttpStreamingType.AUTO;
@@ -84,11 +85,11 @@ public class HttpResponseFactory {
 
   private Optional<TriFunction<TypedValue, Boolean, HttpResponseHeaderBuilder, HttpEntity>> getHandler(Class key) {
     for (Class classKey : this.payloadHandlerMapper.keySet()) {
-        if (classKey.isAssignableFrom(key)) {
+      if (classKey.isAssignableFrom(key)) {
         return ofNullable(this.payloadHandlerMapper.get(classKey));
       }
     }
-    return Optional.empty();
+    return empty();
   }
 
   /**
@@ -194,7 +195,7 @@ public class HttpResponseFactory {
    */
   private HttpEntity guaranteeStreamingIfPossible(boolean possible, HttpResponseHeaderBuilder headerBuilder, Object stream) {
     if (possible) {
-      setupChunkedEncoding(headerBuilder);
+      setupChunkedEncoding(headerBuilder, CHUNKED.equals(headerBuilder.getTransferEncoding()));
     }
     return new InputStreamHttpEntity((InputStream) stream);
   }
@@ -218,11 +219,12 @@ public class HttpResponseFactory {
 
   private void resolveEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder, boolean supportsTransferEncoding,
                                ByteArrayHttpEntity byteArrayHttpEntity) {
+    boolean chunkedTransferEncoding = CHUNKED.equals(httpResponseHeaderBuilder.getTransferEncoding());
     if (responseStreaming == ALWAYS
-        || (responseStreaming == AUTO && httpResponseHeaderBuilder.getContentLength() == null
-            && CHUNKED.equals(httpResponseHeaderBuilder.getTransferEncoding()))) {
+        || (chunkedTransferEncoding && responseStreaming == AUTO &&
+            httpResponseHeaderBuilder.getContentLength() == null)) {
       if (supportsTransferEncoding) {
-        setupChunkedEncoding(httpResponseHeaderBuilder);
+        setupChunkedEncoding(httpResponseHeaderBuilder, chunkedTransferEncoding);
       }
     } else {
       setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getBytes().length);
@@ -237,12 +239,12 @@ public class HttpResponseFactory {
     httpResponseHeaderBuilder.setContentLength(String.valueOf(contentLength));
   }
 
-  private void setupChunkedEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder) {
+  private void setupChunkedEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder, Boolean chunkedTransferEncoding) {
     if (httpResponseHeaderBuilder.getContentLength() != null) {
       logger.debug("Chunked encoding is being used so the 'Content-Length' header has been removed");
       httpResponseHeaderBuilder.removeHeader(CONTENT_LENGTH);
     }
-    if (!CHUNKED.equals(httpResponseHeaderBuilder.getTransferEncoding())) {
+    if (!chunkedTransferEncoding) {
       httpResponseHeaderBuilder.addHeader(HEADER_TRANSFER_ENCODING, CHUNKED);
     }
   }
