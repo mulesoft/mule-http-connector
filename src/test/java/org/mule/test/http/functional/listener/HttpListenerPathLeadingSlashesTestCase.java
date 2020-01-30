@@ -9,7 +9,6 @@ package org.mule.test.http.functional.listener;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import org.mule.tck.junit4.FlakyTest;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;
@@ -69,7 +68,6 @@ public class HttpListenerPathLeadingSlashesTestCase extends AbstractHttpTestCase
   }
 
   @Test
-  @FlakyTest
   public void callPath() throws Exception {
     final String url = String.format("http://localhost:%d/%s", testPort, testPath);
     final Response response = Request.Post(url).body(new StringEntity(testPath)).connectTimeout(1000).execute();
