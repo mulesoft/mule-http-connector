@@ -239,7 +239,7 @@ public class HttpResponseFactory {
     httpResponseHeaderBuilder.setContentLength(String.valueOf(contentLength));
   }
 
-  private void setupChunkedEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder, Boolean chunkedTransferEncoding) {
+  private void setupChunkedEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder, boolean chunkedTransferEncoding) {
     if (httpResponseHeaderBuilder.getContentLength() != null) {
       logger.debug("Chunked encoding is being used so the 'Content-Length' header has been removed");
       httpResponseHeaderBuilder.removeHeader(CONTENT_LENGTH);
