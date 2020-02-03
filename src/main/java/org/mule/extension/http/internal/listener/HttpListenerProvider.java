@@ -153,6 +153,8 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
 
   private HttpServer server;
 
+  private static final String LISTENER_IO_SCHEDULER_NAME = "http-listener-scheduler-io";
+
   @Override
   public void initialise() throws InitialisationException {
 
@@ -186,7 +188,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
         .setPort(connectionParams.getPort())
         .setTlsContextFactory(tlsContext).setUsePersistentConnections(connectionParams.getUsePersistentConnections())
         .setConnectionIdleTimeout(connectionParams.getConnectionIdleTimeout())
-        .setSchedulerSupplier(() -> schedulerService.ioScheduler(SchedulerConfig.config().withName("http-listener-scheduler-io")))
+        .setSchedulerSupplier(() -> schedulerService.ioScheduler(SchedulerConfig.config().withName(LISTENER_IO_SCHEDULER_NAME)))
         .setName(configName)
         .build();
 
