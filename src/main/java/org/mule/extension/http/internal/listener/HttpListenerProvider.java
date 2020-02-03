@@ -23,6 +23,8 @@ import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.scheduler.SchedulerConfig;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
@@ -146,6 +148,9 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
   @Inject
   private HttpService httpService;
 
+  @Inject
+  private SchedulerService schedulerService;
+
   private HttpServer server;
 
   @Override
@@ -181,6 +186,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
         .setPort(connectionParams.getPort())
         .setTlsContextFactory(tlsContext).setUsePersistentConnections(connectionParams.getUsePersistentConnections())
         .setConnectionIdleTimeout(connectionParams.getConnectionIdleTimeout())
+        .setSchedulerSupplier(() -> schedulerService.ioScheduler(SchedulerConfig.config().withName("http-listener-scheduler-io")))
         .setName(configName)
         .build();
 
