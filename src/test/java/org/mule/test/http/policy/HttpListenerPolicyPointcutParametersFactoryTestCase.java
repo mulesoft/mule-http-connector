@@ -87,6 +87,11 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
       public boolean isAnySourcePolicyHeadersAware() {
         return true;
       }
+
+      @Override
+      public boolean isAnySourcePolicyPathAware() {
+        return true;
+      }
     });
 
     HttpListenerPolicyPointcutParameters policyPointcutParameters =
@@ -111,6 +116,11 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
       public boolean isAnySourcePolicyHeadersAware() {
         return false;
       }
+
+      @Override
+      public boolean isAnySourcePolicyPathAware() {
+        return true;
+      }
     });
 
     HttpListenerPolicyPointcutParameters policyPointcutParameters =
@@ -119,6 +129,35 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
 
     assertThat(policyPointcutParameters.getComponent(), is(component));
     assertThat(policyPointcutParameters.getPath(), is(TEST_REQUEST_PATH));
+    assertThat(policyPointcutParameters.getMethod(), is(TEST_METHOD));
+    assertThat(policyPointcutParameters.getHeaders(), is(emptyMultiMap()));
+  }
+
+  @Test
+  public void policyPointcutParametersNotPathHeadesAware() {
+    when(httpAttributes.getRequestPath()).thenReturn(TEST_REQUEST_PATH);
+    when(httpAttributes.getMethod()).thenReturn(TEST_METHOD);
+    when(httpAttributes.getHeaders()).thenReturn(TEST_HEADERS);
+
+    factory.setPolicyProvider(new NullPolicyProvider() {
+
+      @Override
+      public boolean isAnySourcePolicyHeadersAware() {
+        return false;
+      }
+
+      @Override
+      public boolean isAnySourcePolicyPathAware() {
+        return false;
+      }
+    });
+
+    HttpListenerPolicyPointcutParameters policyPointcutParameters =
+        (HttpListenerPolicyPointcutParameters) factory.createPolicyPointcutParameters(component,
+                                                                                      new TypedValue<>(httpAttributes, OBJECT));
+
+    assertThat(policyPointcutParameters.getComponent(), is(component));
+    assertThat(policyPointcutParameters.getPath(), is(""));
     assertThat(policyPointcutParameters.getMethod(), is(TEST_METHOD));
     assertThat(policyPointcutParameters.getHeaders(), is(emptyMultiMap()));
   }
