@@ -21,7 +21,6 @@ import org.mule.extension.http.api.policy.HttpListenerPolicyPointcutParametersFa
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.api.util.MultiMap;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import io.qameta.allure.Story;
@@ -36,17 +35,11 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
       builder().namespace("http").name("listener").build();
   private static final String TEST_REQUEST_PATH = "test-request-path";
   private static final String TEST_METHOD = "PUT";
-  private static final MultiMap<String, String> TEST_HEADERS;
 
   private final HttpListenerPolicyPointcutParametersFactory factory = new HttpListenerPolicyPointcutParametersFactory();
   private final Component component = mock(Component.class);
   private final HttpRequestAttributes httpAttributes = mock(HttpRequestAttributes.class);
   private final TypedValue attributes = new TypedValue(mock(Object.class), OBJECT);
-
-  static {
-    TEST_HEADERS = new MultiMap<>();
-    TEST_HEADERS.put("headerKey", "headerValue");
-  }
 
   @Test
   public void supportsHttpListener() {
@@ -76,7 +69,6 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
   public void policyPointcutParameters() {
     when(httpAttributes.getRequestPath()).thenReturn(TEST_REQUEST_PATH);
     when(httpAttributes.getMethod()).thenReturn(TEST_METHOD);
-    when(httpAttributes.getHeaders()).thenReturn(TEST_HEADERS);
 
     HttpListenerPolicyPointcutParameters policyPointcutParameters =
         (HttpListenerPolicyPointcutParameters) factory.createPolicyPointcutParameters(component,
@@ -85,7 +77,6 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
     assertThat(policyPointcutParameters.getComponent(), is(component));
     assertThat(policyPointcutParameters.getPath(), is(TEST_REQUEST_PATH));
     assertThat(policyPointcutParameters.getMethod(), is(TEST_METHOD));
-    assertThat(policyPointcutParameters.getHeaders(), is(TEST_HEADERS));
   }
 
 }
