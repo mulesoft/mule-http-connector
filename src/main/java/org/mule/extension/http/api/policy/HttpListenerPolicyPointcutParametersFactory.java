@@ -44,7 +44,7 @@ public class HttpListenerPolicyPointcutParametersFactory implements SourcePolicy
 
     HttpRequestAttributes httpRequestAttributes = (HttpRequestAttributes) attributes.getValue();
     return new HttpListenerPolicyPointcutParameters(component, httpRequestAttributes.getRequestPath(),
-                                                    httpRequestAttributes.getMethod(), httpRequestAttributes.getHeaders());
+                                                    httpRequestAttributes.getMethod());
   }
 
 }
