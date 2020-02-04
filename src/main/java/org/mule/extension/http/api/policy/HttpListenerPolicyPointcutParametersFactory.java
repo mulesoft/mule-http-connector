@@ -44,7 +44,9 @@ public class HttpListenerPolicyPointcutParametersFactory implements SourcePolicy
     HttpRequestAttributes httpRequestAttributes = requireHttpRequestAttributes(attributes);
     return new HttpListenerPolicyPointcutParameters(requireNonNull(component,
                                                                    "Cannot create a policy pointcut parameter instance without a component"),
-                                                    httpRequestAttributes.getRequestPath(),
+                                                    policyProvider.isAnySourcePolicyPathAware()
+                                                        ? httpRequestAttributes.getRequestPath()
+                                                        : "",
                                                     httpRequestAttributes.getMethod(),
                                                     policyProvider.isAnySourcePolicyHeadersAware()
                                                         ? httpRequestAttributes.getHeaders()
