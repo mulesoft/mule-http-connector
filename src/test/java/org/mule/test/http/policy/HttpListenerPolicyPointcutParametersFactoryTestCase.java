@@ -6,6 +6,8 @@
  */
 package org.mule.test.http.policy;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.singleton;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -13,6 +15,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
+import static org.mule.runtime.http.policy.api.SourcePolicyAwareAttribute.REQUEST_PATH;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.POLICY_SUPPORT;
 
@@ -24,7 +27,12 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.internal.policy.NullPolicyProvider;
+import org.mule.runtime.http.policy.api.SourcePolicyAwareAttribute;
+import org.mule.runtime.policy.api.PolicyAwareAttribute;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.Test;
 
@@ -84,14 +92,10 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
     factory.setPolicyProvider(new NullPolicyProvider() {
 
       @Override
-      public boolean isAnySourcePolicyHeadersAware() {
-        return true;
+      public Set<PolicyAwareAttribute> sourcePolicyAwareAtributes() {
+        return new HashSet<>(asList(SourcePolicyAwareAttribute.values()));
       }
 
-      @Override
-      public boolean isAnySourcePolicyPathAware() {
-        return true;
-      }
     });
 
     HttpListenerPolicyPointcutParameters policyPointcutParameters =
@@ -113,14 +117,10 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
     factory.setPolicyProvider(new NullPolicyProvider() {
 
       @Override
-      public boolean isAnySourcePolicyHeadersAware() {
-        return false;
+      public Set<PolicyAwareAttribute> sourcePolicyAwareAtributes() {
+        return singleton(REQUEST_PATH);
       }
 
-      @Override
-      public boolean isAnySourcePolicyPathAware() {
-        return true;
-      }
     });
 
     HttpListenerPolicyPointcutParameters policyPointcutParameters =
@@ -139,18 +139,7 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
     when(httpAttributes.getMethod()).thenReturn(TEST_METHOD);
     when(httpAttributes.getHeaders()).thenReturn(TEST_HEADERS);
 
-    factory.setPolicyProvider(new NullPolicyProvider() {
-
-      @Override
-      public boolean isAnySourcePolicyHeadersAware() {
-        return false;
-      }
-
-      @Override
-      public boolean isAnySourcePolicyPathAware() {
-        return false;
-      }
-    });
+    factory.setPolicyProvider(new NullPolicyProvider());
 
     HttpListenerPolicyPointcutParameters policyPointcutParameters =
         (HttpListenerPolicyPointcutParameters) factory.createPolicyPointcutParameters(component,

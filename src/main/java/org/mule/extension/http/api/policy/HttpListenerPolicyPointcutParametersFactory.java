@@ -10,6 +10,8 @@ import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
+import static org.mule.runtime.http.policy.api.SourcePolicyAwareAttribute.HEADERS;
+import static org.mule.runtime.http.policy.api.SourcePolicyAwareAttribute.REQUEST_PATH;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.runtime.api.component.Component;
@@ -44,13 +46,11 @@ public class HttpListenerPolicyPointcutParametersFactory implements SourcePolicy
     HttpRequestAttributes httpRequestAttributes = requireHttpRequestAttributes(attributes);
     return new HttpListenerPolicyPointcutParameters(requireNonNull(component,
                                                                    "Cannot create a policy pointcut parameter instance without a component"),
-                                                    policyProvider.sourcePolicyAwareAtributes()
-                                                        .contains(SourcePolicyAwareAttribute.REQUEST_PATH)
+                                                    policyProvider.sourcePolicyAwareAtributes().contains(REQUEST_PATH)
                                                         ? httpRequestAttributes.getRequestPath()
                                                         : "",
                                                     httpRequestAttributes.getMethod(),
-                                                    policyProvider.sourcePolicyAwareAtributes()
-                                                        .contains(SourcePolicyAwareAttribute.HEADERS)
+                                                    policyProvider.sourcePolicyAwareAtributes().contains(HEADERS)
                                                         ? httpRequestAttributes.getHeaders()
                                                         : emptyMultiMap());
   }
