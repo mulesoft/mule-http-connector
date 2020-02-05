@@ -6,27 +6,38 @@
  */
 package org.mule.test.http.policy;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.singleton;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
+import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
+import static org.mule.runtime.http.policy.api.SourcePolicyAwareAttribute.REQUEST_PATH;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.POLICY_SUPPORT;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.policy.HttpListenerPolicyPointcutParameters;
 import org.mule.extension.http.api.policy.HttpListenerPolicyPointcutParametersFactory;
-import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.core.internal.policy.NullPolicyProvider;
+import org.mule.runtime.http.policy.api.SourcePolicyAwareAttribute;
+import org.mule.runtime.policy.api.PolicyAwareAttribute;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import io.qameta.allure.Story;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.junit.Test;
+
 import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @Feature(HTTP_EXTENSION)
 @Story(POLICY_SUPPORT)
@@ -69,7 +80,7 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
 
   @Test(expected = NullPointerException.class)
   public void failIfComponentLocationIsNull() {
-    factory.createPolicyPointcutParameters(null, attributes);
+    factory.createPolicyPointcutParameters(null, new TypedValue<>(httpAttributes, OBJECT));
   }
 
   @Test
@@ -77,6 +88,15 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
     when(httpAttributes.getRequestPath()).thenReturn(TEST_REQUEST_PATH);
     when(httpAttributes.getMethod()).thenReturn(TEST_METHOD);
     when(httpAttributes.getHeaders()).thenReturn(TEST_HEADERS);
+
+    factory.setPolicyProvider(new NullPolicyProvider() {
+
+      @Override
+      public Set<PolicyAwareAttribute> sourcePolicyAwareAtributes() {
+        return new HashSet<>(asList(SourcePolicyAwareAttribute.values()));
+      }
+
+    });
 
     HttpListenerPolicyPointcutParameters policyPointcutParameters =
         (HttpListenerPolicyPointcutParameters) factory.createPolicyPointcutParameters(component,
@@ -86,6 +106,49 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
     assertThat(policyPointcutParameters.getPath(), is(TEST_REQUEST_PATH));
     assertThat(policyPointcutParameters.getMethod(), is(TEST_METHOD));
     assertThat(policyPointcutParameters.getHeaders(), is(TEST_HEADERS));
+  }
+
+  @Test
+  public void policyPointcutParametersNotHeadesAware() {
+    when(httpAttributes.getRequestPath()).thenReturn(TEST_REQUEST_PATH);
+    when(httpAttributes.getMethod()).thenReturn(TEST_METHOD);
+    when(httpAttributes.getHeaders()).thenReturn(TEST_HEADERS);
+
+    factory.setPolicyProvider(new NullPolicyProvider() {
+
+      @Override
+      public Set<PolicyAwareAttribute> sourcePolicyAwareAtributes() {
+        return singleton(REQUEST_PATH);
+      }
+
+    });
+
+    HttpListenerPolicyPointcutParameters policyPointcutParameters =
+        (HttpListenerPolicyPointcutParameters) factory.createPolicyPointcutParameters(component,
+                                                                                      new TypedValue<>(httpAttributes, OBJECT));
+
+    assertThat(policyPointcutParameters.getComponent(), is(component));
+    assertThat(policyPointcutParameters.getPath(), is(TEST_REQUEST_PATH));
+    assertThat(policyPointcutParameters.getMethod(), is(TEST_METHOD));
+    assertThat(policyPointcutParameters.getHeaders(), is(emptyMultiMap()));
+  }
+
+  @Test
+  public void policyPointcutParametersNotPathHeadesAware() {
+    when(httpAttributes.getRequestPath()).thenReturn(TEST_REQUEST_PATH);
+    when(httpAttributes.getMethod()).thenReturn(TEST_METHOD);
+    when(httpAttributes.getHeaders()).thenReturn(TEST_HEADERS);
+
+    factory.setPolicyProvider(new NullPolicyProvider());
+
+    HttpListenerPolicyPointcutParameters policyPointcutParameters =
+        (HttpListenerPolicyPointcutParameters) factory.createPolicyPointcutParameters(component,
+                                                                                      new TypedValue<>(httpAttributes, OBJECT));
+
+    assertThat(policyPointcutParameters.getComponent(), is(component));
+    assertThat(policyPointcutParameters.getPath(), is(""));
+    assertThat(policyPointcutParameters.getMethod(), is(TEST_METHOD));
+    assertThat(policyPointcutParameters.getHeaders(), is(emptyMultiMap()));
   }
 
 }

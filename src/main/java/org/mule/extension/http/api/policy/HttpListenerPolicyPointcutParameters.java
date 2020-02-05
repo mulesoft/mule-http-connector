@@ -6,6 +6,8 @@
  */
 package org.mule.extension.http.api.policy;
 
+import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.policy.api.HttpPolicyPointcutParameters;
@@ -13,7 +15,7 @@ import org.mule.runtime.policy.api.PolicyPointcutParameters;
 
 /**
  * Specific implementation of {@link PolicyPointcutParameters} for http:listener operation.
- * 
+ *
  * @since 1.0
  */
 public class HttpListenerPolicyPointcutParameters extends HttpPolicyPointcutParameters {
@@ -28,7 +30,7 @@ public class HttpListenerPolicyPointcutParameters extends HttpPolicyPointcutPara
    * @param method the HTTP method of the incoming request
    */
   public HttpListenerPolicyPointcutParameters(Component component, String path, String method) {
-    this(component, path, method, MultiMap.emptyMultiMap());
+    this(component, path, method, emptyMultiMap());
   }
 
   /**
