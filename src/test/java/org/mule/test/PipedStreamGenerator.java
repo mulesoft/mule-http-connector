@@ -9,13 +9,13 @@ package org.mule.test;
 import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import static java.lang.Integer.max;
 import static java.lang.Runtime.getRuntime;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class PipedStreamGenerator {
 
@@ -40,22 +40,25 @@ public class PipedStreamGenerator {
   private static String generateRandomString(int len) {
     byte[] array = new byte[len];
     random.nextBytes(array);
-    return new String(array, Charset.forName("UTF-8"));
+    return new String(array, UTF_8);
   }
 
-  public static String writeChunkInStreams() throws IOException {
+  public static void writeChunkInStreams() throws IOException {
     String chunk = generateRandomString(8192);
-    for (PipedOutputStream stream : sources) {
-      writeChunkInStream(chunk, stream);
+    synchronized (sources) {
+      for (PipedOutputStream stream : sources) {
+        writeChunkInStream(chunk, stream);
+      }
     }
-    return "A chunk was written to " + sources.size() + " streams";
   }
 
   public static void closeStreams() throws IOException {
-    for (PipedOutputStream stream : sources) {
-      stream.close();
+    synchronized (sources) {
+      for (PipedOutputStream stream : sources) {
+        stream.close();
+      }
+      sources.clear();
     }
-    sources.clear();
   }
 
   public static void waitForSources() throws InterruptedException {
