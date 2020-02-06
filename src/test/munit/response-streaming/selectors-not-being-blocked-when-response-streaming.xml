@@ -14,7 +14,7 @@
         http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
         http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd">
 
-    <munit:config name="selectors-not-being-blocked-when-response-streaming" />
+    <munit:config name="selectors-not-being-blocked-when-response-streaming" minMuleVersion="4.3.0"/>
 
     <http:listener-config name="Listener_config" doc:name="HTTP Listener config" >
         <http:listener-connection host="0.0.0.0" port="8081" />
@@ -35,13 +35,11 @@ import java!org::mule::test::PipedStreamGenerator
 output application/java
 ---
 PipedStreamGenerator::availableProcessors()]"/>
-            <logger level="ERROR" doc:name="Logger" message='#["Will send " ++ vars.requestsNumber ++ " requests"]'/>
+            <logger level="INFO" doc:name="Logger" message='#["Will send " ++ vars.requestsNumber ++ " requests"]'/>
             <flow-ref doc:name="Spawn requests" name="SpawnRequests"/>
             <java:invoke-static doc:name="Wait requests started" class="org.mule.test.PipedStreamGenerator" method="waitForSources()" />
-            <logger level="ERROR" doc:name="Logger" message='#["Req started"]'/>
             <java:invoke-static doc:name="Send a chunk" class="org.mule.test.PipedStreamGenerator" method="writeChunkInStreams()"/>
             <java:invoke-static method="writeChunkInStreams()" doc:name="Send another chunk" class="org.mule.test.PipedStreamGenerator" />
-            <logger level="ERROR" doc:name="Logger" message='#["Chunks appended"]'/>
             <http:request method="GET" doc:name="Dummy Request" path="/dummy" config-ref="HTTP_Request_config"/>
             <set-variable value="#[payload as String]" doc:name="Set Variable" variableName="dummy_response"/>
             <java:invoke-static doc:name="Close streams" class="org.mule.test.PipedStreamGenerator" method="closeStreams()"/>
@@ -60,7 +58,7 @@ PipedStreamGenerator::availableProcessors()]"/>
                 <flow-ref doc:name="Spawn N-1 requests" name="SpawnRequests" />
             </when>
             <otherwise >
-                <logger level="ERROR" doc:name="Logger" message="All requests were started"/>
+                <logger level="INFO" doc:name="Logger" message="All requests were started"/>
             </otherwise>
         </choice>
     </sub-flow>
