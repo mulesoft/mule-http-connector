@@ -92,7 +92,7 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
     factory.setPolicyProvider(new NullPolicyProvider() {
 
       @Override
-      public Set<PolicyAwareAttribute> sourcePolicyAwareAtributes() {
+      public Set<PolicyAwareAttribute> sourcePolicyAwareAttributes() {
         return new HashSet<>(asList(SourcePolicyAwareAttribute.values()));
       }
 
@@ -117,7 +117,7 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
     factory.setPolicyProvider(new NullPolicyProvider() {
 
       @Override
-      public Set<PolicyAwareAttribute> sourcePolicyAwareAtributes() {
+      public Set<PolicyAwareAttribute> sourcePolicyAwareAttributes() {
         return singleton(REQUEST_PATH);
       }
 
