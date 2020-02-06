@@ -16,12 +16,14 @@
 
     <munit:config name="selectors-not-being-blocked-when-response-streaming" minMuleVersion="4.3.0"/>
 
+    <munit:dynamic-port propertyName="dynamic.port"/>
+
     <http:listener-config name="Listener_config" doc:name="HTTP Listener config" >
-        <http:listener-connection host="0.0.0.0" port="8081" />
+        <http:listener-connection host="0.0.0.0" port="${dynamic.port}" />
     </http:listener-config>
 
     <http:request-config name="HTTP_Request_config" >
-        <http:request-connection host="localhost" port="8081"/>
+        <http:request-connection host="localhost" port="${dynamic.port}"/>
     </http:request-config>
 
     <munit:test name="Some selector is available while streaming" description="Test">

@@ -186,7 +186,8 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
         .setPort(connectionParams.getPort())
         .setTlsContextFactory(tlsContext).setUsePersistentConnections(connectionParams.getUsePersistentConnections())
         .setConnectionIdleTimeout(connectionParams.getConnectionIdleTimeout())
-        .setSchedulerSupplier(() -> schedulerService.ioScheduler(SchedulerConfig.config().withName("http-listener-scheduler-io")))
+        .setSchedulerSupplier(() -> schedulerService
+            .ioScheduler(SchedulerConfig.config().withName(getSchedulerName(connectionParams))))
         .setName(configName)
         .build();
 
@@ -195,6 +196,11 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
     } catch (ServerCreationException e) {
       throw new InitialisationException(createStaticMessage(buildFailureMessage("create", e)), e, this);
     }
+  }
+
+  private String getSchedulerName(ConnectionParams connectionParams) {
+    return format("http-listener-scheduler-io[%s://%s:%d]", connectionParams.getProtocol().getScheme(),
+                  connectionParams.getHost(), connectionParams.getPort());
   }
 
   @Override
