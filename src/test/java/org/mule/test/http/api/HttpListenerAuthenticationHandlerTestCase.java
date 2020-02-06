@@ -9,10 +9,13 @@ package org.mule.test.http.api;
 import static com.google.common.collect.ImmutableMap.of;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.junit.Assert.assertThat;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -21,9 +24,11 @@ import static org.mule.extension.http.api.HttpHeaders.Names.AUTHORIZATION;
 import org.mule.apache.xerces.impl.dv.util.Base64;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.listener.HttpBasicAuthenticationFilter;
+import org.mule.extension.http.internal.filter.BasicUnauthorisedException;
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.CredentialsBuilder;
 import org.mule.runtime.api.security.DefaultMuleAuthentication;
+import org.mule.runtime.api.security.UnauthorisedException;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.security.DefaultMuleCredentials;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
@@ -34,7 +39,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -43,6 +50,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class HttpListenerAuthenticationHandlerTestCase extends AbstractHttpAttributesTestCase {
+
+  @Rule
+  public ExpectedException expected = none();
 
   @Captor
   private ArgumentCaptor<Authentication> captor;
@@ -98,6 +108,20 @@ public class HttpListenerAuthenticationHandlerTestCase extends AbstractHttpAttri
     assertThat(authentication.getProperties(), hasEntry("thisIsAProperty", "thisIsAValue"));
     assertThat(authentication.getPrincipal(), is("user"));
     assertThat(authentication.getCredentials(), is("password"));
+  }
+
+  @Test
+  public void unauthorisedExceptionProperlyMapped() throws Exception {
+    HttpBasicAuthenticationFilter httpBasicAuthenticationFilter = new HttpBasicAuthenticationFilter();
+
+    setMocks(httpBasicAuthenticationFilter, "attributes", attributes);
+    setMocks(httpBasicAuthenticationFilter, "securityProviders", securityProviders);
+
+    doThrow(UnauthorisedException.class).when(authenticationHandler).setAuthentication(any(), any());
+    expected.expect(BasicUnauthorisedException.class);
+    expected.expectMessage(containsString("Authentication failed for principal user"));
+
+    httpBasicAuthenticationFilter.authenticate(authenticationHandler);
   }
 
   private void setMocks(HttpBasicAuthenticationFilter httpBasicAuthenticationFilter, String fieldName, Object fieldMock)

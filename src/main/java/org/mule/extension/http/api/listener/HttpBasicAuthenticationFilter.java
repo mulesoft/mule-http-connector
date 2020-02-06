@@ -14,6 +14,7 @@ import static org.mule.extension.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
 import static org.mule.extension.http.internal.HttpConnectorConstants.BASIC_LAX_DECODING_PROPERTY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.authFailedForUser;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
@@ -24,6 +25,7 @@ import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.Credentials;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
+import org.mule.runtime.api.security.UnauthorisedException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.api.security.UnsupportedAuthenticationSchemeException;
 import org.mule.runtime.api.util.MultiMap;
@@ -90,12 +92,20 @@ public class HttpBasicAuthenticationFilter {
     LOGGER.debug("Authorization header: {}", header);
 
     if ((header != null) && header.startsWith("Basic ")) {
-      authenticationHandler
-          .setAuthentication(securityProviders,
-                             authenticationHandler
-                                 .createAuthentication(createCredentials(authenticationHandler, decodeToken(header)))
-                                 .setProperties(authenticationProperties(authenticationHandler)));
-      LOGGER.debug("Authentication success.");
+      final Credentials credentials = createCredentials(authenticationHandler, decodeToken(header));
+      try {
+        authenticationHandler
+            .setAuthentication(securityProviders,
+                               authenticationHandler
+                                   .createAuthentication(createCredentials(authenticationHandler, decodeToken(header)))
+                                   .setProperties(authenticationProperties(authenticationHandler)));
+        LOGGER.debug("Authentication success.");
+      } catch (UnauthorisedException e) {
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("Authentication request for user: {} failed: {}", credentials.getUsername(), e);
+        }
+        throw new BasicUnauthorisedException(authFailedForUser(credentials.getUsername()), e, createUnauthenticatedMessage());
+      }
     } else if (header == null) {
       throw new BasicUnauthorisedException(null, "HTTP basic authentication", "HTTP listener", createUnauthenticatedMessage());
     } else {
@@ -115,7 +125,7 @@ public class HttpBasicAuthenticationFilter {
       return new String(DECODER.decode(base64Token), US_ASCII);
     } catch (Exception e) {
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Authentication request failed: {}", e.toString());
+        LOGGER.debug("Authentication request failed: {}", e);
       }
       throw new BasicUnauthorisedException(createStaticMessage("Could not decode authorization header."), e,
                                            createUnauthenticatedMessage());
