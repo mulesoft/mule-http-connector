@@ -308,6 +308,14 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.mule.module</groupId>
+            <artifactId>mule-java-module</artifactId>
+            <version>1.2.6</version>
+            <classifier>mule-plugin</classifier>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <distributionManagement>

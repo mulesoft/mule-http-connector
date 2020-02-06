@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+      xmlns:java="http://www.mulesoft.org/schema/mule/java"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+      xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd">
+
+    <munit:config name="selectors-not-being-blocked-when-response-streaming" />
+
+    <http:listener-config name="Listener_config" doc:name="HTTP Listener config" >
+        <http:listener-connection host="0.0.0.0" port="8081" />
+    </http:listener-config>
+
+    <http:request-config name="HTTP_Request_config" >
+        <http:request-connection host="localhost" port="8081"/>
+    </http:request-config>
+
+    <munit:test name="Some selector is available while streaming" description="Test">
+        <munit:enable-flow-sources >
+            <munit:enable-flow-source value="TheStreamingFlow" />
+            <munit:enable-flow-source value="OtherFlow" />
+        </munit:enable-flow-sources>
+        <munit:execution >
+            <set-variable doc:name="Set number of requests" variableName="requestsNumber" value="#[%dw 2.0
+import java!org::mule::test::PipedStreamGenerator
+output application/java
+---
+PipedStreamGenerator::availableProcessors()]"/>
+            <logger level="ERROR" doc:name="Logger" message='#["Will send " ++ vars.requestsNumber ++ " requests"]'/>
+            <flow-ref doc:name="Spawn requests" name="SpawnRequests"/>
+            <java:invoke-static doc:name="Wait requests started" class="org.mule.test.PipedStreamGenerator" method="waitForSources()" />
+            <logger level="ERROR" doc:name="Logger" message='#["Req started"]'/>
+            <java:invoke-static doc:name="Send a chunk" class="org.mule.test.PipedStreamGenerator" method="writeChunkInStreams()"/>
+            <java:invoke-static method="writeChunkInStreams()" doc:name="Send another chunk" class="org.mule.test.PipedStreamGenerator" />
+            <logger level="ERROR" doc:name="Logger" message='#["Chunks appended"]'/>
+            <http:request method="GET" doc:name="Dummy Request" path="/dummy" config-ref="HTTP_Request_config"/>
+            <set-variable value="#[payload as String]" doc:name="Set Variable" variableName="dummy_response"/>
+            <java:invoke-static doc:name="Close streams" class="org.mule.test.PipedStreamGenerator" method="closeStreams()"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-equals doc:name="Assert dummy request completed (some selector was available)" actual="#[vars.dummy_response]" expected='#["Dummy payload"]'/>
+        </munit:validation>
+    </munit:test>
+    <sub-flow name="SpawnRequests" >
+        <choice doc:name="Choice" >
+            <when expression="#[vars.requestsNumber &gt; 0]">
+                <async doc:name="Request async" >
+                    <http:request method="GET" doc:name="Request" path="/stream" config-ref="HTTP_Request_config" requestStreamingMode="ALWAYS" />
+                </async>
+                <set-variable value="#[vars.requestsNumber-1]" doc:name="Decrease number of requests" variableName="requestsNumber" />
+                <flow-ref doc:name="Spawn N-1 requests" name="SpawnRequests" />
+            </when>
+            <otherwise >
+                <logger level="ERROR" doc:name="Logger" message="All requests were started"/>
+            </otherwise>
+        </choice>
+    </sub-flow>
+
+    <flow name="TheStreamingFlow" >
+        <http:listener doc:name="Stream" path="/stream" config-ref="Listener_config">
+            <non-repeatable-stream />
+        </http:listener>
+        <java:invoke-static doc:name="Create stream" class="org.mule.test.PipedStreamGenerator" method="createPipedStream()"/>
+    </flow>
+    <flow name="OtherFlow" >
+        <http:listener doc:name="Dummy Listener" config-ref="Listener_config" path="/dummy" responseStreamingMode="NEVER">
+            <non-repeatable-stream />
+        </http:listener>
+        <set-payload value='#["Dummy payload"]' doc:name="Set Payload" />
+    </flow>
+
+</mule>
