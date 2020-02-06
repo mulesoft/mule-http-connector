@@ -7,12 +7,12 @@
 package org.mule.extension.http.api.listener;
 
 import static java.lang.Boolean.getBoolean;
+import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.util.Collections.emptyMap;
 import static org.mule.extension.http.api.HttpHeaders.Names.AUTHORIZATION;
 import static org.mule.extension.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
 import static org.mule.extension.http.internal.HttpConnectorConstants.BASIC_LAX_DECODING_PROPERTY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.config.i18n.CoreMessages.authFailedForUser;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
@@ -23,7 +23,6 @@ import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.Credentials;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
-import org.mule.runtime.api.security.UnauthorisedException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.api.security.UnsupportedAuthenticationSchemeException;
 import org.mule.runtime.api.util.MultiMap;
@@ -47,12 +46,12 @@ import org.slf4j.LoggerFactory;
  */
 public class HttpBasicAuthenticationFilter {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(HttpBasicAuthenticationFilter.class);
+
   private static final String HEADER_AUTHORIZATION = AUTHORIZATION.toLowerCase();
   private static final char PADDING = '=';
   private static final Decoder DECODER = Base64.getDecoder();
   private static boolean LAX_DECODING = getBoolean(BASIC_LAX_DECODING_PROPERTY);
-
-  protected static final Logger logger = LoggerFactory.getLogger(HttpBasicAuthenticationFilter.class);
 
   /**
    * Authentication realm.
@@ -85,63 +84,55 @@ public class HttpBasicAuthenticationFilter {
       throws SecurityException, SecurityProviderNotFoundException, UnknownAuthenticationTypeException {
     String header = attributes.getHeaders().get(HEADER_AUTHORIZATION);
 
-    if (logger.isDebugEnabled()) {
-      logger.debug("Authorization header: " + header);
-    }
+    LOGGER.debug("Authorization header: {}", header);
 
     if ((header != null) && header.startsWith("Basic ")) {
-      String base64Token = header.substring(6);
-      if (LAX_DECODING) {
-        // commons-codec ignored the characters beyond the padding
-        base64Token = base64Token.substring(0, base64Token.lastIndexOf(PADDING) + 1);
-      }
-      String token;
-      try {
-        token = new String(DECODER.decode(base64Token.getBytes()));
-      } catch (Exception e) {
-        if (logger.isDebugEnabled()) {
-          logger.debug("Authentication request failed: " + e.toString());
-        }
-        throw new BasicUnauthorisedException(createStaticMessage("Could not decode authorization header."), e,
-                                             createUnauthenticatedMessage());
-      }
-
-      String username = "";
-      String password = "";
-      int delim = token.indexOf(":");
-
-      if (delim != -1) {
-        username = token.substring(0, delim);
-        password = token.substring(delim + 1);
-      }
-
-      Credentials credentials = authenticationHandler.createCredentialsBuilder()
-          .withUsername(username)
-          .withPassword(password.toCharArray())
-          .build();
-
-      try {
-        authenticationHandler
-            .setAuthentication(securityProviders,
-                               authenticationHandler.createAuthentication(credentials)
-                                   .setProperties(authenticationProperties(authenticationHandler)));
-      } catch (UnauthorisedException e) {
-        if (logger.isDebugEnabled()) {
-          logger.debug("Authentication request for user: " + username + " failed: " + e.toString());
-        }
-        throw new BasicUnauthorisedException(authFailedForUser(username), e, createUnauthenticatedMessage());
-      }
-
-      if (logger.isDebugEnabled()) {
-        logger.debug("Authentication success.");
-      }
-
+      authenticationHandler
+          .setAuthentication(securityProviders,
+                             authenticationHandler
+                                 .createAuthentication(createCredentials(authenticationHandler, decodeToken(header)))
+                                 .setProperties(authenticationProperties(authenticationHandler)));
+      LOGGER.debug("Authentication success.");
     } else if (header == null) {
       throw new BasicUnauthorisedException(null, "HTTP basic authentication", "HTTP listener", createUnauthenticatedMessage());
     } else {
       throw new UnsupportedAuthenticationSchemeException(createStaticMessage("Http Basic filter doesn't know how to handle header "
           + header), createUnauthenticatedMessage());
     }
+  }
+
+  private String decodeToken(String header) throws BasicUnauthorisedException {
+    String base64Token = header.substring(6);
+    if (LAX_DECODING) {
+      // commons-codec ignored the characters beyond the padding
+      base64Token = base64Token.substring(0, base64Token.lastIndexOf(PADDING) + 1);
+    }
+
+    try {
+      return new String(DECODER.decode(base64Token), US_ASCII);
+    } catch (Exception e) {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Authentication request failed: {}", e.toString());
+      }
+      throw new BasicUnauthorisedException(createStaticMessage("Could not decode authorization header."), e,
+                                           createUnauthenticatedMessage());
+    }
+  }
+
+  private Credentials createCredentials(AuthenticationHandler authenticationHandler, String token) {
+    String username = "";
+    String password = "";
+    int delim = token.indexOf(":");
+
+    if (delim != -1) {
+      username = token.substring(0, delim);
+      password = token.substring(delim + 1);
+    }
+
+    return authenticationHandler.createCredentialsBuilder()
+        .withUsername(username)
+        .withPassword(password.toCharArray())
+        .build();
   }
 
   private Map<String, Object> authenticationProperties(AuthenticationHandler authenticationHandler) {
