@@ -14,7 +14,9 @@ import org.mule.runtime.api.security.UnauthorisedException;
 
 public class BasicUnauthorisedException extends UnauthorisedException implements ErrorMessageAwareException {
 
-  private Message errorMessage;
+  private static final long serialVersionUID = -5707279260743243251L;
+
+  private final Message errorMessage;
 
   public BasicUnauthorisedException(I18nMessage message, Message errorMessage) {
     super(message);
