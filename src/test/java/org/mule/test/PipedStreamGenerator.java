@@ -19,7 +19,8 @@ import static java.lang.Runtime.getRuntime;
 
 public class PipedStreamGenerator {
 
-  static private final List<PipedOutputStream> sources = new ArrayList<PipedOutputStream>();
+  private static final List<PipedOutputStream> sources = new ArrayList<PipedOutputStream>();
+  private static final Random random = new Random();
 
   public static PipedInputStream createPipedStream() throws IOException {
     PipedOutputStream source = new PipedOutputStream();
@@ -38,7 +39,7 @@ public class PipedStreamGenerator {
 
   private static String generateRandomString(int len) {
     byte[] array = new byte[len];
-    new Random().nextBytes(array);
+    random.nextBytes(array);
     return new String(array, Charset.forName("UTF-8"));
   }
 
