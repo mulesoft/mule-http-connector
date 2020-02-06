@@ -84,9 +84,7 @@ public class HttpBasicAuthenticationFilter {
       throws SecurityException, SecurityProviderNotFoundException, UnknownAuthenticationTypeException {
     String header = attributes.getHeaders().get(HEADER_AUTHORIZATION);
 
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Authorization header: " + header);
-    }
+    LOGGER.debug("Authorization header: {}", header);
 
     if ((header != null) && header.startsWith("Basic ")) {
       authenticationHandler
@@ -94,10 +92,7 @@ public class HttpBasicAuthenticationFilter {
                              authenticationHandler
                                  .createAuthentication(createCredentials(authenticationHandler, decodeToken(header)))
                                  .setProperties(authenticationProperties(authenticationHandler)));
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Authentication success.");
-      }
-
+      LOGGER.debug("Authentication success.");
     } else if (header == null) {
       throw new BasicUnauthorisedException(null, "HTTP basic authentication", "HTTP listener", createUnauthenticatedMessage());
     } else {
@@ -117,7 +112,7 @@ public class HttpBasicAuthenticationFilter {
       return new String(DECODER.decode(base64Token), US_ASCII);
     } catch (Exception e) {
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Authentication request failed: " + e.toString());
+        LOGGER.debug("Authentication request failed: {}", e.toString());
       }
       throw new BasicUnauthorisedException(createStaticMessage("Could not decode authorization header."), e,
                                            createUnauthenticatedMessage());
