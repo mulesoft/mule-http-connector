@@ -63,6 +63,10 @@
         </http:request>
     </flow>
 
+    <flow name="headerInjection">
+        <http:request config-ref="config" path="testPath"/>
+    </flow>
+
     <flow name="headerOverride">
         <http:request config-ref="config" path="testPath">
             <http:headers>#[vars.headers ++ {'testName1':'testValue1'}]</http:headers>

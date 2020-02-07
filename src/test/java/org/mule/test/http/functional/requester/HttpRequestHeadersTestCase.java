@@ -163,7 +163,7 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase {
     registryHeaders.map(hh -> hh.put("testName1", asList("testValue1.1", "testValue1.2")));
     registryHeaders.map(hh -> hh.put("testName2", asList("testValue2.1", "testValue2.2", "testValue2.3")));
 
-    flowRunner("headerMap").withPayload(TEST_MESSAGE).run();
+    flowRunner("headerInjection").withPayload(TEST_MESSAGE).run();
 
     assertThat(headers.get("testName1"), containsInAnyOrder("testValue1.1", "testValue1.2"));
     assertThat(headers.get("testName2"), containsInAnyOrder("testValue2.1", "testValue2.2", "testValue2.3"));
