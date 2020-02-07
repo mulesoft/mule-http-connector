@@ -93,9 +93,11 @@ public class HttpRequester {
 
   public void doRequest(HttpExtensionClient client, HttpRequesterRequestBuilder requestBuilder,
                         boolean checkRetry, MuleContext muleContext,
-                        CompletionCallback<InputStream, HttpResponseAttributes> callback, Map<String, List<String>> injectedHeaders) {
+                        CompletionCallback<InputStream, HttpResponseAttributes> callback,
+                        Map<String, List<String>> injectedHeaders) {
     doRequestWithRetry(client, requestBuilder, checkRetry, muleContext, callback,
-                       eventToHttpRequest.create(requestBuilder, authentication), retryAttempts, injectedHeaders);
+                       eventToHttpRequest.create(requestBuilder, authentication, injectedHeaders), retryAttempts,
+                       injectedHeaders);
   }
 
   private void doRequestWithRetry(HttpExtensionClient client, HttpRequesterRequestBuilder requestBuilder,
