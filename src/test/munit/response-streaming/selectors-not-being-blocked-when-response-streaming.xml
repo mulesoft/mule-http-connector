@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
-      xmlns:java="http://www.mulesoft.org/schema/mule/java"
+<mule xmlns:java="http://www.mulesoft.org/schema/mule/java"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
       xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
       xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
-        http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
-		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      	http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
 		http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
         http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
@@ -51,18 +49,11 @@ PipedStreamGenerator::availableProcessors()]"/>
         </munit:validation>
     </munit:test>
     <sub-flow name="SpawnRequests" >
-        <choice doc:name="Choice" >
-            <when expression="#[vars.requestsNumber &gt; 0]">
-                <async doc:name="Request async" >
-                    <http:request method="GET" doc:name="Request" path="/stream" config-ref="HTTP_Request_config" requestStreamingMode="ALWAYS" />
-                </async>
-                <set-variable value="#[vars.requestsNumber-1]" doc:name="Decrease number of requests" variableName="requestsNumber" />
-                <flow-ref doc:name="Spawn N-1 requests" name="SpawnRequests" />
-            </when>
-            <otherwise >
-                <logger level="INFO" doc:name="Logger" message="All requests were started"/>
-            </otherwise>
-        </choice>
+        <foreach collection="#[1 to vars.requestsNumber]">
+            <async doc:name="Request async" >
+                <http:request method="GET" doc:name="Request" path="/stream" config-ref="HTTP_Request_config" requestStreamingMode="ALWAYS" />
+            </async>
+        </foreach>
     </sub-flow>
 
     <flow name="TheStreamingFlow" >
