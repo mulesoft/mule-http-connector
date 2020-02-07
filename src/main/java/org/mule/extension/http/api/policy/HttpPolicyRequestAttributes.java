@@ -12,6 +12,7 @@ import static org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap.emptyCase
 
 import org.mule.extension.http.api.BaseHttpRequestAttributes;
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.http.api.domain.AbstractCaseInsensitiveMultiMap;
 import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 
 import java.util.Map;
@@ -26,7 +27,7 @@ public class HttpPolicyRequestAttributes extends BaseHttpRequestAttributes {
 
   private static final long serialVersionUID = 7856582596752161400L;
 
-  public HttpPolicyRequestAttributes(CaseInsensitiveMultiMap headers, MultiMap<String, String> queryParams,
+  public HttpPolicyRequestAttributes(AbstractCaseInsensitiveMultiMap headers, MultiMap<String, String> queryParams,
                                      Map<String, String> uriParams, String requestPath) {
     super(headers, queryParams, uriParams, requestPath);
   }

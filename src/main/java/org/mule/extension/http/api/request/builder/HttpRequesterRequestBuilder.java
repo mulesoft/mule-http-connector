@@ -32,6 +32,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
 import org.mule.runtime.extension.api.runtime.parameter.OutboundCorrelationStrategy;
+import org.mule.runtime.http.api.domain.AbstractCaseInsensitiveMultiMap;
 import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
@@ -111,13 +112,13 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
   }
 
   @Override
-  public CaseInsensitiveMultiMap getHeaders() {
+  public AbstractCaseInsensitiveMultiMap getHeaders() {
     return headers;
   }
 
   @Override
-  public void setHeaders(CaseInsensitiveMultiMap headers) {
-    this.headers = headers;
+  public void setHeaders(AbstractCaseInsensitiveMultiMap headers) {
+    this.headers = (CaseInsensitiveMultiMap) headers;
   }
 
   public String replaceUriParams(String path) {

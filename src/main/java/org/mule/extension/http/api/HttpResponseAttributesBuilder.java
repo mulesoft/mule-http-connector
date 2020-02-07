@@ -9,6 +9,7 @@ package org.mule.extension.http.api;
 import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap.emptyCaseInsensitiveMultiMap;
 
+import org.mule.runtime.http.api.domain.AbstractCaseInsensitiveMultiMap;
 import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 
 /**
@@ -18,7 +19,7 @@ import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
  */
 public class HttpResponseAttributesBuilder {
 
-  private CaseInsensitiveMultiMap headers = emptyCaseInsensitiveMultiMap();
+  private AbstractCaseInsensitiveMultiMap headers = emptyCaseInsensitiveMultiMap();
   private int statusCode;
   private String reasonPhrase;
 

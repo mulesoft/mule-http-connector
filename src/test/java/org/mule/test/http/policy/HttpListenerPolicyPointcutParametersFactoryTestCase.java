@@ -43,7 +43,7 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
       builder().namespace("http").name("listener").build();
   private static final String TEST_REQUEST_PATH = "test-request-path";
   private static final String TEST_METHOD = "PUT";
-  private static final MultiMap<String, String> TEST_HEADERS;
+  private static final CaseInsensitiveMultiMap TEST_HEADERS;
 
   private final HttpListenerPolicyPointcutParametersFactory factory = new HttpListenerPolicyPointcutParametersFactory();
   private final Component component = mock(Component.class);

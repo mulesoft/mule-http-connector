@@ -11,6 +11,7 @@ import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 import static org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap.emptyCaseInsensitiveMultiMap;
 
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.http.api.domain.AbstractCaseInsensitiveMultiMap;
 import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 
 import java.util.Map;
@@ -22,7 +23,7 @@ import java.util.Map;
  */
 public class HttpPolicyRequestAttributesBuilder {
 
-  private CaseInsensitiveMultiMap headers = emptyCaseInsensitiveMultiMap();
+  private AbstractCaseInsensitiveMultiMap headers = emptyCaseInsensitiveMultiMap();
   private MultiMap<String, String> queryParams = emptyMultiMap();
   private Map<String, String> uriParams = emptyMultiMap();
   private String requestPath;

@@ -9,7 +9,6 @@ package org.mule.extension.http.api;
 import static java.lang.System.lineSeparator;
 import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
-import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.io.Serializable;
@@ -17,7 +16,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
+import org.mule.runtime.http.api.domain.AbstractCaseInsensitiveMultiMap;
 
 /**
  * Base representation of HTTP message attributes.
@@ -33,13 +32,13 @@ public abstract class HttpAttributes implements Serializable {
    * Map of HTTP headers in the message. Former properties.
    */
   @Parameter
-  protected CaseInsensitiveMultiMap headers;
+  protected AbstractCaseInsensitiveMultiMap headers;
 
-  public HttpAttributes(CaseInsensitiveMultiMap headers) {
+  public HttpAttributes(AbstractCaseInsensitiveMultiMap headers) {
     this.headers = headers.toImmutableMultiMap();
   }
 
-  public CaseInsensitiveMultiMap getHeaders() {
+  public AbstractCaseInsensitiveMultiMap getHeaders() {
     return headers;
   }
 

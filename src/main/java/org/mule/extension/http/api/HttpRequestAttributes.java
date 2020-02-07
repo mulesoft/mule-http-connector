@@ -14,6 +14,7 @@ import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.api.util.SerializableLazyValue;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.http.api.domain.AbstractCaseInsensitiveMultiMap;
 import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 
 import java.security.cert.Certificate;
@@ -61,7 +62,7 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
    */
   @Parameter
   private final String maskedRequestPath;
-  
+
 
   /**
    * HTTP version of the request. Former 'http.version'.
@@ -148,7 +149,8 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
          uriParams, "", remoteAddress, () -> clientCertificate);
   }
 
-  HttpRequestAttributes(CaseInsensitiveMultiMap headers, String listenerPath, String relativePath, String maskedRequestPath,
+  HttpRequestAttributes(AbstractCaseInsensitiveMultiMap headers, String listenerPath, String relativePath,
+                        String maskedRequestPath,
                         String version, String scheme, String method, String requestPath, String rawRequestPath,
                         String requestUri, String rawRequestUri, String queryString, MultiMap<String, String> queryParams,
                         Map<String, String> uriParams, String localAddress, String remoteAddress,

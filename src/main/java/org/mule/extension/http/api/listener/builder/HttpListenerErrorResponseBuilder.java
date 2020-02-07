@@ -10,14 +10,13 @@ import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSES;
 import static org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap.emptyCaseInsensitiveMultiMap;
 
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.http.api.domain.AbstractCaseInsensitiveMultiMap;
 import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
-import shapeless.PolyDefns;
 
 /**
  * Implementation of {@link HttpListenerResponseBuilder} which returns error responses
@@ -92,14 +91,14 @@ public class HttpListenerErrorResponseBuilder extends HttpListenerResponseBuilde
   }
 
   @Override
-  public CaseInsensitiveMultiMap getHeaders() {
+  public AbstractCaseInsensitiveMultiMap getHeaders() {
     return headers;
   }
 
   @Override
-  public void setHeaders(CaseInsensitiveMultiMap headers) {
+  public void setHeaders(AbstractCaseInsensitiveMultiMap headers) {
     if (headers != null) {
-      this.headers = headers;
+      this.headers = (CaseInsensitiveMultiMap) headers;
     } else {
       this.headers = emptyCaseInsensitiveMultiMap();
     }

@@ -11,8 +11,7 @@ import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.internal.request.HttpRequester;
 import org.mule.extension.http.internal.request.HttpResponseToResult;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.api.util.MultiMap;
-import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
+import org.mule.runtime.http.api.domain.AbstractCaseInsensitiveMultiMap;
 import org.mule.runtime.http.api.server.HttpServerProperties;
 
 /**
@@ -23,9 +22,9 @@ import org.mule.runtime.http.api.server.HttpServerProperties;
 @NoExtend
 public abstract class HttpMessageBuilder {
 
-  public abstract CaseInsensitiveMultiMap getHeaders();
+  public abstract AbstractCaseInsensitiveMultiMap getHeaders();
 
-  public abstract void setHeaders(CaseInsensitiveMultiMap headers);
+  public abstract void setHeaders(AbstractCaseInsensitiveMultiMap headers);
 
   public abstract TypedValue<Object> getBody();
 
