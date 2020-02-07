@@ -58,7 +58,9 @@
     </flow>
 
     <flow name="headerMap">
-        <http:request config-ref="config" path="testPath" />
+        <http:request config-ref="config" path="testPath">
+            <http:headers>#[vars.headers]</http:headers>
+        </http:request>
     </flow>
 
     <flow name="headerOverride">
