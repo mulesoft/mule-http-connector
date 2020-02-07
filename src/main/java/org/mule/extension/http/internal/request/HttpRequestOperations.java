@@ -130,7 +130,8 @@ public class HttpRequestOperations implements Initialisable, Disposable {
 
       REQUESTER.doRequest(client, config, resolvedUri, method, overrides.getRequestStreamingMode(), overrides.getSendBodyMode(),
                           overrides.getFollowRedirects(), client.getDefaultAuthentication(), resolvedTimeout, responseValidator,
-                          transformationService, resolvedBuilder, true, muleContext, scheduler, notificationEmitter, callback, injectedHeaders);
+                          transformationService, resolvedBuilder, true, muleContext, scheduler, notificationEmitter, callback,
+                          injectedHeaders);
     } catch (Throwable t) {
       callback.error(t instanceof Exception ? (Exception) t : new DefaultMuleException(t));
     }
