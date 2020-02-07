@@ -21,6 +21,7 @@ public class PipedStreamGenerator {
 
   private static final List<PipedOutputStream> sources = new ArrayList<PipedOutputStream>();
   private static final Random random = new Random();
+  private static final int DEFAULT_CHUNK_SIZE = 8192;
 
   public static PipedInputStream createPipedStream() throws IOException {
     PipedOutputStream source = new PipedOutputStream();
@@ -44,7 +45,7 @@ public class PipedStreamGenerator {
   }
 
   public static void writeChunkInStreams() throws IOException {
-    String chunk = generateRandomString(8192);
+    String chunk = generateRandomString(DEFAULT_CHUNK_SIZE);
     synchronized (sources) {
       for (PipedOutputStream stream : sources) {
         writeChunkInStream(chunk, stream);
