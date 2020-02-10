@@ -43,6 +43,7 @@ import org.mule.runtime.http.api.server.ServerAddress;
 import org.mule.runtime.http.api.server.ServerCreationException;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 
 import javax.inject.Inject;
 
@@ -181,20 +182,37 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
 
     verifyConnectionsParameters();
 
-    HttpServerConfiguration serverConfiguration = new HttpServerConfiguration.Builder()
-        .setHost(connectionParams.getHost())
-        .setPort(connectionParams.getPort())
-        .setTlsContextFactory(tlsContext).setUsePersistentConnections(connectionParams.getUsePersistentConnections())
-        .setConnectionIdleTimeout(connectionParams.getConnectionIdleTimeout())
-        .setSchedulerSupplier(() -> schedulerService
-            .ioScheduler(SchedulerConfig.config().withName(getSchedulerName(connectionParams))))
-        .setName(configName)
-        .build();
+    HttpServerConfiguration serverConfiguration = getServerConfiguration();
 
     try {
       server = httpService.getServerFactory().create(serverConfiguration);
     } catch (ServerCreationException e) {
       throw new InitialisationException(createStaticMessage(buildFailureMessage("create", e)), e, this);
+    }
+  }
+
+  private HttpServerConfiguration getServerConfiguration() {
+    HttpServerConfiguration.Builder builder = new HttpServerConfiguration.Builder()
+        .setHost(connectionParams.getHost())
+        .setPort(connectionParams.getPort())
+        .setTlsContextFactory(tlsContext).setUsePersistentConnections(connectionParams.getUsePersistentConnections())
+        .setConnectionIdleTimeout(connectionParams.getConnectionIdleTimeout())
+        .setName(configName);
+
+    if (useIOScheduler()) {
+      builder.setSchedulerSupplier(() -> schedulerService
+          .ioScheduler(SchedulerConfig.config().withName(getSchedulerName(connectionParams))));
+    }
+
+    return builder.build();
+  }
+
+  private boolean useIOScheduler() {
+    try {
+      Field result = httpService.getClass().getDeclaredField("USE_IO_SCHEDULER");
+      return result.getBoolean(httpService);
+    } catch (NoSuchFieldException | IllegalAccessException e) {
+      return false;
     }
   }
 
