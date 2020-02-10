@@ -209,7 +209,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
 
   private boolean useIOScheduler() {
     try {
-      Field result = httpService.getClass().getDeclaredField("USE_IO_SCHEDULER");
+      Field result = httpService.getServerFactory().getClass().getDeclaredField("USE_IO_SCHEDULER");
       return result.getBoolean(httpService);
     } catch (NoSuchFieldException | IllegalAccessException e) {
       return false;
