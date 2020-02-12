@@ -10,14 +10,17 @@ import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
-import static org.mule.runtime.http.policy.api.SourcePolicyAwareAttribute.HEADERS;
-import static org.mule.runtime.http.policy.api.SourcePolicyAwareAttribute.REQUEST_PATH;
+import static org.mule.runtime.http.policy.api.SourcePolicyAwareAttributes.SourceAttribute.HEADERS;
+import static org.mule.runtime.http.policy.api.SourcePolicyAwareAttributes.SourceAttribute.REQUEST_PATH;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.policy.PolicyProvider;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
+import org.mule.runtime.http.policy.api.SourcePolicyAwareAttributes;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.runtime.policy.api.SourcePolicyPointcutParametersFactory;
 
@@ -46,13 +49,20 @@ public class HttpListenerPolicyPointcutParametersFactory implements SourcePolicy
     HttpRequestAttributes httpRequestAttributes = requireHttpRequestAttributes(attributes);
     return new HttpListenerPolicyPointcutParameters(requireNonNull(component,
                                                                    "Cannot create a policy pointcut parameter instance without a component"),
-                                                    policyProvider.sourcePolicyAwareAttributes().contains(REQUEST_PATH)
+                                                    policyProvider.sourcePolicyAwareAttributes().requires(REQUEST_PATH)
                                                         ? httpRequestAttributes.getRequestPath()
                                                         : "",
                                                     httpRequestAttributes.getMethod(),
-                                                    policyProvider.sourcePolicyAwareAttributes().contains(HEADERS)
-                                                        ? httpRequestAttributes.getHeaders()
-                                                        : emptyMultiMap());
+                                                    getHeaders(httpRequestAttributes));
+  }
+
+  private MultiMap<String, String> getHeaders(HttpRequestAttributes httpRequestAttributes) {
+    MultiMap<String, String> headers = emptyMultiMap();
+    if (policyProvider.sourcePolicyAwareAttributes().requires(HEADERS)) {
+      headers = new CaseInsensitiveMultiMap(httpRequestAttributes.getHeaders());
+      headers.keySet().retainAll(((SourcePolicyAwareAttributes) policyProvider.sourcePolicyAwareAttributes()).getHeaders());
+    }
+    return headers;
   }
 
   private static <T> HttpRequestAttributes requireHttpRequestAttributes(TypedValue<T> attributes) {

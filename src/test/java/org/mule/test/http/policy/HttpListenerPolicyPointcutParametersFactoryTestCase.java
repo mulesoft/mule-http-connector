@@ -7,7 +7,7 @@
 package org.mule.test.http.policy;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.singleton;
+import static java.util.regex.Pattern.compile;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -15,7 +15,6 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
-import static org.mule.runtime.http.policy.api.SourcePolicyAwareAttribute.REQUEST_PATH;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.POLICY_SUPPORT;
 
@@ -27,17 +26,14 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.internal.policy.NullPolicyProvider;
-import org.mule.runtime.http.policy.api.SourcePolicyAwareAttribute;
-import org.mule.runtime.policy.api.PolicyAwareAttribute;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
+import org.mule.runtime.http.policy.api.SourcePolicyAwareAttributes;
+import org.mule.runtime.policy.api.PolicyAwareAttributes;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import org.junit.Test;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Test;
 
 @Feature(HTTP_EXTENSION)
 @Story(POLICY_SUPPORT)
@@ -55,8 +51,10 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
   private final TypedValue attributes = new TypedValue(mock(Object.class), OBJECT);
 
   static {
-    TEST_HEADERS = new MultiMap<>();
-    TEST_HEADERS.put("headerKey", "headerValue");
+    TEST_HEADERS = new CaseInsensitiveMultiMap();
+    TEST_HEADERS.put("header1", "value1");
+    TEST_HEADERS.put("header2", "value2");
+    TEST_HEADERS.put("header3", "value3");
   }
 
   @Test
@@ -84,7 +82,7 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
   }
 
   @Test
-  public void policyPointcutParameters() {
+  public void policyPointcutParametersPathHeadersAware() {
     when(httpAttributes.getRequestPath()).thenReturn(TEST_REQUEST_PATH);
     when(httpAttributes.getMethod()).thenReturn(TEST_METHOD);
     when(httpAttributes.getHeaders()).thenReturn(TEST_HEADERS);
@@ -92,8 +90,8 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
     factory.setPolicyProvider(new NullPolicyProvider() {
 
       @Override
-      public Set<PolicyAwareAttribute> sourcePolicyAwareAttributes() {
-        return new HashSet<>(asList(SourcePolicyAwareAttribute.values()));
+      public PolicyAwareAttributes sourcePolicyAwareAttributes() {
+        return new SourcePolicyAwareAttributes.Builder().requestPathPatterns(compile(".*")).headers("header1", "header3").build();
       }
 
     });
@@ -105,11 +103,14 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
     assertThat(policyPointcutParameters.getComponent(), is(component));
     assertThat(policyPointcutParameters.getPath(), is(TEST_REQUEST_PATH));
     assertThat(policyPointcutParameters.getMethod(), is(TEST_METHOD));
-    assertThat(policyPointcutParameters.getHeaders(), is(TEST_HEADERS));
+
+    MultiMap<String, String> requiredHeaders = new CaseInsensitiveMultiMap(TEST_HEADERS);
+    requiredHeaders.keySet().retainAll(asList("header1", "header3"));
+    assertThat(policyPointcutParameters.getHeaders(), is(requiredHeaders));
   }
 
   @Test
-  public void policyPointcutParametersNotHeadesAware() {
+  public void policyPointcutParametersNotHeadersAware() {
     when(httpAttributes.getRequestPath()).thenReturn(TEST_REQUEST_PATH);
     when(httpAttributes.getMethod()).thenReturn(TEST_METHOD);
     when(httpAttributes.getHeaders()).thenReturn(TEST_HEADERS);
@@ -117,8 +118,8 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
     factory.setPolicyProvider(new NullPolicyProvider() {
 
       @Override
-      public Set<PolicyAwareAttribute> sourcePolicyAwareAttributes() {
-        return singleton(REQUEST_PATH);
+      public PolicyAwareAttributes sourcePolicyAwareAttributes() {
+        return new SourcePolicyAwareAttributes.Builder().requestPathPatterns(compile(".*")).build();
       }
 
     });
@@ -134,7 +135,7 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
   }
 
   @Test
-  public void policyPointcutParametersNotPathHeadesAware() {
+  public void policyPointcutParametersNotPathHeadersAware() {
     when(httpAttributes.getRequestPath()).thenReturn(TEST_REQUEST_PATH);
     when(httpAttributes.getMethod()).thenReturn(TEST_METHOD);
     when(httpAttributes.getHeaders()).thenReturn(TEST_HEADERS);
