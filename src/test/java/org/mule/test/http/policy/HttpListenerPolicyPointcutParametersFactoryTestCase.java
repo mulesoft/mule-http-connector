@@ -24,6 +24,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import io.qameta.allure.Story;
+import org.junit.Before;
 import org.junit.Test;
 import io.qameta.allure.Feature;
 
@@ -39,7 +40,12 @@ public class HttpListenerPolicyPointcutParametersFactoryTestCase extends Abstrac
   private final HttpListenerPolicyPointcutParametersFactory factory = new HttpListenerPolicyPointcutParametersFactory();
   private final Component component = mock(Component.class);
   private final HttpRequestAttributes httpAttributes = mock(HttpRequestAttributes.class);
-  private final TypedValue attributes = new TypedValue(mock(Object.class), OBJECT);
+  private final TypedValue attributes = new TypedValue<>(mock(Object.class), OBJECT);
+
+  @Before
+  public void setUp() {
+    factory.initialise();
+  }
 
   @Test
   public void supportsHttpListener() {

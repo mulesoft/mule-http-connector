@@ -7,6 +7,7 @@
 package org.mule.test.http.functional.listener.intercepting.cors;
 
 import static org.junit.Assert.fail;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_PROVIDER;
 import static org.mule.runtime.http.api.HttpConstants.Method.GET;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.CORS;
@@ -14,12 +15,18 @@ import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.CORS;
 import org.mule.modules.cors.attributes.KernelTestAttributesBuilder;
 import org.mule.modules.cors.result.KernelTestResult;
 import org.mule.modules.cors.tests.functional.PreflightArtifactFunctionalTestCase;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.test.http.functional.NullPolicyProvider;
 import org.mule.test.http.functional.listener.intercepting.cors.parameters.CorsHttpParameters;
 import org.mule.test.http.functional.listener.intercepting.cors.runner.CorsHttpAttributesBuilder;
 import org.mule.test.http.functional.listener.intercepting.cors.runner.CorsHttpEndpoint;
 import org.mule.test.http.functional.listener.intercepting.cors.runner.CorsRequestExecutor;
+
+import java.util.List;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -63,6 +70,18 @@ public class CorsPreflightTestCase extends
   @Override
   protected String getConfigFile() {
     return "http-listener-cors-interceptor.xml";
+  }
+
+  @Override
+  protected void addBuilders(List<ConfigurationBuilder> builders) {
+    super.addBuilders(builders);
+    builders.add(new AbstractConfigurationBuilder() {
+
+      @Override
+      protected void doConfigure(MuleContext muleContext) {
+        muleContext.getCustomizationService().registerCustomServiceImpl(OBJECT_POLICY_PROVIDER, new NullPolicyProvider());
+      }
+    });
   }
 
   @Test
