@@ -7,7 +7,9 @@
 package org.mule.extension.http.api.policy;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.MultiMap;
@@ -18,12 +20,16 @@ import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import org.slf4j.Logger;
+
 /**
  * Specific implementation of {@link PolicyPointcutParameters} for http:listener operation.
  * 
  * @since 1.0
  */
 public class HttpListenerPolicyPointcutParameters extends HttpPolicyPointcutParameters {
+
+  private static final Logger LOGGER = getLogger(HttpRequestAuthentication.class);
 
   /**
    * As long as the connector is compatible with runtime versions < 4.3.0, headers and masked request path need to be set using
@@ -33,8 +39,12 @@ public class HttpListenerPolicyPointcutParameters extends HttpPolicyPointcutPara
   private static Method setMaskedRequestPathMethod;
 
   static {
-    setHeadersMethod = ClassUtils.getMethod(HttpPolicyPointcutParameters.class, "setHeaders", null);
-    setMaskedRequestPathMethod = ClassUtils.getMethod(HttpPolicyPointcutParameters.class, "setMaskedRequestPath", null);
+    try {
+      setHeadersMethod = ClassUtils.getMethod(HttpPolicyPointcutParameters.class, "setHeaders", null);
+      setMaskedRequestPathMethod = ClassUtils.getMethod(HttpPolicyPointcutParameters.class, "setMaskedRequestPath", null);
+    } catch (Exception e) {
+      LOGGER.debug("setHeaders and setMaskedRequestPath methods are not present in HttpPolicyPointcutParameters class");
+    }
   }
 
   /**
@@ -61,8 +71,10 @@ public class HttpListenerPolicyPointcutParameters extends HttpPolicyPointcutPara
                                               MultiMap<String, String> headers) {
     super(component, path, method);
     try {
-      setHeadersMethod.invoke(this, headers);
-      setMaskedRequestPathMethod.invoke(this, maskedRequestPath);
+      if (setHeadersMethod != null && setMaskedRequestPathMethod != null) {
+        setHeadersMethod.invoke(this, headers);
+        setMaskedRequestPathMethod.invoke(this, maskedRequestPath);
+      }
     } catch (InvocationTargetException | IllegalAccessException e) {
       throw new MuleRuntimeException(createStaticMessage("Exception while calling setters by reflection"), e);
     }
