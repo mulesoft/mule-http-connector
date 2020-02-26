@@ -13,7 +13,6 @@ import org.mule.extension.http.api.request.authentication.HttpRequestAuthenticat
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.MultiMap;
-import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.http.policy.api.HttpPolicyPointcutParameters;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 
@@ -40,8 +39,8 @@ public class HttpListenerPolicyPointcutParameters extends HttpPolicyPointcutPara
 
   static {
     try {
-      setHeadersMethod = ClassUtils.getMethod(HttpPolicyPointcutParameters.class, "setHeaders", null);
-      setMaskedRequestPathMethod = ClassUtils.getMethod(HttpPolicyPointcutParameters.class, "setMaskedRequestPath", null);
+      setHeadersMethod = HttpPolicyPointcutParameters.class.getDeclaredMethod("setHeaders", MultiMap.class);
+      setMaskedRequestPathMethod = HttpPolicyPointcutParameters.class.getDeclaredMethod("setMaskedRequestPath", String.class);
     } catch (Exception e) {
       LOGGER.debug("setHeaders and setMaskedRequestPath methods are not present in HttpPolicyPointcutParameters class");
     }

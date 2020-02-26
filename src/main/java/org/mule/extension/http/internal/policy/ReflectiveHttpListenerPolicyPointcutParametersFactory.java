@@ -44,7 +44,9 @@ public class ReflectiveHttpListenerPolicyPointcutParametersFactory implements So
       "org.mule.runtime.http.policy.api.SourcePolicyAwareAttributes";
   private static final String SOURCE_ATTRIBUTE_CLASS_NAME =
       "org.mule.runtime.http.policy.api.SourcePolicyAwareAttributes$SourceAttribute";
+  private static final String ATTRIBUTE_CLASS_NAME = "org.mule.runtime.policy.api.PolicyAwareAttributes$Attribute";
 
+  private static final String SOURCE_POLICY_AWARE_ATTRIBUTES_METHOD_NAME = "sourcePolicyAwareAttributes";
   private static final String GET_HEADERS_METHOD_NAME = "getHeaders";
   private static final String REQUIRES_METHOD_NAME = "requires";
   private static final String VALUE_OF_METHOD_NAME = "valueOf";
@@ -61,16 +63,18 @@ public class ReflectiveHttpListenerPolicyPointcutParametersFactory implements So
 
   static {
     try {
-      Class<?> clazz =
+      Class<?> sourcePolicyAwareAttributesClass =
           loadClass(SOURCE_POLICY_AWARE_ATTRIBUTES_CLASS_NAME, ReflectiveHttpListenerPolicyPointcutParametersFactory.class);
-      Class<?> anotherClazz = loadClass(SOURCE_ATTRIBUTE_CLASS_NAME, ReflectiveHttpListenerPolicyPointcutParametersFactory.class);
-      sourcePolicyAwareAttributesMethod = getMethod(PolicyProvider.class, "sourcePolicyAwareAttributes", null);
-      getHeadersMethod = getMethod(clazz, GET_HEADERS_METHOD_NAME, null);
-      requiresMethod = getMethod(clazz, REQUIRES_METHOD_NAME, null);
-      Method valueOf = getMethod(anotherClazz, VALUE_OF_METHOD_NAME, null);
+      Class<?> sourceAttributesClass =
+          loadClass(SOURCE_ATTRIBUTE_CLASS_NAME, ReflectiveHttpListenerPolicyPointcutParametersFactory.class);
+      Class<?> attributeClass = loadClass(ATTRIBUTE_CLASS_NAME, ReflectiveHttpListenerPolicyPointcutParametersFactory.class);
+      sourcePolicyAwareAttributesMethod = PolicyProvider.class.getDeclaredMethod(SOURCE_POLICY_AWARE_ATTRIBUTES_METHOD_NAME);
+      getHeadersMethod = sourcePolicyAwareAttributesClass.getDeclaredMethod(GET_HEADERS_METHOD_NAME);
+      requiresMethod = sourcePolicyAwareAttributesClass.getDeclaredMethod(REQUIRES_METHOD_NAME, attributeClass);
+      Method valueOf = getMethod(sourceAttributesClass, VALUE_OF_METHOD_NAME, null);
       requestPathEnum = invoke(valueOf, null, REQUEST_PATH_ATTRIBUTE_ENUM_NAME);
       headersEnum = invoke(valueOf, null, HEADERS_ATTRIBUTE_ENUM_NAME);
-    } catch (ClassNotFoundException e) {
+    } catch (ClassNotFoundException | NoSuchMethodException e) {
       throw new MuleRuntimeException(createStaticMessage("Exception while trying to load by reflection"), e);
     }
   }
