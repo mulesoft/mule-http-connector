@@ -29,8 +29,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 /**
  * HttpListenerPolicyPointcutParametersFactory implementation which makes use of pointcut attributes API which was included in
  * 4.3.0.
@@ -85,7 +83,7 @@ public class ReflectiveHttpListenerPolicyPointcutParametersFactory implements So
 
   @Override
   public boolean supportsSourceIdentifier(ComponentIdentifier componentIdentifier) {
-    throw new NotImplementedException();
+    throw new UnsupportedOperationException();
   }
 
   @Override

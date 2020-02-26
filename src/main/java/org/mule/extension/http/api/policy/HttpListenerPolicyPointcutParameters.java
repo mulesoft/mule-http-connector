@@ -9,7 +9,6 @@ package org.mule.extension.http.api.policy;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.MultiMap;
@@ -28,7 +27,7 @@ import org.slf4j.Logger;
  */
 public class HttpListenerPolicyPointcutParameters extends HttpPolicyPointcutParameters {
 
-  private static final Logger LOGGER = getLogger(HttpRequestAuthentication.class);
+  private static final Logger LOGGER = getLogger(HttpListenerPolicyPointcutParameters.class);
 
   /**
    * As long as the connector is compatible with runtime versions < 4.3.0, headers and masked request path need to be set using

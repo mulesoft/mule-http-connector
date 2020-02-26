@@ -17,8 +17,6 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.runtime.policy.api.SourcePolicyPointcutParametersFactory;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 public class CompatibilityHttpListenerPolicyPointcutParameters implements SourcePolicyPointcutParametersFactory {
 
   @Override
@@ -38,6 +36,6 @@ public class CompatibilityHttpListenerPolicyPointcutParameters implements Source
 
   @Override
   public boolean supportsSourceIdentifier(ComponentIdentifier componentIdentifier) {
-    throw new NotImplementedException();
+    throw new UnsupportedOperationException();
   }
 }
