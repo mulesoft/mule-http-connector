@@ -16,6 +16,7 @@ import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.test.http.functional.AbstractHttpTestCase;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -24,7 +25,7 @@ import org.hamcrest.MatcherAssert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class HttpStandardRevocationConfigTestCase extends MuleArtifactFunctionalTestCase {
+public class HttpStandardRevocationConfigTestCase extends AbstractHttpTestCase {
 
   @Override
   protected String getConfigFile() {

@@ -6,10 +6,17 @@
  */
 package org.mule.test.http.functional;
 
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_PROVIDER;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
+
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.service.http.TestHttpClient;
+
+import java.util.List;
 
 import io.qameta.allure.Feature;
 import org.junit.Rule;
@@ -23,4 +30,16 @@ public abstract class AbstractHttpTestCase extends MuleArtifactFunctionalTestCas
 
   @Rule
   public TestHttpClient httpClient = new TestHttpClient.Builder(getService(HttpService.class)).build();
+
+  @Override
+  protected void addBuilders(List<ConfigurationBuilder> builders) {
+    super.addBuilders(builders);
+    builders.add(new AbstractConfigurationBuilder() {
+
+      @Override
+      protected void doConfigure(MuleContext muleContext) {
+        muleContext.getCustomizationService().registerCustomServiceImpl(OBJECT_POLICY_PROVIDER, new NullPolicyProvider());
+      }
+    });
+  }
 }
