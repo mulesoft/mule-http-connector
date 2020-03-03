@@ -13,6 +13,7 @@ import static org.mule.functional.junit4.matchers.MessageMatchers.hasAttributes;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
+import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.STREAMING;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
@@ -35,6 +36,7 @@ import org.apache.http.nio.protocol.BasicAsyncResponseConsumer;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 
 @Story(STREAMING)
