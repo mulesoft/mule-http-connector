@@ -23,8 +23,6 @@ import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.api.scheduler.SchedulerConfig;
-import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -44,7 +42,6 @@ import org.mule.runtime.http.api.server.ServerAddress;
 import org.mule.runtime.http.api.server.ServerCreationException;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 
 import javax.inject.Inject;
 
@@ -147,9 +144,6 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
   @Inject
   private HttpService httpService;
 
-  @Inject
-  private SchedulerService schedulerService;
-
   private HttpServer server;
 
   @Override
@@ -180,43 +174,19 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
 
     verifyConnectionsParameters();
 
-    HttpServerConfiguration serverConfiguration = getServerConfiguration();
+    HttpServerConfiguration serverConfiguration = new HttpServerConfiguration.Builder()
+        .setHost(connectionParams.getHost())
+        .setPort(connectionParams.getPort())
+        .setTlsContextFactory(tlsContext).setUsePersistentConnections(connectionParams.getUsePersistentConnections())
+        .setConnectionIdleTimeout(connectionParams.getConnectionIdleTimeout())
+        .setName(configName)
+        .build();
 
     try {
       server = httpService.getServerFactory().create(serverConfiguration);
     } catch (ServerCreationException e) {
       throw new InitialisationException(createStaticMessage(buildFailureMessage("create", e)), e, this);
     }
-  }
-
-  private HttpServerConfiguration getServerConfiguration() {
-    HttpServerConfiguration.Builder builder = new HttpServerConfiguration.Builder()
-        .setHost(connectionParams.getHost())
-        .setPort(connectionParams.getPort())
-        .setTlsContextFactory(tlsContext).setUsePersistentConnections(connectionParams.getUsePersistentConnections())
-        .setConnectionIdleTimeout(connectionParams.getConnectionIdleTimeout())
-        .setName(configName);
-
-    if (useIOScheduler()) {
-      builder.setSchedulerSupplier(() -> schedulerService
-          .ioScheduler(SchedulerConfig.config().withName(getSchedulerName(connectionParams))));
-    }
-
-    return builder.build();
-  }
-
-  private boolean useIOScheduler() {
-    try {
-      Field result = httpService.getServerFactory().getClass().getDeclaredField("USE_IO_SCHEDULER");
-      return result.getBoolean(httpService);
-    } catch (NoSuchFieldException | IllegalAccessException e) {
-      return false;
-    }
-  }
-
-  private String getSchedulerName(ConnectionParams connectionParams) {
-    return format("http-listener-scheduler-io[%s://%s:%d]", connectionParams.getProtocol().getScheme(),
-                  connectionParams.getHost(), connectionParams.getPort());
   }
 
   @Override
