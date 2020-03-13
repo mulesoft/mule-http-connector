@@ -21,8 +21,8 @@
 
     <properties>
         <fluentHcVersion>4.5.11</fluentHcVersion>
-        <grizzlyVersion>2.3.36-MULE-006</grizzlyVersion>
-        <grizzlyAhcVersion>1.14-MULE-018-SNAPSHOT</grizzlyAhcVersion>
+        <grizzlyVersion>2.3.36-MULE-015</grizzlyVersion>
+        <grizzlyAhcVersion>1.14-MULE-017</grizzlyAhcVersion>
         <javaxActivationVersion>1.2.0</javaxActivationVersion>
         <javaxMailVersion>1.4.3</javaxMailVersion>
         <jettyVersion>9.0.7.v20131107</jettyVersion>
