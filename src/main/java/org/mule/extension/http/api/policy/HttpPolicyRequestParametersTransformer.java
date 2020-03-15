@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.api.policy;
 
+import static java.util.Collections.unmodifiableMap;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
@@ -18,8 +19,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 
-import com.google.common.collect.ImmutableMap;
-
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -44,7 +44,7 @@ public class HttpPolicyRequestParametersTransformer implements OperationPolicyPa
 
   @Override
   public Message fromParametersToMessage(Map<String, Object> parameters) {
-    TypedValue<Object> body = (TypedValue<Object>) parameters.getOrDefault(BODY, new TypedValue<Object>(null, OBJECT));
+    TypedValue<Object> body = (TypedValue<Object>) parameters.getOrDefault(BODY, new TypedValue<>(null, OBJECT));
 
     return Message.builder().payload(body)
         .attributes(new TypedValue<>(new HttpPolicyRequestAttributes(getMultiMap(parameters, HEADERS),
@@ -57,7 +57,7 @@ public class HttpPolicyRequestParametersTransformer implements OperationPolicyPa
 
   @Override
   public Map<String, Object> fromMessageToParameters(Message message) {
-    ImmutableMap.Builder<String, Object> builder = ImmutableMap.builder();
+    final Map<String, Object> builder = new HashMap<>();
 
     if (message.getAttributes().getValue() instanceof BaseHttpRequestAttributes) {
       BaseHttpRequestAttributes requestAttributes = (BaseHttpRequestAttributes) message.getAttributes().getValue();
@@ -70,10 +70,10 @@ public class HttpPolicyRequestParametersTransformer implements OperationPolicyPa
 
     putIfNotNull(builder, "body", message.getPayload());
 
-    return builder.build();
+    return unmodifiableMap(builder);
   }
 
-  private void putIfNotNull(ImmutableMap.Builder<String, Object> builder, String key, Object value) {
+  private void putIfNotNull(Map<String, Object> builder, String key, Object value) {
     if (value != null) {
       builder.put(key, value);
     }

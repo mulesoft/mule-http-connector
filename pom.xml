@@ -27,9 +27,8 @@
         <javaxMailVersion>1.4.3</javaxMailVersion>
         <jettyVersion>9.0.7.v20131107</jettyVersion>
 
-        <commonsLangVersion>3.9</commonsLangVersion>
+        <commonsTextVersion>1.8</commonsTextVersion>
         <commonsIoVersion>2.6</commonsIoVersion>
-        <guavaVersion>25.1-jre</guavaVersion>
         <formatterConfigPath>formatter.xml</formatterConfigPath>
 
         <muleSocketsConnectorVersion>1.1.5</muleSocketsConnectorVersion>
@@ -186,13 +185,8 @@
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>${commonsLangVersion}</version>             
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${guavaVersion}</version>
+            <artifactId>commons-text</artifactId>
+            <version>${commonsTextVersion}</version>             
         </dependency>
         <dependency>
             <groupId>com.sun.activation</groupId>
