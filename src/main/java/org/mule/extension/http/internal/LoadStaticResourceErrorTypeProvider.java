@@ -6,11 +6,11 @@
  */
 package org.mule.extension.http.internal;
 
+import static java.util.Collections.singleton;
 import static org.mule.extension.http.api.error.HttpError.NOT_FOUND;
+
 import org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
-
-import com.google.common.collect.ImmutableSet;
 
 import java.util.Set;
 
@@ -23,8 +23,6 @@ public class LoadStaticResourceErrorTypeProvider implements ErrorTypeProvider {
 
   @Override
   public Set<ErrorTypeDefinition> getErrorTypes() {
-    return ImmutableSet.<ErrorTypeDefinition>builder()
-        .add(NOT_FOUND)
-        .build();
+    return singleton(NOT_FOUND);
   }
 }

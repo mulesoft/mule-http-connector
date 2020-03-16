@@ -6,10 +6,11 @@
  */
 package org.mule.extension.http.internal.request;
 
-import static com.google.common.collect.Sets.newHashSet;
 import static java.lang.String.valueOf;
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.unmodifiableSet;
 import static java.util.Optional.ofNullable;
 import static org.mule.extension.http.api.error.HttpError.SECURITY;
 import static org.mule.extension.http.api.error.HttpError.TRANSFORMATION;
@@ -47,19 +48,19 @@ import org.mule.runtime.http.api.domain.entity.multipart.HttpPart;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.Set;
-import java.util.function.BiConsumer;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -78,7 +79,7 @@ public class HttpRequestFactory {
   private static final String MULE_CORRELATION_ID_PROPERTY_HEADER = MULE_CORRELATION_ID_PROPERTY.toLowerCase();
   private static final String COOKIE_HEADER = COOKIE.toLowerCase();
 
-  private static final Set<String> DEFAULT_EMPTY_BODY_METHODS = newHashSet("GET", "HEAD", "OPTIONS");
+  private static final Set<String> DEFAULT_EMPTY_BODY_METHODS = unmodifiableSet(new HashSet<>(asList("GET", "HEAD", "OPTIONS")));
 
   private static final String BOTH_TRANSFER_HEADERS_SET_MESSAGE =
       "Cannot send both Transfer-Encoding and Content-Length headers. Transfer-Encoding will not be sent.";
@@ -339,7 +340,7 @@ public class HttpRequestFactory {
   private class RepeatableInputStreamHttpEntity implements HttpEntity {
 
     private Long contentLength;
-    private CursorStreamProvider streamProvider;
+    private final CursorStreamProvider streamProvider;
 
     public RepeatableInputStreamHttpEntity(CursorStreamProvider streamProvider) {
       checkNotNull(streamProvider, "HTTP entity stream provider cannot be null.");

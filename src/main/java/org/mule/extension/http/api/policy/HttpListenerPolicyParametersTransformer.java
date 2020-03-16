@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.api.policy;
 
+import static java.util.Collections.singletonMap;
 import static org.mule.extension.http.api.policy.HttpListenerPolicyParametersTransformer.ResponseType.FAILURE;
 import static org.mule.extension.http.api.policy.HttpListenerPolicyParametersTransformer.ResponseType.SUCCESS;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
@@ -19,8 +20,6 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
-
-import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
 
@@ -78,8 +77,6 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
   private Map<String, Object> messageToResponseParameters(HttpListenerResponseBuilder httpListenerResponseBuilder,
                                                           Message message,
                                                           ResponseType responseType) {
-    ImmutableMap.Builder<String, Object> mapBuilder =
-        ImmutableMap.<String, Object>builder().put(responseType.getResponseBuilderParameterName(), httpListenerResponseBuilder);
     if (message.getAttributes().getValue() instanceof HttpResponseAttributes) {
       HttpResponseAttributes httpResponseAttributes = (HttpResponseAttributes) message.getAttributes().getValue();
       httpListenerResponseBuilder.setBody(message.getPayload());
@@ -88,7 +85,6 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
                                                     : httpResponseAttributes.getStatusCode());
       httpListenerResponseBuilder.setHeaders(httpResponseAttributes.getHeaders());
       httpListenerResponseBuilder.setReasonPhrase(httpResponseAttributes.getReasonPhrase());
-      return mapBuilder.build();
     } else if (message.getAttributes().getValue() instanceof HttpPolicyResponseAttributes) {
       HttpPolicyResponseAttributes httpResponseAttributes = (HttpPolicyResponseAttributes) message.getAttributes().getValue();
       httpListenerResponseBuilder.setBody(message.getPayload());
@@ -96,14 +92,14 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
       httpListenerResponseBuilder.setStatusCode(httpResponseAttributes.getStatusCode() == null ? responseType.getStatusCode()
           : httpResponseAttributes.getStatusCode());
       httpListenerResponseBuilder.setReasonPhrase(httpResponseAttributes.getReasonPhrase());
-      return mapBuilder.build();
     } else {
       httpListenerResponseBuilder.setBody(message.getPayload());
       httpListenerResponseBuilder.setStatusCode(httpListenerResponseBuilder.getStatusCode() == null ? responseType.getStatusCode()
           : httpListenerResponseBuilder.getStatusCode());
 
-      return mapBuilder.build();
     }
+
+    return singletonMap(responseType.getResponseBuilderParameterName(), httpListenerResponseBuilder);
   }
 
   enum ResponseType {

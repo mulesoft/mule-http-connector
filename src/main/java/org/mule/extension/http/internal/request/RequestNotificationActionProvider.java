@@ -6,13 +6,14 @@
  */
 package org.mule.extension.http.internal.request;
 
+import static java.util.Collections.unmodifiableSet;
 import static org.mule.extension.http.api.notification.HttpNotificationAction.REQUEST_COMPLETE;
 import static org.mule.extension.http.api.notification.HttpNotificationAction.REQUEST_START;
+
 import org.mule.runtime.extension.api.annotation.notification.NotificationActionProvider;
 import org.mule.runtime.extension.api.notification.NotificationActionDefinition;
 
-import com.google.common.collect.ImmutableSet;
-
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -24,10 +25,12 @@ public class RequestNotificationActionProvider implements NotificationActionProv
 
   @Override
   public Set<NotificationActionDefinition> getNotificationActions() {
-    return ImmutableSet.<NotificationActionDefinition>builder()
-        .add(REQUEST_START)
-        .add(REQUEST_COMPLETE)
-        .build();
+    final Set<NotificationActionDefinition> notificationActions = new HashSet<>();
+
+    notificationActions.add(REQUEST_START);
+    notificationActions.add(REQUEST_COMPLETE);
+
+    return unmodifiableSet(notificationActions);
   }
 
 }

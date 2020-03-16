@@ -6,15 +6,16 @@
  */
 package org.mule.extension.http.internal;
 
+import static java.util.Collections.unmodifiableSet;
 import static org.mule.extension.http.api.error.HttpError.BASIC_AUTHENTICATION;
 import static org.mule.runtime.extension.api.error.MuleErrors.SERVER_SECURITY;
+
 import org.mule.extension.http.api.listener.HttpBasicAuthenticationFilter;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
 
-import com.google.common.collect.ImmutableSet;
-
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -27,9 +28,11 @@ public class BasicSecurityErrorTypeProvider implements ErrorTypeProvider {
 
   @Override
   public Set<ErrorTypeDefinition> getErrorTypes() {
-    return ImmutableSet.<ErrorTypeDefinition>builder()
-        .add(SERVER_SECURITY)
-        .add(BASIC_AUTHENTICATION)
-        .build();
+    final Set<ErrorTypeDefinition> errorTypes = new HashSet<>();
+
+    errorTypes.add(SERVER_SECURITY);
+    errorTypes.add(BASIC_AUTHENTICATION);
+
+    return unmodifiableSet(errorTypes);
   }
 }

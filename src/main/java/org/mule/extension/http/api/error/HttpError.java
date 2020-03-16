@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.api.error;
 
+import static java.util.Collections.unmodifiableSet;
 import static java.util.Optional.ofNullable;
 import static org.mule.extension.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.getStatusByCode;
@@ -15,8 +16,7 @@ import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.http.api.HttpConstants.HttpStatus;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 
-import com.google.common.collect.ImmutableSet;
-
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -64,6 +64,30 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
   INTERNAL_SERVER_ERROR,
 
   SERVICE_UNAVAILABLE;
+
+  private static Set<ErrorTypeDefinition> httpRequestOperationErrors;
+
+  static {
+    final Set<ErrorTypeDefinition> errors = new HashSet<>();
+
+    errors.add(PARSING);
+    errors.add(TIMEOUT);
+    errors.add(SECURITY);
+    errors.add(CLIENT_SECURITY);
+    errors.add(CONNECTIVITY);
+    errors.add(BAD_REQUEST);
+    errors.add(FORBIDDEN);
+    errors.add(UNAUTHORIZED);
+    errors.add(METHOD_NOT_ALLOWED);
+    errors.add(TOO_MANY_REQUESTS);
+    errors.add(NOT_FOUND);
+    errors.add(UNSUPPORTED_MEDIA_TYPE);
+    errors.add(NOT_ACCEPTABLE);
+    errors.add(INTERNAL_SERVER_ERROR);
+    errors.add(SERVICE_UNAVAILABLE);
+
+    httpRequestOperationErrors = unmodifiableSet(errors);
+  }
 
   private ErrorTypeDefinition<?> parentErrorType;
 
@@ -132,11 +156,7 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
   }
 
   public static Set<ErrorTypeDefinition> getHttpRequestOperationErrors() {
-    return ImmutableSet.<ErrorTypeDefinition>builder()
-        .add(PARSING).add(TIMEOUT).add(SECURITY).add(CLIENT_SECURITY).add(CONNECTIVITY).add(BAD_REQUEST).add(FORBIDDEN)
-        .add(UNAUTHORIZED).add(METHOD_NOT_ALLOWED).add(TOO_MANY_REQUESTS)
-        .add(NOT_FOUND).add(UNSUPPORTED_MEDIA_TYPE).add(NOT_ACCEPTABLE).add(INTERNAL_SERVER_ERROR).add(SERVICE_UNAVAILABLE)
-        .build();
+    return httpRequestOperationErrors;
   }
 
   /**
