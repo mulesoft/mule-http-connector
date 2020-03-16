@@ -65,6 +65,30 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
 
   SERVICE_UNAVAILABLE;
 
+  private static Set<ErrorTypeDefinition> httpRequestOperationErrors;
+
+  static {
+    final Set<ErrorTypeDefinition> errors = new HashSet<>();
+
+    errors.add(PARSING);
+    errors.add(TIMEOUT);
+    errors.add(SECURITY);
+    errors.add(CLIENT_SECURITY);
+    errors.add(CONNECTIVITY);
+    errors.add(BAD_REQUEST);
+    errors.add(FORBIDDEN);
+    errors.add(UNAUTHORIZED);
+    errors.add(METHOD_NOT_ALLOWED);
+    errors.add(TOO_MANY_REQUESTS);
+    errors.add(NOT_FOUND);
+    errors.add(UNSUPPORTED_MEDIA_TYPE);
+    errors.add(NOT_ACCEPTABLE);
+    errors.add(INTERNAL_SERVER_ERROR);
+    errors.add(SERVICE_UNAVAILABLE);
+
+    httpRequestOperationErrors = unmodifiableSet(errors);
+  }
+
   private ErrorTypeDefinition<?> parentErrorType;
 
   private Function<HttpRequest, String> errorMessageFunction;
@@ -132,25 +156,7 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
   }
 
   public static Set<ErrorTypeDefinition> getHttpRequestOperationErrors() {
-    final Set<ErrorTypeDefinition> httpRequestOperationErrors = new HashSet<>();
-
-    httpRequestOperationErrors.add(PARSING);
-    httpRequestOperationErrors.add(TIMEOUT);
-    httpRequestOperationErrors.add(SECURITY);
-    httpRequestOperationErrors.add(CLIENT_SECURITY);
-    httpRequestOperationErrors.add(CONNECTIVITY);
-    httpRequestOperationErrors.add(BAD_REQUEST);
-    httpRequestOperationErrors.add(FORBIDDEN);
-    httpRequestOperationErrors.add(UNAUTHORIZED);
-    httpRequestOperationErrors.add(METHOD_NOT_ALLOWED);
-    httpRequestOperationErrors.add(TOO_MANY_REQUESTS);
-    httpRequestOperationErrors.add(NOT_FOUND);
-    httpRequestOperationErrors.add(UNSUPPORTED_MEDIA_TYPE);
-    httpRequestOperationErrors.add(NOT_ACCEPTABLE);
-    httpRequestOperationErrors.add(INTERNAL_SERVER_ERROR);
-    httpRequestOperationErrors.add(SERVICE_UNAVAILABLE);
-
-    return unmodifiableSet(httpRequestOperationErrors);
+    return httpRequestOperationErrors;
   }
 
   /**
