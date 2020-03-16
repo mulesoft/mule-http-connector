@@ -14,6 +14,7 @@ import static org.mule.extension.http.api.error.HttpError.NOT_FOUND;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.error.ResourceNotFoundException;
 import org.mule.runtime.api.i18n.I18nMessage;
@@ -41,7 +42,7 @@ public class StaticResourceLoader {
   private static final String ANY_PATH = "/*";
   private static final String ROOT_PATH = "/";
   private static final String DEFAULT_MIME_TYPE = "application/octet-stream";
-  private MimetypesFileTypeMap mimeTypes = new MimetypesFileTypeMap();
+  private final MimetypesFileTypeMap mimeTypes = new MimetypesFileTypeMap();
 
   /**
    * The resource base from where documents are served up. For example: /Users/maxthemule/resources. Inputs should be validated

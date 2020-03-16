@@ -8,6 +8,7 @@ package org.mule.extension.http.api;
 
 import static java.lang.System.lineSeparator;
 import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
+
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
@@ -23,6 +24,8 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
  * @since 1.0
  */
 public abstract class HttpAttributes implements Serializable {
+
+  private static final long serialVersionUID = -5172640902396741873L;
 
   public static final String TAB = "   ";
   public static final String DOUBLE_TAB = TAB + TAB;
