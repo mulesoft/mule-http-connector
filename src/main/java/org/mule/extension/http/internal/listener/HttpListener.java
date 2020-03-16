@@ -23,6 +23,7 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SECURITY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.util.ClassUtils.getClassName;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
@@ -132,6 +133,10 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   private static final String REPEATED_HEADERS_LOG_FORMAT =
       "'X-Correlation-ID: {}' and 'MULE_CORRELATION_ID: {}' headers found. 'X-Correlation-ID' will be used.";
 
+  // Because of SE-14012, the service has to inform any error that implies lost the client connection
+  private static final String CONNECTION_ALREADY_CLOSED_EXCEPTION =
+      "org.mule.runtime.http.api.exception.ConnectionAlreadyClosedException";
+
   @Inject
   private TransformationService transformationService;
 
@@ -201,7 +206,9 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
                       Error error,
                       SourceCompletionCallback completionCallback) {
     try {
-      sendErrorResponse(errorResponse, callbackContext, error, completionCallback);
+      if (!error.getCause().getClass().getName().equals(CONNECTION_ALREADY_CLOSED_EXCEPTION)) {
+        sendErrorResponse(errorResponse, callbackContext, error, completionCallback);
+      }
     } catch (Throwable t) {
       completionCallback.error(t);
     }
