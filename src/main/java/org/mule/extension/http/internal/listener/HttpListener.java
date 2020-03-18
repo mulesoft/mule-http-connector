@@ -132,7 +132,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   private static final String REPEATED_HEADERS_LOG_FORMAT =
       "'X-Correlation-ID: {}' and 'MULE_CORRELATION_ID: {}' headers found. 'X-Correlation-ID' will be used.";
 
-  // Because of SE-14012, the service has to inform any error that implies lost the client connection
+  // Because of MULE-18191, the service has to inform any error that implies lost the client connection
   private static final String CONNECTION_ALREADY_CLOSED_EXCEPTION =
       "org.mule.runtime.http.api.exception.ConnectionAlreadyClosedException";
 
