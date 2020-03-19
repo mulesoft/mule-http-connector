@@ -15,6 +15,7 @@ import java.util.Random;
 
 import static java.lang.Integer.max;
 import static java.lang.Runtime.getRuntime;
+import static java.lang.Thread.sleep;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class PipedStreamGenerator {
@@ -44,7 +45,9 @@ public class PipedStreamGenerator {
     return new String(array, UTF_8);
   }
 
-  public static void writeChunkInStreams() throws IOException {
+  public static void writeChunkInStreams() throws IOException, InterruptedException {
+    // The default tolerance before delegating response streaming in other thread is 50 ms.
+    sleep(50);
     String chunk = generateRandomString(DEFAULT_CHUNK_SIZE);
     synchronized (sources) {
       for (PipedOutputStream stream : sources) {
