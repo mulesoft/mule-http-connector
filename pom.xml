@@ -130,6 +130,12 @@
                         <version>${mtf-tools.version}</version>
                         <classifier>mule-plugin</classifier>
                     </dependency>
+                    <dependency>
+                        <groupId>org.mule.module</groupId>
+                        <artifactId>mule-java-module</artifactId>
+                        <version>1.2.6</version>
+                        <classifier>mule-plugin</classifier>
+                    </dependency>
                 </dependencies>
             </plugin>
         </plugins>
