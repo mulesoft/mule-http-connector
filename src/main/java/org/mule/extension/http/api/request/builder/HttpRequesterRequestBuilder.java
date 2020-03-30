@@ -13,11 +13,13 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.regex.Matcher.quoteReplacement;
+import static java.util.regex.Pattern.compile;
 import static org.mule.extension.http.internal.HttpConnectorConstants.ENCODE_URI_PARAMS_PROPERTY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 import static org.mule.runtime.extension.api.runtime.parameter.OutboundCorrelationStrategy.AUTO;
 import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
+
 import org.mule.extension.http.api.HttpMessageBuilder;
 import org.mule.extension.http.internal.request.HttpRequesterConfig;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -36,6 +38,7 @@ import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Component that specifies how to create a proper HTTP request.
@@ -43,6 +46,8 @@ import java.util.Map;
  * @since 1.0
  */
 public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
+
+  private static final Pattern WRONGLY_ENCODED_SPACES = compile("\\+");
 
   private static boolean ENCODE_URI_PARAMS = getBoolean(ENCODE_URI_PARAMS_PROPERTY);
 
@@ -96,8 +101,6 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
 
   private CorrelationInfo correlationInfo;
 
-  private HttpRequestBuilder reqBuilder;
-
   @Override
   public TypedValue<Object> getBody() {
     return body;
@@ -127,7 +130,9 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
       }
       if (ENCODE_URI_PARAMS) {
         try {
-          uriParamValue = encode(uriParamValue, UTF_8.displayName());
+          uriParamValue = WRONGLY_ENCODED_SPACES.matcher(encode(uriParamValue, UTF_8.displayName()))
+              // Spaces in path segments cannot be encoded as `+`
+              .replaceAll("%20");
         } catch (UnsupportedEncodingException e) {
           throw new MuleRuntimeException(createStaticMessage("Could not encode URI parameter '%s'", uriParamValue), e);
         }
