@@ -12,7 +12,7 @@
         http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
         http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd">
 
-    <munit:config name="selectors-not-being-blocked-when-response-streaming" minMuleVersion="4.3.0"/>
+    <munit:config name="selectors-not-being-blocked-when-response-streaming" minMuleVersion="4.2.3"/>
 
     <munit:dynamic-port propertyName="dynamic.port"/>
 

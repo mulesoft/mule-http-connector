@@ -47,7 +47,8 @@ public class PipedStreamGenerator {
 
   public static void writeChunkInStreams() throws IOException, InterruptedException {
     // The default tolerance before delegating response streaming in other thread is 50 ms.
-    sleep(50);
+    // We sleep a little longer to avoid flakiness.
+    sleep(55);
     String chunk = generateRandomString(DEFAULT_CHUNK_SIZE);
     synchronized (sources) {
       for (PipedOutputStream stream : sources) {
