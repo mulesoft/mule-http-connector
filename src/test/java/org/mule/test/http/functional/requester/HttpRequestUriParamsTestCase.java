@@ -18,6 +18,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import io.qameta.allure.Issue;
+
 public class HttpRequestUriParamsTestCase extends AbstractHttpRequestTestCase {
 
   @Rule
@@ -64,16 +66,34 @@ public class HttpRequestUriParamsTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void uriParamsContainsReservedUriCharacter() throws Exception {
-    flowRunner("reservedUriCharacter").withPayload(TEST_MESSAGE)
-        .withVariable("paramName", "testParam").withVariable("paramValue", "$a").run();
+    flowRunner("reservedUriCharacter")
+        .withPayload(TEST_MESSAGE)
+        .withVariable("paramName", "testParam")
+        .withVariable("paramValue", "$a")
+        .run();
 
     assertThat(uri, equalTo("/testPath/$a"));
   }
 
   @Test
+  @Issue("MULE-18241")
+  public void uriParamsContainsSpaces() throws Exception {
+    flowRunner("spaceUriCharacter")
+        .withPayload(TEST_MESSAGE)
+        .withVariable("param name", "testParam")
+        .withVariable("paramValue", "a word+here")
+        .run();
+
+    assertThat(uri, equalTo("/testPath/a%20word+here"));
+  }
+
+  @Test
   public void uriParamsWithRegEx() throws Exception {
-    flowRunner("regEx").withPayload(TEST_MESSAGE)
-        .withVariable("paramName", "[1-9]").withVariable("paramValue", "abc").run();
+    flowRunner("regEx")
+        .withPayload(TEST_MESSAGE)
+        .withVariable("paramName", "[1-9]")
+        .withVariable("paramValue", "abc")
+        .run();
 
     assertThat(uri, equalTo("/testPath/abc"));
   }

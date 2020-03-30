@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.http.api.HttpMessageBuilder.refreshSystemProperties;
 import static org.mule.extension.http.internal.HttpConnectorConstants.ENCODE_URI_PARAMS_PROPERTY;
+
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.junit.AfterClass;
@@ -33,9 +34,23 @@ public class HttpRequestUriParamsEncodingTestCase extends HttpRequestUriParamsTe
 
   @Override
   public void uriParamsContainsReservedUriCharacter() throws Exception {
-    flowRunner("reservedUriCharacter").withPayload(TEST_MESSAGE)
-        .withVariable("paramName", "testParam").withVariable("paramValue", "$a/word%here\\").run();
+    flowRunner("reservedUriCharacter")
+        .withPayload(TEST_MESSAGE)
+        .withVariable("paramName", "testParam")
+        .withVariable("paramValue", "$a/word%here\\")
+        .run();
 
     assertThat(uri, equalTo("/testPath/%24a%2Fword%25here%5C"));
+  }
+
+  @Override
+  public void uriParamsContainsSpaces() throws Exception {
+    flowRunner("spaceUriCharacter")
+        .withPayload(TEST_MESSAGE)
+        .withVariable("param name", "testParam")
+        .withVariable("paramValue", "a word+here")
+        .run();
+
+    assertThat(uri, equalTo("/testPath/a%20word%2Bhere"));
   }
 }
