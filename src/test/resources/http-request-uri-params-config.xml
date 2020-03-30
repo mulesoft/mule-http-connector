@@ -37,7 +37,7 @@
     <flow name="uriParamNull">
         <http:request config-ref="config" path="testPath/{testParam1}/{testParam2}">
             <http:uri-params>
-                #[mel:['testParam1' : 'testValue1' , 'testParam2' : payload]]
+                #[{'testParam1' : 'testValue1' , 'testParam2' : payload}]
             </http:uri-params>
         </http:request>
     </flow>
@@ -46,6 +46,14 @@
         <http:request config-ref="config" path="testPath/{testParam}">
             <http:uri-params>
                 #[(vars.paramName): vars.paramValue]
+            </http:uri-params>
+        </http:request>
+    </flow>
+
+    <flow name="spaceUriCharacter">
+        <http:request config-ref="config" path="testPath/{testParam}">
+            <http:uri-params>
+                #[(vars['param name']): vars.paramValue]
             </http:uri-params>
         </http:request>
     </flow>
