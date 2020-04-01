@@ -10,12 +10,16 @@ import static java.lang.String.format;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.extension.http.api.error.HttpError.CLIENT_ERROR;
+import static org.mule.extension.http.api.error.HttpError.SERVER_ERROR;
 import static org.mule.extension.http.internal.listener.HttpListener.HTTP_NAMESPACE;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
-import static org.mule.runtime.extension.api.error.MuleErrors.ANY;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_GATEWAY;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.EXPECTATION_FAILED;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.FORBIDDEN;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.GATEWAY_TIMEOUT;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.HTTP_VERSION_NOT_SUPPORTED;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.METHOD_NOT_ALLOWED;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.NOT_ACCEPTABLE;
@@ -26,6 +30,16 @@ import static org.mule.runtime.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.UNSUPPORTED_MEDIA_TYPE;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.ERRORS;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.ERROR_HANDLING;
+
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang3.SystemUtils;
+import org.junit.Rule;
+import org.junit.Test;
+
+import org.mule.extension.http.api.error.HttpError;
 import org.mule.functional.api.exception.ExpectedError;
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.util.concurrent.Latch;
@@ -33,15 +47,8 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.http.api.HttpConstants.HttpStatus;
 import org.mule.tck.junit4.rule.DynamicPort;
 
-import java.io.IOException;
-
-import javax.servlet.http.HttpServletResponse;
-
 import io.qameta.allure.Stories;
 import io.qameta.allure.Story;
-import org.apache.commons.lang3.SystemUtils;
-import org.junit.Rule;
-import org.junit.Test;
 
 @Stories({@Story(ERROR_HANDLING), @Story(ERRORS)})
 public class HttpRequestErrorHandlingTestCase extends AbstractHttpRequestTestCase {
@@ -112,9 +119,27 @@ public class HttpRequestErrorHandlingTestCase extends AbstractHttpRequestTestCas
   }
 
   @Test
-  public void notMappedStatus() throws Exception {
-    verifyErrorWhenReceiving(EXPECTATION_FAILED, "417 not understood", ANY.name(),
-                             getErrorMessage(" with status code 417"));
+  public void notMappedClientErrorStatus() throws Exception {
+    verifyErrorWhenReceiving(EXPECTATION_FAILED, "417 Client Error", CLIENT_ERROR.name(),
+                             getErrorMessage(": client error (417)"));
+  }
+
+  @Test
+  public void gatewayTimeout() throws Exception {
+    verifyErrorWhenReceiving(GATEWAY_TIMEOUT, "504 Gateway Timeout", HttpError.GATEWAY_TIMEOUT.name(),
+                             getErrorMessage(": gateway timeout (504)"));
+  }
+
+  @Test
+  public void badGateway() throws Exception {
+    verifyErrorWhenReceiving(BAD_GATEWAY, "502 Bad Gateway", HttpError.BAD_GATEWAY.name(),
+                             getErrorMessage(": bad gateway (502)"));
+  }
+
+  @Test
+  public void notMappedServerError() throws Exception {
+    verifyErrorWhenReceiving(HTTP_VERSION_NOT_SUPPORTED, "505 Server Error", SERVER_ERROR.name(),
+                             getErrorMessage(": server error (505)"));
   }
 
   @Test

@@ -6,7 +6,9 @@
  */
 package org.mule.extension.http.api.error;
 
+import static java.util.Arrays.stream;
 import static java.util.Collections.unmodifiableSet;
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.extension.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.getStatusByCode;
@@ -20,6 +22,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * Represents an error that can happen in an HTTP operation.
@@ -31,6 +34,12 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
   PARSING,
 
   TIMEOUT,
+
+  // represents any 4xx error
+  CLIENT_ERROR((Predicate<Integer>) statusCode -> statusCode >= 400 && statusCode < 500),
+
+  // represents any 5xx error
+  SERVER_ERROR((Predicate<Integer>) statusCode -> statusCode >= 500),
 
   SECURITY(MuleErrors.SECURITY),
 
@@ -57,13 +66,17 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
   NOT_ACCEPTABLE,
 
   UNSUPPORTED_MEDIA_TYPE(
-      request -> "media type " + request.getHeaderValue(CONTENT_TYPE) + " not supported"),
+      (Function<HttpRequest, String>) request -> "media type " + request.getHeaderValue(CONTENT_TYPE) + " not supported"),
 
   TOO_MANY_REQUESTS,
 
   INTERNAL_SERVER_ERROR,
 
-  SERVICE_UNAVAILABLE;
+  SERVICE_UNAVAILABLE,
+
+  BAD_GATEWAY,
+
+  GATEWAY_TIMEOUT;
 
   private static Set<ErrorTypeDefinition> httpRequestOperationErrors;
 
@@ -72,6 +85,8 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
 
     errors.add(PARSING);
     errors.add(TIMEOUT);
+    errors.add(CLIENT_ERROR);
+    errors.add(SERVER_ERROR);
     errors.add(SECURITY);
     errors.add(CLIENT_SECURITY);
     errors.add(CONNECTIVITY);
@@ -85,6 +100,9 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
     errors.add(NOT_ACCEPTABLE);
     errors.add(INTERNAL_SERVER_ERROR);
     errors.add(SERVICE_UNAVAILABLE);
+    errors.add(GATEWAY_TIMEOUT);
+    errors.add(BAD_GATEWAY);
+    errors.add(SERVICE_UNAVAILABLE);
 
     httpRequestOperationErrors = unmodifiableSet(errors);
   }
@@ -93,9 +111,12 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
 
   private Function<HttpRequest, String> errorMessageFunction;
 
+  private Optional<Predicate<Integer>> errorFamilyMatcher;
+
   HttpError() {
     String message = this.name().replace("_", " ").toLowerCase();
     errorMessageFunction = httpRequest -> message;
+    errorFamilyMatcher = empty();
   }
 
   HttpError(ErrorTypeDefinition<?> parentErrorType) {
@@ -111,6 +132,12 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
   HttpError(ErrorTypeDefinition<?> parentErrorType, Function<HttpRequest, String> errorMessageFunction) {
     this.parentErrorType = parentErrorType;
     this.errorMessageFunction = errorMessageFunction;
+    errorFamilyMatcher = empty();
+  }
+
+  HttpError(Predicate<Integer> errorFamilyMatcher) {
+    this();
+    this.errorFamilyMatcher = ofNullable(errorFamilyMatcher);
   }
 
   @Override
@@ -132,7 +159,9 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
       try {
         error = HttpError.valueOf(status.name());
       } catch (Throwable e) {
-        // Do nothing
+        error = stream(HttpError.values()).filter(httpError -> httpError.isParentOf(statusCode))
+            .findFirst()
+            .orElse(null);
       }
     }
     return ofNullable(error);
@@ -153,6 +182,10 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
       }
     }
     return ofNullable(result);
+  }
+
+  public boolean isParentOf(int statusCode) {
+    return errorFamilyMatcher.orElse(p -> false).test(statusCode);
   }
 
   public static Set<ErrorTypeDefinition> getHttpRequestOperationErrors() {
