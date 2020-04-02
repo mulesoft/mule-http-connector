@@ -111,12 +111,12 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
 
   private Function<HttpRequest, String> errorMessageFunction;
 
-  private Optional<Predicate<Integer>> errorFamilyMatcher;
+  private Optional<Predicate<Integer>> errorCategoryMatcher;
 
   HttpError() {
     String message = this.name().replace("_", " ").toLowerCase();
     errorMessageFunction = httpRequest -> message;
-    errorFamilyMatcher = empty();
+    errorCategoryMatcher = empty();
   }
 
   HttpError(ErrorTypeDefinition<?> parentErrorType) {
@@ -132,12 +132,12 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
   HttpError(ErrorTypeDefinition<?> parentErrorType, Function<HttpRequest, String> errorMessageFunction) {
     this.parentErrorType = parentErrorType;
     this.errorMessageFunction = errorMessageFunction;
-    errorFamilyMatcher = empty();
+    errorCategoryMatcher = empty();
   }
 
-  HttpError(Predicate<Integer> errorFamilyMatcher) {
+  HttpError(Predicate<Integer> errorCategoryMatcher) {
     this();
-    this.errorFamilyMatcher = ofNullable(errorFamilyMatcher);
+    this.errorCategoryMatcher = ofNullable(errorCategoryMatcher);
   }
 
   @Override
@@ -159,9 +159,10 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
       try {
         error = HttpError.valueOf(status.name());
       } catch (Throwable e) {
+        // Do nothing
       }
       if (error == null) {
-        error = stream(HttpError.values()).filter(httpError -> httpError.isParentOf(statusCode))
+        error = stream(HttpError.values()).filter(httpError -> httpError.isWithinCategory(statusCode))
             .findFirst()
             .orElse(null);
       }
@@ -194,10 +195,10 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
    * @param statusCode
    * @return
    *
-   * @since 1.6.0
+   * @since 1.5.17
    */
-  public boolean isParentOf(int statusCode) {
-    return errorFamilyMatcher.orElse(p -> false).test(statusCode);
+  public boolean isWithinCategory(int statusCode) {
+    return errorCategoryMatcher.orElse(p -> false).test(statusCode);
   }
 
   public static Set<ErrorTypeDefinition> getHttpRequestOperationErrors() {
