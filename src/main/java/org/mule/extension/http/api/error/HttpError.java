@@ -36,10 +36,10 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
   TIMEOUT,
 
   // represents any 4xx error
-  CLIENT_ERROR((Predicate<Integer>) statusCode -> statusCode >= 400 && statusCode < 500),
+  CLIENT_SIDE((Predicate<Integer>) statusCode -> statusCode >= 400 && statusCode < 500),
 
   // represents any 5xx error
-  SERVER_ERROR((Predicate<Integer>) statusCode -> statusCode >= 500),
+  SERVER_SIDE((Predicate<Integer>) statusCode -> statusCode >= 500),
 
   SECURITY(MuleErrors.SECURITY),
 
@@ -85,8 +85,8 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
 
     errors.add(PARSING);
     errors.add(TIMEOUT);
-    errors.add(CLIENT_ERROR);
-    errors.add(SERVER_ERROR);
+    errors.add(CLIENT_SIDE);
+    errors.add(SERVER_SIDE);
     errors.add(SECURITY);
     errors.add(CLIENT_SECURITY);
     errors.add(CONNECTIVITY);
@@ -159,6 +159,8 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
       try {
         error = HttpError.valueOf(status.name());
       } catch (Throwable e) {
+      }
+      if (error == null) {
         error = stream(HttpError.values()).filter(httpError -> httpError.isParentOf(statusCode))
             .findFirst()
             .orElse(null);
@@ -184,6 +186,16 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
     return ofNullable(result);
   }
 
+  /**
+   * Returns whether the error is the parent of a given error represented by a {@code statusCode}. Parent means that the error
+   * belongs to the same hierarchy or kind of error. For example, 4xx are client errors, 5xx are server errors, etc, so a generic
+   * client error should be the parent of a more specific forbidden one (error code 403).
+   * 
+   * @param statusCode
+   * @return
+   *
+   * @since 1.6.0
+   */
   public boolean isParentOf(int statusCode) {
     return errorFamilyMatcher.orElse(p -> false).test(statusCode);
   }

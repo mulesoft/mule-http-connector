@@ -10,8 +10,8 @@ import static java.lang.String.format;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.extension.http.api.error.HttpError.CLIENT_ERROR;
-import static org.mule.extension.http.api.error.HttpError.SERVER_ERROR;
+import static org.mule.extension.http.api.error.HttpError.CLIENT_SIDE;
+import static org.mule.extension.http.api.error.HttpError.SERVER_SIDE;
 import static org.mule.extension.http.internal.listener.HttpListener.HTTP_NAMESPACE;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_GATEWAY;
@@ -35,6 +35,8 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 import org.apache.commons.lang3.SystemUtils;
 import org.junit.Rule;
 import org.junit.Test;
@@ -119,27 +121,35 @@ public class HttpRequestErrorHandlingTestCase extends AbstractHttpRequestTestCas
   }
 
   @Test
+  @Issue("MULE-18247")
+  @Description("Any 4xx error that isn't mapped in an HttpError should be a generic CLIENT_SIDE error")
   public void notMappedClientErrorStatus() throws Exception {
-    verifyErrorWhenReceiving(EXPECTATION_FAILED, "417 Client Error", CLIENT_ERROR.name(),
-                             getErrorMessage(": client error (417)"));
+    verifyErrorWhenReceiving(EXPECTATION_FAILED, "417 Client Error", CLIENT_SIDE.name(),
+                             getErrorMessage(": client side (417)"));
   }
 
   @Test
+  @Issue("MULE-18247")
+  @Description("Receive the correct 504 error")
   public void gatewayTimeout() throws Exception {
     verifyErrorWhenReceiving(GATEWAY_TIMEOUT, "504 Gateway Timeout", HttpError.GATEWAY_TIMEOUT.name(),
                              getErrorMessage(": gateway timeout (504)"));
   }
 
   @Test
+  @Issue("MULE-18247")
+  @Description("Receive the correct 502 error")
   public void badGateway() throws Exception {
     verifyErrorWhenReceiving(BAD_GATEWAY, "502 Bad Gateway", HttpError.BAD_GATEWAY.name(),
                              getErrorMessage(": bad gateway (502)"));
   }
 
   @Test
+  @Issue("MULE-18247")
+  @Description("Any 5xx error that isn't mapped in an HttpError should be a generic SERVER_SIDE error")
   public void notMappedServerError() throws Exception {
-    verifyErrorWhenReceiving(HTTP_VERSION_NOT_SUPPORTED, "505 Server Error", SERVER_ERROR.name(),
-                             getErrorMessage(": server error (505)"));
+    verifyErrorWhenReceiving(HTTP_VERSION_NOT_SUPPORTED, "505 Server Error", SERVER_SIDE.name(),
+                             getErrorMessage(": server side (505)"));
   }
 
   @Test
