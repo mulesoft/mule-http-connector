@@ -10,16 +10,14 @@ import static java.lang.String.format;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.extension.http.api.error.HttpError.CLIENT_SIDE;
-import static org.mule.extension.http.api.error.HttpError.SERVER_SIDE;
 import static org.mule.extension.http.internal.listener.HttpListener.HTTP_NAMESPACE;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
+import static org.mule.runtime.extension.api.error.MuleErrors.ANY;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_GATEWAY;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.EXPECTATION_FAILED;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.FORBIDDEN;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.GATEWAY_TIMEOUT;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.HTTP_VERSION_NOT_SUPPORTED;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.METHOD_NOT_ALLOWED;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.NOT_ACCEPTABLE;
@@ -121,11 +119,9 @@ public class HttpRequestErrorHandlingTestCase extends AbstractHttpRequestTestCas
   }
 
   @Test
-  @Issue("MULE-18247")
-  @Description("Any 4xx error that isn't mapped in an HttpError should be a generic CLIENT_SIDE error")
-  public void notMappedClientErrorStatus() throws Exception {
-    verifyErrorWhenReceiving(EXPECTATION_FAILED, "417 Client Error", CLIENT_SIDE.name(),
-                             getErrorMessage(": client side (417)"));
+  public void notMappedStatus() throws Exception {
+    verifyErrorWhenReceiving(EXPECTATION_FAILED, "417 not understood", ANY.name(),
+                             getErrorMessage(" with status code 417"));
   }
 
   @Test
@@ -142,14 +138,6 @@ public class HttpRequestErrorHandlingTestCase extends AbstractHttpRequestTestCas
   public void badGateway() throws Exception {
     verifyErrorWhenReceiving(BAD_GATEWAY, "502 Bad Gateway", HttpError.BAD_GATEWAY.name(),
                              getErrorMessage(": bad gateway (502)"));
-  }
-
-  @Test
-  @Issue("MULE-18247")
-  @Description("Any 5xx error that isn't mapped in an HttpError should be a generic SERVER_SIDE error")
-  public void notMappedServerError() throws Exception {
-    verifyErrorWhenReceiving(HTTP_VERSION_NOT_SUPPORTED, "505 Server Error", SERVER_SIDE.name(),
-                             getErrorMessage(": server side (505)"));
   }
 
   @Test

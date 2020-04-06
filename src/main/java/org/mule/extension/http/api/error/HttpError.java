@@ -8,7 +8,6 @@ package org.mule.extension.http.api.error;
 
 import static java.util.Arrays.stream;
 import static java.util.Collections.unmodifiableSet;
-import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.extension.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.getStatusByCode;
@@ -22,7 +21,6 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 /**
  * Represents an error that can happen in an HTTP operation.
@@ -34,12 +32,6 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
   PARSING,
 
   TIMEOUT,
-
-  // represents any 4xx error
-  CLIENT_SIDE((Predicate<Integer>) statusCode -> statusCode >= 400 && statusCode < 500),
-
-  // represents any 5xx error
-  SERVER_SIDE((Predicate<Integer>) statusCode -> statusCode >= 500),
 
   SECURITY(MuleErrors.SECURITY),
 
@@ -66,7 +58,7 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
   NOT_ACCEPTABLE,
 
   UNSUPPORTED_MEDIA_TYPE(
-      (Function<HttpRequest, String>) request -> "media type " + request.getHeaderValue(CONTENT_TYPE) + " not supported"),
+      request -> "media type " + request.getHeaderValue(CONTENT_TYPE) + " not supported"),
 
   TOO_MANY_REQUESTS,
 
@@ -85,8 +77,6 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
 
     errors.add(PARSING);
     errors.add(TIMEOUT);
-    errors.add(CLIENT_SIDE);
-    errors.add(SERVER_SIDE);
     errors.add(SECURITY);
     errors.add(CLIENT_SECURITY);
     errors.add(CONNECTIVITY);
@@ -100,9 +90,8 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
     errors.add(NOT_ACCEPTABLE);
     errors.add(INTERNAL_SERVER_ERROR);
     errors.add(SERVICE_UNAVAILABLE);
-    errors.add(GATEWAY_TIMEOUT);
     errors.add(BAD_GATEWAY);
-    errors.add(SERVICE_UNAVAILABLE);
+    errors.add(GATEWAY_TIMEOUT);
 
     httpRequestOperationErrors = unmodifiableSet(errors);
   }
@@ -111,12 +100,9 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
 
   private Function<HttpRequest, String> errorMessageFunction;
 
-  private Optional<Predicate<Integer>> errorCategoryMatcher;
-
   HttpError() {
     String message = this.name().replace("_", " ").toLowerCase();
     errorMessageFunction = httpRequest -> message;
-    errorCategoryMatcher = empty();
   }
 
   HttpError(ErrorTypeDefinition<?> parentErrorType) {
@@ -132,12 +118,6 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
   HttpError(ErrorTypeDefinition<?> parentErrorType, Function<HttpRequest, String> errorMessageFunction) {
     this.parentErrorType = parentErrorType;
     this.errorMessageFunction = errorMessageFunction;
-    errorCategoryMatcher = empty();
-  }
-
-  HttpError(Predicate<Integer> errorCategoryMatcher) {
-    this();
-    this.errorCategoryMatcher = ofNullable(errorCategoryMatcher);
   }
 
   @Override
@@ -156,16 +136,10 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
     HttpError error = null;
     HttpStatus status = getStatusByCode(statusCode);
     if (status != null) {
-      try {
-        error = HttpError.valueOf(status.name());
-      } catch (Throwable e) {
-        // Do nothing
-      }
-      if (error == null) {
-        error = stream(HttpError.values()).filter(httpError -> httpError.isWithinCategory(statusCode))
-            .findFirst()
-            .orElse(null);
-      }
+      error = stream(HttpError.values())
+          .filter(httpError -> httpError.name().equals(status.name()))
+          .findFirst()
+          .orElse(null);
     }
     return ofNullable(error);
   }
@@ -185,20 +159,6 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
       }
     }
     return ofNullable(result);
-  }
-
-  /**
-   * Returns whether the error is the parent of a given error represented by a {@code statusCode}. Parent means that the error
-   * belongs to the same hierarchy or kind of error. For example, 4xx are client errors, 5xx are server errors, etc, so a generic
-   * client error should be the parent of a more specific forbidden one (error code 403).
-   * 
-   * @param statusCode
-   * @return
-   *
-   * @since 1.5.17
-   */
-  public boolean isWithinCategory(int statusCode) {
-    return errorCategoryMatcher.orElse(p -> false).test(statusCode);
   }
 
   public static Set<ErrorTypeDefinition> getHttpRequestOperationErrors() {
