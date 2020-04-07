@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.api.error;
 
+import static java.util.Arrays.stream;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Optional.ofNullable;
 import static org.mule.extension.http.api.HttpHeaders.Names.CONTENT_TYPE;
@@ -63,7 +64,11 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
 
   INTERNAL_SERVER_ERROR,
 
-  SERVICE_UNAVAILABLE;
+  SERVICE_UNAVAILABLE,
+
+  BAD_GATEWAY,
+
+  GATEWAY_TIMEOUT;
 
   private static Set<ErrorTypeDefinition> httpRequestOperationErrors;
 
@@ -85,6 +90,8 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
     errors.add(NOT_ACCEPTABLE);
     errors.add(INTERNAL_SERVER_ERROR);
     errors.add(SERVICE_UNAVAILABLE);
+    errors.add(BAD_GATEWAY);
+    errors.add(GATEWAY_TIMEOUT);
 
     httpRequestOperationErrors = unmodifiableSet(errors);
   }
@@ -129,11 +136,10 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
     HttpError error = null;
     HttpStatus status = getStatusByCode(statusCode);
     if (status != null) {
-      try {
-        error = HttpError.valueOf(status.name());
-      } catch (Throwable e) {
-        // Do nothing
-      }
+      error = stream(HttpError.values())
+          .filter(httpError -> httpError.name().equals(status.name()))
+          .findFirst()
+          .orElse(null);
     }
     return ofNullable(error);
   }

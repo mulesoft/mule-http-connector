@@ -51,6 +51,12 @@
             <on-error-continue type="http:CONNECTIVITY">
                 <set-payload value="#[error.cause.message ++ ' connectivity']"/>
             </on-error-continue>
+            <on-error-continue type="http:BAD_GATEWAY">
+                <set-payload value="#[error.errorMessage.attributes.statusCode ++ ' Bad Gateway']"/>
+            </on-error-continue>
+            <on-error-continue type="http:GATEWAY_TIMEOUT">
+                <set-payload value="#[error.errorMessage.attributes.statusCode ++ ' Gateway Timeout']"/>
+            </on-error-continue>
             <on-error-continue type="ANY">
                 <set-payload value="#[error.errorMessage.attributes.statusCode ++ ' not understood']"/>
             </on-error-continue>
