@@ -58,7 +58,7 @@ public class HttpResponseFactoryTestCase extends AbstractMuleContextTestCase {
     headers.put(CONTENT_LENGTH, WRONG_CONTENT_LENGTH);
     when(listenerResponseBuilder.getHeaders()).thenReturn(headers);
     when(listenerResponseBuilder.getStatusCode()).thenReturn(OK.getStatusCode());
-    HttpResponseFactory httpResponseBuilder = new HttpResponseFactory(AUTO, muleContext.getTransformationService());
+    HttpResponseFactory httpResponseBuilder = new HttpResponseFactory(AUTO, muleContext.getTransformationService(), () -> false);
 
     HttpResponse httpResponse =
         httpResponseBuilder.create(HttpResponse.builder(), new NoInterception(), listenerResponseBuilder, true);
@@ -76,7 +76,7 @@ public class HttpResponseFactoryTestCase extends AbstractMuleContextTestCase {
     when(listenerResponseBuilder.getHeaders()).thenReturn(new MultiMap<>());
     when(listenerResponseBuilder.getStatusCode()).thenReturn(OK.getStatusCode());
 
-    HttpResponseFactory httpResponseBuilder = new HttpResponseFactory(AUTO, muleContext.getTransformationService());
+    HttpResponseFactory httpResponseBuilder = new HttpResponseFactory(AUTO, muleContext.getTransformationService(), () -> false);
 
     exceptionGrabber.expect(RuntimeException.class);
     exceptionGrabber.expectMessage(INVALID_DATA_MSG);
