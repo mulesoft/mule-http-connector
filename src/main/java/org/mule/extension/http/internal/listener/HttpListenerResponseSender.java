@@ -27,7 +27,7 @@ public class HttpListenerResponseSender {
   }
 
   public HttpListenerResponseSender(TransformationService transformationService) {
-    this.responseFactory = new HttpResponseFactory(HttpStreamingType.NEVER, transformationService);
+    this.responseFactory = new HttpResponseFactory(HttpStreamingType.NEVER, transformationService, () -> false);
   }
 
   public void sendResponse(HttpResponseContext context,

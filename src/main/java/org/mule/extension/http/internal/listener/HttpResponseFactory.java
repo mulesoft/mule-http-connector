@@ -15,10 +15,12 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.NOT_MODIFIED;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.NO_CONTENT;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.getReasonPhraseForStatusCode;
+import static org.mule.runtime.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
+import static org.mule.runtime.http.api.HttpHeaders.Values.CLOSE;
 
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
@@ -43,6 +45,8 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.function.Supplier;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,14 +64,17 @@ public class HttpResponseFactory {
   private HttpStreamingType responseStreaming = AUTO;
   private TransformationService transformationService;
   private Map<Class, TriFunction<TypedValue, Boolean, HttpResponseHeaderBuilder, HttpEntity>> payloadHandlerMapper;
+  private Supplier<Boolean> shouldForceConnectionCloseHeader;
 
   private static final String INVALID_DATA_MSG = "Attempted to send invalid data through http response.";
 
   public HttpResponseFactory(HttpStreamingType responseStreaming,
-                             TransformationService transformationService) {
+                             TransformationService transformationService,
+                             Supplier<Boolean> shouldForceConnectionCloseHeader) {
     this.responseStreaming = responseStreaming;
     this.transformationService = transformationService;
     this.payloadHandlerMapper = new HashMap<>();
+    this.shouldForceConnectionCloseHeader = shouldForceConnectionCloseHeader;
     initResponsePayloadHandlers();
   }
 
@@ -110,6 +117,7 @@ public class HttpResponseFactory {
 
     addInterceptingHeaders(interception, httpResponseHeaderBuilder);
     addUserHeaders(listenerResponseBuilder, supportsTransferEncoding, httpResponseHeaderBuilder);
+    addConnectionCloseHeaderIfStopping(httpResponseHeaderBuilder);
 
     TypedValue<Object> body = listenerResponseBuilder.getBody();
     if (httpResponseHeaderBuilder.getContentType() == null && !ANY.matches(body.getDataType().getMediaType())) {
@@ -168,6 +176,13 @@ public class HttpResponseFactory {
 
     responseBuilder.entity(httpEntity);
     return responseBuilder.build();
+  }
+
+  private void addConnectionCloseHeaderIfStopping(HttpResponseHeaderBuilder httpResponseHeaderBuilder) {
+    if (shouldForceConnectionCloseHeader.get()) {
+      httpResponseHeaderBuilder.removeHeader(CONNECTION);
+      httpResponseHeaderBuilder.addHeader(CONNECTION, CLOSE);
+    }
   }
 
   private void addInterceptingHeaders(Interception interception, HttpResponseHeaderBuilder httpResponseHeaderBuilder) {
