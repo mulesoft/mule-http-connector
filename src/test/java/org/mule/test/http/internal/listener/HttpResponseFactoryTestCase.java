@@ -11,12 +11,17 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.extension.http.api.HttpHeaders.Values.CLOSE;
+import static org.mule.extension.http.api.HttpHeaders.Values.KEEP_ALIVE;
 import static org.mule.extension.http.api.streaming.HttpStreamingType.AUTO;
 import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
+import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.runtime.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
 
+import io.qameta.allure.Issue;
 import org.eclipse.jetty.http.HttpStatus;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.internal.listener.HttpResponseFactory;
@@ -29,6 +34,7 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.function.Supplier;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
@@ -58,7 +64,7 @@ public class HttpResponseFactoryTestCase extends AbstractMuleContextTestCase {
     headers.put(CONTENT_LENGTH, WRONG_CONTENT_LENGTH);
     when(listenerResponseBuilder.getHeaders()).thenReturn(headers);
     when(listenerResponseBuilder.getStatusCode()).thenReturn(OK.getStatusCode());
-    HttpResponseFactory httpResponseBuilder = new HttpResponseFactory(AUTO, muleContext.getTransformationService());
+    HttpResponseFactory httpResponseBuilder = new HttpResponseFactory(AUTO, muleContext.getTransformationService(), () -> false);
 
     HttpResponse httpResponse =
         httpResponseBuilder.create(HttpResponse.builder(), new NoInterception(), listenerResponseBuilder, true);
@@ -76,11 +82,63 @@ public class HttpResponseFactoryTestCase extends AbstractMuleContextTestCase {
     when(listenerResponseBuilder.getHeaders()).thenReturn(new MultiMap<>());
     when(listenerResponseBuilder.getStatusCode()).thenReturn(OK.getStatusCode());
 
-    HttpResponseFactory httpResponseBuilder = new HttpResponseFactory(AUTO, muleContext.getTransformationService());
+    HttpResponseFactory httpResponseBuilder = new HttpResponseFactory(AUTO, muleContext.getTransformationService(), () -> false);
 
     exceptionGrabber.expect(RuntimeException.class);
     exceptionGrabber.expectMessage(INVALID_DATA_MSG);
     httpResponseBuilder.create(HttpResponse.builder(), new NoInterception(), listenerResponseBuilder, true);
   }
 
+  @Issue("MULE-18396")
+  @Test
+  @Description("Forces connection close header honoring the constructor supplier.")
+  public void forceConnectionCloseHeaderWhenNotPresent() {
+    checkForceConnectionCloseHeader(true, null);
+  }
+
+  @Issue("MULE-18396")
+  @Test
+  @Description("Forces connection close header honoring the constructor supplier.")
+  public void forceConnectionCloseHeaderWhenPresent() {
+    checkForceConnectionCloseHeader(true, KEEP_ALIVE);
+  }
+
+  @Issue("MULE-18396")
+  @Test
+  @Description("Doesn't force connection close header honoring the constructor supplier.")
+  public void doesNotForceConnectionCloseHeaderWhenNotPresent() {
+    checkForceConnectionCloseHeader(false, null);
+  }
+
+  @Issue("MULE-18396")
+  @Test
+  @Description("Doesn't force connection close header honoring the constructor supplier.")
+  public void doesNotForceConnectionCloseHeaderWhenPresent() {
+    checkForceConnectionCloseHeader(false, KEEP_ALIVE);
+  }
+
+  private void checkForceConnectionCloseHeader(final boolean shouldForceConnectionClose, String defaultValue) {
+    HttpListenerResponseBuilder listenerResponseBuilder = mock(HttpListenerResponseBuilder.class);
+    TypedValue<Object> payload = new TypedValue<>(EXAMPLE_STRING, STRING);
+    when(listenerResponseBuilder.getBody()).thenReturn(payload);
+    when(listenerResponseBuilder.getStatusCode()).thenReturn(OK.getStatusCode());
+
+    MultiMap<String, String> headers = new MultiMap<>();
+    if (defaultValue != null) {
+      headers.put(CONNECTION, defaultValue);
+    }
+    when(listenerResponseBuilder.getHeaders()).thenReturn(headers);
+
+    HttpResponseFactory httpResponseBuilder =
+        new HttpResponseFactory(AUTO, muleContext.getTransformationService(), () -> shouldForceConnectionClose);
+
+    HttpResponse httpResponseWithHeader =
+        httpResponseBuilder.create(HttpResponse.builder(), new NoInterception(), listenerResponseBuilder, true);
+
+    if (shouldForceConnectionClose) {
+      assertThat(httpResponseWithHeader.getHeaderValue(CONNECTION), is(CLOSE));
+    } else {
+      assertThat(httpResponseWithHeader.getHeaderValue(CONNECTION), is(defaultValue));
+    }
+  }
 }
