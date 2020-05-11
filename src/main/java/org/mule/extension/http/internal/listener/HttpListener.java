@@ -53,6 +53,8 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.notification.Notification;
+import org.mule.runtime.api.notification.NotificationListener;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.MuleContext;
@@ -101,6 +103,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
@@ -304,8 +307,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   public void onStart(SourceCallback<InputStream, HttpRequestAttributes> sourceCallback) throws MuleException {
     server = serverProvider.connect();
     resolveFullPath();
-    responseFactory =
-        new HttpResponseFactory(responseStreamingMode, transformationService);
+    responseFactory = new HttpResponseFactory(responseStreamingMode, transformationService, this::isContextStopping);
     responseSender = new HttpListenerResponseSender(responseFactory);
     startIfNeeded(responseFactory);
 
@@ -347,8 +349,16 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
     return matchers;
   }
 
+  private boolean isContextStopping() {
+    return muleContext.isStopping() || muleContext.isStopped();
+  }
+
   @Override
   public void onStop() {
+    if (isContextStopping()) {
+      server.stop();
+    }
+
     if (requestHandlerManager != null) {
       requestHandlerManager.stop();
       requestHandlerManager.dispose();
