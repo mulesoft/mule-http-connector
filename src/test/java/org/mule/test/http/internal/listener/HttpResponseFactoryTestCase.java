@@ -21,6 +21,7 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
 
+import io.qameta.allure.Issue;
 import org.eclipse.jetty.http.HttpStatus;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.internal.listener.HttpResponseFactory;
@@ -88,24 +89,28 @@ public class HttpResponseFactoryTestCase extends AbstractMuleContextTestCase {
     httpResponseBuilder.create(HttpResponse.builder(), new NoInterception(), listenerResponseBuilder, true);
   }
 
+  @Issue("MULE-18396")
   @Test
   @Description("Forces connection close header honoring the constructor supplier.")
   public void forceConnectionCloseHeaderWhenNotPresent() {
     checkForceConnectionCloseHeader(true, null);
   }
 
+  @Issue("MULE-18396")
   @Test
   @Description("Forces connection close header honoring the constructor supplier.")
   public void forceConnectionCloseHeaderWhenPresent() {
     checkForceConnectionCloseHeader(true, KEEP_ALIVE);
   }
 
+  @Issue("MULE-18396")
   @Test
   @Description("Doesn't force connection close header honoring the constructor supplier.")
   public void doesNotForceConnectionCloseHeaderWhenNotPresent() {
     checkForceConnectionCloseHeader(false, null);
   }
 
+  @Issue("MULE-18396")
   @Test
   @Description("Doesn't force connection close header honoring the constructor supplier.")
   public void doesNotForceConnectionCloseHeaderWhenPresent() {
