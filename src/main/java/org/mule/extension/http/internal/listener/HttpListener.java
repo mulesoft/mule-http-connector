@@ -350,7 +350,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
 
   @Override
   public void onStop() {
-    if (isContextStopping()) {
+    if (isContextStopping() && !server.isStopped()) {
       server.stop();
     }
 
