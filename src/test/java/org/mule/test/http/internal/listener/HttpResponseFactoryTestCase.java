@@ -92,32 +92,32 @@ public class HttpResponseFactoryTestCase extends AbstractMuleContextTestCase {
   @Issue("MULE-18396")
   @Test
   @Description("Forces connection close header honoring the constructor supplier.")
-  public void forceConnectionCloseHeaderWhenNotPresent() {
+  public void forceConnectionCloseHeaderWhenNotPresent() throws IOException {
     checkForceConnectionCloseHeader(true, null);
   }
 
   @Issue("MULE-18396")
   @Test
   @Description("Forces connection close header honoring the constructor supplier.")
-  public void forceConnectionCloseHeaderWhenPresent() {
+  public void forceConnectionCloseHeaderWhenPresent() throws IOException {
     checkForceConnectionCloseHeader(true, KEEP_ALIVE);
   }
 
   @Issue("MULE-18396")
   @Test
   @Description("Doesn't force connection close header honoring the constructor supplier.")
-  public void doesNotForceConnectionCloseHeaderWhenNotPresent() {
+  public void doesNotForceConnectionCloseHeaderWhenNotPresent() throws IOException {
     checkForceConnectionCloseHeader(false, null);
   }
 
   @Issue("MULE-18396")
   @Test
   @Description("Doesn't force connection close header honoring the constructor supplier.")
-  public void doesNotForceConnectionCloseHeaderWhenPresent() {
+  public void doesNotForceConnectionCloseHeaderWhenPresent() throws IOException {
     checkForceConnectionCloseHeader(false, KEEP_ALIVE);
   }
 
-  private void checkForceConnectionCloseHeader(final boolean shouldForceConnectionClose, String defaultValue) {
+  private void checkForceConnectionCloseHeader(final boolean shouldForceConnectionClose, String defaultValue) throws IOException {
     HttpListenerResponseBuilder listenerResponseBuilder = mock(HttpListenerResponseBuilder.class);
     TypedValue<Object> payload = new TypedValue<>(EXAMPLE_STRING, STRING);
     when(listenerResponseBuilder.getBody()).thenReturn(payload);
