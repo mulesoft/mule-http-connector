@@ -17,7 +17,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.runtime.policy.api.SourcePolicyPointcutParametersFactory;
 
-public class CompatibilityHttpListenerPolicyPointcutParameters implements SourcePolicyPointcutParametersFactory {
+public class CompatibilityHttpListenerPolicyPointcutParametersFactory implements SourcePolicyPointcutParametersFactory {
 
   @Override
   public <T> PolicyPointcutParameters createPolicyPointcutParameters(Component component, TypedValue<T> attributes) {
