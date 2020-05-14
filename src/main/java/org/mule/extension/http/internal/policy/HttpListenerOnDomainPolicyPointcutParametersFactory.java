@@ -18,6 +18,11 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.runtime.policy.api.SourcePolicyPointcutParametersFactory;
 
+/**
+ * When HTTP is on a domain, optimizations based on requested attributes by deployed policies in an Application can't be
+ * performed. Therefore, it is assumed that HTTP pathes are always needed and HTTP headers are never needed when creating
+ * {@link PolicyPointcutParameters}
+ */
 public class HttpListenerOnDomainPolicyPointcutParametersFactory implements SourcePolicyPointcutParametersFactory {
 
   @Override

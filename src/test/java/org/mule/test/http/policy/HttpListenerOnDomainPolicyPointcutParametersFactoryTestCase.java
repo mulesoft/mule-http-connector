@@ -26,12 +26,14 @@ import org.mule.runtime.policy.api.SourcePolicyPointcutParametersFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Test;
 
 @Feature(HTTP_EXTENSION)
 @Story(POLICY_SUPPORT)
+@Issue("MULE-18403")
 public class HttpListenerOnDomainPolicyPointcutParametersFactoryTestCase extends AbstractMuleTestCase {
 
   private static final String TEST_REQUEST_PATH = "test-request-path";
