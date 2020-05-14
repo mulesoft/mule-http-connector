@@ -8,6 +8,7 @@ package org.mule.extension.http.internal.policy;
 
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
+import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.policy.HttpListenerPolicyPointcutParameters;
@@ -17,7 +18,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.runtime.policy.api.SourcePolicyPointcutParametersFactory;
 
-public class CompatibilityHttpListenerPolicyPointcutParameters implements SourcePolicyPointcutParametersFactory {
+public class HttpListenerOnDomainPolicyPointcutParametersFactory implements SourcePolicyPointcutParametersFactory {
 
   @Override
   public <T> PolicyPointcutParameters createPolicyPointcutParameters(Component component, TypedValue<T> attributes) {
@@ -30,8 +31,11 @@ public class CompatibilityHttpListenerPolicyPointcutParameters implements Source
     }
 
     HttpRequestAttributes httpRequestAttributes = (HttpRequestAttributes) attributes.getValue();
-    return new HttpListenerPolicyPointcutParameters(component, httpRequestAttributes.getRequestPath(),
-                                                    httpRequestAttributes.getMethod());
+    return new HttpListenerPolicyPointcutParameters(component,
+                                                    httpRequestAttributes.getRequestPath(),
+                                                    httpRequestAttributes.getMethod(),
+                                                    httpRequestAttributes.getMaskedRequestPath(),
+                                                    emptyMultiMap());
   }
 
   @Override
