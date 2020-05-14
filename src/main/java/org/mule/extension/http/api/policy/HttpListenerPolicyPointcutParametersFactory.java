@@ -10,7 +10,8 @@ import static org.mule.extension.http.internal.policy.ReflectiveHttpListenerPoli
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.core.api.util.ClassUtils.isClassOnPath;
 
-import org.mule.extension.http.internal.policy.CompatibilityHttpListenerPolicyPointcutParameters;
+import org.mule.extension.http.internal.policy.CompatibilityHttpListenerPolicyPointcutParametersFactory;
+import org.mule.extension.http.internal.policy.HttpListenerOnDomainPolicyPointcutParametersFactory;
 import org.mule.extension.http.internal.policy.ReflectiveHttpListenerPolicyPointcutParametersFactory;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -19,6 +20,8 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.policy.PolicyProvider;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.runtime.policy.api.SourcePolicyPointcutParametersFactory;
+
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -32,7 +35,7 @@ public class HttpListenerPolicyPointcutParametersFactory implements SourcePolicy
   private final static ComponentIdentifier listenerIdentifier =
       builder().namespace("http").name("listener").build();
 
-  private PolicyProvider policyProvider;
+  private Optional<PolicyProvider> policyProvider;
   private SourcePolicyPointcutParametersFactory factoryDelegate;
 
   @Override
@@ -47,15 +50,30 @@ public class HttpListenerPolicyPointcutParametersFactory implements SourcePolicy
   }
 
   @Inject
-  public void setPolicyProvider(PolicyProvider policyProvider) {
+  public void setPolicyProvider(Optional<PolicyProvider> policyProvider) {
     this.policyProvider = policyProvider;
   }
 
   @Override
   public void initialise() {
-    factoryDelegate =
-        isClassOnPath(SOURCE_POLICY_AWARE_ATTRIBUTES_CLASS_NAME, this.getClass())
-            ? new ReflectiveHttpListenerPolicyPointcutParametersFactory(policyProvider)
-            : new CompatibilityHttpListenerPolicyPointcutParameters();
+    if (isPointcutAttributesApiAvailable()) {
+      if (isInDomain()) {
+        factoryDelegate = new HttpListenerOnDomainPolicyPointcutParametersFactory();
+      } else {
+        factoryDelegate = new ReflectiveHttpListenerPolicyPointcutParametersFactory(policyProvider.get());
+      }
+    } else
+      factoryDelegate = new CompatibilityHttpListenerPolicyPointcutParametersFactory();
+  }
+
+  private boolean isPointcutAttributesApiAvailable() {
+    return isClassOnPath(SOURCE_POLICY_AWARE_ATTRIBUTES_CLASS_NAME, this.getClass());
+  }
+
+  /**
+   * When configured in a Domain, Policy provider is not present since it belongs to the App
+   */
+  private boolean isInDomain() {
+    return !policyProvider.isPresent();
   }
 }
