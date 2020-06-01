@@ -106,19 +106,19 @@
 
     <flow name="testFlowGlobalContextDefaultProtocolsClient">
         <http:listener config-ref="globalConfigDefault" path="/" allowedMethods="GET"/>
-        <expression-component>mel:payload = 'ok'</expression-component>
+        <set-payload value="ok"/>
     </flow>
     <flow name="testFlowGlobalContextCustomProtocolsInvalidClient">
         <http:listener config-ref="globalConfigTLSv1.1" path="/" allowedMethods="GET"/>
-        <expression-component>mel:payload = 'ok'</expression-component>
+        <set-payload value="ok"/>
     </flow>
     <flow name="testFlowGlobalContextCustomProtocolsValidClient">
         <http:listener config-ref="globalConfigAllTLS" path="/" allowedMethods="GET"/>
-        <expression-component>mel:payload = 'ok'</expression-component>
+        <set-payload value="ok"/>
     </flow>
     <flow name="testFlowGlobalContextCustomProtocolsPropertyClient">
         <http:listener config-ref="globalConfigTLSv1.2" path="/" allowedMethods="GET"/>
-        <expression-component>mel:payload = 'ok'</expression-component>
+        <set-payload value="ok"/>
     </flow>
 
 </mule>
