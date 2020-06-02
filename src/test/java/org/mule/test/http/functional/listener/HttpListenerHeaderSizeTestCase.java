@@ -10,19 +10,22 @@ import static java.lang.String.format;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.appendQueryParam;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.REQUEST_TOO_LONG;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
+import org.apache.http.client.fluent.Response;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
 import org.apache.http.client.fluent.Request;
 import org.junit.Rule;
 import org.junit.Test;
+
+import java.io.IOException;
 
 public class HttpListenerHeaderSizeTestCase extends AbstractHttpTestCase {
 
@@ -41,25 +44,24 @@ public class HttpListenerHeaderSizeTestCase extends AbstractHttpTestCase {
 
   @Test
   public void maxHeaderSizeExceeded() throws Exception {
-    HttpResponse response =
-        sendRequestWithQueryParam(Integer.valueOf(maxHeaderSectionSizeSystemProperty.getValue()) + SIZE_DELTA);
-    StatusLine statusLine = response.getStatusLine();
-    assertThat(statusLine.getStatusCode(), is(BAD_REQUEST.getStatusCode()));
-    assertThat(statusLine.getReasonPhrase(), is(BAD_REQUEST.getReasonPhrase()));
+    int queryParamSize = Integer.parseInt(maxHeaderSectionSizeSystemProperty.getValue()) + SIZE_DELTA;
+    Response response = sendRequestWithQueryParam(queryParamSize);
+    StatusLine statusLine = response.returnResponse().getStatusLine();
+    assertThat(statusLine.getStatusCode(), is(REQUEST_TOO_LONG.getStatusCode()));
+    assertThat(statusLine.getReasonPhrase(), is(REQUEST_TOO_LONG.getReasonPhrase()));
   }
 
   @Test
   public void maxHeaderSizeNotExceeded() throws Exception {
-    int queryParamSize = Integer.valueOf(maxHeaderSectionSizeSystemProperty.getValue()) - SIZE_DELTA;
-    HttpResponse response = sendRequestWithQueryParam(queryParamSize);
+    int queryParamSize = Integer.parseInt(maxHeaderSectionSizeSystemProperty.getValue()) - SIZE_DELTA;
+    HttpResponse response = sendRequestWithQueryParam(queryParamSize).returnResponse();
     assertThat(response.getStatusLine().getStatusCode(), is(OK.getStatusCode()));
-    assertThat((int) response.getEntity().getContentLength(), is(queryParamSize));
   }
 
-  private HttpResponse sendRequestWithQueryParam(int queryParamSize) throws Exception {
-    String longQueryParamValue = RandomStringUtils.randomAlphanumeric(queryParamSize);
-    String urlWithQueryParameter =
-        appendQueryParam(format("http://localhost:%d/", dynamicPort.getNumber()), "longQueryParam", longQueryParamValue);
-    return Request.Post(urlWithQueryParameter).execute().returnResponse();
+  private Response sendRequestWithQueryParam(int queryParamSize) throws IOException {
+    String longHeaderValue = RandomStringUtils.randomAlphanumeric(queryParamSize);
+    String urlWithQueryParameter = format("http://localhost:%d/", dynamicPort.getNumber());
+    return Request.Get(urlWithQueryParameter).setHeader("header", longHeaderValue)
+        .execute();
   }
 }
