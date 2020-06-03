@@ -11,7 +11,15 @@
     </http:request-config>
 
     <flow name="retryFlow">
-        <http:request config-ref="requestConfig" method="#[vars.httpMethod]"  path="test" />
+        <http:request config-ref="requestConfig" method="#[vars.httpMethod]" path="test" />
+    </flow>
+
+    <flow name="testRetryPolicyWithPayload">
+        <http:request config-ref="requestConfig" method="#[vars.httpMethod]" path="test">
+            <http:body>
+                #[payload]
+            </http:body>
+        </http:request>
     </flow>
 
 </mule>
