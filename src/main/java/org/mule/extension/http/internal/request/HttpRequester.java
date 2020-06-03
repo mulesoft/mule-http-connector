@@ -258,7 +258,7 @@ public class HttpRequester {
       } else {
         if (logger.isDebugEnabled()) {
           logger.debug("Sending HTTP message failed with `" + IOException.class.getCanonicalName() + ": " + REMOTELY_CLOSED
-                  + "`. Request will not be retried because entity not support retry.");
+              + "`. Request will not be retried because entity not support retry.");
         }
         shouldRetry = false;
       }
@@ -273,8 +273,8 @@ public class HttpRequester {
   private boolean entitySupportRetry(HttpRequest request) {
     boolean entitySupportRetry = true;
     if (request.getEntity() != null && request.getEntity().isStreaming()) {
-        // If input stream is not 'mark supported' can not be consumed again so retry is not supported
-        entitySupportRetry = request.getEntity().getContent().markSupported();
+      // If input stream is not 'mark supported' can not be consumed again so retry is not supported
+      entitySupportRetry = request.getEntity().getContent().markSupported();
     }
     return entitySupportRetry;
   }
