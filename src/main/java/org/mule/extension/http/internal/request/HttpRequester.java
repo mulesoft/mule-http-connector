@@ -153,7 +153,7 @@ public class HttpRequester {
           } else {
             checkIfRemotelyClosed(exception, client.getDefaultUriParameters());
 
-            if (shouldRetryRemotelyClosed(exception, retryCount, httpRequest.getMethod())) {
+            if (shouldRetryRemotelyClosed(exception, retryCount, httpRequest)) {
               doRequestWithRetry(client, config, uri, method, streamingMode, sendBodyMode, followRedirects,
                                  authentication, responseTimeout, responseValidator, transformationService,
                                  requestBuilder, checkRetry, muleContext, scheduler, notificationEmitter,
@@ -247,18 +247,36 @@ public class HttpRequester {
     }
   }
 
-  private boolean shouldRetryRemotelyClosed(Throwable exception, int retryCount, String httpMethod) {
+  private boolean shouldRetryRemotelyClosed(Throwable exception, int retryCount, HttpRequest httpRequest) {
     boolean shouldRetry = exception instanceof IOException && containsIgnoreCase(exception.getMessage(), REMOTELY_CLOSED)
-        && supportsRetry(httpMethod) && retryCount > 0;
+        && supportsRetry(httpRequest.getMethod()) && retryCount > 0;
     if (shouldRetry) {
-      logger.warn("Sending HTTP message failed with `" + IOException.class.getCanonicalName() + ": " + REMOTELY_CLOSED
-          + "`. Request will be retried " + retryCount + " time(s) before failing.");
+      boolean entitySupportRetry = entitySupportRetry(httpRequest);
+      if (entitySupportRetry) {
+        logger.warn("Sending HTTP message failed with `" + IOException.class.getCanonicalName() + ": " + REMOTELY_CLOSED
+            + "`. Request will be retried " + retryCount + " time(s) before failing.");
+      } else {
+        if (logger.isDebugEnabled()) {
+          logger.debug("Sending HTTP message failed with `" + IOException.class.getCanonicalName() + ": " + REMOTELY_CLOSED
+              + "`. Request will not be retried because entity not support retry.");
+        }
+        shouldRetry = false;
+      }
     }
     return shouldRetry;
   }
 
   private boolean supportsRetry(String httpMethod) {
     return RETRY_ON_ALL_METHODS || IDEMPOTENT_METHODS.contains(httpMethod);
+  }
+
+  private boolean entitySupportRetry(HttpRequest request) {
+    boolean entitySupportRetry = true;
+    if (request.getEntity() != null && request.getEntity().isStreaming()) {
+      // If input stream is not 'mark supported' can not be consumed again so retry is not supported
+      entitySupportRetry = request.getEntity().getContent().markSupported();
+    }
+    return entitySupportRetry;
   }
 
   public static void refreshSystemProperties() {
