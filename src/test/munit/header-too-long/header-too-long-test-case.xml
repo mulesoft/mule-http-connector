@@ -5,7 +5,7 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
       xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
-      xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
+      xmlns="http://www.mulesoft.org/schema/mule/core" xsi:schemaLocation="
       	http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
 		http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
@@ -16,7 +16,7 @@
 
     <munit:dynamic-port propertyName="dynamic.port"/>
 
-    <http:listener-config name="HttpListenerConfig" doc:name="listener" >
+    <http:listener-config name="HttpListenerConfig">
         <http:listener-connection host="0.0.0.0" port="${dynamic.port}" />
     </http:listener-config>
 
@@ -28,8 +28,8 @@
             <munit:enable-flow-source value="ListenerFlow" />
         </munit:enable-flow-sources>
         <munit:execution >
-            <try doc:name="Try" doc:id="4c64049c-d03e-4d49-9afc-41e9ec1fd3ef" >
-                <http:request method="GET" doc:name="Request" path="/" config-ref="HttpRequestConfig">
+            <try>
+                <http:request method="GET" path="/" config-ref="HttpRequestConfig">
                     <http:headers><![CDATA[#[%dw 2.0
 import * from dw::core::Strings
 ---
@@ -38,20 +38,20 @@ import * from dw::core::Strings
 }]]]></http:headers>
                 </http:request>
                 <error-handler >
-                    <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="bf4f7911-69e9-40e6-8937-dd6ac75ac59d" >
-                        <set-variable value="#[error.description]" doc:name="Set Variable" doc:id="fb860e88-5f66-419a-857a-ef50daaae82b" variableName="errorMessage"/>
+                    <on-error-continue enableNotifications="true" logException="true">
+                        <set-variable value="#[error.description]" variableName="errorMessage"/>
                     </on-error-continue>
                 </error-handler>
             </try>
         </munit:execution>
         <munit:validation>
-            <munit-tools:assert-that doc:name="Assert that" doc:id="aa1cf034-0b19-4706-a995-bcb5fc0730d7" is="#[MunitTools::containsString('failed with status code 413')]" expression="#[vars.errorMessage]"/>
+            <munit-tools:assert-that is="#[MunitTools::containsString('failed with status code 413')]" expression="#[vars.errorMessage]"/>
         </munit:validation>
     </munit:test>
     <flow name="ListenerFlow" >
-        <http:listener doc:name="Listener" config-ref="HttpListenerConfig" path="*" responseStreamingMode="NEVER">
+        <http:listener config-ref="HttpListenerConfig" path="*" responseStreamingMode="NEVER">
             <non-repeatable-stream />
         </http:listener>
-        <set-payload value='#["Dummy payload"]' doc:name="Set Payload" />
+        <set-payload value='#["Dummy payload"]'/>
     </flow>
 </mule>
