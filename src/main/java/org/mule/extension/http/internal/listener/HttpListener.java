@@ -322,7 +322,6 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
         requestHandlerManager =
             server.addRequestHandler(path, getRequestHandler(sourceCallback));
       }
-      server.start();
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
     }
@@ -356,7 +355,9 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
 
   @Override
   public void onStop() {
-    server.stop();
+    if (isContextStopping() && !server.isStopped()) {
+      server.stop();
+    }
 
     if (requestHandlerManager != null) {
       requestHandlerManager.stop();

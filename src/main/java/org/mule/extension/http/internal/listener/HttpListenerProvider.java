@@ -9,7 +9,6 @@ package org.mule.extension.http.internal.listener;
 import static java.lang.String.format;
 import static org.mule.extension.http.internal.HttpConnectorConstants.TLS_CONFIGURATION;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
-import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -27,6 +26,7 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -40,15 +40,11 @@ import org.mule.runtime.http.api.HttpConstants;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.http.api.server.HttpServer;
 import org.mule.runtime.http.api.server.HttpServerConfiguration;
-import org.mule.runtime.http.api.server.RequestHandler;
-import org.mule.runtime.http.api.server.RequestHandlerManager;
 import org.mule.runtime.http.api.server.ServerAddress;
 import org.mule.runtime.http.api.server.ServerCreationException;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
 
@@ -157,6 +153,9 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
   @Inject
   private SchedulerService schedulerService;
 
+  @Inject
+  private MuleContext muleContext;
+
   private HttpServer server;
 
   @Override
@@ -190,7 +189,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
     HttpServerConfiguration serverConfiguration = getServerConfiguration();
 
     try {
-      server = new ShareableHttpServer(httpService.getServerFactory().create(serverConfiguration));
+      server = httpService.getServerFactory().create(serverConfiguration);
     } catch (ServerCreationException e) {
       throw new InitialisationException(createStaticMessage(buildFailureMessage("create", e)), e, this);
     }
@@ -263,7 +262,17 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
 
   @Override
   public HttpServer connect() throws ConnectionException {
-    return server;
+    return new HttpServerDelegate(server) {
+
+      @Override
+      public HttpServer stop() {
+        if (muleContext.isStopping() || muleContext.isStopped()) {
+          return super.stop();
+        } else {
+          return getDelegate();
+        }
+      }
+    };
   }
 
   @Override
@@ -291,90 +300,4 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
       connectionParams.connectionIdleTimeout = 0;
     }
   }
-
-  private static class ShareableHttpServer extends HttpServerDelegate {
-
-    private final AtomicInteger timesStarted = new AtomicInteger(0);
-
-    ShareableHttpServer(HttpServer delegate) {
-      super(delegate);
-    }
-
-    @Override
-    public HttpServer start() throws IOException {
-      if (timesStarted.getAndIncrement() == 0 && isStopped()) {
-        return super.start();
-      } else {
-        return getDelegate();
-      }
-    }
-
-    @Override
-    public HttpServer stop() {
-      if (timesStarted.decrementAndGet() == 0 && !isStopped()) {
-        return super.stop();
-      } else {
-        return getDelegate();
-      }
-    }
-  }
-
-  private static class HttpServerDelegate implements HttpServer {
-
-    private final HttpServer delegate;
-
-    HttpServerDelegate(HttpServer delegate) {
-      this.delegate = delegate;
-    }
-
-    @Override
-    public HttpServer start() throws IOException {
-      return delegate.start();
-    }
-
-    @Override
-    public HttpServer stop() {
-      return delegate.stop();
-    }
-
-    @Override
-    public void dispose() {
-      delegate.dispose();
-    }
-
-    @Override
-    public ServerAddress getServerAddress() {
-      return delegate.getServerAddress();
-    }
-
-    @Override
-    public HttpConstants.Protocol getProtocol() {
-      return delegate.getProtocol();
-    }
-
-    @Override
-    public boolean isStopping() {
-      return delegate.isStopping();
-    }
-
-    @Override
-    public boolean isStopped() {
-      return delegate.isStopped();
-    }
-
-    @Override
-    public RequestHandlerManager addRequestHandler(Collection<String> methods, String path, RequestHandler requestHandler) {
-      return delegate.addRequestHandler(methods, path, requestHandler);
-    }
-
-    @Override
-    public RequestHandlerManager addRequestHandler(String path, RequestHandler requestHandler) {
-      return delegate.addRequestHandler(path, requestHandler);
-    }
-
-    protected HttpServer getDelegate() {
-      return delegate;
-    }
-  }
-
 }
