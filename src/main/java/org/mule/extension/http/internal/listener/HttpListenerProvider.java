@@ -267,10 +267,9 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
       @Override
       public HttpServer stop() {
         if (muleContext.isStopping() || muleContext.isStopped()) {
-          return super.stop();
-        } else {
-          return getDelegate();
+          super.stop();
         }
+        return this;
       }
     };
   }

@@ -28,12 +28,14 @@ public class HttpServerDelegate implements HttpServer {
 
   @Override
   public HttpServer start() throws IOException {
-    return delegate.start();
+    delegate.start();
+    return this;
   }
 
   @Override
   public HttpServer stop() {
-    return delegate.stop();
+    delegate.stop();
+    return this;
   }
 
   @Override
