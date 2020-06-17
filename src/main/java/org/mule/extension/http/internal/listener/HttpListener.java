@@ -53,8 +53,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.api.notification.Notification;
-import org.mule.runtime.api.notification.NotificationListener;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.api.util.MultiMap;
