@@ -23,6 +23,7 @@ import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.tls.TlsContextFactory;
@@ -150,6 +151,10 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
   @Inject
   private SchedulerService schedulerService;
 
+  @Inject
+  private NotificationListenerRegistry notificationListenerRegistry;
+
+  private MuleContextStopWatcher muleContextStopWatcher;
   private HttpServer server;
 
   @Override
@@ -186,6 +191,11 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
       server = httpService.getServerFactory().create(serverConfiguration);
     } catch (ServerCreationException e) {
       throw new InitialisationException(createStaticMessage(buildFailureMessage("create", e)), e, this);
+    }
+
+    if (muleContextStopWatcher == null) {
+      muleContextStopWatcher = new MuleContextStopWatcher();
+      notificationListenerRegistry.registerListener(muleContextStopWatcher);
     }
   }
 
@@ -246,7 +256,9 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
 
   @Override
   public void stop() throws MuleException {
-    server.stop();
+    if (!server.isStopped()) {
+      server.stop();
+    }
   }
 
   @Override
@@ -256,7 +268,16 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
 
   @Override
   public HttpServer connect() throws ConnectionException {
-    return server;
+    return new HttpServerDelegate(server) {
+
+      @Override
+      public HttpServer stop() {
+        if (muleContextStopWatcher.isStopping()) {
+          super.stop();
+        }
+        return this;
+      }
+    };
   }
 
   @Override
@@ -284,5 +305,4 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
       connectionParams.connectionIdleTimeout = 0;
     }
   }
-
 }
