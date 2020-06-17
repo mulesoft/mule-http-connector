@@ -23,10 +23,10 @@ import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -154,7 +154,9 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
   private SchedulerService schedulerService;
 
   @Inject
-  private MuleContext muleContext;
+  private NotificationListenerRegistry notificationListenerRegistry;
+
+  private MuleContextLifecycleWatcher muleContextLifecycleWatcher;
 
   private HttpServer server;
 
@@ -192,6 +194,11 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
       server = httpService.getServerFactory().create(serverConfiguration);
     } catch (ServerCreationException e) {
       throw new InitialisationException(createStaticMessage(buildFailureMessage("create", e)), e, this);
+    }
+
+    if (muleContextLifecycleWatcher == null) {
+      muleContextLifecycleWatcher = new MuleContextLifecycleWatcher();
+      notificationListenerRegistry.registerListener(muleContextLifecycleWatcher);
     }
   }
 
@@ -252,7 +259,9 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
 
   @Override
   public void stop() throws MuleException {
-    server.stop();
+    if (!server.isStopped()) {
+      server.stop();
+    }
   }
 
   @Override
@@ -266,7 +275,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
 
       @Override
       public HttpServer stop() {
-        if (muleContext.isStopping() || muleContext.isStopped()) {
+        if (!muleContextLifecycleWatcher.isMuleContextStarted()) {
           super.stop();
         }
         return this;
