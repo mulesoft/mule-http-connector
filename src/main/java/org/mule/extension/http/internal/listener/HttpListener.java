@@ -148,7 +148,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   @Inject
   private NotificationListenerRegistry notificationListenerRegistry;
 
-  private MuleContextLifecycleWatcher muleContextLifecycleWatcher;
+  private MuleContextStopWatcher muleContextStopWatcher;
 
   /**
    * Relative path from the path set in the HTTP Listener configuration
@@ -331,9 +331,9 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
     knownErrors = new DisjunctiveErrorTypeMatcher(createErrorMatcherList(muleContext.getErrorTypeRepository()));
     requestHandlerManager.start();
 
-    if (muleContextLifecycleWatcher == null) {
-      muleContextLifecycleWatcher = new MuleContextLifecycleWatcher();
-      notificationListenerRegistry.registerListener(muleContextLifecycleWatcher);
+    if (muleContextStopWatcher == null) {
+      muleContextStopWatcher = new MuleContextStopWatcher();
+      notificationListenerRegistry.registerListener(muleContextStopWatcher);
     }
   }
 
@@ -358,7 +358,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   }
 
   private boolean isContextStopping() {
-    return !muleContextLifecycleWatcher.isMuleContextStarted();
+    return muleContextStopWatcher.isStopping();
   }
 
   @Override

@@ -11,20 +11,20 @@ import static org.mule.runtime.core.api.context.notification.MuleContextNotifica
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 
-public class MuleContextLifecycleWatcher implements MuleContextNotificationListener<MuleContextNotification> {
+class MuleContextStopWatcher implements MuleContextNotificationListener<MuleContextNotification> {
 
-  private volatile boolean isStarted = true;
+  private volatile boolean stopping = false;
 
   @Override
   public synchronized void onNotification(MuleContextNotification notification) {
     if (notification.getAction().getActionId() == CONTEXT_STOPPING) {
-      isStarted = false;
+      stopping = true;
     } else if (notification.getAction().getActionId() == CONTEXT_STARTING) {
-      isStarted = true;
+      stopping = false;
     }
   }
 
-  public synchronized boolean isMuleContextStarted() {
-    return isStarted;
+  synchronized boolean isStopping() {
+    return stopping;
   }
 }

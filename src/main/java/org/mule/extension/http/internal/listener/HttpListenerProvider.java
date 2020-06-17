@@ -156,8 +156,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
   @Inject
   private NotificationListenerRegistry notificationListenerRegistry;
 
-  private MuleContextLifecycleWatcher muleContextLifecycleWatcher;
-
+  private MuleContextStopWatcher muleContextStopWatcher;
   private HttpServer server;
 
   @Override
@@ -196,9 +195,9 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
       throw new InitialisationException(createStaticMessage(buildFailureMessage("create", e)), e, this);
     }
 
-    if (muleContextLifecycleWatcher == null) {
-      muleContextLifecycleWatcher = new MuleContextLifecycleWatcher();
-      notificationListenerRegistry.registerListener(muleContextLifecycleWatcher);
+    if (muleContextStopWatcher == null) {
+      muleContextStopWatcher = new MuleContextStopWatcher();
+      notificationListenerRegistry.registerListener(muleContextStopWatcher);
     }
   }
 
@@ -275,7 +274,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
 
       @Override
       public HttpServer stop() {
-        if (!muleContextLifecycleWatcher.isMuleContextStarted()) {
+        if (muleContextStopWatcher.isStopping()) {
           super.stop();
         }
         return this;
