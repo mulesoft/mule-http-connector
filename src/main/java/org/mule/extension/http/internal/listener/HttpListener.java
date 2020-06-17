@@ -53,8 +53,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.api.notification.Notification;
-import org.mule.runtime.api.notification.NotificationListener;
+import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.MuleContext;
@@ -105,7 +104,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
@@ -144,6 +142,11 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
 
   @Connection
   private ConnectionProvider<HttpServer> serverProvider;
+
+  @Inject
+  private NotificationListenerRegistry notificationListenerRegistry;
+
+  private MuleContextStopWatcher muleContextStopWatcher;
 
   /**
    * Relative path from the path set in the HTTP Listener configuration
@@ -322,6 +325,11 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
     }
     knownErrors = new DisjunctiveErrorTypeMatcher(createErrorMatcherList(muleContext.getErrorTypeRepository()));
     requestHandlerManager.start();
+
+    if (muleContextStopWatcher == null) {
+      muleContextStopWatcher = new MuleContextStopWatcher();
+      notificationListenerRegistry.registerListener(muleContextStopWatcher);
+    }
   }
 
   private void resolveFullPath() {
@@ -345,7 +353,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   }
 
   private boolean isContextStopping() {
-    return muleContext.isStopping() || muleContext.isStopped();
+    return muleContextStopWatcher.isStopping();
   }
 
   @Override
