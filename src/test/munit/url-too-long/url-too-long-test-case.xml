@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:java="http://www.mulesoft.org/schema/mule/java"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+      xmlns="http://www.mulesoft.org/schema/mule/core" xsi:schemaLocation="
+      	http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd">
+
+    <munit:config name="url-too-long-test-case" minMuleVersion="4.4.0"/>
+
+    <munit:dynamic-port propertyName="dynamic.port"/>
+
+    <http:listener-config name="UrlTooLongHttpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="${dynamic.port}" />
+    </http:listener-config>
+
+    <http:request-config name="UrlTooLongHttpRequestConfig" >
+        <http:request-connection host="localhost" port="${dynamic.port}"/>
+    </http:request-config>
+    <munit:test name="url-too-long-test" description="Test">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="ListenerFlow" />
+        </munit:enable-flow-sources>
+        <munit:execution >
+            <try>
+                <http:request method="GET" path='#[%dw 2.0
+import * from dw::core::Strings
+---
+"/" ++ repeat("path",3000)]' config-ref="UrlTooLongHttpRequestConfig">
+                </http:request>
+                <error-handler >
+                    <on-error-continue enableNotifications="true" logException="true">
+                        <set-variable value="#[error.description]" variableName="errorMessage"/>
+                    </on-error-continue>
+                </error-handler>
+            </try>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that is="#[MunitTools::containsString('failed with status code 414')]" expression="#[vars.errorMessage]"/>
+        </munit:validation>
+    </munit:test>
+    <flow name="UrlTooLongListenerFlow" >
+        <http:listener config-ref="HttpListenerConfig" path="*" responseStreamingMode="NEVER">
+            <non-repeatable-stream />
+        </http:listener>
+        <set-payload value='#["Dummy payload"]'/>
+    </flow>
+</mule>
