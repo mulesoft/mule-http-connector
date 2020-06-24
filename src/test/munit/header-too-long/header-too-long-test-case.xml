@@ -23,6 +23,7 @@
     <http:request-config name="HttpRequestConfig" >
         <http:request-connection host="localhost" port="${dynamic.port}"/>
     </http:request-config>
+
     <munit:test name="header-too-long-test" description="Test" ignore="#[Munit::muleVersionEqualTo('4.3.0')]">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="ListenerFlow" />
