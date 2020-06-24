@@ -12,7 +12,7 @@
         http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
         http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd">
 
-    <munit:config name="url-too-long-test-case" minMuleVersion="4.4.0"/>
+    <munit:config name="url-too-long-test-case" minMuleVersion="4.2.3"/>
 
     <munit:dynamic-port propertyName="dynamic.port"/>
 
@@ -23,7 +23,8 @@
     <http:request-config name="UrlTooLongHttpRequestConfig" >
         <http:request-connection host="localhost" port="${dynamic.port}"/>
     </http:request-config>
-    <munit:test name="url-too-long-test" description="Test">
+
+    <munit:test name="url-too-long-test" description="Test" ignore="#[Munit::muleVersionEqualTo('4.3.0')]">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="ListenerFlow" />
         </munit:enable-flow-sources>
