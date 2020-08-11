@@ -30,16 +30,16 @@ public class SuccessStatusCodeValidator extends RangeStatusCodeValidator {
   }
 
   @Override
-  public void validate(Result<InputStream, HttpResponseAttributes> result, HttpRequest request) {
+  public void validate(Result<Object, HttpResponseAttributes> result, HttpRequest request) {
     validate(result, status -> throwValidationException(result, request, status));
   }
 
   @Override
-  public void validate(Result<InputStream, HttpResponseAttributes> result, HttpRequest request, StreamingHelper streamingHelper) {
+  public void validate(Result<Object, HttpResponseAttributes> result, HttpRequest request, StreamingHelper streamingHelper) {
     validate(result, status -> throwValidationException(toMessage(result, streamingHelper), request, status));
   }
 
-  private void validate(Result<InputStream, HttpResponseAttributes> result, Consumer<Integer> ifInvalid) {
+  private void validate(Result<Object, HttpResponseAttributes> result, Consumer<Integer> ifInvalid) {
     int status = result.getAttributes().get().getStatusCode();
 
     if (!belongs(status)) {

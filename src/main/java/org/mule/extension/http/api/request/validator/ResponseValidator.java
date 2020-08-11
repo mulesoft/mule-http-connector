@@ -31,7 +31,7 @@ public interface ResponseValidator {
    *         specific error type.
    * @deprecated use {@link #validate(Result, HttpRequest, StreamingHelper)} instead
    */
-  void validate(Result<InputStream, HttpResponseAttributes> result, HttpRequest request);
+  void validate(Result<Object, HttpResponseAttributes> result, HttpRequest request);
 
   /**
    * Validates whether an HTTP response result should be accepted or not, failing in that case. By default this will behave as
@@ -46,7 +46,7 @@ public interface ResponseValidator {
    * @throws ResponseValidatorException if the message is not considered valid and the response validator does not relates to an
    *         specific error type.
    */
-  default void validate(Result<InputStream, HttpResponseAttributes> result, HttpRequest request,
+  default void validate(Result<Object, HttpResponseAttributes> result, HttpRequest request,
                         StreamingHelper streamingHelper) {
     validate(result, request);
   }

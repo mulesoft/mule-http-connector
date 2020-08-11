@@ -39,7 +39,7 @@ public class ResponseValidatorException extends MuleRuntimeException implements 
    * @deprecated use {@link #ResponseValidatorException(String, Message)} instead.
    */
   @Deprecated
-  public ResponseValidatorException(String message, Result<InputStream, HttpResponseAttributes> result) {
+  public ResponseValidatorException(String message, Result<Object, HttpResponseAttributes> result) {
     this(message);
     this.errorMessage = Message.builder()
         .value(result.getOutput())

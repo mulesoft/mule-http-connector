@@ -111,7 +111,7 @@ public class HttpRequestOperations implements Initialisable, Disposable {
                       CorrelationInfo correlationInfo,
                       NotificationEmitter notificationEmitter,
                       StreamingHelper streamingHelper,
-                      CompletionCallback<InputStream, HttpResponseAttributes> callback) {
+                      CompletionCallback<Object, HttpResponseAttributes> callback) {
     try {
       HttpRequesterRequestBuilder resolvedBuilder = requestBuilder != null ? requestBuilder : DEFAULT_REQUEST_BUILDER;
 

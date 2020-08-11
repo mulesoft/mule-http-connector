@@ -104,7 +104,7 @@ public class HttpRequester {
                         int responseTimeout, ResponseValidator responseValidator,
                         TransformationService transformationService, HttpRequesterRequestBuilder requestBuilder,
                         boolean checkRetry, MuleContext muleContext, Scheduler scheduler, NotificationEmitter notificationEmitter,
-                        StreamingHelper streamingHelper, CompletionCallback<InputStream, HttpResponseAttributes> callback,
+                        StreamingHelper streamingHelper, CompletionCallback<Object, HttpResponseAttributes> callback,
                         Map<String, List<String>> injectedHeaders) {
     doRequestWithRetry(client, config, uri, method, streamingMode, sendBodyMode, followRedirects, authentication, responseTimeout,
                        responseValidator, transformationService, requestBuilder, checkRetry, muleContext, scheduler,
@@ -122,7 +122,7 @@ public class HttpRequester {
                                   boolean checkRetry, MuleContext muleContext, Scheduler scheduler,
                                   NotificationEmitter notificationEmitter,
                                   StreamingHelper streamingHelper,
-                                  CompletionCallback<InputStream, HttpResponseAttributes> callback, HttpRequest httpRequest,
+                                  CompletionCallback<Object, HttpResponseAttributes> callback, HttpRequest httpRequest,
                                   int retryCount, Map<String, List<String>> injectedHeaders) {
     fireNotification(notificationEmitter, REQUEST_START, () -> HttpRequestNotificationData.from(httpRequest),
                      REQUEST_NOTIFICATION_DATA_TYPE);
@@ -134,8 +134,8 @@ public class HttpRequester {
               fireNotification(notificationEmitter, REQUEST_COMPLETE, () -> HttpResponseNotificationData.from(response),
                                RESPONSE_NOTIFICATION_DATA_TYPE);
 
-              Result<InputStream, HttpResponseAttributes> result =
-                  RESPONSE_TO_RESULT.convert(config, muleContext, response, httpRequest.getUri());
+              Result<Object, HttpResponseAttributes> result =
+                  RESPONSE_TO_RESULT.convert(config, muleContext, response, httpRequest.getUri(), streamingHelper);
 
               resendRequest(result, checkRetry, authentication, () -> {
                 scheduler.submit(() -> consumePayload(result));

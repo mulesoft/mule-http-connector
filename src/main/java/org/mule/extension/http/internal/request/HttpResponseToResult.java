@@ -24,6 +24,7 @@ import org.mule.extension.http.internal.request.builder.HttpResponseAttributesBu
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 
@@ -56,8 +57,8 @@ public class HttpResponseToResult {
 
   private final Function<String, MediaType> parseMediaType = memoize(ctv -> parseMediaType(ctv), new ConcurrentHashMap<>());
 
-  public Result<InputStream, HttpResponseAttributes> convert(HttpRequesterCookieConfig config, MuleContext muleContext,
-                                                             HttpResponse response, URI uri) {
+  public Result<Object, HttpResponseAttributes> convert(HttpRequesterCookieConfig config, MuleContext muleContext,
+                                                        HttpResponse response, URI uri, StreamingHelper streamingHelper) {
     String responseContentType = response.getHeaderValue(CONTENT_TYPE);
 
     HttpEntity entity = response.getEntity();
@@ -75,13 +76,13 @@ public class HttpResponseToResult {
 
     HttpResponseAttributes responseAttributes = createAttributes(response);
 
-    final Result.Builder<InputStream, HttpResponseAttributes> builder = Result.builder();
+    final Result.Builder<Object, HttpResponseAttributes> builder = Result.builder();
     builder.mediaType(responseMediaType);
     if (entity.getLength().isPresent()) {
       builder.length(entity.getLength().get());
     }
 
-    return builder.output(entity.getContent()).attributes(responseAttributes).build();
+    return builder.output(streamingHelper.resolveCursorProvider(entity.getContent())).attributes(responseAttributes).build();
   }
 
   private boolean empty(HttpEntity entity) {

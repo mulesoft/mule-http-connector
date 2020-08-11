@@ -39,7 +39,7 @@ public class ResponseValidatorTypedException extends ModuleException implements 
    * @deprecated use {{@link #ResponseValidatorTypedException(String, HttpError, Message)}} instead
    */
   @Deprecated
-  public ResponseValidatorTypedException(String message, HttpError error, Result<InputStream, HttpResponseAttributes> result) {
+  public ResponseValidatorTypedException(String message, HttpError error, Result<Object, HttpResponseAttributes> result) {
     this(message, error);
     this.errorMessage = Message.builder()
         .value(result.getOutput())

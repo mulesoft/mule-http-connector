@@ -83,7 +83,7 @@ public abstract class RangeStatusCodeValidator implements ResponseValidator {
    * @throws ResponseValidatorTypedException
    * @throws ResponseValidatorException
    */
-  protected void throwValidationException(Result<InputStream, HttpResponseAttributes> result, HttpRequest request, int status) {
+  protected void throwValidationException(Result<Object, HttpResponseAttributes> result, HttpRequest request, int status) {
     getErrorByCode(status)
         .map(error -> {
           throw new ResponseValidatorTypedException(errorMessageGenerator.createFrom(request, status), error, result);
@@ -110,9 +110,9 @@ public abstract class RangeStatusCodeValidator implements ResponseValidator {
                      () -> new ResponseValidatorException(errorMessageGenerator.createFrom(request, status), message));
   }
 
-  protected Message toMessage(Result<InputStream, HttpResponseAttributes> result, StreamingHelper streamingHelper) {
+  protected Message toMessage(Result<Object, HttpResponseAttributes> result, StreamingHelper streamingHelper) {
     return Message.builder()
-        .value(streamingHelper.resolveCursorProvider(result.getOutput()))
+        .value(result.getOutput())
         .attributesValue(result.getAttributes().get())
         .mediaType(result.getMediaType().orElse(ANY))
         .build();
