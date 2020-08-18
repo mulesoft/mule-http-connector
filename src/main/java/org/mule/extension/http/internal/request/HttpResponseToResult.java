@@ -22,6 +22,7 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.SET_COOKIE2;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.internal.request.builder.HttpResponseAttributesBuilder;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
@@ -51,23 +52,14 @@ public class HttpResponseToResult {
 
   private static final Logger logger = LoggerFactory.getLogger(HttpResponseToResult.class);
 
-  private static final String BINARY_CONTENT_TYPE = BINARY.toRfcString();
+  static final String BINARY_CONTENT_TYPE = BINARY.toRfcString();
   private static boolean STRICT_CONTENT_TYPE = parseBoolean(getProperty(SYSTEM_PROPERTY_PREFIX + "strictContentType"));
 
   private final Function<String, MediaType> parseMediaType = memoize(ctv -> parseMediaType(ctv), new ConcurrentHashMap<>());
 
-  public Result<InputStream, HttpResponseAttributes> convert(HttpRequesterCookieConfig config, MuleContext muleContext,
-                                                             HttpResponse response, URI uri) {
-    String responseContentType = response.getHeaderValue(CONTENT_TYPE);
-
-    HttpEntity entity = response.getEntity();
-
-    if (isEmpty(responseContentType) && !empty(entity)) {
-      // RFC-2616 specifies application/octet-stream as default when none is received
-      responseContentType = BINARY_CONTENT_TYPE;
-    }
-
-    MediaType responseMediaType = getMediaType(responseContentType, getDefaultEncoding(muleContext));
+  Result<InputStream, HttpResponseAttributes> convert(HttpRequesterCookieConfig config, MuleContext muleContext,
+                                                      HttpResponse response, HttpEntity entity,
+                                                      CursorProvider payloadCursorProvider, URI uri) {
 
     if (config.isEnableCookies()) {
       processCookies(config, response, uri);
@@ -76,23 +68,23 @@ public class HttpResponseToResult {
     HttpResponseAttributes responseAttributes = createAttributes(response);
 
     final Result.Builder<InputStream, HttpResponseAttributes> builder = Result.builder();
-    builder.mediaType(responseMediaType);
+    builder.mediaType(getMediaType(getResponseContentType(response, entity), getDefaultEncoding(muleContext)));
     if (entity.getLength().isPresent()) {
       builder.length(entity.getLength().get());
     }
 
-    return builder.output(entity.getContent()).attributes(responseAttributes).build();
+    return builder.output((InputStream) payloadCursorProvider.openCursor()).attributes(responseAttributes).build();
   }
 
   private boolean empty(HttpEntity entity) {
     return entity.getLength().filter(length -> length <= 0).isPresent();
   }
 
-  private HttpResponseAttributes createAttributes(HttpResponse response) {
+  HttpResponseAttributes createAttributes(HttpResponse response) {
     return new HttpResponseAttributesBuilder().setResponse(response).build();
   }
 
-  private void processCookies(HttpRequesterCookieConfig config, HttpResponse response, URI uri) {
+  void processCookies(HttpRequesterCookieConfig config, HttpResponse response, URI uri) {
     Collection<String> setCookieHeader = response.getHeaderValues(SET_COOKIE);
     Collection<String> setCookie2Header = response.getHeaderValues(SET_COOKIE2);
 
@@ -119,7 +111,7 @@ public class HttpResponseToResult {
    * @param defaultCharset the encoding to use if the given {@code contentTypeValue} doesn't have a {@code charset} parameter.
    * @return
    */
-  private MediaType getMediaType(final String contentTypeValue, Charset defaultCharset) {
+  MediaType getMediaType(final String contentTypeValue, Charset defaultCharset) {
     MediaType mediaType;
     if (contentTypeValue != null) {
       mediaType = parseMediaType.apply(contentTypeValue);
@@ -153,4 +145,13 @@ public class HttpResponseToResult {
     STRICT_CONTENT_TYPE = parseBoolean(getProperty(SYSTEM_PROPERTY_PREFIX + "strictContentType"));
   }
 
+  private String getResponseContentType(HttpResponse response, HttpEntity entity) {
+    String responseContentType = response.getHeaderValue(CONTENT_TYPE);
+
+    if (isEmpty(responseContentType) && !empty(entity)) {
+      // RFC-2616 specifies application/octet-stream as default when none is received
+      responseContentType = BINARY_CONTENT_TYPE;
+    }
+    return responseContentType;
+  }
 }
