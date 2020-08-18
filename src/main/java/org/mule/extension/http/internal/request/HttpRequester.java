@@ -40,6 +40,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.util.IOUtils;
@@ -49,6 +50,7 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
+import org.mule.runtime.http.api.domain.entity.HttpEntity;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 
 import java.io.IOException;
@@ -134,8 +136,11 @@ public class HttpRequester {
               fireNotification(notificationEmitter, REQUEST_COMPLETE, () -> HttpResponseNotificationData.from(response),
                                RESPONSE_NOTIFICATION_DATA_TYPE);
 
+              HttpEntity entity = response.getEntity();
+              CursorProvider payloadCursorProvider = (CursorProvider) streamingHelper.resolveCursorProvider(entity.getContent());
+
               Result<InputStream, HttpResponseAttributes> result =
-                  RESPONSE_TO_RESULT.convert(config, muleContext, response, httpRequest.getUri());
+                  RESPONSE_TO_RESULT.convert(config, muleContext, response, entity, payloadCursorProvider, httpRequest.getUri());
 
               resendRequest(result, checkRetry, authentication, () -> {
                 scheduler.submit(() -> consumePayload(result));
@@ -145,7 +150,11 @@ public class HttpRequester {
                           streamingHelper, callback, injectedHeaders);
               }, () -> {
                 responseValidator.validate(result, httpRequest, streamingHelper);
-                callback.success(result);
+
+                Result<InputStream, HttpResponseAttributes> freshResult = RESPONSE_TO_RESULT
+                    .convert(config, muleContext, response, entity, payloadCursorProvider, httpRequest.getUri());
+
+                callback.success(freshResult);
               });
             } catch (Exception e) {
               callback.error(e);
