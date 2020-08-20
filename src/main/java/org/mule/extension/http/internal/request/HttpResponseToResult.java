@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Component that transforms an HTTP response to a proper {@link Result}.
@@ -52,14 +53,14 @@ public class HttpResponseToResult {
 
   private static final Logger logger = LoggerFactory.getLogger(HttpResponseToResult.class);
 
-  static final String BINARY_CONTENT_TYPE = BINARY.toRfcString();
+  private static final String BINARY_CONTENT_TYPE = BINARY.toRfcString();
   private static boolean STRICT_CONTENT_TYPE = parseBoolean(getProperty(SYSTEM_PROPERTY_PREFIX + "strictContentType"));
 
   private final Function<String, MediaType> parseMediaType = memoize(ctv -> parseMediaType(ctv), new ConcurrentHashMap<>());
 
   Result<InputStream, HttpResponseAttributes> convert(HttpRequesterCookieConfig config, MuleContext muleContext,
                                                       HttpResponse response, HttpEntity entity,
-                                                      CursorProvider payloadCursorProvider, URI uri) {
+                                                      Supplier<InputStream> payloadSupplier, URI uri) {
 
     if (config.isEnableCookies()) {
       processCookies(config, response, uri);
@@ -73,18 +74,18 @@ public class HttpResponseToResult {
       builder.length(entity.getLength().get());
     }
 
-    return builder.output((InputStream) payloadCursorProvider.openCursor()).attributes(responseAttributes).build();
+    return builder.output(payloadSupplier.get()).attributes(responseAttributes).build();
   }
 
   private boolean empty(HttpEntity entity) {
     return entity.getLength().filter(length -> length <= 0).isPresent();
   }
 
-  HttpResponseAttributes createAttributes(HttpResponse response) {
+  private HttpResponseAttributes createAttributes(HttpResponse response) {
     return new HttpResponseAttributesBuilder().setResponse(response).build();
   }
 
-  void processCookies(HttpRequesterCookieConfig config, HttpResponse response, URI uri) {
+  private void processCookies(HttpRequesterCookieConfig config, HttpResponse response, URI uri) {
     Collection<String> setCookieHeader = response.getHeaderValues(SET_COOKIE);
     Collection<String> setCookie2Header = response.getHeaderValues(SET_COOKIE2);
 
@@ -111,7 +112,7 @@ public class HttpResponseToResult {
    * @param defaultCharset the encoding to use if the given {@code contentTypeValue} doesn't have a {@code charset} parameter.
    * @return
    */
-  MediaType getMediaType(final String contentTypeValue, Charset defaultCharset) {
+  private MediaType getMediaType(final String contentTypeValue, Charset defaultCharset) {
     MediaType mediaType;
     if (contentTypeValue != null) {
       mediaType = parseMediaType.apply(contentTypeValue);

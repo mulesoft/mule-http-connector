@@ -41,6 +41,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.streaming.CursorProvider;
+import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.util.IOUtils;
@@ -137,10 +138,13 @@ public class HttpRequester {
                                RESPONSE_NOTIFICATION_DATA_TYPE);
 
               HttpEntity entity = response.getEntity();
-              CursorProvider payloadCursorProvider = (CursorProvider) streamingHelper.resolveCursorProvider(entity.getContent());
+
+              CursorProvider<CursorStream> payloadBodyCursorProvider =
+                  (CursorProvider<CursorStream>) streamingHelper.resolveCursorProvider(entity.getContent());
 
               Result<InputStream, HttpResponseAttributes> result =
-                  RESPONSE_TO_RESULT.convert(config, muleContext, response, entity, payloadCursorProvider, httpRequest.getUri());
+                  RESPONSE_TO_RESULT.convert(config, muleContext, response, entity, payloadBodyCursorProvider::openCursor,
+                                             httpRequest.getUri());
 
               resendRequest(result, checkRetry, authentication, () -> {
                 scheduler.submit(() -> consumePayload(result));
@@ -152,7 +156,7 @@ public class HttpRequester {
                 responseValidator.validate(result, httpRequest, streamingHelper);
 
                 Result<InputStream, HttpResponseAttributes> freshResult = RESPONSE_TO_RESULT
-                    .convert(config, muleContext, response, entity, payloadCursorProvider, httpRequest.getUri());
+                    .convert(config, muleContext, response, entity, payloadBodyCursorProvider::openCursor, httpRequest.getUri());
 
                 callback.success(freshResult);
               });
