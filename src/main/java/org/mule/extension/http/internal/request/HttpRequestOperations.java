@@ -14,6 +14,7 @@ import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.encodeSpaces;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
+import org.mule.extension.http.api.error.HttpErrorMessageGenerator;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
@@ -67,7 +68,8 @@ public class HttpRequestOperations implements Initialisable, Disposable {
   private static final int WAIT_FOR_EVER = MAX_VALUE;
   private static final SuccessStatusCodeValidator DEFAULT_STATUS_CODE_VALIDATOR = new SuccessStatusCodeValidator("0..399");
   private static final HttpRequesterRequestBuilder DEFAULT_REQUEST_BUILDER = new HttpRequesterRequestBuilder();
-  private static final HttpRequester REQUESTER = new HttpRequester();
+  private static final HttpRequester REQUESTER =
+      new HttpRequester(new HttpRequestFactory(), new HttpResponseToResult(), new HttpErrorMessageGenerator());
 
   @Inject
   private MuleContext muleContext;

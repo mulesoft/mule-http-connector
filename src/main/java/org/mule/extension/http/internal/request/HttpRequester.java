@@ -84,9 +84,9 @@ public class HttpRequester {
   private static final DataType REQUEST_NOTIFICATION_DATA_TYPE = DataType.fromType(HttpRequestNotificationData.class);
   private static final DataType RESPONSE_NOTIFICATION_DATA_TYPE = DataType.fromType(HttpResponseNotificationData.class);
 
-  private static final HttpRequestFactory EVENT_TO_HTTP_REQUEST = new HttpRequestFactory();
-  private static final HttpResponseToResult RESPONSE_TO_RESULT = new HttpResponseToResult();
-  private static final HttpErrorMessageGenerator ERROR_MESSAGE_GENERATOR = new HttpErrorMessageGenerator();
+  private final HttpRequestFactory httpRequestFactory;
+  private final HttpResponseToResult httpResponseToResult;
+  private final HttpErrorMessageGenerator httpErrorMessageGenerator;
 
   private static final Method fireNotificationMethod;
 
@@ -101,6 +101,13 @@ public class HttpRequester {
     fireNotificationMethod = fireLazy;
   }
 
+  public HttpRequester(HttpRequestFactory httpRequestFactory, HttpResponseToResult httpResponseToResult,
+                       HttpErrorMessageGenerator httpErrorMessageGenerator) {
+    this.httpRequestFactory = httpRequestFactory;
+    this.httpResponseToResult = httpResponseToResult;
+    this.httpErrorMessageGenerator = httpErrorMessageGenerator;
+  }
+
   public void doRequest(HttpExtensionClient client, HttpRequesterConfig config, String uri, String method,
                         HttpStreamingType streamingMode, HttpSendBodyMode sendBodyMode,
                         boolean followRedirects, HttpRequestAuthentication authentication,
@@ -112,8 +119,8 @@ public class HttpRequester {
     doRequestWithRetry(client, config, uri, method, streamingMode, sendBodyMode, followRedirects, authentication, responseTimeout,
                        responseValidator, transformationService, requestBuilder, checkRetry, muleContext, scheduler,
                        notificationEmitter, streamingHelper, callback,
-                       EVENT_TO_HTTP_REQUEST.create(config, uri, method, streamingMode, sendBodyMode, transformationService,
-                                                    requestBuilder, authentication, injectedHeaders),
+                       httpRequestFactory.create(config, uri, method, streamingMode, sendBodyMode, transformationService,
+                                                 requestBuilder, authentication, injectedHeaders),
                        RETRY_ATTEMPTS, injectedHeaders);
   }
 
@@ -143,8 +150,8 @@ public class HttpRequester {
                   (CursorProvider<CursorStream>) streamingHelper.resolveCursorProvider(entity.getContent());
 
               Result<InputStream, HttpResponseAttributes> result =
-                  RESPONSE_TO_RESULT.convert(config, muleContext, response, entity, payloadBodyCursorProvider::openCursor,
-                                             httpRequest.getUri());
+                  httpResponseToResult.convert(config, muleContext, response, entity, payloadBodyCursorProvider::openCursor,
+                                               httpRequest.getUri());
 
               resendRequest(result, checkRetry, authentication, () -> {
                 scheduler.submit(() -> consumePayload(result));
@@ -155,7 +162,7 @@ public class HttpRequester {
               }, () -> {
                 responseValidator.validate(result, httpRequest, streamingHelper);
 
-                Result<InputStream, HttpResponseAttributes> freshResult = RESPONSE_TO_RESULT
+                Result<InputStream, HttpResponseAttributes> freshResult = httpResponseToResult
                     .convert(config, muleContext, response, entity, payloadBodyCursorProvider::openCursor, httpRequest.getUri());
 
                 callback.success(freshResult);
@@ -177,7 +184,7 @@ public class HttpRequester {
 
             logger.error(getErrorMessage(httpRequest));
             HttpError error = exception instanceof TimeoutException ? TIMEOUT : CONNECTIVITY;
-            callback.error(new HttpRequestFailedException(createStaticMessage(ERROR_MESSAGE_GENERATOR
+            callback.error(new HttpRequestFailedException(createStaticMessage(httpErrorMessageGenerator
                 .createFrom(httpRequest,
                             getExceptionMessage(exception))),
                                                           exception, error));
