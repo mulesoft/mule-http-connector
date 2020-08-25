@@ -76,6 +76,9 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
   private HttpRequest httpRequest;
   private HttpExtensionClient client;
   private MuleConfiguration muleConfiguration;
+  private URI someUri;
+  private String uri;
+  private String textPayload;
 
   @Before
   public void setUp() throws Exception {
@@ -91,76 +94,65 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     notificationEmitter = mock(NotificationEmitter.class);
     callback = mock(CompletionCallback.class);
     entity = mock(HttpEntity.class);
+
     response = mock(HttpResponse.class);
+    when(response.getHeaders()).thenReturn(new MultiMap<>());
+    when(response.getEntity()).thenReturn(entity);
+    when(response.getHeaderValue(CONTENT_TYPE)).thenReturn("text/plain");
+
     streamingHelper = mock(StreamingHelper.class);
+
+    textPayload = "some text payload";
+    InputStream payloadInputStream = IOUtils.toInputStream(textPayload);
+    when(entity.getContent()).thenReturn(payloadInputStream);
+    when(entity.getLength()).thenReturn(Optional.of((long) textPayload.length()));
+
+    when(streamingHelper.resolveCursorProvider(entity.getContent())).thenReturn(new FakeCursorProvider(payloadInputStream));
+
     httpRequest = mock(HttpRequest.class);
+    uri = "dummyUri";
+    someUri = URI.create(uri);
+    when(httpRequest.getUri()).thenReturn(someUri);
+    when(httpRequest.getHeaders()).thenReturn(new MultiMap<>());
+    when(httpRequest.getQueryParams()).thenReturn(new MultiMap<>());
+
     client = mock(HttpExtensionClient.class);
+
+    when(client.send(httpRequest, 0, false, null))
+        .thenReturn(CompletableFuture.completedFuture(response));
   }
 
   @Test
   public void testDoRequestCallsStreamingHelperThenHttpResponseToResultConvertTwiceThenCallbackSuccess_WhenDoingRequestWithResendAndNoRetryWasNecessary() {
     // Given
     HttpRequestAuthentication authentication = mock(HttpRequestAuthentication.class);
-    doAnswer((Answer<Void>) invocation -> {
-      Object[] args = invocation.getArguments();
-      Runnable notRetryCallback = (Runnable) args[2];
-      notRetryCallback.run();
-      return null;
-    }).when(authentication).retryIfShould(any(), any(), any());
+    doAnswer(callNotRetryCallback()).when(authentication).retryIfShould(any(), any(), any());
 
     HttpResponseToResult httpResponseToResult = mock(HttpResponseToResult.class);
     HttpRequester httpRequester = new HttpRequester(httpRequestFactory, httpResponseToResult, httpErrorMessageGenerator);
 
-    when(response.getHeaders()).thenReturn(new MultiMap<>());
-    when(response.getEntity()).thenReturn(entity);
-
-    String textPayload = "some text payload";
-    InputStream payloadInputStream = IOUtils.toInputStream(textPayload);
-    when(entity.getContent()).thenReturn(payloadInputStream);
-
-    when(streamingHelper.resolveCursorProvider(entity.getContent())).thenReturn(new FakeCursorProvider(payloadInputStream));
-
-    String uri = "dummyUri";
-    URI someuri = URI.create(uri);
-    when(httpRequest.getUri()).thenReturn(someuri);
-    when(httpRequest.getHeaders()).thenReturn(new MultiMap<>());
-    when(httpRequest.getQueryParams()).thenReturn(new MultiMap<>());
-
     // The first time convert is called will return a result and the second time the result object will be a different instance
-    Result<InputStream, HttpResponseAttributes> result1 =
-        Result.<InputStream, HttpResponseAttributes>builder().output(IOUtils.toInputStream("One")).build();
-    Result<InputStream, HttpResponseAttributes> result2 =
-        Result.<InputStream, HttpResponseAttributes>builder().output(IOUtils.toInputStream("Two")).build();
-    when(httpResponseToResult.convert(same(config), same(muleContext), same(response), same(entity), any(), same(someuri)))
+    Result<InputStream, HttpResponseAttributes> result1 = makeResult("One");
+    Result<InputStream, HttpResponseAttributes> result2 = makeResult("Two");
+    when(httpResponseToResult.convert(same(config), same(muleContext), same(response), same(entity), any(), same(someUri)))
         .thenReturn(result1, result2);
 
-    int responseTimeout = 0;
-    boolean followRedirects = false;
-    when(client.send(httpRequest, responseTimeout, followRedirects, null))
-        .thenReturn(CompletableFuture.completedFuture(response));
-
-    String method = "dummyMethod";
-    HttpStreamingType streamingMode = null;
-    HttpSendBodyMode sendBodyMode = null;
-    TransformationService transformationService = null;
     Map<String, List<String>> injectedHeaders = new HashMap<>();
-    when(httpRequestFactory.create(config, uri, method, streamingMode, sendBodyMode, transformationService, requestBuilder,
+    when(httpRequestFactory.create(config, uri, "dummyMethod", null, null, null, requestBuilder,
                                    authentication, injectedHeaders)).thenReturn(httpRequest);
 
 
-    boolean checkRetry = true;
-    Scheduler scheduler = null;
-
     // When
-    httpRequester.doRequest(client, config, uri, method, streamingMode, sendBodyMode, followRedirects, authentication,
-                            responseTimeout, responseValidator, transformationService, requestBuilder, checkRetry, muleContext,
-                            scheduler, notificationEmitter, streamingHelper, callback, injectedHeaders);
+    boolean checkRetry = true;
+    httpRequester.doRequest(client, config, uri, "dummyMethod", null, null, false, authentication,
+                            0, responseValidator, null, requestBuilder, checkRetry, muleContext,
+                            null, notificationEmitter, streamingHelper, callback, injectedHeaders);
 
     // Then
     InOrder order = inOrder(streamingHelper, httpResponseToResult, authentication, callback);
     order.verify(streamingHelper, times(1)).resolveCursorProvider(entity.getContent());
     order.verify(httpResponseToResult, times(2)).convert(same(config), same(muleContext), same(response), same(entity), any(),
-                                                         same(someuri));
+                                                         same(someUri));
     order.verify(callback, times(1)).success(result2);
     order.verifyNoMoreInteractions();
   }
@@ -169,59 +161,27 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
   public void testDoRequestCallsStreamigHelperThenAuthentiationRetryIfShouldWithAMappedResultThenCallbackSuccessWithAnotherResult_WhenDoingRequestWithResendAndNoRetryWasNecesary() {
     // Given
     HttpRequestAuthentication authentication = mock(HttpRequestAuthentication.class);
-    doAnswer((Answer<Void>) invocation -> {
-      Object[] args = invocation.getArguments();
-      Runnable notRetryCallback = (Runnable) args[2];
-      notRetryCallback.run();
-      return null;
-    }).when(authentication).retryIfShould(any(), any(), any());
+    doAnswer(callNotRetryCallback()).when(authentication).retryIfShould(any(), any(), any());
 
     HttpResponseToResult httpResponseToResult = mock(HttpResponseToResult.class);
     HttpRequester httpRequester = new HttpRequester(httpRequestFactory, httpResponseToResult, httpErrorMessageGenerator);
 
-    when(response.getHeaders()).thenReturn(new MultiMap<>());
-    when(response.getEntity()).thenReturn(entity);
-
-    String textPayload = "yet another text payload";
-    InputStream payloadInputStream = IOUtils.toInputStream(textPayload);
-    when(entity.getContent()).thenReturn(payloadInputStream);
-
-    when(streamingHelper.resolveCursorProvider(entity.getContent())).thenReturn(new FakeCursorProvider(payloadInputStream));
-
-    String uri = "dummyUri";
-    URI someuri = URI.create(uri);
-    when(httpRequest.getUri()).thenReturn(someuri);
-    when(httpRequest.getHeaders()).thenReturn(new MultiMap<>());
-    when(httpRequest.getQueryParams()).thenReturn(new MultiMap<>());
-
     // The first time convert is called will return a result and the second time the result object will be a different instance
-    Result<InputStream, HttpResponseAttributes> result1 =
-        Result.<InputStream, HttpResponseAttributes>builder().output(IOUtils.toInputStream("One")).build();
-    Result<InputStream, HttpResponseAttributes> result2 =
-        Result.<InputStream, HttpResponseAttributes>builder().output(IOUtils.toInputStream("Two")).build();
-    when(httpResponseToResult.convert(same(config), same(muleContext), same(response), same(entity), any(), same(someuri)))
+    Result<InputStream, HttpResponseAttributes> result1 = makeResult("One");
+    Result<InputStream, HttpResponseAttributes> result2 = makeResult("Two");
+    when(httpResponseToResult.convert(same(config), same(muleContext), same(response), same(entity), any(), same(someUri)))
         .thenReturn(result1, result2);
 
-    int responseTimeout = 0;
-    boolean followRedirects = false;
-    when(client.send(httpRequest, responseTimeout, followRedirects, null))
-        .thenReturn(CompletableFuture.completedFuture(response));
-
-    String method = "dummyMethod";
-    HttpStreamingType streamingMode = null;
-    HttpSendBodyMode sendBodyMode = null;
-    TransformationService transformationService = null;
     Map<String, List<String>> injectedHeaders = new HashMap<>();
-    when(httpRequestFactory.create(config, uri, method, streamingMode, sendBodyMode, transformationService, requestBuilder,
+    when(httpRequestFactory.create(config, uri, "dummyMethod", null, null, null, requestBuilder,
                                    authentication, injectedHeaders)).thenReturn(httpRequest);
 
     boolean checkRetry = true;
-    Scheduler scheduler = null;
 
     // When
-    httpRequester.doRequest(client, config, uri, method, streamingMode, sendBodyMode, followRedirects, authentication,
-                            responseTimeout, responseValidator, transformationService, requestBuilder, checkRetry, muleContext,
-                            scheduler, notificationEmitter, streamingHelper, callback, injectedHeaders);
+    httpRequester.doRequest(client, config, uri, "dummyMethod", null, null, false, authentication,
+                            0, responseValidator, null, requestBuilder, checkRetry, muleContext,
+                            null, notificationEmitter, streamingHelper, callback, injectedHeaders);
 
     // Then
     InOrder order = inOrder(streamingHelper, httpResponseToResult, authentication, callback);
@@ -241,45 +201,18 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
 
     HttpRequester httpRequester = new HttpRequester(httpRequestFactory, httpResponseToResult, httpErrorMessageGenerator);
 
-    when(response.getHeaders()).thenReturn(new MultiMap<>());
-    when(response.getEntity()).thenReturn(entity);
-    when(response.getHeaderValue(CONTENT_TYPE)).thenReturn("text/plain");
-
-    String textPayload = "some other text payload";
-    InputStream payloadInputStream = IOUtils.toInputStream(textPayload);
-    when(entity.getContent()).thenReturn(payloadInputStream);
-    when(entity.getLength()).thenReturn(Optional.of((long) textPayload.length()));
-
-    when(streamingHelper.resolveCursorProvider(entity.getContent())).thenReturn(new FakeCursorProvider(payloadInputStream));
-
-    String uri = "dummyUri2";
-    URI someuri = URI.create(uri);
-    when(httpRequest.getUri()).thenReturn(someuri);
-    when(httpRequest.getHeaders()).thenReturn(new MultiMap<>());
-    when(httpRequest.getQueryParams()).thenReturn(new MultiMap<>());
-
-    int responseTimeout = 0;
-    boolean followRedirects = false;
-    when(client.send(httpRequest, responseTimeout, followRedirects, null))
-        .thenReturn(CompletableFuture.completedFuture(response));
-
-    String method = "dummyMethod2";
-    HttpStreamingType streamingMode = null;
-    HttpSendBodyMode sendBodyMode = null;
-    TransformationService transformationService = null;
     Map<String, List<String>> injectedHeaders = new HashMap<>();
-    when(httpRequestFactory.create(config, uri, method, streamingMode, sendBodyMode, transformationService, requestBuilder,
+    when(httpRequestFactory.create(config, uri, "dummyMethod", null, null, null, requestBuilder,
                                    authentication, injectedHeaders)).thenReturn(httpRequest);
 
     boolean checkRetry = true;
-    Scheduler scheduler = null;
 
     when(muleContext.getConfiguration().getDefaultEncoding()).thenReturn("UTF-8");
 
     // When
-    httpRequester.doRequest(client, config, uri, method, streamingMode, sendBodyMode, followRedirects, authentication,
-                            responseTimeout, responseValidator, transformationService, requestBuilder, checkRetry, muleContext,
-                            scheduler, notificationEmitter, streamingHelper, callback, injectedHeaders);
+    httpRequester.doRequest(client, config, uri, "dummyMethod", null, null, false, authentication,
+                            0, responseValidator, null, requestBuilder, checkRetry, muleContext,
+                            null, notificationEmitter, streamingHelper, callback, injectedHeaders);
 
     // Then
     ArgumentCaptor<Result> argumentCaptor = ArgumentCaptor.forClass(Result.class);
@@ -288,7 +221,21 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     assertThat(actualPayload, equalTo(textPayload));
   }
 
+  private Result<InputStream, HttpResponseAttributes> makeResult(String payloadString) {
+    return Result.<InputStream, HttpResponseAttributes>builder().output(IOUtils.toInputStream(payloadString)).build();
+  }
+
+  private Answer<Void> callNotRetryCallback() {
+    return invocation -> {
+      Object[] args = invocation.getArguments();
+      Runnable notRetryCallback = (Runnable) args[2];
+      notRetryCallback.run();
+      return null;
+    };
+  }
+
   private static class PayloadConsumingHttpRequestAuthentication implements HttpRequestAuthentication {
+
 
     @Override
     public void authenticate(HttpRequestBuilder builder) throws MuleException {
@@ -312,8 +259,8 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
       }
     }
   }
-
   private static class FakeCursorStream extends CursorStream implements Cursor {
+
 
     private final InputStream payload;
     private final CursorProvider<FakeCursorStream> cursorProvider;
@@ -353,8 +300,8 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
       return payload.read();
     }
   }
-
   private static class FakeCursorProvider implements CursorProvider<HttpRequesterAuthConsumesPayloadTestCase.FakeCursorStream> {
+
 
     String payload;
 
@@ -385,6 +332,6 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     public boolean isClosed() {
       return false;
     }
-  }
 
+  }
 }
