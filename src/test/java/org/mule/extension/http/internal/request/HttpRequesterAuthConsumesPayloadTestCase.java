@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.internal.request;
 
+import io.qameta.allure.Issue;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,6 +49,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
@@ -123,6 +125,7 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
   }
 
   @Test
+  @Issue("MULE-18307")
   public void testDoRequestCallsStreamingHelperThenHttpResponseToResultConvertTwiceThenCallbackSuccess_WhenDoingRequestWithResendAndNoRetryWasNecessary() {
     // Given
     HttpRequestAuthentication authentication = mock(HttpRequestAuthentication.class);
@@ -141,7 +144,6 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     when(httpRequestFactory.create(config, uri, "dummyMethod", null, null, null, requestBuilder,
                                    authentication, injectedHeaders)).thenReturn(httpRequest);
 
-
     // When
     boolean checkRetry = true;
     httpRequester.doRequest(client, config, uri, "dummyMethod", null, null, false, authentication,
@@ -158,6 +160,7 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
   }
 
   @Test
+  @Issue("MULE-18307")
   public void testDoRequestCallsStreamigHelperThenAuthentiationRetryIfShouldWithAMappedResultThenCallbackSuccessWithAnotherResult_WhenDoingRequestWithResendAndNoRetryWasNecesary() {
     // Given
     HttpRequestAuthentication authentication = mock(HttpRequestAuthentication.class);
@@ -192,6 +195,7 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
   }
 
   @Test
+  @Issue("MULE-18307")
   public void testDoRequestCallsCallbackSuccessWithResultContainingUnconsumedPayloadInputStream_WhenDoingRequestWithResend()
       throws IOException {
     // Given
@@ -217,7 +221,7 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     // Then
     ArgumentCaptor<Result> argumentCaptor = ArgumentCaptor.forClass(Result.class);
     verify(callback, times(1)).success(argumentCaptor.capture());
-    String actualPayload = IOUtils.toString((InputStream) argumentCaptor.getValue().getOutput(), StandardCharsets.UTF_8.name());
+    String actualPayload = IOUtils.toString((InputStream) argumentCaptor.getValue().getOutput(), UTF_8.name());
     assertThat(actualPayload, equalTo(textPayload));
   }
 
@@ -236,7 +240,6 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
 
   private static class PayloadConsumingHttpRequestAuthentication implements HttpRequestAuthentication {
 
-
     @Override
     public void authenticate(HttpRequestBuilder builder) throws MuleException {
 
@@ -252,15 +255,15 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
                               Runnable notRetryCallback) {
       try {
         // Simulating how Oauth consumes the payload when using it in the refreshTokenWhenExpression
-        String text = IOUtils.toString((InputStream) firstAttemptResult.getOutput(), StandardCharsets.UTF_8.name());
+        String text = IOUtils.toString((InputStream) firstAttemptResult.getOutput(), UTF_8.name());
         notRetryCallback.run();
       } catch (IOException e) {
         throw new RuntimeException("Error when consuming the payload in retryIfShould");
       }
     }
   }
-  private static class FakeCursorStream extends CursorStream implements Cursor {
 
+  private static class FakeCursorStream extends CursorStream implements Cursor {
 
     private final InputStream payload;
     private final CursorProvider<FakeCursorStream> cursorProvider;
@@ -300,14 +303,14 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
       return payload.read();
     }
   }
-  private static class FakeCursorProvider implements CursorProvider<HttpRequesterAuthConsumesPayloadTestCase.FakeCursorStream> {
 
+  private static class FakeCursorProvider implements CursorProvider<HttpRequesterAuthConsumesPayloadTestCase.FakeCursorStream> {
 
     String payload;
 
     FakeCursorProvider(InputStream is) {
       try {
-        this.payload = IOUtils.toString(is, StandardCharsets.UTF_8.name());
+        this.payload = IOUtils.toString(is, UTF_8.name());
       } catch (IOException e) {
         e.printStackTrace();
       }
