@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.internal.request;
 
+import io.qameta.allure.Issue;
 import org.apache.tika.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -49,6 +50,7 @@ public class HttpResponseToResultTestCase {
   }
 
   @Test
+  @Issue("MULE-18307")
   public void testConvertReturnsResultWithSuppliersOutput_WhenConvertingAResponseToAResult() {
     // Given
     String dummyString = "dummy string";
