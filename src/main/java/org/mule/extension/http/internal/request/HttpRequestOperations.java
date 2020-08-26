@@ -66,10 +66,9 @@ public class HttpRequestOperations implements Initialisable, Disposable {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HttpRequestOperations.class);
   private static final int WAIT_FOR_EVER = MAX_VALUE;
-  private static final SuccessStatusCodeValidator DEFAULT_STATUS_CODE_VALIDATOR = new SuccessStatusCodeValidator("0..399");
-  private static final HttpRequesterRequestBuilder DEFAULT_REQUEST_BUILDER = new HttpRequesterRequestBuilder();
-  private static final HttpRequester REQUESTER =
-      new HttpRequester(new HttpRequestFactory(), new HttpResponseToResult(), new HttpErrorMessageGenerator());
+  private SuccessStatusCodeValidator defaultStatusCodeValidator;
+  private HttpRequesterRequestBuilder defaultRequestBuilder;
+  private HttpRequester httpRequester;
 
   @Inject
   private MuleContext muleContext;
@@ -115,7 +114,7 @@ public class HttpRequestOperations implements Initialisable, Disposable {
                       StreamingHelper streamingHelper,
                       CompletionCallback<InputStream, HttpResponseAttributes> callback) {
     try {
-      HttpRequesterRequestBuilder resolvedBuilder = requestBuilder != null ? requestBuilder : DEFAULT_REQUEST_BUILDER;
+      HttpRequesterRequestBuilder resolvedBuilder = requestBuilder != null ? requestBuilder : defaultRequestBuilder;
 
       handleCursor(resolvedBuilder);
 
@@ -134,13 +133,15 @@ public class HttpRequestOperations implements Initialisable, Disposable {
 
       int resolvedTimeout = resolveResponseTimeout(overrides.getResponseTimeout());
       ResponseValidator responseValidator = responseValidationSettings.getResponseValidator();
-      responseValidator = responseValidator != null ? responseValidator : DEFAULT_STATUS_CODE_VALIDATOR;
+      responseValidator = responseValidator != null ? responseValidator : defaultStatusCodeValidator;
 
       LOGGER.debug("Sending '{}' request to '{}'.", method, resolvedUri);
-      REQUESTER.doRequest(client, config, resolvedUri, method, overrides.getRequestStreamingMode(), overrides.getSendBodyMode(),
-                          overrides.getFollowRedirects(), client.getDefaultAuthentication(), resolvedTimeout, responseValidator,
-                          transformationService, resolvedBuilder, true, muleContext, scheduler, notificationEmitter,
-                          streamingHelper, callback, injectedHeaders);
+      httpRequester.doRequest(client, config, resolvedUri, method, overrides.getRequestStreamingMode(),
+                              overrides.getSendBodyMode(),
+                              overrides.getFollowRedirects(), client.getDefaultAuthentication(), resolvedTimeout,
+                              responseValidator,
+                              transformationService, resolvedBuilder, true, muleContext, scheduler, notificationEmitter,
+                              streamingHelper, callback, injectedHeaders);
     } catch (Throwable t) {
       callback.error(t instanceof Exception ? (Exception) t : new DefaultMuleException(t));
     }
@@ -202,6 +203,9 @@ public class HttpRequestOperations implements Initialisable, Disposable {
 
   @Override
   public void initialise() throws InitialisationException {
+    defaultStatusCodeValidator = new SuccessStatusCodeValidator("0..399");
+    defaultRequestBuilder = new HttpRequesterRequestBuilder();
+    httpRequester = new HttpRequester(new HttpRequestFactory(), new HttpResponseToResult(), new HttpErrorMessageGenerator());
     this.scheduler = schedulerService.ioScheduler();
   }
 
