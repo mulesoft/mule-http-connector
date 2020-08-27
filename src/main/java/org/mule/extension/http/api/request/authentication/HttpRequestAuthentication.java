@@ -44,7 +44,7 @@ public interface HttpRequestAuthentication {
    * @deprecated implement {@link #retryIfShould(Result, Runnable, Runnable)} that allows to do a non-blocking retry.
    */
   @Deprecated
-  boolean shouldRetry(Result<Object, HttpResponseAttributes> firstAttemptResult) throws MuleException;
+  boolean shouldRetry(Result<? extends Object, HttpResponseAttributes> firstAttemptResult) throws MuleException;
 
   /**
    * Detects if there was an authentication failure in the response. After sending an HTTP request and creating a result with the
@@ -57,7 +57,7 @@ public interface HttpRequestAuthentication {
    * @param retryCallback the callback that performs the retry of the request.
    * @param notRetryCallback the callback that perfroms any necessary steps for not retrying the request.
    */
-  default void retryIfShould(Result<Object, HttpResponseAttributes> firstAttemptResult, Runnable retryCallback,
+  default void retryIfShould(Result<? extends Object, HttpResponseAttributes> firstAttemptResult, Runnable retryCallback,
                              Runnable notRetryCallback) {
     try {
       if (shouldRetry(firstAttemptResult)) {
