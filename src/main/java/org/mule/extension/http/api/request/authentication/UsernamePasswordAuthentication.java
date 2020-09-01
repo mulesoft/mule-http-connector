@@ -51,7 +51,7 @@ public abstract class UsernamePasswordAuthentication implements HttpAuthenticati
   }
 
   @Override
-  public boolean shouldRetry(Result<Object, HttpResponseAttributes> firstAttemptResult) throws MuleException {
+  public boolean shouldRetry(Result<? extends Object, HttpResponseAttributes> firstAttemptResult) throws MuleException {
     return false;
   }
 
