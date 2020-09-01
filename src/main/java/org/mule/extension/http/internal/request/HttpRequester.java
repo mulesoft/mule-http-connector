@@ -146,8 +146,9 @@ public class HttpRequester {
 
               HttpEntity entity = response.getEntity();
 
-              Result<InputStream, HttpResponseAttributes> result =
-                  makeResult(config, muleContext, streamingHelper, httpRequest, response, entity);
+              Result<InputStream, HttpResponseAttributes> result = httpResponseToResult
+                  .convert(config, muleContext, response, entity,
+                           resultInputStreamSupplier(streamingHelper, entity, authentication), httpRequest.getUri());
 
               resendRequest(result, checkRetry, authentication, () -> {
                 scheduler.submit(() -> consumePayload(result));
@@ -158,8 +159,9 @@ public class HttpRequester {
               }, () -> {
                 responseValidator.validate(result, httpRequest, streamingHelper);
 
-                Result<InputStream, HttpResponseAttributes> freshResult =
-                    makeResult(config, muleContext, streamingHelper, httpRequest, response, entity);
+                Result<InputStream, HttpResponseAttributes> freshResult = httpResponseToResult
+                    .convert(config, muleContext, response, entity,
+                             resultInputStreamSupplier(streamingHelper, entity, authentication), httpRequest.getUri());
 
                 callback.success(freshResult);
               });
@@ -188,20 +190,19 @@ public class HttpRequester {
         });
   }
 
-  private Result<InputStream, HttpResponseAttributes> makeResult(HttpRequesterConfig config, MuleContext muleContext,
-                                                                 StreamingHelper streamingHelper, HttpRequest httpRequest,
-                                                                 org.mule.runtime.http.api.domain.message.response.HttpResponse response,
-                                                                 HttpEntity entity) {
+  private Supplier<InputStream> resultInputStreamSupplier(StreamingHelper streamingHelper, HttpEntity entity,
+                                                          HttpRequestAuthentication authentication) {
+    if (authentication != null && !authentication.isConsumesPayload()) {
+      return entity::getContent;
+    }
+
     Object resolved = streamingHelper.resolveCursorProvider(entity.getContent());
 
     if (resolved instanceof CursorProvider) {
-      CursorProvider<CursorStream> payloadBodyCursorProvider = (CursorProvider<CursorStream>) resolved;
-      return httpResponseToResult.convert(config, muleContext, response, entity, payloadBodyCursorProvider::openCursor,
-                                          httpRequest.getUri());
+      return ((CursorProvider<CursorStream>) resolved)::openCursor;
     }
 
-    return httpResponseToResult.convert(config, muleContext, response, entity, () -> (InputStream) resolved,
-                                        httpRequest.getUri());
+    return () -> (InputStream) resolved;
   }
 
   private String getExceptionMessage(Throwable t) {
@@ -274,8 +275,7 @@ public class HttpRequester {
   private void checkIfRemotelyClosed(Throwable exception, UriParameters uriParameters) {
     if (HTTPS.equals(uriParameters.getScheme()) && containsIgnoreCase(exception.getMessage(), REMOTELY_CLOSED)) {
       logger
-          .error(
-                 "Remote host closed connection. Possible SSL/TLS handshake issue. Check protocols, cipher suites and certificate set up. Use -Djavax.net.debug=ssl for further debugging.");
+          .error("Remote host closed connection. Possible SSL/TLS handshake issue. Check protocols, cipher suites and certificate set up. Use -Djavax.net.debug=ssl for further debugging.");
     }
   }
 

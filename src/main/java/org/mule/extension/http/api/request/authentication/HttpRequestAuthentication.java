@@ -71,4 +71,7 @@ public interface HttpRequestAuthentication {
     }
   }
 
+  default boolean isConsumesPayload() {
+    return false;
+  }
 }

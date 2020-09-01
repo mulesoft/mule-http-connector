@@ -20,23 +20,20 @@ import org.mockito.InOrder;
 import org.mockito.stubbing.Answer;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.error.HttpErrorMessageGenerator;
-import org.mule.extension.http.api.request.HttpSendBodyMode;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
-import org.mule.extension.http.api.streaming.HttpStreamingType;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
-import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.extension.api.notification.NotificationEmitter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
@@ -48,8 +45,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -134,8 +129,9 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
   @Issue("MULE-18307")
   public void testDoRequestCallsStreamingHelperThenHttpResponseToResultConvertTwiceThenCallbackSuccess_WhenDoingRequestWithResendAndNoRetryWasNecessary() {
     // Given
-    HttpRequestAuthentication authentication = mock(HttpRequestAuthentication.class);
+    PayloadConsumingHttpRequestAuthentication authentication = mock(PayloadConsumingHttpRequestAuthentication.class);
     doAnswer(callNotRetryCallback()).when(authentication).retryIfShould(any(), any(), any());
+    when(authentication.isConsumesPayload()).thenReturn(true);
 
     HttpResponseToResult httpResponseToResult = mock(HttpResponseToResult.class);
     HttpRequester httpRequester = new HttpRequester(httpRequestFactory, httpResponseToResult, httpErrorMessageGenerator);
@@ -169,8 +165,9 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
   @Issue("MULE-18307")
   public void testDoRequestCallsStreamigHelperThenAuthentiationRetryIfShouldWithAMappedResultThenCallbackSuccessWithAnotherResult_WhenDoingRequestWithResendAndNoRetryWasNecesary() {
     // Given
-    HttpRequestAuthentication authentication = mock(HttpRequestAuthentication.class);
+    PayloadConsumingHttpRequestAuthentication authentication = mock(PayloadConsumingHttpRequestAuthentication.class);
     doAnswer(callNotRetryCallback()).when(authentication).retryIfShould(any(), any(), any());
+    when(authentication.isConsumesPayload()).thenReturn(true);
 
     HttpResponseToResult httpResponseToResult = mock(HttpResponseToResult.class);
     HttpRequester httpRequester = new HttpRequester(httpRequestFactory, httpResponseToResult, httpErrorMessageGenerator);
@@ -302,6 +299,11 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
       } catch (IOException e) {
         throw new RuntimeException("Error when consuming the payload in retryIfShould");
       }
+    }
+
+    @Override
+    public boolean isConsumesPayload() {
+      return true;
     }
   }
 
