@@ -146,9 +146,10 @@ public class HttpRequester {
 
               HttpEntity entity = response.getEntity();
 
-              Result<InputStream, HttpResponseAttributes> result = httpResponseToResult
-                  .convert(config, muleContext, response, entity,
-                           resultInputStreamSupplier(streamingHelper, entity, authentication), httpRequest.getUri());
+              Supplier<Object> resultInputStreamSupplier = resultInputStreamSupplier(streamingHelper, entity, authentication);
+
+              Result<Object, HttpResponseAttributes> result = httpResponseToResult
+                  .convert(config, muleContext, response, entity, resultInputStreamSupplier, httpRequest.getUri());
 
               resendRequest(result, checkRetry, authentication, () -> {
                 scheduler.submit(() -> consumePayload(result));
@@ -157,13 +158,12 @@ public class HttpRequester {
                           requestBuilder, false, muleContext, scheduler, notificationEmitter,
                           streamingHelper, callback, injectedHeaders);
               }, () -> {
-                responseValidator.validate(result, httpRequest, streamingHelper);
+                responseValidator.validate((Result) result, httpRequest, streamingHelper);
 
-                Result<InputStream, HttpResponseAttributes> freshResult = httpResponseToResult
-                    .convert(config, muleContext, response, entity,
-                             resultInputStreamSupplier(streamingHelper, entity, authentication), httpRequest.getUri());
+                Result<Object, HttpResponseAttributes> freshResult = httpResponseToResult
+                    .convert(config, muleContext, response, entity, resultInputStreamSupplier, httpRequest.getUri());
 
-                callback.success(freshResult);
+                callback.success((Result) freshResult);
               });
             } catch (Exception e) {
               callback.error(e);
@@ -190,8 +190,8 @@ public class HttpRequester {
         });
   }
 
-  private Supplier<InputStream> resultInputStreamSupplier(StreamingHelper streamingHelper, HttpEntity entity,
-                                                          HttpRequestAuthentication authentication) {
+  private Supplier<Object> resultInputStreamSupplier(StreamingHelper streamingHelper, HttpEntity entity,
+                                                     HttpRequestAuthentication authentication) {
     if (authentication != null && !authentication.isConsumesPayload()) {
       return entity::getContent;
     }

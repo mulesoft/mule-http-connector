@@ -55,11 +55,11 @@ public class HttpResponseToResultTestCase {
     // Given
     String dummyString = "dummy string";
     InputStream expected = IOUtils.toInputStream(dummyString);
-    Supplier<InputStream> payloadSupplier = () -> expected;
+    Supplier<Object> payloadSupplier = () -> expected;
     when(entity.getLength()).thenReturn(Optional.of((long) dummyString.length()));
 
     // When
-    Result<InputStream, HttpResponseAttributes> result =
+    Result<Object, HttpResponseAttributes> result =
         httpResponseToResult.convert(config, muleContext, response, entity, payloadSupplier, uri);
 
     // Then

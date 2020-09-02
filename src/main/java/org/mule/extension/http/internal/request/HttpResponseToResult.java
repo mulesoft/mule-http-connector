@@ -57,9 +57,9 @@ public class HttpResponseToResult {
 
   private final Function<String, MediaType> parseMediaType = memoize(ctv -> parseMediaType(ctv), new ConcurrentHashMap<>());
 
-  Result<InputStream, HttpResponseAttributes> convert(HttpRequesterCookieConfig config, MuleContext muleContext,
-                                                      HttpResponse response, HttpEntity entity,
-                                                      Supplier<InputStream> payloadSupplier, URI uri) {
+  Result<Object, HttpResponseAttributes> convert(HttpRequesterCookieConfig config, MuleContext muleContext,
+                                                 HttpResponse response, HttpEntity entity,
+                                                 Supplier<Object> payloadSupplier, URI uri) {
 
     if (config.isEnableCookies()) {
       processCookies(config, response, uri);
@@ -67,7 +67,7 @@ public class HttpResponseToResult {
 
     HttpResponseAttributes responseAttributes = createAttributes(response);
 
-    final Result.Builder<InputStream, HttpResponseAttributes> builder = Result.builder();
+    final Result.Builder<Object, HttpResponseAttributes> builder = Result.builder();
     builder.mediaType(getMediaType(getResponseContentType(response, entity), getDefaultEncoding(muleContext)));
     if (entity.getLength().isPresent()) {
       builder.length(entity.getLength().get());

@@ -137,8 +137,8 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     HttpRequester httpRequester = new HttpRequester(httpRequestFactory, httpResponseToResult, httpErrorMessageGenerator);
 
     // The first time convert is called will return a result and the second time the result object will be a different instance
-    Result<InputStream, HttpResponseAttributes> result1 = makeResult("One");
-    Result<InputStream, HttpResponseAttributes> result2 = makeResult("Two");
+    Result<Object, HttpResponseAttributes> result1 = makeResult("One");
+    Result<Object, HttpResponseAttributes> result2 = makeResult("Two");
     when(httpResponseToResult.convert(same(config), same(muleContext), same(response), same(entity), any(), same(someUri)))
         .thenReturn(result1, result2);
 
@@ -157,7 +157,7 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     order.verify(streamingHelper, times(1)).resolveCursorProvider(entity.getContent());
     order.verify(httpResponseToResult, times(2)).convert(same(config), same(muleContext), same(response), same(entity), any(),
                                                          same(someUri));
-    order.verify(callback, times(1)).success(result2);
+    order.verify(callback, times(1)).success((Result) result2);
     order.verifyNoMoreInteractions();
   }
 
@@ -173,8 +173,8 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     HttpRequester httpRequester = new HttpRequester(httpRequestFactory, httpResponseToResult, httpErrorMessageGenerator);
 
     // The first time convert is called will return a result and the second time the result object will be a different instance
-    Result<InputStream, HttpResponseAttributes> result1 = makeResult("One");
-    Result<InputStream, HttpResponseAttributes> result2 = makeResult("Two");
+    Result<Object, HttpResponseAttributes> result1 = makeResult("One");
+    Result<Object, HttpResponseAttributes> result2 = makeResult("Two");
     when(httpResponseToResult.convert(same(config), same(muleContext), same(response), same(entity), any(), same(someUri)))
         .thenReturn(result1, result2);
 
@@ -193,7 +193,7 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     InOrder order = inOrder(streamingHelper, httpResponseToResult, authentication, callback);
     order.verify(streamingHelper, times(1)).resolveCursorProvider(entity.getContent());
     order.verify(authentication, times(1)).retryIfShould(same(result1), any(), any());
-    order.verify(callback, times(1)).success(result2);
+    order.verify(callback, times(1)).success((Result) result2);
     order.verifyNoMoreInteractions();
   }
 
@@ -264,8 +264,8 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     assertThat(actualPayload, equalTo(""));
   }
 
-  private Result<InputStream, HttpResponseAttributes> makeResult(String payloadString) {
-    return Result.<InputStream, HttpResponseAttributes>builder().output(IOUtils.toInputStream(payloadString)).build();
+  private Result<Object, HttpResponseAttributes> makeResult(String payloadString) {
+    return Result.<Object, HttpResponseAttributes>builder().output(IOUtils.toInputStream(payloadString)).build();
   }
 
   private Answer<Void> callNotRetryCallback() {
@@ -285,12 +285,12 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     }
 
     @Override
-    public boolean shouldRetry(Result<? extends Object, HttpResponseAttributes> firstAttemptResult) throws MuleException {
+    public boolean shouldRetry(Result<Object, HttpResponseAttributes> firstAttemptResult) throws MuleException {
       return true;
     }
 
     @Override
-    public void retryIfShould(Result<? extends Object, HttpResponseAttributes> firstAttemptResult, Runnable retryCallback,
+    public void retryIfShould(Result<Object, HttpResponseAttributes> firstAttemptResult, Runnable retryCallback,
                               Runnable notRetryCallback) {
       try {
         // Simulating how Oauth consumes the payload when using it in the refreshTokenWhenExpression
