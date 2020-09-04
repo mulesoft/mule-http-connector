@@ -8,10 +8,7 @@ package org.mule.extension.http.internal.request;
 
 import io.qameta.allure.Issue;
 import org.apache.commons.io.IOUtils;
-import org.glassfish.grizzly.Buffer;
-import org.glassfish.grizzly.http.io.InputBuffer;
 import org.glassfish.grizzly.memory.ByteBufferWrapper;
-import org.glassfish.grizzly.memory.HeapBuffer;
 import org.glassfish.grizzly.utils.BufferInputStream;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +30,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.extension.api.notification.NotificationEmitter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
@@ -131,7 +127,7 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     // Given
     PayloadConsumingHttpRequestAuthentication authentication = mock(PayloadConsumingHttpRequestAuthentication.class);
     doAnswer(callNotRetryCallback()).when(authentication).retryIfShould(any(), any(), any());
-    when(authentication.isConsumesPayload()).thenReturn(true);
+    when(authentication.readsAuthenticatedResponseBody()).thenReturn(true);
 
     HttpResponseToResult httpResponseToResult = mock(HttpResponseToResult.class);
     HttpRequester httpRequester = new HttpRequester(httpRequestFactory, httpResponseToResult, httpErrorMessageGenerator);
@@ -167,7 +163,7 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     // Given
     PayloadConsumingHttpRequestAuthentication authentication = mock(PayloadConsumingHttpRequestAuthentication.class);
     doAnswer(callNotRetryCallback()).when(authentication).retryIfShould(any(), any(), any());
-    when(authentication.isConsumesPayload()).thenReturn(true);
+    when(authentication.readsAuthenticatedResponseBody()).thenReturn(true);
 
     HttpResponseToResult httpResponseToResult = mock(HttpResponseToResult.class);
     HttpRequester httpRequester = new HttpRequester(httpRequestFactory, httpResponseToResult, httpErrorMessageGenerator);
@@ -302,7 +298,7 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     }
 
     @Override
-    public boolean isConsumesPayload() {
+    public boolean readsAuthenticatedResponseBody() {
       return true;
     }
   }

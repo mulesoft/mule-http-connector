@@ -71,7 +71,12 @@ public interface HttpRequestAuthentication {
     }
   }
 
-  default boolean isConsumesPayload() {
+  /**
+   * Indicates if the response body is read in the process of handling it
+   * @return Whether the response body will be read or not
+   * @since 1.5.20
+   */
+  default boolean readsAuthenticatedResponseBody() {
     return false;
   }
 }
