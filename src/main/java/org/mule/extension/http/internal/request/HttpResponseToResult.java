@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Component that transforms an HTTP response to a proper {@link Result}.
@@ -56,18 +57,9 @@ public class HttpResponseToResult {
 
   private final Function<String, MediaType> parseMediaType = memoize(ctv -> parseMediaType(ctv), new ConcurrentHashMap<>());
 
-  public Result<InputStream, HttpResponseAttributes> convert(HttpRequesterCookieConfig config, MuleContext muleContext,
-                                                             HttpResponse response, URI uri) {
-    String responseContentType = response.getHeaderValue(CONTENT_TYPE);
-
-    HttpEntity entity = response.getEntity();
-
-    if (isEmpty(responseContentType) && !empty(entity)) {
-      // RFC-2616 specifies application/octet-stream as default when none is received
-      responseContentType = BINARY_CONTENT_TYPE;
-    }
-
-    MediaType responseMediaType = getMediaType(responseContentType, getDefaultEncoding(muleContext));
+  Result<Object, HttpResponseAttributes> convert(HttpRequesterCookieConfig config, MuleContext muleContext,
+                                                 HttpResponse response, HttpEntity entity,
+                                                 Supplier<Object> payloadSupplier, URI uri) {
 
     if (config.isEnableCookies()) {
       processCookies(config, response, uri);
@@ -75,13 +67,13 @@ public class HttpResponseToResult {
 
     HttpResponseAttributes responseAttributes = createAttributes(response);
 
-    final Result.Builder<InputStream, HttpResponseAttributes> builder = Result.builder();
-    builder.mediaType(responseMediaType);
+    final Result.Builder<Object, HttpResponseAttributes> builder = Result.builder();
+    builder.mediaType(getMediaType(getResponseContentType(response, entity), getDefaultEncoding(muleContext)));
     if (entity.getLength().isPresent()) {
       builder.length(entity.getLength().get());
     }
 
-    return builder.output(entity.getContent()).attributes(responseAttributes).build();
+    return builder.output(payloadSupplier.get()).attributes(responseAttributes).build();
   }
 
   private boolean empty(HttpEntity entity) {
@@ -153,4 +145,13 @@ public class HttpResponseToResult {
     STRICT_CONTENT_TYPE = parseBoolean(getProperty(SYSTEM_PROPERTY_PREFIX + "strictContentType"));
   }
 
+  private String getResponseContentType(HttpResponse response, HttpEntity entity) {
+    String responseContentType = response.getHeaderValue(CONTENT_TYPE);
+
+    if (isEmpty(responseContentType) && !empty(entity)) {
+      // RFC-2616 specifies application/octet-stream as default when none is received
+      responseContentType = BINARY_CONTENT_TYPE;
+    }
+    return responseContentType;
+  }
 }
