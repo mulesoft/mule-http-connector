@@ -40,6 +40,8 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.streaming.CursorProvider;
+import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.util.IOUtils;
@@ -49,6 +51,7 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
+import org.mule.runtime.http.api.domain.entity.HttpEntity;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 
 import java.io.IOException;
@@ -81,9 +84,9 @@ public class HttpRequester {
   private static final DataType REQUEST_NOTIFICATION_DATA_TYPE = DataType.fromType(HttpRequestNotificationData.class);
   private static final DataType RESPONSE_NOTIFICATION_DATA_TYPE = DataType.fromType(HttpResponseNotificationData.class);
 
-  private static final HttpRequestFactory EVENT_TO_HTTP_REQUEST = new HttpRequestFactory();
-  private static final HttpResponseToResult RESPONSE_TO_RESULT = new HttpResponseToResult();
-  private static final HttpErrorMessageGenerator ERROR_MESSAGE_GENERATOR = new HttpErrorMessageGenerator();
+  private final HttpRequestFactory httpRequestFactory;
+  private final HttpResponseToResult httpResponseToResult;
+  private final HttpErrorMessageGenerator httpErrorMessageGenerator;
 
   private static final Method fireNotificationMethod;
 
@@ -98,6 +101,13 @@ public class HttpRequester {
     fireNotificationMethod = fireLazy;
   }
 
+  public HttpRequester(HttpRequestFactory httpRequestFactory, HttpResponseToResult httpResponseToResult,
+                       HttpErrorMessageGenerator httpErrorMessageGenerator) {
+    this.httpRequestFactory = httpRequestFactory;
+    this.httpResponseToResult = httpResponseToResult;
+    this.httpErrorMessageGenerator = httpErrorMessageGenerator;
+  }
+
   public void doRequest(HttpExtensionClient client, HttpRequesterConfig config, String uri, String method,
                         HttpStreamingType streamingMode, HttpSendBodyMode sendBodyMode,
                         boolean followRedirects, HttpRequestAuthentication authentication,
@@ -109,8 +119,8 @@ public class HttpRequester {
     doRequestWithRetry(client, config, uri, method, streamingMode, sendBodyMode, followRedirects, authentication, responseTimeout,
                        responseValidator, transformationService, requestBuilder, checkRetry, muleContext, scheduler,
                        notificationEmitter, streamingHelper, callback,
-                       EVENT_TO_HTTP_REQUEST.create(config, uri, method, streamingMode, sendBodyMode, transformationService,
-                                                    requestBuilder, authentication, injectedHeaders),
+                       httpRequestFactory.create(config, uri, method, streamingMode, sendBodyMode, transformationService,
+                                                 requestBuilder, authentication, injectedHeaders),
                        RETRY_ATTEMPTS, injectedHeaders);
   }
 
@@ -134,8 +144,12 @@ public class HttpRequester {
               fireNotification(notificationEmitter, REQUEST_COMPLETE, () -> HttpResponseNotificationData.from(response),
                                RESPONSE_NOTIFICATION_DATA_TYPE);
 
-              Result<InputStream, HttpResponseAttributes> result =
-                  RESPONSE_TO_RESULT.convert(config, muleContext, response, httpRequest.getUri());
+              HttpEntity entity = response.getEntity();
+
+              Supplier<Object> resultInputStreamSupplier = resultInputStreamSupplier(streamingHelper, entity, authentication);
+
+              Result<Object, HttpResponseAttributes> result = httpResponseToResult
+                  .convert(config, muleContext, response, entity, resultInputStreamSupplier, httpRequest.getUri());
 
               resendRequest(result, checkRetry, authentication, () -> {
                 scheduler.submit(() -> consumePayload(result));
@@ -144,8 +158,12 @@ public class HttpRequester {
                           requestBuilder, false, muleContext, scheduler, notificationEmitter,
                           streamingHelper, callback, injectedHeaders);
               }, () -> {
-                responseValidator.validate(result, httpRequest, streamingHelper);
-                callback.success(result);
+                responseValidator.validate((Result) result, httpRequest, streamingHelper);
+
+                Result<Object, HttpResponseAttributes> freshResult = httpResponseToResult
+                    .convert(config, muleContext, response, entity, resultInputStreamSupplier, httpRequest.getUri());
+
+                callback.success((Result) freshResult);
               });
             } catch (Exception e) {
               callback.error(e);
@@ -164,12 +182,27 @@ public class HttpRequester {
 
             logger.error(getErrorMessage(httpRequest));
             HttpError error = exception instanceof TimeoutException ? TIMEOUT : CONNECTIVITY;
-            callback.error(new HttpRequestFailedException(createStaticMessage(ERROR_MESSAGE_GENERATOR
+            callback.error(new HttpRequestFailedException(createStaticMessage(httpErrorMessageGenerator
                 .createFrom(httpRequest,
                             getExceptionMessage(exception))),
                                                           exception, error));
           }
         });
+  }
+
+  private Supplier<Object> resultInputStreamSupplier(StreamingHelper streamingHelper, HttpEntity entity,
+                                                     HttpRequestAuthentication authentication) {
+    if (authentication != null && !authentication.readsAuthenticatedResponseBody()) {
+      return entity::getContent;
+    }
+
+    Object resolved = streamingHelper.resolveCursorProvider(entity.getContent());
+
+    if (resolved instanceof CursorProvider) {
+      return ((CursorProvider<CursorStream>) resolved)::openCursor;
+    }
+
+    return () -> (InputStream) resolved;
   }
 
   private String getExceptionMessage(Throwable t) {
@@ -242,8 +275,7 @@ public class HttpRequester {
   private void checkIfRemotelyClosed(Throwable exception, UriParameters uriParameters) {
     if (HTTPS.equals(uriParameters.getScheme()) && containsIgnoreCase(exception.getMessage(), REMOTELY_CLOSED)) {
       logger
-          .error(
-                 "Remote host closed connection. Possible SSL/TLS handshake issue. Check protocols, cipher suites and certificate set up. Use -Djavax.net.debug=ssl for further debugging.");
+          .error("Remote host closed connection. Possible SSL/TLS handshake issue. Check protocols, cipher suites and certificate set up. Use -Djavax.net.debug=ssl for further debugging.");
     }
   }
 
