@@ -8,6 +8,7 @@ package org.mule.test.http.functional.listener;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;
@@ -33,6 +34,8 @@ public class HttpListenerPathLeadingSlashesTestCase extends AbstractHttpTestCase
   @ClassRule
   public static DynamicPort listenPort3 = new DynamicPort("port3");
   @ClassRule
+  public static DynamicPort listenPort4 = new DynamicPort("port4");
+  @ClassRule
   public static SystemProperty path = new SystemProperty("path", "path");
   @ClassRule
   public static SystemProperty path2 = new SystemProperty("path2", "path2");
@@ -49,8 +52,8 @@ public class HttpListenerPathLeadingSlashesTestCase extends AbstractHttpTestCase
     return Arrays.asList(new Object[][] {
         {listenPort1.getNumber(), path.getValue()},
         {listenPort2.getNumber(), "prefix/" + path2.getValue()},
-        {listenPort2.getNumber(), "prefix/" + anotherPath.getValue()},
-        {listenPort3.getNumber(), "prefix/" + pathSubPath.getValue()},
+        {listenPort3.getNumber(), "prefix/" + anotherPath.getValue()},
+        {listenPort4.getNumber(), "prefix/" + pathSubPath.getValue()},
     });
   }
 

@@ -6,26 +6,37 @@
  */
 package org.mule.extension.http.api.policy;
 
-import static java.lang.String.format;
-import static java.util.Objects.requireNonNull;
+import static org.mule.extension.http.internal.policy.ReflectiveHttpListenerPolicyPointcutParametersFactory.SOURCE_POLICY_AWARE_ATTRIBUTES_CLASS_NAME;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.core.api.util.ClassUtils.isClassOnPath;
 
-import org.mule.extension.http.api.HttpRequestAttributes;
+import org.mule.extension.http.internal.policy.CompatibilityHttpListenerPolicyPointcutParametersFactory;
+import org.mule.extension.http.internal.policy.HttpListenerOnDomainPolicyPointcutParametersFactory;
+import org.mule.extension.http.internal.policy.ReflectiveHttpListenerPolicyPointcutParametersFactory;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.core.api.policy.PolicyProvider;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.runtime.policy.api.SourcePolicyPointcutParametersFactory;
+
+import java.util.Optional;
+
+import javax.inject.Inject;
 
 /**
  * HTTP request operation policy pointcut parameters factory.
  *
  * @since 1.0
  */
-public class HttpListenerPolicyPointcutParametersFactory implements SourcePolicyPointcutParametersFactory {
+public class HttpListenerPolicyPointcutParametersFactory implements SourcePolicyPointcutParametersFactory, Initialisable {
 
   private final static ComponentIdentifier listenerIdentifier =
       builder().namespace("http").name("listener").build();
+
+  private Optional<PolicyProvider> policyProvider;
+  private SourcePolicyPointcutParametersFactory factoryDelegate;
 
   @Override
   public boolean supportsSourceIdentifier(ComponentIdentifier sourceIdentifier) {
@@ -35,16 +46,34 @@ public class HttpListenerPolicyPointcutParametersFactory implements SourcePolicy
   @Override
   public <T> PolicyPointcutParameters createPolicyPointcutParameters(Component component,
                                                                      TypedValue<T> attributes) {
-    requireNonNull(component, "Cannot create a policy pointcut parameter instance without a component");
-    if (!(attributes.getValue() instanceof HttpRequestAttributes)) {
-      throw new IllegalArgumentException(format("Cannot create a policy pointcut parameter instance from a message which attributes is not an instance of %s, the current attribute instance type is: %s",
-                                                HttpRequestAttributes.class.getName(),
-                                                attributes.getClass().getName()));
-    }
-
-    HttpRequestAttributes httpRequestAttributes = (HttpRequestAttributes) attributes.getValue();
-    return new HttpListenerPolicyPointcutParameters(component, httpRequestAttributes.getRequestPath(),
-                                                    httpRequestAttributes.getMethod());
+    return factoryDelegate.createPolicyPointcutParameters(component, attributes);
   }
 
+  @Inject
+  public void setPolicyProvider(Optional<PolicyProvider> policyProvider) {
+    this.policyProvider = policyProvider;
+  }
+
+  @Override
+  public void initialise() {
+    if (isPointcutAttributesApiAvailable()) {
+      if (isInDomain()) {
+        factoryDelegate = new HttpListenerOnDomainPolicyPointcutParametersFactory();
+      } else {
+        factoryDelegate = new ReflectiveHttpListenerPolicyPointcutParametersFactory(policyProvider.get());
+      }
+    } else
+      factoryDelegate = new CompatibilityHttpListenerPolicyPointcutParametersFactory();
+  }
+
+  private boolean isPointcutAttributesApiAvailable() {
+    return isClassOnPath(SOURCE_POLICY_AWARE_ATTRIBUTES_CLASS_NAME, this.getClass());
+  }
+
+  /**
+   * When configured in a Domain, Policy provider is not present since it belongs to the App
+   */
+  private boolean isInDomain() {
+    return !policyProvider.isPresent();
+  }
 }

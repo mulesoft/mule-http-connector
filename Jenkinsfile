@@ -1,3 +1,1 @@
-Map pipelineParams = [ : ]
-
-runtimeExtensionsBuild(pipelineParams)
+runtimeBuild()

@@ -8,6 +8,8 @@
 package org.mule.extension.http.internal.listener;
 
 import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import static org.mule.extension.http.api.streaming.HttpStreamingType.ALWAYS;
 import static org.mule.extension.http.api.streaming.HttpStreamingType.AUTO;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
@@ -15,10 +17,12 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.NOT_MODIFIED;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.NO_CONTENT;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.getReasonPhraseForStatusCode;
+import static org.mule.runtime.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
+import static org.mule.runtime.http.api.HttpHeaders.Values.CLOSE;
 
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
@@ -41,6 +45,8 @@ import java.io.InputStream;
 import java.util.Optional;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.function.Supplier;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,14 +64,17 @@ public class HttpResponseFactory {
   private HttpStreamingType responseStreaming = AUTO;
   private TransformationService transformationService;
   private Map<Class, TriFunction<TypedValue, Boolean, HttpResponseHeaderBuilder, HttpEntity>> payloadHandlerMapper;
+  private Supplier<Boolean> shouldForceConnectionCloseHeader;
 
   private static final String INVALID_DATA_MSG = "Attempted to send invalid data through http response.";
 
   public HttpResponseFactory(HttpStreamingType responseStreaming,
-                             TransformationService transformationService) {
+                             TransformationService transformationService,
+                             Supplier<Boolean> shouldForceConnectionCloseHeader) {
     this.responseStreaming = responseStreaming;
     this.transformationService = transformationService;
     this.payloadHandlerMapper = new HashMap<>();
+    this.shouldForceConnectionCloseHeader = shouldForceConnectionCloseHeader;
     initResponsePayloadHandlers();
   }
 
@@ -82,9 +91,12 @@ public class HttpResponseFactory {
   }
 
   private Optional<TriFunction<TypedValue, Boolean, HttpResponseHeaderBuilder, HttpEntity>> getHandler(Class key) {
-    return this.payloadHandlerMapper.keySet().stream()
-        .filter((s) -> (s.isAssignableFrom(key))).findFirst()
-        .map(classKey -> this.payloadHandlerMapper.get(classKey));
+    for (Class classKey : this.payloadHandlerMapper.keySet()) {
+      if (classKey.isAssignableFrom(key)) {
+        return ofNullable(this.payloadHandlerMapper.get(classKey));
+      }
+    }
+    return empty();
   }
 
   /**
@@ -101,26 +113,21 @@ public class HttpResponseFactory {
   public HttpResponse create(HttpResponseBuilder responseBuilder,
                              Interception interception,
                              HttpListenerResponseBuilder listenerResponseBuilder,
-                             boolean supportsTransferEncoding)
-      throws IOException {
+                             boolean supportsTransferEncoding) {
 
     final HttpResponseHeaderBuilder httpResponseHeaderBuilder = new HttpResponseHeaderBuilder(responseBuilder);
 
     addInterceptingHeaders(interception, httpResponseHeaderBuilder);
     addUserHeaders(listenerResponseBuilder, supportsTransferEncoding, httpResponseHeaderBuilder);
+    addConnectionCloseHeaderIfStopping(httpResponseHeaderBuilder);
 
     TypedValue<Object> body = listenerResponseBuilder.getBody();
     if (httpResponseHeaderBuilder.getContentType() == null && !ANY.matches(body.getDataType().getMediaType())) {
       httpResponseHeaderBuilder.addHeader(CONTENT_TYPE, body.getDataType().getMediaType().toRfcString());
     }
 
-    final String existingTransferEncoding = httpResponseHeaderBuilder.getTransferEncoding();
-    final String existingContentLength = httpResponseHeaderBuilder.getContentLength();
-    final boolean hasLength = body.getLength().isPresent();
-
     HttpEntity httpEntity;
     Object payload = body.getValue();
-
 
     if (payload == null) {
       setupContentLengthEncoding(httpResponseHeaderBuilder, 0);
@@ -131,8 +138,7 @@ public class HttpResponseFactory {
           .orElseGet(() -> {
             ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(getMessageAsBytes(body));
 
-            resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding,
-                            byteArrayHttpEntity);
+            resolveEncoding(httpResponseHeaderBuilder, supportsTransferEncoding, byteArrayHttpEntity);
             return byteArrayHttpEntity;
           });
     }
@@ -158,6 +164,13 @@ public class HttpResponseFactory {
 
     responseBuilder.entity(httpEntity);
     return responseBuilder.build();
+  }
+
+  private void addConnectionCloseHeaderIfStopping(HttpResponseHeaderBuilder httpResponseHeaderBuilder) {
+    if (shouldForceConnectionCloseHeader.get()) {
+      httpResponseHeaderBuilder.removeHeader(CONNECTION);
+      httpResponseHeaderBuilder.addHeader(CONNECTION, CLOSE);
+    }
   }
 
   private void addInterceptingHeaders(Interception interception, HttpResponseHeaderBuilder httpResponseHeaderBuilder) {
@@ -197,7 +210,7 @@ public class HttpResponseFactory {
    */
   private HttpEntity guaranteeStreamingIfPossible(boolean possible, HttpResponseHeaderBuilder headerBuilder, Object stream) {
     if (possible) {
-      setupChunkedEncoding(headerBuilder);
+      setupChunkedEncoding(headerBuilder, CHUNKED.equals(headerBuilder.getTransferEncoding()));
     }
     return new InputStreamHttpEntity((InputStream) stream);
   }
@@ -219,14 +232,14 @@ public class HttpResponseFactory {
     return byteArrayHttpEntity;
   }
 
-  private void resolveEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder, String existingTransferEncoding,
-                               String existingContentLength, boolean supportsTransferEncoding,
+  private void resolveEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder, boolean supportsTransferEncoding,
                                ByteArrayHttpEntity byteArrayHttpEntity) {
+    boolean chunkedTransferEncoding = CHUNKED.equals(httpResponseHeaderBuilder.getTransferEncoding());
     if (responseStreaming == ALWAYS
-        || (responseStreaming == AUTO && existingContentLength == null
-            && CHUNKED.equals(existingTransferEncoding))) {
+        || (chunkedTransferEncoding && responseStreaming == AUTO &&
+            httpResponseHeaderBuilder.getContentLength() == null)) {
       if (supportsTransferEncoding) {
-        setupChunkedEncoding(httpResponseHeaderBuilder);
+        setupChunkedEncoding(httpResponseHeaderBuilder, chunkedTransferEncoding);
       }
     } else {
       setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getBytes().length);
@@ -241,13 +254,12 @@ public class HttpResponseFactory {
     httpResponseHeaderBuilder.setContentLength(String.valueOf(contentLength));
   }
 
-  private void setupChunkedEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder) {
+  private void setupChunkedEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder, boolean chunkedTransferEncoding) {
     if (httpResponseHeaderBuilder.getContentLength() != null) {
       logger.debug("Chunked encoding is being used so the 'Content-Length' header has been removed");
       httpResponseHeaderBuilder.removeHeader(CONTENT_LENGTH);
     }
-    String existingTransferEncoding = httpResponseHeaderBuilder.getTransferEncoding();
-    if (!CHUNKED.equals(existingTransferEncoding)) {
+    if (!chunkedTransferEncoding) {
       httpResponseHeaderBuilder.addHeader(HEADER_TRANSFER_ENCODING, CHUNKED);
     }
   }

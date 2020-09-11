@@ -6,9 +6,11 @@
  */
 package org.mule.extension.http.internal;
 
-import static com.google.common.collect.ImmutableSet.of;
+import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableSet;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -25,7 +27,7 @@ public interface HttpConnectorConstants {
   String CONNECTOR_OVERRIDES = "Connector Overrides";
   String TLS_CONFIGURATION = "TLS Configuration";
   String AUTHENTICATION = "Authentication";
-  Set<String> IDEMPOTENT_METHODS = of("GET", "PUT", "DELETE", "HEAD", "OPTIONS", "TRACE");
+  Set<String> IDEMPOTENT_METHODS = unmodifiableSet(new HashSet<>(asList("GET", "PUT", "DELETE", "HEAD", "OPTIONS", "TRACE")));
   String REMOTELY_CLOSED = "Remotely closed";
   String RETRY_ATTEMPTS_PROPERTY = SYSTEM_PROPERTY_PREFIX + "http.client.maxRetries";
   String RETRY_ON_ALL_METHODS_PROPERTY = SYSTEM_PROPERTY_PREFIX + "http.client.retryOnAllMethods";

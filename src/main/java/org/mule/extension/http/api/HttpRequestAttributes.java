@@ -7,6 +7,7 @@
 package org.mule.extension.http.api;
 
 import static java.lang.System.lineSeparator;
+
 import org.mule.extension.http.internal.certificate.CertificateProvider;
 import org.mule.extension.http.internal.certificate.CertificateProviderFactory;
 import org.mule.runtime.api.util.MultiMap;
@@ -25,6 +26,10 @@ import java.util.function.Supplier;
 public class HttpRequestAttributes extends BaseHttpRequestAttributes {
 
   private static final long serialVersionUID = 7227330842640270811L;
+
+  public static HttpRequestAttributesBuilder builder() {
+    return new HttpRequestAttributesBuilder();
+  }
 
   /**
    * Full path where the request was received. Former 'http.listener.path'.
@@ -215,6 +220,7 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
     return this.clientCertificate;
   }
 
+  @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();
     builder.append(this.getClass().getName()).append(lineSeparator()).append("{").append(lineSeparator())

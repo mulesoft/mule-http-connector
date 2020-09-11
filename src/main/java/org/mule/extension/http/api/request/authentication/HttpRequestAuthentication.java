@@ -71,4 +71,12 @@ public interface HttpRequestAuthentication {
     }
   }
 
+  /**
+   * Indicates if the response body may be read in the process of determining the result of the authenticated request
+   * @return Whether the response body may be read or not
+   * @since 1.6, 1.5.20
+   */
+  default boolean readsAuthenticatedResponseBody() {
+    return false;
+  }
 }

@@ -16,6 +16,8 @@ import static org.mule.extension.http.internal.HttpConnectorConstants.REMOTELY_C
 import static org.mule.extension.http.internal.HttpConnectorConstants.RETRY_ATTEMPTS_PROPERTY;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.RETRY_POLICY;
 
+import org.mule.functional.api.flow.FlowRunner;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;
@@ -32,6 +34,10 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import io.qameta.allure.Story;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 
 @Story(RETRY_POLICY)
 @RunnerDelegateTo(Parameterized.class)
@@ -84,20 +90,36 @@ public class HttpRetryRequestTestCase extends AbstractHttpTestCase {
 
   @Test
   public void nonIdempotentMethod() throws Exception {
-    runRetryPolicyTest("POST", getIdempotentMethodExpectedRetries());
+    FlowRunner flowRunner = flowRunner("retryFlow").withVariable("httpMethod", "POST");
+    runRetryPolicyTest(flowRunner, getIdempotentMethodExpectedRetries());
   }
 
   @Test
   public void idempotentMethod() throws Exception {
-    runRetryPolicyTest("GET", retryAttempts);
+    FlowRunner flowRunner = flowRunner("retryFlow").withVariable("httpMethod", "GET");
+    runRetryPolicyTest(flowRunner, retryAttempts);
   }
 
-  private void runRetryPolicyTest(String httpMethod, int expectedConnections) throws Exception {
+  @Test
+  public void entityNotSupportRetry() throws Exception {
+    InputStream in = new FileInputStream(new File("src/test/resources/http-retry-policy-payload.json"));
+    FlowRunner flowRunner = flowRunner("testRetryPolicyWithPayload").withVariable("httpMethod", "PUT").withPayload(in);
+    runRetryPolicyTest(flowRunner, 0);
+  }
+
+  @Test
+  public void entitySupportRetry() throws Exception {
+    FlowRunner flowRunner = flowRunner("testRetryPolicyWithPayload").withVariable("httpMethod", "PUT")
+        .withPayload(AbstractMuleContextTestCase.TEST_MESSAGE);
+    runRetryPolicyTest(flowRunner, retryAttempts);
+  }
+
+  private void runRetryPolicyTest(FlowRunner flowRunner, int expectedConnections) throws Exception {
     TestServerSocket testServerSocket = new TestServerSocket(port.getNumber(), expectedConnections + 1);
     assertThat("Http server can't be initialized.", testServerSocket.startServer(5000), is(true));
     expectedException.expectCause(REMOTELY_CLOSE_CAUSE_MATCHER);
     try {
-      flowRunner("retryFlow").withVariable("httpMethod", httpMethod).run();
+      flowRunner.run();
     } finally {
       assertThat(testServerSocket.getConnectionCounter() - 1, is(expectedConnections));
       assertThat("There was an error trying to dispose the http server.", testServerSocket.dispose(5000), is(true));

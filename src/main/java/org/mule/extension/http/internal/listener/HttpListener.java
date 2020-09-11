@@ -32,6 +32,7 @@ import static org.mule.runtime.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAIL
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.getReasonPhraseForStatusCode;
 import static org.mule.runtime.http.api.HttpHeaders.Names.X_CORRELATION_ID;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
@@ -52,6 +53,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.MuleContext;
@@ -143,6 +145,11 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   @Connection
   private ConnectionProvider<HttpServer> serverProvider;
 
+  @Inject
+  private NotificationListenerRegistry notificationListenerRegistry;
+
+  private MuleContextStopWatcher muleContextStopWatcher;
+
   /**
    * Relative path from the path set in the HTTP Listener configuration
    */
@@ -217,8 +224,11 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
 
   @OnTerminate
   public void onTerminate(SourceResult sourceResult) {
-    Boolean sendingResponse = (Boolean) sourceResult.getSourceCallbackContext().getVariable(RESPONSE_SEND_ATTEMPT).orElse(false);
-    if (FALSE.equals(sendingResponse)) {
+    if (!((Boolean) sourceResult
+        .getSourceCallbackContext()
+        .getVariable(RESPONSE_SEND_ATTEMPT)
+        .orElse(FALSE))
+            .booleanValue()) {
       sourceResult
           .getInvocationError()
           .ifPresent(error -> sendErrorResponse(new HttpListenerErrorResponseBuilder(),
@@ -252,7 +262,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
 
     final HttpResponseReadyCallback responseCallback = context.getResponseCallback();
     callbackContext.addVariable(RESPONSE_SEND_ATTEMPT, true);
-    responseCallback.responseReady(response, getResponseFailureCallback(responseCallback, completionCallback));
+    responseCallback.responseReady(response, new ResponseFailureStatusCallback(responseCallback, completionCallback));
   }
 
   private void sendBackPressureResponse(BackPressureContext ctx, SourceCompletionCallback completionCallback) {
@@ -276,7 +286,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
 
     final HttpResponseReadyCallback responseCallback = context.getResponseCallback();
     callbackContext.addVariable(RESPONSE_SEND_ATTEMPT, true);
-    responseCallback.responseReady(response, getResponseFailureCallback(responseCallback, completionCallback));
+    responseCallback.responseReady(response, new ResponseFailureStatusCallback(responseCallback, completionCallback));
   }
 
   private HttpResponseBuilder createFailureResponseBuilder(Error error) {
@@ -299,10 +309,8 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   @Override
   public void onStart(SourceCallback<InputStream, HttpRequestAttributes> sourceCallback) throws MuleException {
     server = serverProvider.connect();
-    listenerPath = config.getFullListenerPath(config.sanitizePathWithStartSlash(path));
-    path = listenerPath.getResolvedPath();
-    responseFactory =
-        new HttpResponseFactory(responseStreamingMode, transformationService);
+    resolveFullPath();
+    responseFactory = new HttpResponseFactory(responseStreamingMode, transformationService, this::isContextStopping);
     responseSender = new HttpListenerResponseSender(responseFactory);
     startIfNeeded(responseFactory);
 
@@ -322,6 +330,18 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
     }
     knownErrors = new DisjunctiveErrorTypeMatcher(createErrorMatcherList(muleContext.getErrorTypeRepository()));
     requestHandlerManager.start();
+
+    if (muleContextStopWatcher == null) {
+      muleContextStopWatcher = new MuleContextStopWatcher();
+      notificationListenerRegistry.registerListener(muleContextStopWatcher);
+    }
+  }
+
+  private void resolveFullPath() {
+    if (listenerPath == null) {
+      listenerPath = config.getFullListenerPath(config.sanitizePathWithStartSlash(path));
+      path = listenerPath.getResolvedPath();
+    }
   }
 
   private List<ErrorTypeMatcher> createErrorMatcherList(ErrorTypeRepository errorTypeRepository) {
@@ -337,8 +357,16 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
     return matchers;
   }
 
+  private boolean isContextStopping() {
+    return muleContextStopWatcher.isStopping();
+  }
+
   @Override
   public void onStop() {
+    if (isContextStopping() && !server.isStopped()) {
+      server.stop();
+    }
+
     if (requestHandlerManager != null) {
       requestHandlerManager.stop();
       requestHandlerManager.dispose();
@@ -514,30 +542,41 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
     return errorResponse;
   }
 
-  private ResponseStatusCallback getResponseFailureCallback(HttpResponseReadyCallback responseReadyCallback,
-                                                            SourceCompletionCallback completionCallback) {
-    return new BaseResponseStatusCallback(completionCallback) {
+  public class ResponseFailureStatusCallback extends BaseResponseStatusCallback {
 
-      @Override
-      public void responseSendFailure(Throwable throwable) {
-        LOGGER.error("Found exception trying to send response", throwable);
-        responseReadyCallback.responseReady(buildErrorResponse(), new BaseResponseStatusCallback(completionCallback) {
+    private final HttpResponseReadyCallback responseReadyCallback;
 
-          @Override
-          public void responseSendFailure(Throwable throwable) {
-            LOGGER.error("Found exception trying to send error response", throwable);
-            if (completionCallback != null) {
-              completionCallback.error(throwable);
-            }
-          }
-        });
+    public ResponseFailureStatusCallback(HttpResponseReadyCallback responseReadyCallback,
+                                         SourceCompletionCallback completionCallback) {
+      super(completionCallback);
+      this.responseReadyCallback = responseReadyCallback;
+    }
+
+    @Override
+    public void responseSendFailure(Throwable throwable) {
+      LOGGER.error("Found exception trying to send response", throwable);
+      responseReadyCallback.responseReady(buildErrorResponse(), new ResponseSendFailureStatusCallback(completionCallback));
+    }
+  }
+
+  public class ResponseSendFailureStatusCallback extends BaseResponseStatusCallback {
+
+    public ResponseSendFailureStatusCallback(SourceCompletionCallback completionCallback) {
+      super(completionCallback);
+    }
+
+    @Override
+    public void responseSendFailure(Throwable throwable) {
+      LOGGER.error("Found exception trying to send error response", throwable);
+      if (completionCallback != null) {
+        completionCallback.error(throwable);
       }
-    };
+    }
   }
 
   private abstract class BaseResponseStatusCallback implements ResponseStatusCallback {
 
-    private final SourceCompletionCallback completionCallback;
+    protected final SourceCompletionCallback completionCallback;
 
     public BaseResponseStatusCallback(SourceCompletionCallback completionCallback) {
       this.completionCallback = completionCallback;

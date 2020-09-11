@@ -27,32 +27,20 @@ public class HttpListenerResponseSender {
   }
 
   public HttpListenerResponseSender(TransformationService transformationService) {
-    this.responseFactory = new HttpResponseFactory(HttpStreamingType.NEVER, transformationService);
+    this.responseFactory = new HttpResponseFactory(HttpStreamingType.NEVER, transformationService, () -> false);
   }
 
   public void sendResponse(HttpResponseContext context,
                            HttpListenerResponseBuilder response,
-                           SourceCompletionCallback completionCallback)
-      throws Exception {
+                           SourceCompletionCallback completionCallback) {
     HttpResponse httpResponse = buildResponse(response, context.getInterception(), context.isSupportStreaming());
     final HttpResponseReadyCallback responseCallback = context.getResponseCallback();
     responseCallback.responseReady(httpResponse, getResponseFailureCallback(responseCallback, completionCallback));
   }
 
   protected HttpResponse buildResponse(HttpListenerResponseBuilder listenerResponseBuilder, Interception interception,
-                                       boolean supportStreaming)
-      throws Exception {
-    HttpResponseBuilder responseBuilder = HttpResponse.builder();
-
-    return doBuildResponse(responseBuilder, listenerResponseBuilder, interception, supportStreaming);
-  }
-
-  protected HttpResponse doBuildResponse(HttpResponseBuilder responseBuilder,
-                                         HttpListenerResponseBuilder listenerResponseBuilder,
-                                         Interception interception,
-                                         boolean supportsStreaming)
-      throws Exception {
-    return responseFactory.create(responseBuilder, interception, listenerResponseBuilder, supportsStreaming);
+                                       boolean supportStreaming) {
+    return responseFactory.create(HttpResponse.builder(), interception, listenerResponseBuilder, supportStreaming);
   }
 
   public ResponseStatusCallback getResponseFailureCallback(HttpResponseReadyCallback responseReadyCallback,
@@ -64,7 +52,7 @@ public class HttpListenerResponseSender {
    * Implemented as an inner class instead of an anonymous class so that no problem arises in case reflection is needed for
    * retrieval of methods. This may be the case for backward compatibility concerns.
    */
-  private static class FailureResponseStatusCallback implements ResponseStatusCallback {
+  public static class FailureResponseStatusCallback implements ResponseStatusCallback {
 
     private HttpResponseReadyCallback responseReadyCallback;
     private SourceCompletionCallback completionCallback;

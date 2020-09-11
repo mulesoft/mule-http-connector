@@ -18,6 +18,8 @@ import java.util.Map;
  */
 public class BaseHttpRequestAttributes extends HttpAttributes {
 
+  private static final long serialVersionUID = -3580630130730447236L;
+
   /**
    * Query parameters map built from the parsed string. Former 'http.query.params'.
    */
@@ -55,5 +57,4 @@ public class BaseHttpRequestAttributes extends HttpAttributes {
   public Map<String, String> getUriParams() {
     return uriParams;
   }
-
 }
