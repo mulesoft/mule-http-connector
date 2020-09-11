@@ -14,24 +14,29 @@ import static org.mule.extension.http.internal.request.RequestConnectionParams.D
 import static org.mule.extension.http.internal.request.RequestConnectionParams.DEFAULT_MAX_CONNECTIONS;
 import static org.mule.extension.http.internal.request.RequestConnectionParams.DEFAULT_RESPONSE_BUFFER_SIZE;
 import static org.mule.runtime.core.api.connection.util.ConnectionProviderUtils.unwrapProviderWrapper;
-import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTP;
-import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.REQUEST_CONFIG;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationInstanceFromRegistry;
 
-import org.junit.Ignore;
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
+
+import org.mule.extension.http.internal.request.HttpRequesterConnectionManager;
 import org.mule.extension.http.internal.request.HttpRequesterProvider;
 import org.mule.extension.http.internal.request.RequestConnectionParams;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpExtensionFunctionalTestCase;
 
+import javax.inject.Inject;
+
 import io.qameta.allure.Feature;
 import org.junit.Rule;
 import org.junit.Test;
 
 @Feature(HTTP_EXTENSION)
-@Ignore("MULE-15802")
+@Story(REQUEST_CONFIG)
 public class HttpRequestConfigTestCase extends AbstractHttpExtensionFunctionalTestCase {
 
   private static final String DEFAULT_HTTP_REQUEST_CONFIG_NAME = "requestConfig";
@@ -48,6 +53,8 @@ public class HttpRequestConfigTestCase extends AbstractHttpExtensionFunctionalTe
   @Rule
   public SystemProperty idleTimeout = new SystemProperty("idleTimeout", String.valueOf(IDLE_TIMEOUT));
 
+  @Inject
+  private HttpRequesterConnectionManager connectionManager;
 
   @Override
   protected String getConfigFile() {
@@ -82,6 +89,21 @@ public class HttpRequestConfigTestCase extends AbstractHttpExtensionFunctionalTe
     assertThat(connectionParams.getResponseBufferSize(), is(RESPONSE_BUFFER_SIZE));
     assertThat(connectionParams.getMaxConnections(), is(MAX_CONNECTIONS));
     assertThat(connectionParams.getConnectionIdleTimeout(), is(IDLE_TIMEOUT));
+  }
+
+  @Test
+  @Description("When an HttpRequesterProvider is disposed, it should be also disposed the httpClient associated with it")
+  @Issue("MULE-18757")
+  public void httpClientDisposed() throws Exception {
+    ConfigurationInstance config =
+        getConfigurationInstanceFromRegistry(DEFAULT_PORT_HTTP_REQUEST_CONFIG_NAME, testEvent(), muleContext);
+    HttpRequesterProvider provider = (HttpRequesterProvider) unwrapProviderWrapper(config.getConnectionProvider().get());
+
+    String clientId = muleContext.getConfiguration().getId() + "_" + DEFAULT_PORT_HTTP_REQUEST_CONFIG_NAME;
+
+    assertThat(connectionManager.lookup(clientId).isPresent(), is(true));
+    provider.dispose();
+    assertThat(connectionManager.lookup(clientId).isPresent(), is(false));
   }
 
 }

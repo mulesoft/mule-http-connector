@@ -144,6 +144,9 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
     if (authentication != null) {
       disposeIfNeeded(authentication, LOGGER);
     }
+    // MULE-18757: it's necessary to clean up the httpClient in case the app
+    // is associated with a domain.
+    connectionManager.disposeClient(getConfigurationId());
   }
 
   private void verifyConnectionsParameters() throws InitialisationException {
