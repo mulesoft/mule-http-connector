@@ -23,6 +23,7 @@ public interface AllureConstants {
       String PROXY_CONFIG_BUILDER = "Proxy Config Builder";
       String REQUEST_BUILDER = "Request Builder";
       String REQUEST_URL = "Request URL";
+      String REQUEST_CONFIG = "Request Configuration";
       String RESPONSE_BUILDER = "Response Builder";
       String STREAMING = "Streaming";
       String TCP_BUILDER = "TCP Builders";

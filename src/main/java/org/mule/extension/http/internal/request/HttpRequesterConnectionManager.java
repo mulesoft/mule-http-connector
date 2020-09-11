@@ -74,6 +74,17 @@ public class HttpRequesterConnectionManager implements Disposable {
   }
 
   /**
+   * Removes from the internal cache the {@link ShareableHttpClient} associated with a given {@code configName}
+   *
+   * @param configName
+   *
+   * @since 1.5.21
+   */
+  public void disposeClient(String configName) {
+    clients.remove(configName);
+  }
+
+  /**
    * Wrapper implementation of an {@link HttpClient} that allows being shared by only configuring the client when first required
    * and only disabling it when last required.
    */
