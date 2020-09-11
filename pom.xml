@@ -8,6 +8,7 @@
         <!-- TODO MULE-15249 if this is upgraded, change the Map to Set in HttpResponseHeaderBuilder -->
         <!-- TODO MULE-15803 if this is upgraded, change HttpRequestAttributes#lazyClientCertificate-->
         <version>1.1.8</version>
+        <relativePath/>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
