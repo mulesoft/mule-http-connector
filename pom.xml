@@ -28,7 +28,6 @@
         <jettyVersion>9.0.7.v20131107</jettyVersion>
 
         <commonsTextVersion>1.9</commonsTextVersion>
-        <commonsIoVersion>2.6</commonsIoVersion>
         <formatterConfigPath>formatter.xml</formatterConfigPath>
 
         <muleSocketsConnectorVersion>1.1.5</muleSocketsConnectorVersion>
