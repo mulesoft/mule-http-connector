@@ -192,7 +192,7 @@ public class HttpRequester {
 
   private Supplier<Object> resultInputStreamSupplier(StreamingHelper streamingHelper, HttpEntity entity,
                                                      HttpRequestAuthentication authentication) {
-    if (authentication != null && !authentication.readsAuthenticatedResponseBody()) {
+    if (authentication == null || !authentication.readsAuthenticatedResponseBody()) {
       return entity::getContent;
     }
 
