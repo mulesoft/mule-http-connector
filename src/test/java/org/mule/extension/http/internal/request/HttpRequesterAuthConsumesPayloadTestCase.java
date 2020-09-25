@@ -284,8 +284,8 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
 
     // When
     httpRequester.doRequest(client, config, uri, "dummyMethod", null, null, false, authentication, 0, responseValidator, null,
-        requestBuilder, checkRetry, muleContext, null, notificationEmitter, streamingHelper, callback,
-        injectedHeaders);
+                            requestBuilder, checkRetry, muleContext, null, notificationEmitter, streamingHelper, callback,
+                            injectedHeaders);
 
     // Then
     verify(streamingHelper, never()).resolveCursorProvider(entity.getContent());
