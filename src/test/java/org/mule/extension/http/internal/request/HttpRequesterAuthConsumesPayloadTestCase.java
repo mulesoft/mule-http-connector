@@ -55,6 +55,7 @@ import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -258,6 +259,37 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     String actualPayload = IOUtils.toString((InputStream) argumentCaptor.getValue().getOutput(), UTF_8.name());
     // The Stream is empty because is a <non-repeatable-stream>
     assertThat(actualPayload, equalTo(""));
+  }
+
+  @Test
+  @Issue("MULE-18307")
+  public void testDoRequestDoesntCallsStreamingHelper_WhenNoAuthenticationIsConfigured() {
+    // Given
+    PayloadConsumingHttpRequestAuthentication authentication = null;
+
+    HttpResponseToResult httpResponseToResult = mock(HttpResponseToResult.class);
+    HttpRequester httpRequester = new HttpRequester(httpRequestFactory, httpResponseToResult, httpErrorMessageGenerator);
+
+    // The first time convert is called will return a result and the second time the result object will be a different instance
+    Result<Object, HttpResponseAttributes> result1 = makeResult("One");
+    Result<Object, HttpResponseAttributes> result2 = makeResult("Two");
+    when(httpResponseToResult.convert(same(config), same(muleContext), same(response), same(entity), any(), same(someUri)))
+        .thenReturn(result1, result2);
+
+    Map<String, List<String>> injectedHeaders = new HashMap<>();
+    when(httpRequestFactory.create(config, uri, "dummyMethod", null, null, null, requestBuilder, authentication, injectedHeaders))
+        .thenReturn(httpRequest);
+
+    boolean checkRetry = true;
+
+    // When
+    httpRequester.doRequest(client, config, uri, "dummyMethod", null, null, false, authentication, 0, responseValidator, null,
+        requestBuilder, checkRetry, muleContext, null, notificationEmitter, streamingHelper, callback,
+        injectedHeaders);
+
+    // Then
+    verify(streamingHelper, never()).resolveCursorProvider(entity.getContent());
+    verify(callback, times(1)).success((Result) result2);
   }
 
   private Result<Object, HttpResponseAttributes> makeResult(String payloadString) {
