@@ -21,7 +21,7 @@
     <description>A Mule extension that provides HTTP server and client functionality</description>
 
     <properties>
-        <fluentHcVersion>4.5.12</fluentHcVersion>
+        <fluentHcVersion>4.5.13</fluentHcVersion>
         <grizzlyVersion>2.3.36-MULE-015</grizzlyVersion>
         <grizzlyAhcVersion>1.14-MULE-019</grizzlyAhcVersion>
         <javaxActivationVersion>1.2.0</javaxActivationVersion>
