@@ -88,6 +88,8 @@ public class HttpRequestFactory {
   private static final String INVALID_TRANSFER_ENCODING_HEADER_MESSAGE =
       "Transfer-Encoding header value was invalid and will not be sent.";
 
+  private static final String COOKIES_SEPARATOR = "; ";
+
   /**
    * Creates an {@HttpRequest}.
    *
@@ -171,9 +173,15 @@ public class HttpRequestFactory {
         //   as the value of the header field.
         //
         // So we should concatenate the cookies
-        StringBuilder sb = new StringBuilder(cookies.get(0));
+
+        int totalHeaderLength = COOKIES_SEPARATOR.length() * (cookies.size() - 1);
+        for (String cookie : cookies) {
+          totalHeaderLength += cookie.length();
+        }
+
+        StringBuilder sb = new StringBuilder(totalHeaderLength).append(cookies.get(0));
         for (int index = 1; index < cookies.size(); ++index) {
-          sb.append("; ").append(cookies.get(index));
+          sb.append(COOKIES_SEPARATOR).append(cookies.get(index));
         }
         builder.addHeader(COOKIE_HEADER, sb.toString());
       }
