@@ -88,6 +88,8 @@ public class HttpRequestFactory {
   private static final String INVALID_TRANSFER_ENCODING_HEADER_MESSAGE =
       "Transfer-Encoding header value was invalid and will not be sent.";
 
+  private static final String COOKIES_SEPARATOR = "; ";
+
   /**
    * Creates an {@HttpRequest}.
    *
@@ -140,14 +142,7 @@ public class HttpRequestFactory {
         });
 
     if (config.isEnableCookies()) {
-      try {
-        List<String> cookies = config.getCookieManager().get(builder.getUri(), emptyMap()).get(COOKIE);
-        if (cookies != null) {
-          builder.addHeaders(COOKIE_HEADER, cookies);
-        }
-      } catch (IOException e) {
-        LOGGER.warn("Error reading cookies for URI " + uri, e);
-      }
+      addCookiesHeader(config, uri, builder);
     }
 
     try {
@@ -166,6 +161,33 @@ public class HttpRequestFactory {
     }
 
     return builder.build();
+  }
+
+  private void addCookiesHeader(HttpRequesterConfig config, String uri, HttpRequestBuilder builder) {
+    try {
+      List<String> cookies = config.getCookieManager().get(builder.getUri(), emptyMap()).get(COOKIE);
+      if (cookies != null && cookies.size() > 0) {
+        // The RFC-6265, section 5.4 says:
+        //   If the user agent does attach a Cookie header field to an HTTP
+        //   request, the user agent MUST send the cookie-string (defined below)
+        //   as the value of the header field.
+        //
+        // So we should concatenate the cookies
+
+        int totalHeaderLength = COOKIES_SEPARATOR.length() * (cookies.size() - 1);
+        for (String cookie : cookies) {
+          totalHeaderLength += cookie.length();
+        }
+
+        StringBuilder sb = new StringBuilder(totalHeaderLength).append(cookies.get(0));
+        for (int index = 1; index < cookies.size(); ++index) {
+          sb.append(COOKIES_SEPARATOR).append(cookies.get(index));
+        }
+        builder.addHeader(COOKIE_HEADER, sb.toString());
+      }
+    } catch (IOException e) {
+      LOGGER.warn("Error reading cookies for URI " + uri, e);
+    }
   }
 
   private HttpEntity createRequestEntity(HttpStreamingType streamingMode, HttpSendBodyMode sendBodyMode,
