@@ -70,12 +70,21 @@ public class HttpRequestCookiesTestCase extends AbstractHttpRequestTestCase {
     assertThat(headers.containsKey(COOKIE), is(true));
 
     Set<String> sentCookies = new HashSet<>(headers.get(COOKIE));
-    Set<String> expectedCookies = Sets.newHashSet();
+    Set<String> expectedCookies = buildCookiesSet(cookies);
 
-    for (String cookie : cookies) {
-      expectedCookies.add(cookie + "=" + COOKIE_TEST_VALUE);
-    }
     assertThat(sentCookies, equalTo(expectedCookies));
+  }
+
+  private Set<String> buildCookiesSet(String... cookies) {
+    if (cookies.length == 0) {
+      return Sets.newHashSet();
+    }
+
+    StringBuilder sb = new StringBuilder(cookies[0] + "=" + COOKIE_TEST_VALUE);
+    for (int i = 1; i < cookies.length; ++i) {
+      sb.append("; ").append(cookies[i]).append("=").append(COOKIE_TEST_VALUE);
+    }
+    return Sets.newHashSet(sb.toString());
   }
 
   private void assertNoCookiesSent() {
