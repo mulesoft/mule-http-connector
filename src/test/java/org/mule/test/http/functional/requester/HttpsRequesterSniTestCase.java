@@ -145,7 +145,7 @@ public class HttpsRequesterSniTestCase extends AbstractHttpTestCase {
       sslServerEngineConfig = new SSLEngineConfigurator(createSSLContextConfigurator().createSSLContext(), false, false, false);
       networkListener.setSSLEngineConfig(sslServerEngineConfig);
 
-      webServer = HttpServer.createSimpleServer();
+      webServer = new HttpServer();
       webServer.addListener(networkListener);
       networkListener.setSecure(true);
       networkListener.registerAddOn(new SniAddOn());
