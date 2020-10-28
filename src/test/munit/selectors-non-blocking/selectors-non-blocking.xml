@@ -16,11 +16,11 @@
 
     <munit:dynamic-port propertyName="dynamic.port"/>
 
-    <http:listener-config name="Listener_config" doc:name="HTTP Listener config" >
+    <http:listener-config name="listenerConfig" doc:name="HTTP Listener config" >
         <http:listener-connection host="0.0.0.0" port="${dynamic.port}" />
     </http:listener-config>
 
-    <http:request-config name="HTTP_Request_config" >
+    <http:request-config name="requestConfig" >
         <http:request-connection host="localhost" port="${dynamic.port}"/>
     </http:request-config>
 
@@ -33,7 +33,7 @@
                 <java:args>#[{arg0: p('dynamic.port')}]</java:args>
             </java:invoke-static>
 
-            <http:request method="GET" doc:name="Test Request" path="/test" config-ref="HTTP_Request_config"/>
+            <http:request method="GET" doc:name="Test Request" path="/test" config-ref="requestConfig"/>
             <set-variable value="#[payload as String]" doc:name="Set Variable" variableName="test_response"/>
 
             <java:invoke-static doc:name="Close sockets" class="org.mule.test.SlowRequester" method="closeSockets()"/>
@@ -44,7 +44,7 @@
     </munit:test>
     
     <flow name="TestFlow" >
-        <http:listener doc:name="Test" path="/test" config-ref="Listener_config" />
+        <http:listener doc:name="Test" path="/test" config-ref="listenerConfig" />
         <logger />
         <set-payload value='#["Test payload"]' />
     </flow>
