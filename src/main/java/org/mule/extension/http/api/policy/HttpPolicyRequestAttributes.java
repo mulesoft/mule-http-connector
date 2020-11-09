@@ -25,8 +25,13 @@ public class HttpPolicyRequestAttributes extends BaseHttpRequestAttributes {
   private static final long serialVersionUID = 7856582596752161400L;
 
   public HttpPolicyRequestAttributes(MultiMap<String, String> headers, MultiMap<String, String> queryParams,
+                                     Map<String, String> uriParams, String requestPath, String url) {
+    super(headers, queryParams, uriParams, requestPath, url);
+  }
+
+  public HttpPolicyRequestAttributes(MultiMap<String, String> headers, MultiMap<String, String> queryParams,
                                      Map<String, String> uriParams, String requestPath) {
-    super(headers, queryParams, uriParams, requestPath);
+    this(headers, queryParams, uriParams, requestPath, "");
   }
 
   public HttpPolicyRequestAttributes() {
@@ -45,12 +50,17 @@ public class HttpPolicyRequestAttributes extends BaseHttpRequestAttributes {
     this.uriParams = uriParams;
   }
 
+  public void setUrl(String url) {
+    this.url = url;
+  }
+
   @Override
   public String toString() {
 
     StringBuilder builder = new StringBuilder();
     builder.append(this.getClass().getName()).append(lineSeparator()).append("{")
         .append(lineSeparator()).append(TAB).append("Request path=").append(requestPath)
+        .append(lineSeparator()).append(TAB).append("Url=").append(url)
         .append(lineSeparator());
 
     buildMapToString(headers, "Headers", headers.entryList().stream(), builder);

@@ -38,16 +38,32 @@ public class BaseHttpRequestAttributes extends HttpAttributes {
   @Parameter
   protected String requestPath;
 
+  /**
+   * Full url to use for the request.
+   */
+  @Parameter
+  protected String url;
+
   public BaseHttpRequestAttributes(MultiMap<String, String> headers, MultiMap<String, String> queryParams,
                                    Map<String, String> uriParams, String requestPath) {
+    this(headers, queryParams, uriParams, requestPath, null);
+  }
+
+  public BaseHttpRequestAttributes(MultiMap<String, String> headers, MultiMap<String, String> queryParams,
+                                   Map<String, String> uriParams, String requestPath, String url) {
     super(headers);
     this.queryParams = queryParams;
     this.uriParams = uriParams;
     this.requestPath = requestPath;
+    this.url = url;
   }
 
   public String getRequestPath() {
     return requestPath;
+  }
+
+  public String getUrl() {
+    return url;
   }
 
   public MultiMap<String, String> getQueryParams() {

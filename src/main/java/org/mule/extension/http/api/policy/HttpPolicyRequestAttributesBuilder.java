@@ -24,6 +24,7 @@ public class HttpPolicyRequestAttributesBuilder {
   private MultiMap<String, String> queryParams = emptyMultiMap();
   private Map<String, String> uriParams = emptyMultiMap();
   private String requestPath;
+  private String url;
 
   public HttpPolicyRequestAttributesBuilder() {}
 
@@ -32,6 +33,7 @@ public class HttpPolicyRequestAttributesBuilder {
     this.queryParams = attributes.getQueryParams();
     this.uriParams = attributes.getUriParams();
     this.requestPath = attributes.getRequestPath();
+    this.url = attributes.getUrl();
   }
 
   public HttpPolicyRequestAttributesBuilder headers(MultiMap<String, String> headers) {
@@ -57,7 +59,12 @@ public class HttpPolicyRequestAttributesBuilder {
     return this;
   }
 
+  public HttpPolicyRequestAttributesBuilder url(String url) {
+    this.url = url;
+    return this;
+  }
+
   public HttpPolicyRequestAttributes build() {
-    return new HttpPolicyRequestAttributes(headers, queryParams, uriParams, requestPath);
+    return new HttpPolicyRequestAttributes(headers, queryParams, uriParams, requestPath, url);
   }
 }

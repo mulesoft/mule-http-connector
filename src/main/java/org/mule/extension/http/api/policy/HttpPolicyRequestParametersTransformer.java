@@ -31,6 +31,7 @@ public class HttpPolicyRequestParametersTransformer implements OperationPolicyPa
 
   private static final DataType HTTP_POLICY_REQUEST_ATTRIBUTES_DATATYPE = DataType.fromType(HttpPolicyRequestAttributes.class);
 
+  private static final String URL = "url";
   private static final String BODY = "body";
   private static final String PATH = "path";
   private static final String HEADERS = "headers";
@@ -50,7 +51,8 @@ public class HttpPolicyRequestParametersTransformer implements OperationPolicyPa
         .attributes(new TypedValue<>(new HttpPolicyRequestAttributes(getMultiMap(parameters, HEADERS),
                                                                      getMultiMap(parameters, QUERY_PARAMS),
                                                                      getMap(parameters, URI_PARAMS),
-                                                                     (String) parameters.get(PATH)),
+                                                                     (String) parameters.get(PATH),
+                                                                     (String) parameters.get(URL)),
                                      HTTP_POLICY_REQUEST_ATTRIBUTES_DATATYPE))
         .build();
   }
@@ -62,6 +64,7 @@ public class HttpPolicyRequestParametersTransformer implements OperationPolicyPa
     if (message.getAttributes().getValue() instanceof BaseHttpRequestAttributes) {
       BaseHttpRequestAttributes requestAttributes = (BaseHttpRequestAttributes) message.getAttributes().getValue();
 
+      putIfNotNull(builder, URL, requestAttributes.getUrl());
       putIfNotNull(builder, PATH, requestAttributes.getRequestPath());
       putIfNotNull(builder, HEADERS, requestAttributes.getHeaders());
       putIfNotNull(builder, QUERY_PARAMS, requestAttributes.getQueryParams());
