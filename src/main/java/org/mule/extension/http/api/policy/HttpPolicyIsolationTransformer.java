@@ -8,11 +8,11 @@ package org.mule.extension.http.api.policy;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.runtime.api.PolicyIsolationTransformer;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.policy.api.HttpRequestMessage;
 import org.mule.runtime.http.policy.api.HttpResponseMessage;
+import org.mule.runtime.http.policy.api.PolicyIsolationTransformer;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -27,7 +27,9 @@ public class HttpPolicyIsolationTransformer implements PolicyIsolationTransforme
     if (message.getAttributes().getValue() instanceof HttpRequestAttributes) {
       HttpRequestAttributes attributes = (HttpRequestAttributes) message.getAttributes().getValue();
       HttpRequestMessage anchor =
-          new HttpRequestMessage(attributes.getHeaders(), attributes.getRawRequestUri(), attributes.getMethod());
+          new HttpRequestMessage(attributes.getHeaders(), attributes.getScheme(),
+                                 attributes.getLocalAddress(), 8080,
+                                 attributes.getRawRequestPath(), attributes.getMethod());
       message1 = Message.builder(message).attributesValue(anchor).build();
     } else if (message.getAttributes().getValue() instanceof HttpResponseAttributes) {
       HttpResponseAttributes attributes = (HttpResponseAttributes) message.getAttributes().getValue();
@@ -46,16 +48,27 @@ public class HttpPolicyIsolationTransformer implements PolicyIsolationTransforme
 
     if (message.getAttributes().getValue() instanceof HttpRequestMessage) {
       HttpRequestMessage requestMessage = (HttpRequestMessage) message.getAttributes().getValue();
-      URI uri;
-      try {
-        uri = new URI(requestMessage.getUrl());
-      } catch (URISyntaxException e) {
-        throw new RuntimeException(e);
-      }
+
+      URI uri = URI.create(requestMessage.getRawPath());
+
       HttpRequestAttributes requestAttributes =
-          new HttpRequestAttributes(requestMessage.getHeaders(), uri.getPath(), uri.getPath(), "1.1", uri.getScheme(),
-                                    requestMessage.getMethod(), uri.getPath(), uri.getPath(), uri.getQuery(), new MultiMap<>(),
-                                    new MultiMap<>(), "127.0.0.1", null);
+          HttpRequestAttributes.builder()
+              .headers(requestMessage.getHeaders())
+              .listenerPath("/*")
+              .localAddress(requestMessage.getDomain())
+              .method(requestMessage.getMethod())
+              .queryParams(new MultiMap<>())
+              .queryString("")
+              .rawRequestPath(requestMessage.getRawPath())
+              .requestPath(uri.getPath())
+              .remoteAddress("127.0.0.1")
+              .relativePath(uri.getPath())
+              .requestUri(uri.getPath())
+              .scheme(requestMessage.getScheme())
+              .uriParams(new MultiMap<>())
+              .version("1.1")
+              .build();
+
       message1 = Message.builder(message).attributesValue(requestAttributes).build();
     } else if (message.getAttributes().getValue() instanceof HttpResponseMessage) {
       HttpResponseMessage responseMessage = (HttpResponseMessage) message.getAttributes().getValue();
