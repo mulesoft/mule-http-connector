@@ -8,16 +8,32 @@ package org.mule.extension.http.api.policy;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
+import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.http.policy.api.HttpRequestMessage;
 import org.mule.runtime.http.policy.api.HttpResponseMessage;
 import org.mule.runtime.http.policy.api.PolicyIsolationTransformer;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 
-public class HttpPolicyIsolationTransformer implements PolicyIsolationTransformer {
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class HttpPolicyIsolationTransformer implements PolicyIsolationTransformer, Initialisable {
+
+  protected static final Logger LOGGER = LoggerFactory.getLogger(HttpPolicyIsolationTransformer.class);
+
+  @Inject
+  private MuleContext muleContext;
+
+  @Override
+  public void initialise() {
+    LOGGER.warn("Initialising {} for {}", HttpPolicyIsolationTransformer.class.getName(), muleContext.getConfiguration().getId());
+  }
 
   @Override
   public Message isolate(Message message) {
