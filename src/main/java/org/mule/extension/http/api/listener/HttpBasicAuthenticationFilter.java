@@ -7,7 +7,6 @@
 package org.mule.extension.http.api.listener;
 
 import static java.lang.Boolean.getBoolean;
-import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyMap;
 import static org.mule.extension.http.api.HttpHeaders.Names.AUTHORIZATION;
