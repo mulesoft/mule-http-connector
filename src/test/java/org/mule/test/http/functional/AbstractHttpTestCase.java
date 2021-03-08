@@ -25,7 +25,12 @@ import org.junit.Rule;
 public abstract class AbstractHttpTestCase extends MuleArtifactFunctionalTestCase {
 
   protected static final int DEFAULT_TIMEOUT = 1000;
-  protected static final String J8_SSL_ERROR_RESPONSE = "General SSLEngine problem";
+
+  // Expected validation error message for JDK 1.8.0_262.
+  protected static final String J8_262_SSL_ERROR_RESPONSE = "General SSLEngine problem";
+  // Expected validation error message for JDK 1.8.0_275.
+  protected static final String J8_275_SSL_ERROR_RESPONSE = "Certificate signature validation failed";
+  // Expected validation error message for JDK 11.
   protected static final String J11_SSL_ERROR_RESPONSE = "PKIX path building failed";
 
   @Rule
