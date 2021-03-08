@@ -57,6 +57,9 @@ public class HttpListenerAuthenticationHandlerTestCase extends AbstractHttpAttri
   @Captor
   private ArgumentCaptor<Authentication> captor;
 
+  @Captor
+  private ArgumentCaptor<char[]> passwordCaptor;
+
   @Mock
   private AuthenticationHandler authenticationHandler;
 
@@ -108,6 +111,39 @@ public class HttpListenerAuthenticationHandlerTestCase extends AbstractHttpAttri
     assertThat(authentication.getProperties(), hasEntry("thisIsAProperty", "thisIsAValue"));
     assertThat(authentication.getPrincipal(), is("user"));
     assertThat(authentication.getCredentials(), is("password"));
+  }
+
+  @Test
+  public void passwordIsCorrectlyParsedByDecodeToken() throws Exception {
+    DefaultMuleCredentials newCredentials = new DefaultMuleCredentials("mule12345", "mule12345§".toCharArray());
+    when(credentialsBuilder.build()).thenReturn(newCredentials);
+    when(authenticationHandler.createCredentialsBuilder()).thenReturn(credentialsBuilder);
+    when(authenticationHandler.createAuthentication(newCredentials)).thenReturn(new DefaultMuleAuthentication(newCredentials));
+    headers = new MultiMap<String, String>() {
+
+      {
+        put(HEADER_AUTHORIZATION, "Basic " + new String(Base64.encode("mule12345:mule12345§".getBytes()).getBytes()));
+      }
+    };
+    when(attributes.getHeaders()).thenReturn(headers);
+
+    HttpBasicAuthenticationFilter httpBasicAuthenticationFilter = new HttpBasicAuthenticationFilter();
+
+    setMocks(httpBasicAuthenticationFilter, "attributes", attributes);
+    setMocks(httpBasicAuthenticationFilter, "securityProviders", securityProviders);
+
+    httpBasicAuthenticationFilter.authenticate(authenticationHandler);
+
+    verify(authenticationHandler).setAuthentication(eq(securityProviders), captor.capture());
+    verify(this.credentialsBuilder).withPassword(passwordCaptor.capture());
+
+    Authentication authentication = captor.getValue();
+    char[] decodedPassword = passwordCaptor.getValue();
+    assertThat(authentication, notNullValue());
+    assertThat(authentication.getProperties(), hasEntry("thisIsAProperty", "thisIsAValue"));
+    assertThat(authentication.getPrincipal(), is("mule12345"));
+    assertThat(authentication.getCredentials(), is("mule12345§"));
+    assertThat(decodedPassword, is("mule12345§".toCharArray()));
   }
 
   @Test
