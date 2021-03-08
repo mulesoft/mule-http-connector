@@ -70,7 +70,7 @@ public class HttpTlsContextInsecureModeTestCase extends AbstractHttpTlsContextTe
 
     assertThat(response, hasStatusCode(SC_INTERNAL_SERVER_ERROR));
     assertThat(response, body(anyOf(containsString(J8_262_SSL_ERROR_RESPONSE),
-                                    containsString(J8_275_SSL_ERROR_RESPONSE),
+                                    containsString("No trusted certificate found"),
                                     containsString(J11_SSL_ERROR_RESPONSE))));
   }
 
@@ -88,7 +88,7 @@ public class HttpTlsContextInsecureModeTestCase extends AbstractHttpTlsContextTe
 
     assertThat(response, hasStatusCode(SC_INTERNAL_SERVER_ERROR));
     assertThat(response, body(anyOf(containsString(J8_262_SSL_ERROR_RESPONSE),
-                                    containsString(J8_275_SSL_ERROR_RESPONSE),
+                                    containsString("No trusted certificate found"),
                                     containsString(J11_SSL_ERROR_RESPONSE))));
   }
 
