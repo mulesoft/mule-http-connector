@@ -7,7 +7,7 @@
 package org.mule.extension.http.api.listener;
 
 import static java.lang.Boolean.getBoolean;
-import static java.nio.charset.StandardCharsets.US_ASCII;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyMap;
 import static org.mule.extension.http.api.HttpHeaders.Names.AUTHORIZATION;
 import static org.mule.extension.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
@@ -119,10 +119,10 @@ public class HttpBasicAuthenticationFilter {
     }
 
     try {
-      return new String(DECODER.decode(base64Token), US_ASCII);
+      return new String(DECODER.decode(base64Token), UTF_8);
     } catch (Exception e) {
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Authentication request failed: {}", e);
+        LOGGER.debug("Authentication request failed: ", e);
       }
       throw new BasicUnauthorisedException(createStaticMessage("Could not decode authorization header."), e,
                                            createUnauthenticatedMessage());
@@ -154,6 +154,7 @@ public class HttpBasicAuthenticationFilter {
     if (realm != null) {
       realmHeader += "\"" + realm + "\"";
     }
+    realmHeader += ", charset=\"UTF-8\"";
     MultiMap<String, String> headers = new MultiMap<>();
     headers.put(WWW_AUTHENTICATE, realmHeader);
     return Message.builder().nullValue().attributesValue(new HttpListenerResponseAttributes(UNAUTHORIZED.getStatusCode(),
