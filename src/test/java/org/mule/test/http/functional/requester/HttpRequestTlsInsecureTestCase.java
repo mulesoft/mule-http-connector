@@ -70,7 +70,7 @@ public class HttpRequestTlsInsecureTestCase extends AbstractHttpTestCase {
     expectedError.expectCause(instanceOf(IOException.class));
     expectedError
         .expectCause(anyOf(hasMessage(containsString(J8_262_SSL_ERROR_RESPONSE)),
-                           hasMessage(containsString(J8_275_SSL_ERROR_RESPONSE)),
+                           hasMessage(containsString("No trusted certificate found")),
                            hasMessage(containsString(J11_SSL_ERROR_RESPONSE))));
     flowRunner("testSecureRequest").withPayload(TEST_PAYLOAD).run();
   }
