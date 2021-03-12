@@ -10,6 +10,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
 
@@ -17,6 +18,10 @@ import org.slf4j.Logger;
 
 /**
  * An object that authenticates an HTTP request.
+ * <p>
+ * For dynamic configurations of the {@code http:request-config} but with a static {@code http:authentication}, the instances of
+ * this interface implementors will be shared. This is relevant for implementations that also implement {@link Lifecycle} or any
+ * of its superinterfaces, since the lifecycle methods will be tied to the lifecycle of the dynamic connection.
  *
  * @since 1.0
  */
@@ -55,7 +60,7 @@ public interface HttpRequestAuthentication {
    *
    * @param firstAttemptResult The result with the response of the request.
    * @param retryCallback the callback that performs the retry of the request.
-   * @param notRetryCallback the callback that perfroms any necessary steps for not retrying the request.
+   * @param notRetryCallback the callback that performs any necessary steps for not retrying the request.
    */
   default void retryIfShould(Result<Object, HttpResponseAttributes> firstAttemptResult, Runnable retryCallback,
                              Runnable notRetryCallback) {
