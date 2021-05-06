@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.internal.listener;
 
+import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.http.api.HttpConstants;
 import org.mule.runtime.http.api.server.HttpServer;
 import org.mule.runtime.http.api.server.RequestHandler;
@@ -76,4 +77,10 @@ public class HttpServerDelegate implements HttpServer {
   protected HttpServer getDelegate() {
     return delegate;
   }
+
+  // Keep these methods to compile against 4.4.0 version of mule-service-http-api.
+
+  public void enableTls(TlsContextFactory tlsContextFactory) {}
+
+  public void disableTls() {}
 }
