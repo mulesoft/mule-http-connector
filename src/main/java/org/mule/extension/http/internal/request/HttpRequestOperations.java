@@ -74,7 +74,6 @@ public class HttpRequestOperations implements Initialisable, Disposable {
     map.put(' ', "%20");
     // RFC-3986: delims
     map.put(':', "%3A");
-    map.put('?', "%3F");
     map.put('#', "%24");
     map.put('[', "%5B");
     map.put(']', "%5D");
@@ -82,14 +81,12 @@ public class HttpRequestOperations implements Initialisable, Disposable {
     // RFC-3986: sub-delims
     map.put('!', "%21");
     map.put('$', "%24");
-    map.put('&', "%26");
     map.put('\'', "%27");
     map.put('(', "%28");
     map.put(')', "%29");
     map.put('+', "%2B");
     map.put(',', "%2C");
     map.put(';', "%3B");
-    map.put('=', "%3D");
     RESERVED_CONVERSION = map;
   }
 
