@@ -72,7 +72,7 @@ public class HttpRequestUriParamsTestCase extends AbstractHttpRequestTestCase {
         .withVariable("paramValue", "$a")
         .run();
 
-    assertThat(uri, equalTo("/testPath/$a"));
+    assertThat(uri, equalTo("/testPath/%24a"));
   }
 
   @Test
@@ -84,7 +84,7 @@ public class HttpRequestUriParamsTestCase extends AbstractHttpRequestTestCase {
         .withVariable("paramValue", "a word+here")
         .run();
 
-    assertThat(uri, equalTo("/testPath/a%20word+here"));
+    assertThat(uri, equalTo("/testPath/a%20word%2Bhere"));
   }
 
   @Test
