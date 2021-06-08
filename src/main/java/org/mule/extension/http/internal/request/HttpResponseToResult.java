@@ -43,6 +43,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import javax.activation.MimeType;
+import javax.activation.MimeTypeParseException;
+
 /**
  * Component that transforms an HTTP response to a proper {@link Result}.
  *
@@ -114,7 +117,14 @@ public class HttpResponseToResult {
   private MediaType getMediaType(final String contentTypeValue, Charset defaultCharset) {
     MediaType mediaType;
     if (contentTypeValue != null) {
-      mediaType = parseMediaType.apply(contentTypeValue);
+      MimeType mimeType;
+      try {
+        mimeType = new MimeType(contentTypeValue);
+      } catch (MimeTypeParseException e) {
+        throw new IllegalArgumentException("MediaType cannot be parsed: " + contentTypeValue, e);
+      }
+      mimeType.removeParameter("boundary"); //TODO: Create constant
+      mediaType = parseMediaType.apply(mimeType.toString());
     } else {
       mediaType = MediaType.ANY;
     }
