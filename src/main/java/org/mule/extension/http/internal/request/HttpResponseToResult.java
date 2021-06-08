@@ -113,7 +113,9 @@ public class HttpResponseToResult {
    */
   private MediaType getMediaType(final String contentTypeValue, Charset defaultCharset) {
     MediaType mediaType;
-    if (contentTypeValue != null) {
+    if (contentTypeValue != null && contentTypeValue.contains("boundary")) {
+      mediaType = parseMediaType(contentTypeValue);
+    } else if (contentTypeValue != null) {
       mediaType = parseMediaType.apply(contentTypeValue);
     } else {
       mediaType = MediaType.ANY;
