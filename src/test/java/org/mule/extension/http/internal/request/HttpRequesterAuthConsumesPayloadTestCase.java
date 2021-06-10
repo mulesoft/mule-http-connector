@@ -306,7 +306,8 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     HttpRequestAuthentication authentication = new PayloadConsumingHttpRequestAuthentication();
 
     HttpResponseToResult httpResponseToResult = new HttpResponseToResult();
-    FieldSetter fieldSetter = new FieldSetter(httpResponseToResult, httpResponseToResult.getClass().getDeclaredField("parseMediaType"));
+    FieldSetter fieldSetter =
+        new FieldSetter(httpResponseToResult, httpResponseToResult.getClass().getDeclaredField("parseMediaType"));
     Function<String, MediaType> mockedParseMediaType = mock(Function.class);
     fieldSetter.set(mockedParseMediaType);
 
@@ -329,8 +330,8 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
 
     // When
     httpRequester.doRequest(client, config, uri, "dummyMethod", null, null, false, authentication, 0, responseValidator, null,
-        requestBuilder, checkRetry, muleContext, null, notificationEmitter, streamingHelper, callback,
-        injectedHeaders);
+                            requestBuilder, checkRetry, muleContext, null, notificationEmitter, streamingHelper, callback,
+                            injectedHeaders);
 
     // Then
     ArgumentCaptor<Result> argumentCaptor = ArgumentCaptor.forClass(Result.class);
@@ -348,7 +349,8 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     HttpRequestAuthentication authentication = new PayloadConsumingHttpRequestAuthentication();
 
     HttpResponseToResult httpResponseToResult = new HttpResponseToResult();
-    FieldSetter fieldSetter = new FieldSetter(httpResponseToResult, httpResponseToResult.getClass().getDeclaredField("parseMediaType"));
+    FieldSetter fieldSetter =
+        new FieldSetter(httpResponseToResult, httpResponseToResult.getClass().getDeclaredField("parseMediaType"));
     Function<String, MediaType> mockedParseMediaType = mock(Function.class);
     fieldSetter.set(mockedParseMediaType);
     MediaType returnedMediaType = MediaType.parse(response.getHeaderValue(CONTENT_TYPE));
@@ -368,8 +370,8 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
 
     // When
     httpRequester.doRequest(client, config, uri, "dummyMethod", null, null, false, authentication, 0, responseValidator, null,
-        requestBuilder, checkRetry, muleContext, null, notificationEmitter, streamingHelper, callback,
-        injectedHeaders);
+                            requestBuilder, checkRetry, muleContext, null, notificationEmitter, streamingHelper, callback,
+                            injectedHeaders);
 
     // Then
     ArgumentCaptor<Result> argumentCaptor = ArgumentCaptor.forClass(Result.class);
