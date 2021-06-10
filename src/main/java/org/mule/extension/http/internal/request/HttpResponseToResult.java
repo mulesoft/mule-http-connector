@@ -54,6 +54,7 @@ public class HttpResponseToResult {
 
   private static final String BINARY_CONTENT_TYPE = BINARY.toRfcString();
   private static boolean STRICT_CONTENT_TYPE = parseBoolean(getProperty(SYSTEM_PROPERTY_PREFIX + "strictContentType"));
+  private static final String BOUNDARY_PARAM = "boundary";
 
   private final Function<String, MediaType> parseMediaType = memoize(ctv -> parseMediaType(ctv), new ConcurrentHashMap<>());
 
@@ -113,7 +114,9 @@ public class HttpResponseToResult {
    */
   private MediaType getMediaType(final String contentTypeValue, Charset defaultCharset) {
     MediaType mediaType;
-    if (contentTypeValue != null) {
+    if (contentTypeValue != null && contentTypeValue.contains(BOUNDARY_PARAM)) {
+      mediaType = parseMediaType(contentTypeValue);
+    } else if (contentTypeValue != null) {
       mediaType = parseMediaType.apply(contentTypeValue);
     } else {
       mediaType = MediaType.ANY;

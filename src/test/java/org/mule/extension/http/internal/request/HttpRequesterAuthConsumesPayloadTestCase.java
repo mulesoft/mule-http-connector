@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
+import org.mockito.internal.util.reflection.FieldSetter;
 import org.mockito.stubbing.Answer;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.error.HttpErrorMessageGenerator;
@@ -22,6 +23,7 @@ import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
@@ -46,12 +48,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.same;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -290,6 +294,89 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     // Then
     verify(streamingHelper, never()).resolveCursorProvider(entity.getContent());
     verify(callback, times(1)).success((Result) result2);
+  }
+
+  @Test
+  @Issue("HTTPC-141")
+  public void testDoRequestCallsCallbackSuccessWithResponseWithContentTypeWithBoundaryFieldAndDoesNotCacheMediaType()
+      throws IOException, NoSuchFieldException {
+    // Given
+    String contentType = "multipart/related; charset=UTF-8; boundary=\"----=_Part_9884_1807804394.1622732346926\"";
+
+    HttpRequestAuthentication authentication = new PayloadConsumingHttpRequestAuthentication();
+
+    HttpResponseToResult httpResponseToResult = new HttpResponseToResult();
+    FieldSetter fieldSetter = new FieldSetter(httpResponseToResult, httpResponseToResult.getClass().getDeclaredField("parseMediaType"));
+    Function<String, MediaType> mockedParseMediaType = mock(Function.class);
+    fieldSetter.set(mockedParseMediaType);
+
+    HttpRequester httpRequester = new HttpRequester(httpRequestFactory, httpResponseToResult, httpErrorMessageGenerator);
+
+    Map<String, List<String>> injectedHeaders = new HashMap<>();
+    when(httpRequestFactory.create(config, uri, "dummyMethod", null, null, null, requestBuilder, authentication, injectedHeaders))
+        .thenReturn(httpRequest);
+
+    boolean checkRetry = true;
+
+    when(muleContext.getConfiguration().getDefaultEncoding()).thenReturn("UTF-8");
+    HttpExtensionClient client = mock(HttpExtensionClient.class);
+    HttpResponse response = mock(HttpResponse.class);
+    when(response.getHeaders()).thenReturn(new MultiMap<>());
+    when(response.getEntity()).thenReturn(entity);
+    when(response.getHeaderValue(CONTENT_TYPE)).thenReturn(contentType);
+
+    when(client.send(httpRequest, 0, false, null)).thenReturn(CompletableFuture.completedFuture(response));
+
+    // When
+    httpRequester.doRequest(client, config, uri, "dummyMethod", null, null, false, authentication, 0, responseValidator, null,
+        requestBuilder, checkRetry, muleContext, null, notificationEmitter, streamingHelper, callback,
+        injectedHeaders);
+
+    // Then
+    ArgumentCaptor<Result> argumentCaptor = ArgumentCaptor.forClass(Result.class);
+    verify(callback, times(1)).success(argumentCaptor.capture());
+    String actualPayload = IOUtils.toString((InputStream) argumentCaptor.getValue().getOutput(), UTF_8.name());
+    assertThat(actualPayload, equalTo(textPayload));
+    verify(mockedParseMediaType, times(0)).apply(response.getHeaderValue(CONTENT_TYPE));
+  }
+
+  @Test
+  @Issue("HTTPC-141")
+  public void testDoRequestCallsCallbackSuccessWithResponseWithContentTypeWithoutBoundaryFieldAndCachesMediaType()
+      throws IOException, NoSuchFieldException {
+    // Given
+    HttpRequestAuthentication authentication = new PayloadConsumingHttpRequestAuthentication();
+
+    HttpResponseToResult httpResponseToResult = new HttpResponseToResult();
+    FieldSetter fieldSetter = new FieldSetter(httpResponseToResult, httpResponseToResult.getClass().getDeclaredField("parseMediaType"));
+    Function<String, MediaType> mockedParseMediaType = mock(Function.class);
+    fieldSetter.set(mockedParseMediaType);
+    MediaType returnedMediaType = MediaType.parse(response.getHeaderValue(CONTENT_TYPE));
+    when(mockedParseMediaType.apply(response.getHeaderValue(CONTENT_TYPE))).thenReturn(returnedMediaType);
+
+    HttpRequester httpRequester = new HttpRequester(httpRequestFactory, httpResponseToResult, httpErrorMessageGenerator);
+
+    Map<String, List<String>> injectedHeaders = new HashMap<>();
+    when(httpRequestFactory.create(config, uri, "dummyMethod", null, null, null, requestBuilder, authentication, injectedHeaders))
+        .thenReturn(httpRequest);
+
+    boolean checkRetry = true;
+
+    when(muleContext.getConfiguration().getDefaultEncoding()).thenReturn("UTF-8");
+
+    when(client.send(httpRequest, 0, false, null)).thenReturn(CompletableFuture.completedFuture(response));
+
+    // When
+    httpRequester.doRequest(client, config, uri, "dummyMethod", null, null, false, authentication, 0, responseValidator, null,
+        requestBuilder, checkRetry, muleContext, null, notificationEmitter, streamingHelper, callback,
+        injectedHeaders);
+
+    // Then
+    ArgumentCaptor<Result> argumentCaptor = ArgumentCaptor.forClass(Result.class);
+    verify(callback, times(1)).success(argumentCaptor.capture());
+    String actualPayload = IOUtils.toString((InputStream) argumentCaptor.getValue().getOutput(), UTF_8.name());
+    assertThat(actualPayload, equalTo(textPayload));
+    verify(mockedParseMediaType, atLeastOnce()).apply(response.getHeaderValue(CONTENT_TYPE));
   }
 
   private Result<Object, HttpResponseAttributes> makeResult(String payloadString) {
