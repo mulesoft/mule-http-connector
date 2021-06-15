@@ -23,9 +23,11 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import static org.hamcrest.core.IsSame.sameInstance;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 
 public class HttpResponseToResultTestCase {
 
@@ -64,6 +66,47 @@ public class HttpResponseToResultTestCase {
 
     // Then
     assertThat(result.getOutput(), sameInstance(expected));
+  }
+
+  @Test
+  @Issue("HTTPC-141")
+  public void testConvertReturnsResultWithNewMediaType_WhenConvertingAResponseWithBoundaryFieldToAResult() {
+    // Given
+    String dummyString = "dummy string";
+    InputStream expected = IOUtils.toInputStream(dummyString);
+    Supplier<Object> payloadSupplier = () -> expected;
+    when(entity.getLength()).thenReturn(Optional.of((long) dummyString.length()));
+    when(response.getHeaderValue(CONTENT_TYPE))
+        .thenReturn("multipart/related; charset=UTF-8; boundary=\"----=_Part_9884_1807804394.1622732346926\"");
+
+    // When
+    Result<Object, HttpResponseAttributes> result =
+        httpResponseToResult.convert(config, muleContext, response, entity, payloadSupplier, uri);
+    Result<Object, HttpResponseAttributes> result2 =
+        httpResponseToResult.convert(config, muleContext, response, entity, payloadSupplier, uri);
+
+    // Then
+    assertThat(result2.getMediaType().get(), not(sameInstance(result.getMediaType().get())));
+  }
+
+  @Test
+  @Issue("HTTPC-141")
+  public void testConvertReturnsResultWithCachedMediaType_WhenConvertingAResponseWithoutBoundaryFieldToAResult() {
+    // Given
+    String dummyString = "dummy string";
+    InputStream expected = IOUtils.toInputStream(dummyString);
+    Supplier<Object> payloadSupplier = () -> expected;
+    when(entity.getLength()).thenReturn(Optional.of((long) dummyString.length()));
+    when(response.getHeaderValue(CONTENT_TYPE)).thenReturn("multipart/related; charset=UTF-8");
+
+    // When
+    Result<Object, HttpResponseAttributes> result =
+        httpResponseToResult.convert(config, muleContext, response, entity, payloadSupplier, uri);
+    Result<Object, HttpResponseAttributes> result2 =
+        httpResponseToResult.convert(config, muleContext, response, entity, payloadSupplier, uri);
+
+    // Then
+    assertThat(result2.getMediaType().get(), sameInstance(result.getMediaType().get()));
   }
 
 }
