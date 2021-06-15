@@ -12,6 +12,7 @@ import static java.lang.System.getProperty;
 import static java.nio.charset.Charset.defaultCharset;
 import static org.mule.runtime.api.metadata.MediaType.BINARY;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.core.api.util.ClassUtils.memoize;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
@@ -30,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -38,7 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -52,9 +54,8 @@ public class HttpResponseToResult {
 
   private static final String BINARY_CONTENT_TYPE = BINARY.toRfcString();
   private static boolean STRICT_CONTENT_TYPE = parseBoolean(getProperty(SYSTEM_PROPERTY_PREFIX + "strictContentType"));
-  private static final String BOUNDARY_PARAM = "boundary";
 
-  private static final ConcurrentMap<String, MediaType> parsedMediaTypes = new ConcurrentHashMap<>();
+  private final Function<String, MediaType> parseMediaType = memoize(ctv -> parseMediaType(ctv), new ConcurrentHashMap<>());
 
   Result<Object, HttpResponseAttributes> convert(HttpRequesterCookieConfig config, MuleContext muleContext,
                                                  HttpResponse response, HttpEntity entity,
@@ -113,12 +114,7 @@ public class HttpResponseToResult {
   private MediaType getMediaType(final String contentTypeValue, Charset defaultCharset) {
     MediaType mediaType;
     if (contentTypeValue != null) {
-      // Since the boundary field value is mostly random, caching each value only fills up the cache
-      // Therefore, contentTypeValues with boundary fields are not saved
-      mediaType = parsedMediaTypes.computeIfAbsent(contentTypeValue, this::parseAndExcludeTypeWithBoundary);
-      if (mediaType == null) {
-        mediaType = parseMediaType(contentTypeValue);
-      }
+      mediaType = parseMediaType.apply(contentTypeValue);
     } else {
       mediaType = MediaType.ANY;
     }
@@ -128,11 +124,6 @@ public class HttpResponseToResult {
     } else {
       return mediaType;
     }
-  }
-
-  private MediaType parseAndExcludeTypeWithBoundary(final String contentTypeValue) {
-    MediaType mediaType = parseMediaType(contentTypeValue);
-    return mediaType.getParameter(BOUNDARY_PARAM) == null ? mediaType : null;
   }
 
   private MediaType parseMediaType(final String contentTypeValue) {
