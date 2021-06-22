@@ -53,6 +53,7 @@ public class HttpResponseToResult {
   private static final String BINARY_CONTENT_TYPE = BINARY.toRfcString();
   private static boolean STRICT_CONTENT_TYPE = parseBoolean(getProperty(SYSTEM_PROPERTY_PREFIX + "strictContentType"));
   private static final String BOUNDARY_PARAM = "boundary";
+  private MediaType parsedMediaTypeHolder;
 
   private static final ConcurrentMap<String, MediaType> parsedMediaTypes = new ConcurrentHashMap<>();
 
@@ -115,10 +116,9 @@ public class HttpResponseToResult {
     if (contentTypeValue != null) {
       // Since the boundary field value is mostly random, caching each value only fills up the cache
       // Therefore, contentTypeValues with boundary fields are not saved
-      mediaType = parsedMediaTypes.computeIfAbsent(contentTypeValue, this::parseAndExcludeTypeWithBoundary);
-      if (mediaType == null) {
-        mediaType = parseMediaType(contentTypeValue);
-      }
+      parsedMediaTypes.computeIfAbsent(contentTypeValue, this::parseAndExcludeTypeWithBoundary);
+      // Since parseAndExcludeTypeWithBoundary must only receive one argument, a holder is used to save the parsed media type
+      mediaType = parsedMediaTypeHolder;
     } else {
       mediaType = MediaType.ANY;
     }
@@ -131,8 +131,8 @@ public class HttpResponseToResult {
   }
 
   private MediaType parseAndExcludeTypeWithBoundary(final String contentTypeValue) {
-    MediaType mediaType = parseMediaType(contentTypeValue);
-    return mediaType.getParameter(BOUNDARY_PARAM) == null ? mediaType : null;
+    parsedMediaTypeHolder = parseMediaType(contentTypeValue);
+    return parsedMediaTypeHolder.getParameter(BOUNDARY_PARAM) == null ? parsedMediaTypeHolder : null;
   }
 
   private MediaType parseMediaType(final String contentTypeValue) {
