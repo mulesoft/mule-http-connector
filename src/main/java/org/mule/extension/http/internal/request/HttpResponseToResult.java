@@ -116,9 +116,11 @@ public class HttpResponseToResult {
     if (contentTypeValue != null) {
       // Since the boundary field value is mostly random, caching each value only fills up the cache
       // Therefore, contentTypeValues with boundary fields are not saved
-      parsedMediaTypes.computeIfAbsent(contentTypeValue, this::parseAndExcludeTypeWithBoundary);
+      mediaType = parsedMediaTypes.computeIfAbsent(contentTypeValue, this::parseAndExcludeTypeWithBoundary);
       // Since parseAndExcludeTypeWithBoundary must only receive one argument, a holder is used to save the parsed media type
-      mediaType = parsedMediaTypeHolder;
+      if (mediaType == null) {
+        mediaType = parsedMediaTypeHolder;
+      }
     } else {
       mediaType = MediaType.ANY;
     }
