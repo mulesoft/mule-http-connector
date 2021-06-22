@@ -16,7 +16,7 @@ public class MediaTypeHolder {
     return mediaType;
   }
 
-  public void setMediaType(MediaType mediaType){
+  public void setMediaType(MediaType mediaType) {
     this.mediaType = mediaType;
   }
 }
