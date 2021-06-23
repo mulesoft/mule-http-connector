@@ -33,7 +33,8 @@
 
         <muleSocketsConnectorVersion>1.2.1</muleSocketsConnectorVersion>
         <muleCorsKernelVersion>1.1.2</muleCorsKernelVersion>
-
+        <muleSdkApiVersion>0.3.0</muleSdkApiVersion>
+        
         <!-- This dependencies must be explicitly defined as long as HTTP supports runtimes prior to 4.1.2 -->
         <muleHttpPolicyApiVersion>1.1.3</muleHttpPolicyApiVersion>
         <mulePolicyApiVersion>1.1.3</mulePolicyApiVersion>
@@ -178,6 +179,12 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-policy-api</artifactId>
             <version>${mulePolicyApiVersion}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.sdk</groupId>
+            <artifactId>mule-sdk-api</artifactId>
+            <version>${muleSdkApiVersion}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
