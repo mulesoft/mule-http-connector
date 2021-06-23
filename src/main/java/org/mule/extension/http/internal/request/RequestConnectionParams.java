@@ -17,6 +17,9 @@ import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.http.api.HttpConstants;
+import org.mule.sdk.api.annotation.semantics.connectivity.ExcludeFromConnectivitySchema;
+import org.mule.sdk.api.annotation.semantics.connectivity.Host;
+import org.mule.sdk.api.annotation.semantics.connectivity.Port;
 
 /**
  * Groups parameters related to a requester connection
@@ -48,6 +51,7 @@ public final class RequestConnectionParams {
   @Optional
   @Example("www.mulesoft.com")
   @Placement(order = 2)
+  @Host
   private String host;
 
   /**
@@ -57,6 +61,7 @@ public final class RequestConnectionParams {
   @Parameter
   @Optional
   @Placement(order = 3)
+  @Port
   private Integer port;
 
   /**
@@ -66,6 +71,7 @@ public final class RequestConnectionParams {
   @Optional(defaultValue = "true")
   @Expression(NOT_SUPPORTED)
   @Placement(tab = ADVANCED_TAB, order = 1)
+  @ExcludeFromConnectivitySchema
   private boolean usePersistentConnections;
 
   /**
@@ -76,6 +82,7 @@ public final class RequestConnectionParams {
   @Optional(defaultValue = DEFAULT_MAX_CONNECTIONS)
   @Expression(NOT_SUPPORTED)
   @Placement(tab = ADVANCED_TAB, order = 2)
+  @ExcludeFromConnectivitySchema
   private Integer maxConnections;
 
   /**
@@ -97,6 +104,7 @@ public final class RequestConnectionParams {
   @Optional(defaultValue = "false")
   @Expression(NOT_SUPPORTED)
   @Placement(tab = ADVANCED_TAB, order = 4)
+  @ExcludeFromConnectivitySchema
   private boolean streamResponse;
 
   /**
@@ -106,6 +114,7 @@ public final class RequestConnectionParams {
   @Optional(defaultValue = DEFAULT_RESPONSE_BUFFER_SIZE)
   @Expression(NOT_SUPPORTED)
   @Placement(tab = ADVANCED_TAB, order = 5)
+  @ExcludeFromConnectivitySchema
   private int responseBufferSize;
 
   @Parameter
@@ -113,6 +122,7 @@ public final class RequestConnectionParams {
   @NullSafe
   @Expression(NOT_SUPPORTED)
   @Placement(tab = ADVANCED_TAB, order = 6)
+  @ExcludeFromConnectivitySchema
   private TcpClientSocketProperties clientSocketProperties;
 
   public HttpConstants.Protocol getProtocol() {
