@@ -82,11 +82,19 @@ public class HttpResponseToResultTestCase {
     // When
     Result<Object, HttpResponseAttributes> result =
         httpResponseToResult.convert(config, muleContext, response, entity, payloadSupplier, uri);
-    Result<Object, HttpResponseAttributes> result2 =
+
+    // Converting different response
+    when(response.getHeaderValue(CONTENT_TYPE))
+        .thenReturn("multipart/related; charset=UTF-8; boundary=\"----=_Part_9884_1807804394.473284789327\"");
+    httpResponseToResult.convert(config, muleContext, response, entity, payloadSupplier, uri);
+
+    when(response.getHeaderValue(CONTENT_TYPE))
+        .thenReturn("multipart/related; charset=UTF-8; boundary=\"----=_Part_9884_1807804394.1622732346926\"");
+    Result<Object, HttpResponseAttributes> result3 =
         httpResponseToResult.convert(config, muleContext, response, entity, payloadSupplier, uri);
 
     // Then
-    assertThat(result2.getMediaType().get(), not(sameInstance(result.getMediaType().get())));
+    assertThat(result3.getMediaType().get(), not(sameInstance(result.getMediaType().get())));
   }
 
   @Test
@@ -102,11 +110,19 @@ public class HttpResponseToResultTestCase {
     // When
     Result<Object, HttpResponseAttributes> result =
         httpResponseToResult.convert(config, muleContext, response, entity, payloadSupplier, uri);
-    Result<Object, HttpResponseAttributes> result2 =
+
+    // Converting different response
+    when(response.getHeaderValue(CONTENT_TYPE))
+        .thenReturn("multipart/other; charset=UTF-8");
+    httpResponseToResult.convert(config, muleContext, response, entity, payloadSupplier, uri);
+
+    when(response.getHeaderValue(CONTENT_TYPE))
+        .thenReturn("multipart/related; charset=UTF-8");
+    Result<Object, HttpResponseAttributes> result3 =
         httpResponseToResult.convert(config, muleContext, response, entity, payloadSupplier, uri);
 
     // Then
-    assertThat(result2.getMediaType().get(), sameInstance(result.getMediaType().get()));
+    assertThat(result3.getMediaType().get(), sameInstance(result.getMediaType().get()));
   }
 
 }

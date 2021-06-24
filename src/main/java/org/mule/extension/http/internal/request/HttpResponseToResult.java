@@ -113,11 +113,16 @@ public class HttpResponseToResult {
   private MediaType getMediaType(final String contentTypeValue, Charset defaultCharset) {
     MediaType mediaType;
     if (contentTypeValue != null) {
-      // Since the boundary field value is mostly random, caching each value only fills up the cache
+      // As the boundary field value is mostly random, caching each value only fills up the cache
       // Therefore, contentTypeValues with boundary fields are not saved
-      mediaType = parsedMediaTypes.computeIfAbsent(contentTypeValue, this::parseAndExcludeTypeWithBoundary);
+      MediaTypeHolder mediaTypeHolder = new MediaTypeHolder();
+      mediaType = parsedMediaTypes.computeIfAbsent(contentTypeValue, (contentType) -> {
+        MediaType parsedMediaType = parseMediaType(contentType);
+        mediaTypeHolder.setMediaType(parsedMediaType);
+        return parsedMediaType.getParameter(BOUNDARY_PARAM) == null ? parsedMediaType : null;
+      });
       if (mediaType == null) {
-        mediaType = parseMediaType(contentTypeValue);
+        mediaType = mediaTypeHolder.getMediaType();
       }
     } else {
       mediaType = MediaType.ANY;
@@ -128,11 +133,6 @@ public class HttpResponseToResult {
     } else {
       return mediaType;
     }
-  }
-
-  private MediaType parseAndExcludeTypeWithBoundary(final String contentTypeValue) {
-    MediaType mediaType = parseMediaType(contentTypeValue);
-    return mediaType.getParameter(BOUNDARY_PARAM) == null ? mediaType : null;
   }
 
   private MediaType parseMediaType(final String contentTypeValue) {
