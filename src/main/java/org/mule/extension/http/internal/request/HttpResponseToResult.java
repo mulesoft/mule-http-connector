@@ -117,8 +117,9 @@ public class HttpResponseToResult {
       // Therefore, contentTypeValues with boundary fields are not saved
       MediaTypeHolder mediaTypeHolder = new MediaTypeHolder();
       mediaType = parsedMediaTypes.computeIfAbsent(contentTypeValue, (contentType) -> {
-        mediaTypeHolder.setMediaType(parseMediaType(contentType));
-        return mediaTypeHolder.getMediaType().getParameter(BOUNDARY_PARAM) == null ? mediaTypeHolder.getMediaType() : null;
+        MediaType parsedMediaType = parseMediaType(contentType);
+        mediaTypeHolder.setMediaType(parsedMediaType);
+        return parsedMediaType.getParameter(BOUNDARY_PARAM) == null ? parsedMediaType : null;
       });
       if (mediaType == null) {
         mediaType = mediaTypeHolder.getMediaType();
