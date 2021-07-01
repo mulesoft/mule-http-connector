@@ -66,6 +66,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
 
   private static final int UNLIMITED_CONNECTIONS = -1;
   private static final String NAME_PATTERN = "http.requester.%s";
+  private static final String DISABLE_PROXY_CONFIG = "<<disabled>>";
 
   @Inject
   private MuleContext muleContext;
@@ -170,19 +171,21 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
     } else {
       String name = format(NAME_PATTERN, configName);
 
-      HttpClientConfiguration configuration = new HttpClientConfiguration.Builder()
+      HttpClientConfiguration.Builder configBuilder = new HttpClientConfiguration.Builder()
           .setTlsContextFactory(tlsContext)
-          .setProxyConfig(proxyConfig)
           .setClientSocketProperties(buildTcpProperties(connectionParams.getClientSocketProperties()))
           .setMaxConnections(connectionParams.getMaxConnections())
           .setUsePersistentConnections(connectionParams.getUsePersistentConnections())
           .setConnectionIdleTimeout(connectionParams.getConnectionIdleTimeout())
           .setStreaming(connectionParams.getStreamResponse())
           .setResponseBufferSize(connectionParams.getResponseBufferSize())
-          .setName(name)
-          .build();
+          .setName(name);
 
-      httpClient = connectionManager.create(getConfigurationId(), configuration);
+      if (proxyConfig != null && !DISABLE_PROXY_CONFIG.equals(proxyConfig.getHost())) {
+        configBuilder.setProxyConfig(proxyConfig);
+      }
+
+      httpClient = connectionManager.create(getConfigurationId(), configBuilder.build());
     }
     UriParameters uriParameters = new DefaultUriParameters(connectionParams.getProtocol(), connectionParams.getHost(),
                                                            connectionParams.getPort());
