@@ -32,7 +32,7 @@
 
     <munit:test name="parallel-redirect-test" description="Create multiple request to an endpoint that return 301.">
         <munit:enable-flow-sources>
-            <munit:enable-flow-source value="moved" />
+            <munit:enable-flow-source value="parallel-moved" />
             <munit:enable-flow-source value="response" />
         </munit:enable-flow-sources>
         <munit:execution>
@@ -47,7 +47,7 @@
         </munit:validation>
     </munit:test>
 
-    <flow name="moved">
+    <flow name="parallel-moved">
         <http:listener config-ref="HTTP_Listener_config_moved" path="/move">
             <http:response statusCode="301" reasonPhrase="Moved Permanently">
                 <http:headers ><![CDATA[#[output application/java
