@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+      xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+               http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		       http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <munit:config name="redirect-test-case"/>
+
+    <munit:dynamic-port propertyName="dynamic.port"/>
+
+    <http:listener-config name="HTTP_Listener_config">
+        <http:listener-connection host="0.0.0.0" port="${dynamic.port}" />
+    </http:listener-config>
+
+    <http:request-config name="followRedirects" followRedirects="true">
+        <http:request-connection host="localhost" port="${dynamic.port}"/>
+    </http:request-config>
+
+    <http:request-config name="noRedirect" followRedirects="false">
+        <http:request-connection host="localhost" port="${dynamic.port}"/>
+    </http:request-config>
+
+    <munit:test name="moved-test" description="Create a request to an endpoint that return 301. Should follow redirect">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="moved" />
+            <munit:enable-flow-source value="response" />
+        </munit:enable-flow-sources>
+
+        <munit:execution>
+            <http:request method="GET" config-ref="followRedirects" path="/move"/>
+            <set-variable value="#[payload as String]" variableName="moved_response"/>
+        </munit:execution>
+
+        <munit:validation>
+            <munit-tools:assert-equals actual="#[vars.moved_response]" expected='#["response"]'/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="no-redirect-test" description="Create a request to an endpoint that return 301. Should not follow redirect">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="moved" />
+            <munit:enable-flow-source value="response" />
+        </munit:enable-flow-sources>
+
+        <munit:execution>
+            <http:request method="GET" config-ref="noRedirect" path="/move"/>
+            <set-variable value="#[payload as String]" variableName="response"/>
+        </munit:execution>
+
+        <munit:validation>
+            <munit-tools:assert-equals actual="#[vars.response]" expected='#["moved"]'/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="redirect-test-overriding-config" description="Create a request to an endpoint that return 301. Should follow redirect">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="moved" />
+            <munit:enable-flow-source value="response" />
+        </munit:enable-flow-sources>
+
+        <munit:execution>
+            <http:request method="GET" config-ref="noRedirect" path="/move" followRedirects="true"/>
+            <set-variable value="#[payload as String]" variableName="response"/>
+        </munit:execution>
+
+        <munit:validation>
+            <munit-tools:assert-equals actual="#[vars.response]" expected='#["response"]'/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="no-redirect-test-overriding-config" description="Create a request to an endpoint that return 301. Should not follow redirect">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="moved" />
+            <munit:enable-flow-source value="response" />
+        </munit:enable-flow-sources>
+
+        <munit:execution>
+            <http:request method="GET" config-ref="followRedirects" path="/move" followRedirects="false"/>
+            <set-variable value="#[payload as String]" variableName="response"/>
+        </munit:execution>
+
+        <munit:validation>
+            <munit-tools:assert-equals actual="#[vars.response]" expected='#["moved"]'/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="redirect-loop" description="Create a request to an endpoint that return 301 to itself. Should throw a MaxRedirect exception">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="redirect-loop-flow" />
+        </munit:enable-flow-sources>
+
+        <munit:execution>
+            <try>
+                <http:request method="GET" config-ref="followRedirects" path="/redirectLoop"/>
+                <error-handler>
+                    <on-error-continue enableNotifications="false" logException="false">
+                        <set-payload value="#[error.description]"/>
+                    </on-error-continue>
+                </error-handler>
+            </try>
+        </munit:execution>
+
+        <munit:validation>
+            <munit-tools:assert-that expression="#[payload as String]" is="#[MunitTools::containsString('MaxRedirectException')]"/>
+        </munit:validation>
+    </munit:test>
+
+    <flow name="moved">
+        <http:listener config-ref="HTTP_Listener_config" path="/move">
+            <http:response statusCode="301" reasonPhrase="Moved Permanently">
+                <http:headers ><![CDATA[#[output application/java
+---
+{
+	"Location" : "http://localhost:${dynamic.port}/response"
+}]]]></http:headers>
+            </http:response>
+        </http:listener>
+        <set-payload value='#["moved"]' />
+    </flow>
+
+    <flow name="response">
+        <http:listener config-ref="HTTP_Listener_config" path="/response"/>
+        <set-payload value='#["response"]'/>
+    </flow>
+
+    <flow name="redirect-loop-flow">
+        <http:listener config-ref="HTTP_Listener_config" path="/redirectLoop">
+            <http:response statusCode="301" reasonPhrase="Moved Permanently">
+                <http:headers ><![CDATA[#[output application/java
+---
+{
+	"Location" : "http://localhost:${dynamic.port}/redirectLoop"
+}]]]></http:headers>
+            </http:response>
+        </http:listener>
+        <set-payload value='#["moved"]' />
+    </flow>
+</mule>
