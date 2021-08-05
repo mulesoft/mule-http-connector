@@ -26,7 +26,7 @@
         <http:listener-connection host="0.0.0.0" port="${dynamic.port.response}" />
     </http:listener-config>
 
-    <http:request-config name="followRedirects" followRedirects="true">
+    <http:request-config name="followParallelRedirects" followRedirects="true">
         <http:request-connection host="localhost" port="${dynamic.port.moved}"/>
     </http:request-config>
 
@@ -37,7 +37,7 @@
         </munit:enable-flow-sources>
         <munit:execution>
             <parallel-foreach  maxConcurrency="30" collection="#[1 to 100]" target="response">
-                <http:request method="GET" config-ref="followRedirects" path="/move"/>
+                <http:request method="GET" config-ref="followParallelRedirects" path="/move"/>
             </parallel-foreach>
         </munit:execution>
         <munit:validation>
