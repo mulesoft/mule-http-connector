@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+      xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+               http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		       http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <munit:config name="parallel-redirect-test-case" minMuleVersion="4.3.1"/>
+
+    <munit:dynamic-port propertyName="dynamic.port.moved"/>
+
+    <munit:dynamic-port propertyName="dynamic.port.response"/>
+
+    <http:listener-config name="HTTP_Listener_config_moved">
+        <http:listener-connection host="0.0.0.0" port="${dynamic.port.moved}" />
+    </http:listener-config>
+
+    <http:listener-config name="HTTP_Listener_config_response">
+        <http:listener-connection host="0.0.0.0" port="${dynamic.port.response}" />
+    </http:listener-config>
+
+    <http:request-config name="followParallelRedirects" followRedirects="true">
+        <http:request-connection host="localhost" port="${dynamic.port.moved}"/>
+    </http:request-config>
+
+    <munit:test name="parallel-redirect-test" description="Create multiple request to an endpoint that return 301.">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="moved" />
+            <munit:enable-flow-source value="response" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <parallel-foreach  maxConcurrency="30" collection="#[1 to 100]" target="response">
+                <http:request method="GET" config-ref="followParallelRedirects" path="/move"/>
+            </parallel-foreach>
+        </munit:execution>
+        <munit:validation>
+            <foreach collection="#[vars.response]">
+                <munit-tools:assert-equals actual="#[payload as String]" expected='#["response"]'/>
+            </foreach>
+        </munit:validation>
+    </munit:test>
+
+    <flow name="moved">
+        <http:listener config-ref="HTTP_Listener_config_moved" path="/move">
+            <http:response statusCode="301" reasonPhrase="Moved Permanently">
+                <http:headers ><![CDATA[#[output application/java
+---
+{
+	"Location" : "http://localhost:${dynamic.port.response}/response"
+}]]]></http:headers>
+            </http:response>
+        </http:listener>
+        <set-payload value='#["moved"]' />
+    </flow>
+    <flow name="response">
+        <http:listener config-ref="HTTP_Listener_config_response" path="/response"/>
+        <set-payload value='#["response"]'/>
+    </flow>
+</mule>
