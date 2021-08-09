@@ -33,7 +33,7 @@
     <munit:test name="parallel-redirect-test" description="Create multiple request to an endpoint that return 301.">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="parallel-moved" />
-            <munit:enable-flow-source value="response" />
+            <munit:enable-flow-source value="parallel-response" />
         </munit:enable-flow-sources>
         <munit:execution>
             <parallel-foreach  maxConcurrency="30" collection="#[1 to 100]" target="response">
@@ -59,7 +59,8 @@
         </http:listener>
         <set-payload value='#["moved"]' />
     </flow>
-    <flow name="response">
+
+    <flow name="parallel-response">
         <http:listener config-ref="HTTP_Listener_config_response" path="/response"/>
         <set-payload value='#["response"]'/>
     </flow>
