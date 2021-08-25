@@ -11,6 +11,9 @@ import static java.util.Optional.of;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
+import org.mule.extension.http.api.listener.headers.HttpHeadersFilter;
+import org.mule.extension.http.api.listener.headers.IdempotentHeaderFilter;
+import org.mule.extension.http.api.listener.headers.InvalidTransferEncodingFilter;
 import org.mule.extension.http.internal.listener.HttpListener;
 import org.mule.extension.http.internal.listener.HttpListenerProvider;
 import org.mule.extension.http.internal.listener.ListenerPath;
@@ -51,9 +54,20 @@ public class HttpListenerConfig implements Initialisable {
   @Expression(NOT_SUPPORTED)
   private CorsInterceptorWrapper listenerInterceptors;
 
+  /**
+   * If true, request with an invalid value for "Transfer-Encoding" header will be rejected with a 400 Bad Request.
+   */
+  @Parameter
+  @Optional(defaultValue = "false")
+  @Expression(NOT_SUPPORTED)
+  private boolean rejectInvalidTransferEncoding;
+
+  private HttpHeadersFilter httpHeaderFilter;
+
   @Override
   public void initialise() throws InitialisationException {
     basePath = sanitizePathWithStartSlash(this.basePath);
+    httpHeaderFilter = createHeaderFilter();
   }
 
   public ListenerPath getFullListenerPath(String listenerPath) {
@@ -70,5 +84,17 @@ public class HttpListenerConfig implements Initialisable {
 
   public java.util.Optional<HttpListenerInterceptor> getInterceptor() {
     return listenerInterceptors != null ? of(listenerInterceptors.getInterceptor()) : empty();
+  }
+
+  public HttpHeadersFilter getHeaderFilter() {
+    return httpHeaderFilter;
+  }
+
+  private HttpHeadersFilter createHeaderFilter() {
+    if (rejectInvalidTransferEncoding) {
+      return new InvalidTransferEncodingFilter();
+    } else {
+      return new IdempotentHeaderFilter();
+    }
   }
 }

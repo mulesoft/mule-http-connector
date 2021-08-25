@@ -38,6 +38,8 @@ import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.listener.builder.HttpListenerErrorResponseBuilder;
 import org.mule.extension.http.api.listener.builder.HttpListenerSuccessResponseBuilder;
+import org.mule.extension.http.api.listener.headers.HttpHeaderError;
+import org.mule.extension.http.api.listener.headers.HttpHeadersFilter;
 import org.mule.extension.http.api.listener.server.HttpListenerConfig;
 import org.mule.extension.http.api.streaming.HttpStreamingType;
 import org.mule.extension.http.internal.HttpMetadataResolver;
@@ -384,7 +386,11 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
 
       @Override
       public Result<InputStream, HttpRequestAttributes> createResult(HttpRequestContext requestContext) {
-        return HttpListener.this.createResult(requestContext);
+        try {
+          return HttpListener.this.createResult(requestContext, config.getHeaderFilter());
+        } catch (HttpHeaderError headersError) {
+          throw new IllegalArgumentException(headersError);
+        }
       }
 
       @Override
@@ -526,8 +532,10 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
         .reasonPhrase(reasonPhraseFromException != null ? reasonPhraseFromException : throwable.getMessage());
   }
 
-  private Result<InputStream, HttpRequestAttributes> createResult(HttpRequestContext requestContext) {
-    return transform(requestContext, getDefaultEncoding(muleContext), listenerPath);
+  private Result<InputStream, HttpRequestAttributes> createResult(HttpRequestContext requestContext,
+                                                                  HttpHeadersFilter headersFilter)
+      throws HttpHeaderError {
+    return transform(requestContext, getDefaultEncoding(muleContext), listenerPath, headersFilter);
     // TODO: MULE-9748 Analyse RequestContext use in HTTP extension
     // Update RequestContext ThreadLocal for backwards compatibility
     // setCurrentEvent(muleEvent);

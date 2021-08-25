@@ -11,6 +11,8 @@ import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.decodeUriP
 
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpRequestAttributesBuilder;
+import org.mule.extension.http.api.listener.headers.HttpHeaderError;
+import org.mule.extension.http.api.listener.headers.HttpHeadersFilter;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.request.ClientConnection;
 import org.mule.runtime.http.api.domain.request.HttpRequestContext;
@@ -26,6 +28,7 @@ public class HttpRequestAttributesResolver {
 
   private HttpRequestContext requestContext;
   private ListenerPath listenerPath;
+  private HttpHeadersFilter headersFilter;
 
   public HttpRequestAttributesResolver setRequestContext(HttpRequestContext requestContext) {
     this.requestContext = requestContext;
@@ -37,7 +40,12 @@ public class HttpRequestAttributesResolver {
     return this;
   }
 
-  public HttpRequestAttributes resolve() {
+  public HttpRequestAttributesResolver setHeadersFilter(HttpHeadersFilter headersFilter) {
+    this.headersFilter = headersFilter;
+    return this;
+  }
+
+  public HttpRequestAttributes resolve() throws HttpHeaderError {
 
     String listenerPath = this.listenerPath.getResolvedPath();
     HttpRequest request = requestContext.getRequest();
@@ -70,7 +78,7 @@ public class HttpRequestAttributesResolver {
         .method(request.getMethod())
         .scheme(requestContext.getScheme())
         .version(request.getProtocol().asString())
-        .headers(request.getHeaders())
+        .headers(headersFilter.filter(request.getHeaders()))
         .uriParams(decodeUriParams(listenerPath, rawPath))
         .queryString(queryString)
         .queryParams(decodeQueryString(rawQuery))

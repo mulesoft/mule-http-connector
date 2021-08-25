@@ -14,7 +14,7 @@
     <munit:dynamic-port propertyName="dynamic.port"/>
 
     <!-- Target Application -->
-    <http:listener-config name="InvalidTransferEncodingHttpListenerConfig">
+    <http:listener-config name="InvalidTransferEncodingHttpListenerConfig" rejectInvalidTransferEncoding="true">
         <http:listener-connection host="0.0.0.0" port="${dynamic.port}" usePersistentConnections="false" />
     </http:listener-config>
     <flow name="invalidTransferEncodingFlow" >
@@ -51,5 +51,4 @@ OK
             <munit-tools:assert-that is="#[MunitTools::containsString('HTTP/1.1 400')]" expression="#[payload as String]"/>
         </munit:validation>
     </munit:test>
-
 </mule>

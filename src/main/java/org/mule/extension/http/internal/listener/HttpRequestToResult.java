@@ -13,6 +13,8 @@ import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PR
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
+import org.mule.extension.http.api.listener.headers.HttpHeaderError;
+import org.mule.extension.http.api.listener.headers.HttpHeadersFilter;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
@@ -36,7 +38,9 @@ public class HttpRequestToResult {
 
   public static Result<InputStream, HttpRequestAttributes> transform(final HttpRequestContext requestContext,
                                                                      final Charset encoding,
-                                                                     ListenerPath listenerPath) {
+                                                                     ListenerPath listenerPath,
+                                                                     HttpHeadersFilter headersFilter)
+      throws HttpHeaderError {
     final HttpRequest request = requestContext.getRequest();
 
     MediaType mediaType = getMediaType(request.getHeaderValue(CONTENT_TYPE), encoding);
@@ -44,8 +48,8 @@ public class HttpRequestToResult {
     final HttpEntity entity = request.getEntity();
     InputStream payload = entity.getContent();
 
-    HttpRequestAttributes attributes =
-        new HttpRequestAttributesResolver().setRequestContext(requestContext).setListenerPath(listenerPath).resolve();
+    HttpRequestAttributes attributes = new HttpRequestAttributesResolver().setRequestContext(requestContext)
+        .setListenerPath(listenerPath).setHeadersFilter(headersFilter).resolve();
 
     Result.Builder<InputStream, HttpRequestAttributes> resultBuilder = Result.builder();
     if (entity.getLength().isPresent()) {
