@@ -38,8 +38,8 @@ import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.listener.builder.HttpListenerErrorResponseBuilder;
 import org.mule.extension.http.api.listener.builder.HttpListenerSuccessResponseBuilder;
-import org.mule.extension.http.api.listener.headers.HttpHeaderError;
-import org.mule.extension.http.api.listener.headers.HttpHeadersFilter;
+import org.mule.extension.http.api.listener.headers.HttpHeadersException;
+import org.mule.extension.http.api.listener.headers.HttpHeadersValidator;
 import org.mule.extension.http.api.listener.server.HttpListenerConfig;
 import org.mule.extension.http.api.streaming.HttpStreamingType;
 import org.mule.extension.http.internal.HttpMetadataResolver;
@@ -386,11 +386,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
 
       @Override
       public Result<InputStream, HttpRequestAttributes> createResult(HttpRequestContext requestContext) {
-        try {
-          return HttpListener.this.createResult(requestContext, config.getHeaderFilter());
-        } catch (HttpHeaderError headersError) {
-          throw new IllegalArgumentException(headersError);
-        }
+        return HttpListener.this.createResult(requestContext);
       }
 
       @Override
@@ -405,6 +401,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
           responseContext.setSupportStreaming(supportsTransferEncoding(httpVersion));
           responseContext.setResponseCallback(responseCallback);
           MultiMap<String, String> headers = getHeaders(result);
+          config.validateHeaders(headers);
           config.getInterceptor().ifPresent(interceptor -> responseContext
               .setInterception(interceptor.request(getMethod(result), headers)));
 
@@ -414,6 +411,8 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
           resolveCorrelationId(headers, context);
 
           sourceCallback.handle(result, context);
+        } catch (HttpHeadersException httpHeadersError) {
+          sendErrorResponse(httpHeadersError.getStatusCode(), getEscapedErrorBody(httpHeadersError), responseCallback);
         } catch (IllegalArgumentException e) {
           if (LOGGER.isDebugEnabled()) {
             LOGGER.warn("Exception occurred parsing request:", e);
@@ -532,10 +531,8 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
         .reasonPhrase(reasonPhraseFromException != null ? reasonPhraseFromException : throwable.getMessage());
   }
 
-  private Result<InputStream, HttpRequestAttributes> createResult(HttpRequestContext requestContext,
-                                                                  HttpHeadersFilter headersFilter)
-      throws HttpHeaderError {
-    return transform(requestContext, getDefaultEncoding(muleContext), listenerPath, headersFilter);
+  private Result<InputStream, HttpRequestAttributes> createResult(HttpRequestContext requestContext) {
+    return transform(requestContext, getDefaultEncoding(muleContext), listenerPath);
     // TODO: MULE-9748 Analyse RequestContext use in HTTP extension
     // Update RequestContext ThreadLocal for backwards compatibility
     // setCurrentEvent(muleEvent);
