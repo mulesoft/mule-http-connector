@@ -30,10 +30,7 @@ import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 public class HttpInvalidTransferEncodingTestCase extends AbstractHttpTestCase {
 
   @Rule
-  public DynamicPort rejectingPort = new DynamicPort("rejectingPort");
-
-  @Rule
-  public DynamicPort allowingPort = new DynamicPort("allowingPort");
+  public DynamicPort port = new DynamicPort("port");
 
   @Override
   protected String getConfigFile() {
@@ -43,10 +40,10 @@ public class HttpInvalidTransferEncodingTestCase extends AbstractHttpTestCase {
   @Test
   public void chunkedTransferEncodingIsAllowed() throws IOException {
     String content = "Test content";
-    try (Socket clientSocket = new Socket("localhost", rejectingPort.getNumber())) {
+    try (Socket clientSocket = new Socket("localhost", port.getNumber())) {
       StringBuilder request = new StringBuilder(128);
       request.append("POST /test HTTP/1.1").append(lineSeparator());
-      request.append("Host: localhost:").append(rejectingPort.getNumber()).append(lineSeparator());
+      request.append("Host: localhost:").append(port.getNumber()).append(lineSeparator());
       request.append("Transfer-Encoding: chunked").append(lineSeparator());
       request.append(lineSeparator());
       request.append(toHexString(content.length())).append(lineSeparator());
@@ -62,10 +59,10 @@ public class HttpInvalidTransferEncodingTestCase extends AbstractHttpTestCase {
   @Test
   public void chunkedWithQuotesTransferEncodingIsForbidden() throws IOException {
     String content = "Test content";
-    try (Socket clientSocket = new Socket("localhost", rejectingPort.getNumber())) {
+    try (Socket clientSocket = new Socket("localhost", port.getNumber())) {
       StringBuilder request = new StringBuilder(128);
       request.append("POST /test HTTP/1.1").append(lineSeparator());
-      request.append("Host: localhost:").append(rejectingPort.getNumber()).append(lineSeparator());
+      request.append("Host: localhost:").append(port.getNumber()).append(lineSeparator());
       request.append("Transfer-Encoding: 'chunked'").append(lineSeparator());
       request.append(lineSeparator());
       request.append(toHexString(content.length())).append(lineSeparator());
@@ -81,10 +78,10 @@ public class HttpInvalidTransferEncodingTestCase extends AbstractHttpTestCase {
   @Test
   public void bothContentLengthAndTransferEncoding() throws IOException {
     String content = "Test content";
-    try (Socket clientSocket = new Socket("localhost", rejectingPort.getNumber())) {
+    try (Socket clientSocket = new Socket("localhost", port.getNumber())) {
       StringBuilder request = new StringBuilder(128);
       request.append("POST /test HTTP/1.1").append(lineSeparator());
-      request.append("Host: localhost:").append(rejectingPort.getNumber()).append(lineSeparator());
+      request.append("Host: localhost:").append(port.getNumber()).append(lineSeparator());
       request.append("Content-Length: 2").append(lineSeparator());
       request.append("Transfer-Encoding: chunked").append(lineSeparator());
       request.append(lineSeparator());
@@ -102,10 +99,10 @@ public class HttpInvalidTransferEncodingTestCase extends AbstractHttpTestCase {
   @Test
   public void multipleValidTransferEncodingSpecifiedInSameHeader() throws IOException {
     String content = "Test content";
-    try (Socket clientSocket = new Socket("localhost", rejectingPort.getNumber())) {
+    try (Socket clientSocket = new Socket("localhost", port.getNumber())) {
       StringBuilder request = new StringBuilder(128);
       request.append("POST /test HTTP/1.1").append(lineSeparator());
-      request.append("Host: localhost:").append(rejectingPort.getNumber()).append(lineSeparator());
+      request.append("Host: localhost:").append(port.getNumber()).append(lineSeparator());
       request.append("Transfer-Encoding: chunked, deflate").append(lineSeparator());
       request.append(lineSeparator());
       request.append(toHexString(content.length())).append(lineSeparator());
@@ -122,10 +119,10 @@ public class HttpInvalidTransferEncodingTestCase extends AbstractHttpTestCase {
   @Test
   public void multipleValidTransferEncodingSpecifiedInMultipleHeaders() throws IOException {
     String content = "Test content";
-    try (Socket clientSocket = new Socket("localhost", rejectingPort.getNumber())) {
+    try (Socket clientSocket = new Socket("localhost", port.getNumber())) {
       StringBuilder request = new StringBuilder(128);
       request.append("POST /test HTTP/1.1").append(lineSeparator());
-      request.append("Host: localhost:").append(rejectingPort.getNumber()).append(lineSeparator());
+      request.append("Host: localhost:").append(port.getNumber()).append(lineSeparator());
       request.append("Transfer-Encoding: deflate").append(lineSeparator());
       request.append("Transfer-Encoding: chunked").append(lineSeparator());
       request.append(lineSeparator());
