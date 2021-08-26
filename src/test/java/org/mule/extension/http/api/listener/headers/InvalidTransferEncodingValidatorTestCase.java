@@ -6,6 +6,8 @@
  */
 package org.mule.extension.http.api.listener.headers;
 
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.Rule;
@@ -20,6 +22,8 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mule.extension.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 
+@Story("Invalid Transfer Encoding")
+@Issue("HTTPC-149")
 public class InvalidTransferEncodingValidatorTestCase {
 
   @Rule
