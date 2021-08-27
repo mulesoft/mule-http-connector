@@ -46,9 +46,51 @@ public class InvalidTransferEncodingValidatorTestCase {
     }
   }
 
-  private static void assertThatTransferEncodingValueIsValid(String transferEncoding) {
+  @Test
+  public void multipleValidValuesInTheSameHeader() {
+    assertThatTransferEncodingValueIsValid("deflate, chunked");
+  }
+
+  @Test
+  public void multipleValidValuesInSeparatedHeaders() {
+    assertThatTransferEncodingValueIsValid("chunked", "deflate");
+  }
+
+  @Test
+  public void chunkedWithQuotesIsInvalid() throws HttpHeadersException {
+    assertThatTransferEncodingValueIsInvalid("'chunked'");
+  }
+
+  @Test
+  public void validAndInvalidInTheSameHeaderValidFirst() throws HttpHeadersException {
+    assertThatTransferEncodingValueIsInvalid("deflate, 'chunked'");
+  }
+
+  @Test
+  public void validAndInvalidInTheSameHeaderInvalidFirst() throws HttpHeadersException {
+    assertThatTransferEncodingValueIsInvalid("'chunked', deflate");
+  }
+
+  @Test
+  public void validAndInvalidInTheSeparatedHeadersInvalidFirst() throws HttpHeadersException {
+    assertThatTransferEncodingValueIsInvalid("'chunked'", "deflate");
+  }
+
+  @Test
+  public void validAndInvalidInTheSeparatedHeadersValidFirst() throws HttpHeadersException {
+    assertThatTransferEncodingValueIsInvalid("deflate", "'chunked'");
+  }
+
+  @Test
+  public void obviouslyInvalidValue() throws HttpHeadersException {
+    assertThatTransferEncodingValueIsInvalid("thisIsNotValid");
+  }
+
+  private static void assertThatTransferEncodingValueIsValid(String... transferEncodings) {
     MultiMap<String, String> headers = new MultiMap<>();
-    headers.put(TRANSFER_ENCODING, transferEncoding);
+    for (String transferEncoding : transferEncodings) {
+      headers.put(TRANSFER_ENCODING, transferEncoding);
+    }
 
     HttpHeadersValidator validator = new InvalidTransferEncodingValidator();
     try {
@@ -58,22 +100,11 @@ public class InvalidTransferEncodingValidatorTestCase {
     }
   }
 
-  @Test
-  public void chunkedWithQuotesIsInvalid() throws HttpHeadersException {
+  private void assertThatTransferEncodingValueIsInvalid(String... transferEncodings) throws HttpHeadersException {
     MultiMap<String, String> headers = new MultiMap<>();
-    headers.put(TRANSFER_ENCODING, "'chunked'");
-
-    exception.expect(HttpHeadersException.class);
-    exception.expectMessage("'Transfer-Encoding' header has an invalid value");
-    exception.expect(new HasStatusCode(BAD_REQUEST));
-    HttpHeadersValidator validator = new InvalidTransferEncodingValidator();
-    validator.validateHeaders(headers);
-  }
-
-  @Test
-  public void obviouslyInvalidValue() throws HttpHeadersException {
-    MultiMap<String, String> headers = new MultiMap<>();
-    headers.put(TRANSFER_ENCODING, "thisIsNotValid");
+    for (String transferEncoding : transferEncodings) {
+      headers.put(TRANSFER_ENCODING, transferEncoding);
+    }
 
     exception.expect(HttpHeadersException.class);
     exception.expectMessage("'Transfer-Encoding' header has an invalid value");

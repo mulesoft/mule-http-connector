@@ -91,7 +91,6 @@ public class HttpInvalidTransferEncodingTestCase extends AbstractHttpTestCase {
       clientSocket.getOutputStream().write(request.toString().getBytes(UTF_8));
 
       String response = getResponse(clientSocket);
-      // TODO: Check if it's ok to support this
       assertThat(response, containsString("HTTP/1.1 200"));
     }
   }
@@ -111,8 +110,7 @@ public class HttpInvalidTransferEncodingTestCase extends AbstractHttpTestCase {
       clientSocket.getOutputStream().write(request.toString().getBytes(UTF_8));
 
       String response = getResponse(clientSocket);
-      // TODO: Check if we should support this
-      assertThat(response, containsString("HTTP/1.1 400"));
+      assertThat(response, containsString("HTTP/1.1 200"));
     }
   }
 

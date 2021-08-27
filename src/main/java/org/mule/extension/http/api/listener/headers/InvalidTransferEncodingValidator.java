@@ -8,12 +8,14 @@ package org.mule.extension.http.api.listener.headers;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
 import static java.util.Locale.ROOT;
 import static org.mule.extension.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 
 import org.mule.runtime.api.util.MultiMap;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -35,9 +37,14 @@ public class InvalidTransferEncodingValidator implements HttpHeadersValidator {
    */
   @Override
   public void validateHeaders(MultiMap<String, String> headers) throws HttpHeadersException {
-    if (headers.getAll(TRANSFER_ENCODING).stream().map(s -> s.toLowerCase(ROOT))
-        .anyMatch(headerValue -> !validTransferEncodings.contains(headerValue))) {
+    if (headers.getAll(TRANSFER_ENCODING).stream().anyMatch(this::isInvalidTransferEncodingHeader)) {
       throw new HttpHeadersException(format("'%s' header has an invalid value", TRANSFER_ENCODING), BAD_REQUEST);
     }
+  }
+
+  private boolean isInvalidTransferEncodingHeader(String headerValue) {
+    return stream(headerValue.split(","))
+        .map(transferEncoding -> transferEncoding.trim().toLowerCase(ROOT))
+        .anyMatch(lowerCase -> !validTransferEncodings.contains(lowerCase));
   }
 }
