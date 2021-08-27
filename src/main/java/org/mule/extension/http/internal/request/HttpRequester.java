@@ -9,6 +9,8 @@ package org.mule.extension.http.internal.request;
 import static java.lang.Boolean.getBoolean;
 import static java.lang.Integer.getInteger;
 import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
 import static org.mule.extension.http.api.error.HttpError.CONNECTIVITY;
 import static org.mule.extension.http.api.error.HttpError.TIMEOUT;
@@ -36,6 +38,7 @@ import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.streaming.HttpStreamingType;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
+import org.mule.extension.http.internal.request.profiling.HttpRequestResponseProfilingDataProducerAdaptor;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -62,6 +65,7 @@ import java.nio.channels.UnresolvedAddressException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
@@ -87,6 +91,7 @@ public class HttpRequester {
   private final HttpRequestFactory httpRequestFactory;
   private final HttpResponseToResult httpResponseToResult;
   private final HttpErrorMessageGenerator httpErrorMessageGenerator;
+  private Optional<HttpRequestResponseProfilingDataProducerAdaptor> profilingDataProducer = empty();
 
   private static final Method fireNotificationMethod;
 
@@ -108,6 +113,13 @@ public class HttpRequester {
     this.httpErrorMessageGenerator = httpErrorMessageGenerator;
   }
 
+  public HttpRequester(HttpRequestFactory httpRequestFactory, HttpResponseToResult httpResponseToResult,
+                       HttpErrorMessageGenerator httpErrorMessageGenerator,
+                       HttpRequestResponseProfilingDataProducerAdaptor profilingDataProducer) {
+    this(httpRequestFactory, httpResponseToResult, httpErrorMessageGenerator);
+    this.profilingDataProducer = ofNullable(profilingDataProducer);
+  }
+
   public void doRequest(HttpExtensionClient client, HttpRequesterConfig config, String uri, String method,
                         HttpStreamingType streamingMode, HttpSendBodyMode sendBodyMode,
                         boolean followRedirects, HttpRequestAuthentication authentication,
@@ -115,13 +127,14 @@ public class HttpRequester {
                         TransformationService transformationService, HttpRequesterRequestBuilder requestBuilder,
                         boolean checkRetry, MuleContext muleContext, Scheduler scheduler, NotificationEmitter notificationEmitter,
                         StreamingHelper streamingHelper, CompletionCallback<InputStream, HttpResponseAttributes> callback,
-                        Map<String, List<String>> injectedHeaders) {
+                        Map<String, List<String>> injectedHeaders,
+                        String correlationId) {
     doRequestWithRetry(client, config, uri, method, streamingMode, sendBodyMode, followRedirects, authentication, responseTimeout,
                        responseValidator, transformationService, requestBuilder, checkRetry, muleContext, scheduler,
                        notificationEmitter, streamingHelper, callback,
                        httpRequestFactory.create(config, uri, method, streamingMode, sendBodyMode, transformationService,
                                                  requestBuilder, authentication, injectedHeaders),
-                       RETRY_ATTEMPTS, injectedHeaders);
+                       RETRY_ATTEMPTS, injectedHeaders, correlationId);
   }
 
   private void doRequestWithRetry(HttpExtensionClient client, HttpRequesterConfig config, String uri, String method,
@@ -133,7 +146,7 @@ public class HttpRequester {
                                   NotificationEmitter notificationEmitter,
                                   StreamingHelper streamingHelper,
                                   CompletionCallback<InputStream, HttpResponseAttributes> callback, HttpRequest httpRequest,
-                                  int retryCount, Map<String, List<String>> injectedHeaders) {
+                                  int retryCount, Map<String, List<String>> injectedHeaders, String correlationId) {
     fireNotification(notificationEmitter, REQUEST_START, () -> HttpRequestNotificationData.from(httpRequest),
                      REQUEST_NOTIFICATION_DATA_TYPE);
 
@@ -156,12 +169,15 @@ public class HttpRequester {
                 doRequest(client, config, uri, method, streamingMode, sendBodyMode, followRedirects,
                           authentication, responseTimeout, responseValidator, transformationService,
                           requestBuilder, false, muleContext, scheduler, notificationEmitter,
-                          streamingHelper, callback, injectedHeaders);
+                          streamingHelper, callback, injectedHeaders, correlationId);
               }, () -> {
                 responseValidator.validate((Result) result, httpRequest, streamingHelper);
 
                 Result<Object, HttpResponseAttributes> freshResult = httpResponseToResult
                     .convert(config, muleContext, response, entity, resultInputStreamSupplier, httpRequest.getUri());
+
+                profilingDataProducer
+                    .ifPresent(profilingDataProducer -> profilingDataProducer.triggerProfilingEvent(result, correlationId));
 
                 callback.success((Result) freshResult);
               });
@@ -176,7 +192,7 @@ public class HttpRequester {
                                  authentication, responseTimeout, responseValidator, transformationService,
                                  requestBuilder, checkRetry, muleContext, scheduler, notificationEmitter,
                                  streamingHelper, callback,
-                                 httpRequest, retryCount - 1, injectedHeaders);
+                                 httpRequest, retryCount - 1, injectedHeaders, correlationId);
               return;
             }
 
