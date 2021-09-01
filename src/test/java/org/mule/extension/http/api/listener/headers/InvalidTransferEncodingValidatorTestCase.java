@@ -16,6 +16,8 @@ import org.junit.rules.ExpectedException;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.HttpConstants.HttpStatus;
 
+import java.util.Locale;
+
 import static java.util.Arrays.asList;
 import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
@@ -89,10 +91,10 @@ public class InvalidTransferEncodingValidatorTestCase {
   private static void assertThatTransferEncodingValueIsValid(String... transferEncodings) {
     MultiMap<String, String> headers = new MultiMap<>();
     for (String transferEncoding : transferEncodings) {
-      headers.put(TRANSFER_ENCODING, transferEncoding);
+      headers.put(TRANSFER_ENCODING.toLowerCase(Locale.ROOT), transferEncoding);
     }
 
-    HttpHeadersValidator validator = new InvalidTransferEncodingValidator();
+    HttpHeadersValidator validator = new InvalidTransferEncodingValidator(true);
     try {
       validator.validateHeaders(headers);
     } catch (HttpHeadersException e) {
@@ -103,13 +105,13 @@ public class InvalidTransferEncodingValidatorTestCase {
   private void assertThatTransferEncodingValueIsInvalid(String... transferEncodings) throws HttpHeadersException {
     MultiMap<String, String> headers = new MultiMap<>();
     for (String transferEncoding : transferEncodings) {
-      headers.put(TRANSFER_ENCODING, transferEncoding);
+      headers.put(TRANSFER_ENCODING.toLowerCase(Locale.ROOT), transferEncoding);
     }
 
     exception.expect(HttpHeadersException.class);
     exception.expectMessage("'Transfer-Encoding' header has an invalid value");
     exception.expect(new HasStatusCode(BAD_REQUEST));
-    HttpHeadersValidator validator = new InvalidTransferEncodingValidator();
+    HttpHeadersValidator validator = new InvalidTransferEncodingValidator(true);
     validator.validateHeaders(headers);
   }
 

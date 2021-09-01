@@ -57,6 +57,25 @@ public class HttpInvalidTransferEncodingTestCase extends AbstractHttpTestCase {
   }
 
   @Test
+  public void chunkedCaseInsensitiveTransferEncodingIsAllowed() throws IOException {
+    String content = "Test content";
+    try (Socket clientSocket = new Socket("localhost", port.getNumber())) {
+      StringBuilder request = new StringBuilder(128);
+      request.append("POST /test HTTP/1.1").append(lineSeparator());
+      request.append("Host: localhost:").append(port.getNumber()).append(lineSeparator());
+      request.append("Transfer-Encoding: cHuNkEd").append(lineSeparator());
+      request.append(lineSeparator());
+      request.append(toHexString(content.length())).append(lineSeparator());
+      request.append(content).append(lineSeparator());
+      request.append("0").append(lineSeparator()).append(lineSeparator());
+      clientSocket.getOutputStream().write(request.toString().getBytes(UTF_8));
+
+      String response = getResponse(clientSocket);
+      assertThat(response, containsString("HTTP/1.1 200"));
+    }
+  }
+
+  @Test
   public void chunkedWithQuotesTransferEncodingIsForbidden() throws IOException {
     String content = "Test content";
     try (Socket clientSocket = new Socket("localhost", port.getNumber())) {

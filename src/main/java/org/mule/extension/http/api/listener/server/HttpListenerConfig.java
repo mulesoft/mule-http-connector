@@ -6,8 +6,6 @@
  */
 package org.mule.extension.http.api.listener.server;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
@@ -30,8 +28,6 @@ import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-
-import java.util.Collection;
 
 /**
  * Configuration element for a {@link HttpListener}.
@@ -68,12 +64,12 @@ public class HttpListenerConfig implements Initialisable {
   @Expression(NOT_SUPPORTED)
   private boolean rejectInvalidTransferEncoding;
 
-  private Collection<HttpHeadersValidator> httpHeaderValidators;
+  private HttpHeadersValidator httpHeaderValidators;
 
   @Override
   public void initialise() throws InitialisationException {
     basePath = sanitizePathWithStartSlash(this.basePath);
-    httpHeaderValidators = createHeaderFilters();
+    httpHeaderValidators = new InvalidTransferEncodingValidator(rejectInvalidTransferEncoding);
   }
 
   public ListenerPath getFullListenerPath(String listenerPath) {
@@ -92,22 +88,13 @@ public class HttpListenerConfig implements Initialisable {
     return listenerInterceptors != null ? of(listenerInterceptors.getInterceptor()) : empty();
   }
 
-  private Collection<HttpHeadersValidator> createHeaderFilters() {
-    if (rejectInvalidTransferEncoding) {
-      return singletonList(new InvalidTransferEncodingValidator());
-    } else {
-      return emptyList();
-    }
-  }
-
   /**
-   * Calls the configured header validators.
-   * @param headers Dictionary containing the headers from an HTTP requuest.
+   * Calls the configured header validator.
+   *
+   * @param headers dictionary containing the headers from an HTTP request.
    * @throws HttpHeadersException if an error related to headers is found.
    */
   public void validateHeaders(MultiMap<String, String> headers) throws HttpHeadersException {
-    for (HttpHeadersValidator validator : httpHeaderValidators) {
-      validator.validateHeaders(headers);
-    }
+    httpHeaderValidators.validateHeaders(headers);
   }
 }

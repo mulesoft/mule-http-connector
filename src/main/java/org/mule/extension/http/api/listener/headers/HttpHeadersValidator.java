@@ -16,8 +16,9 @@ import org.mule.runtime.api.util.MultiMap;
 public interface HttpHeadersValidator {
 
   /**
-   * Makes some validation on the headers from an HTTP request.
-   * @param headers Headers in the request.
+   * Validates HTTP request headers.
+   *
+   * @param headers headers in the request.
    * @throws HttpHeadersException if an error related to headers is found.
    */
   void validateHeaders(MultiMap<String, String> headers) throws HttpHeadersException;

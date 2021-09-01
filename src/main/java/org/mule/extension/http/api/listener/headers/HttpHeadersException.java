@@ -9,7 +9,9 @@ package org.mule.extension.http.api.listener.headers;
 import org.mule.runtime.http.api.HttpConstants.HttpStatus;
 
 /**
- * Exception thrown by {@link HttpHeadersValidator} when an headers error is found.
+ * Exception thrown by {@link HttpHeadersValidator} when a headers error is found.
+ *
+ * @since 1.6.0
  */
 public class HttpHeadersException extends Exception {
 
