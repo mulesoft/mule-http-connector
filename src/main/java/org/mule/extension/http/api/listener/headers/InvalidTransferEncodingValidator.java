@@ -94,24 +94,14 @@ public class InvalidTransferEncodingValidator implements HttpHeadersValidator {
     int size = trimmed.length();
     switch (size) {
       case 7:
-        if ("chunked".equals(toLowerIfNeeded(trimmed)) || "deflate".equals(toLowerIfNeeded(trimmed))) {
-          return true;
-        }
-        break;
+        return ("chunked".equals(toLowerIfNeeded(trimmed)) || "deflate".equals(toLowerIfNeeded(trimmed)));
       case 8:
-        if ("compress".equals(toLowerIfNeeded(trimmed)) || "identity".equals(toLowerIfNeeded(trimmed))) {
-          return true;
-        }
-        break;
+        return ("compress".equals(toLowerIfNeeded(trimmed)) || "identity".equals(toLowerIfNeeded(trimmed)));
       case 4:
-        if ("gzip".equals(toLowerIfNeeded(trimmed))) {
-          return true;
-        }
-        break;
+        return ("gzip".equals(toLowerIfNeeded(trimmed)));
       default:
         return false;
     }
-    return false;
   }
 
   private static String toLowerIfNeeded(String input) {
@@ -131,13 +121,6 @@ public class InvalidTransferEncodingValidator implements HttpHeadersValidator {
       }
     }
     return true;
-  }
-
-  private static String[] splitIfNeeded(String headerValue, String delimiter) {
-    if (headerValue.contains(delimiter)) {
-      return headerValue.split(delimiter);
-    }
-    return new String[] {headerValue};
   }
 
   private static String trimIfNeeded(String input) {

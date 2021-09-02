@@ -88,6 +88,19 @@ public class InvalidTransferEncodingValidatorTestCase {
     assertThatTransferEncodingValueIsInvalid("thisIsNotValid");
   }
 
+  @Test
+  public void invalidHeaderDoesNotThrowExceptionIfFlagIsFalse() throws HttpHeadersException {
+    MultiMap<String, String> headers = new MultiMap<>();
+    headers.put(TRANSFER_ENCODING.toLowerCase(Locale.ROOT), "ThisIsInvalid");
+
+    HttpHeadersValidator validator = new InvalidTransferEncodingValidator(false);
+    try {
+      validator.validateHeaders(headers);
+    } catch (HttpHeadersException e) {
+      fail("When the throwException boolean is false, it shouldn't throw exception");
+    }
+  }
+
   private static void assertThatTransferEncodingValueIsValid(String... transferEncodings) {
     MultiMap<String, String> headers = new MultiMap<>();
     for (String transferEncoding : transferEncodings) {
