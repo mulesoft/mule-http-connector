@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Validator utilized to check the "Transfer-Encoding" header value in the request. All the valid values are specified in
@@ -28,8 +29,15 @@ public class InvalidTransferEncodingValidator implements HttpHeadersValidator {
 
   private static final Logger LOGGER = getLogger(InvalidTransferEncodingValidator.class);
   private static final String TRANSFER_ENCODING_LOWERCASE = TRANSFER_ENCODING.toLowerCase(Locale.ROOT);
+  private static final int ERRORS_LIMIT_TO_PRINT_WARNING = 2 << 20;
   private final boolean throwException;
+  private final AtomicInteger errorsFound = new AtomicInteger();
 
+  /**
+   * @param throwException if {@code true}, the errors will be reported as an exception. Otherwise, the errors will be
+   *                       logged. One of each {@link ERRORS_LIMIT_TO_PRINT_WARNING} errors will be printed as a WARN log,
+   *                       and the others as TRACE, in order to avoid log flooding.
+   */
   public InvalidTransferEncodingValidator(boolean throwException) {
     this.throwException = throwException;
   }
@@ -67,7 +75,11 @@ public class InvalidTransferEncodingValidator implements HttpHeadersValidator {
     if (throwException) {
       throw new HttpHeadersException(format("'%s' header has an invalid value", TRANSFER_ENCODING), BAD_REQUEST);
     } else {
-      LOGGER.warn("'{}' header has an invalid value", TRANSFER_ENCODING);
+      if (errorsFound.getAndIncrement() % ERRORS_LIMIT_TO_PRINT_WARNING == 0) {
+        LOGGER.warn("'{}' header has an invalid value", TRANSFER_ENCODING);
+      } else {
+        LOGGER.trace("'{}' header has an invalid value", TRANSFER_ENCODING);
+      }
     }
   }
 

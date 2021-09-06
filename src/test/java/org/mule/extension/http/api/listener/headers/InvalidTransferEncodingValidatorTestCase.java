@@ -95,6 +95,8 @@ public class InvalidTransferEncodingValidatorTestCase {
 
     HttpHeadersValidator validator = new InvalidTransferEncodingValidator(false);
     try {
+      // Calling it twice in order to print both the warning and the trace logs
+      validator.validateHeaders(headers);
       validator.validateHeaders(headers);
     } catch (HttpHeadersException e) {
       fail("When the throwException boolean is false, it shouldn't throw exception");
