@@ -6,6 +6,14 @@
  */
 package org.mule.extension.http.api.listener.headers;
 
+import static java.util.Arrays.asList;
+import static org.junit.Assert.fail;
+import static org.junit.rules.ExpectedException.none;
+import static org.mule.extension.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
+import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.REJECT_INVALID_TRANSFER_ENCODING;
+
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
@@ -19,14 +27,8 @@ import org.mule.runtime.http.api.HttpConstants.HttpStatus;
 
 import java.util.Locale;
 
-import static java.util.Arrays.asList;
-import static org.junit.Assert.fail;
-import static org.junit.rules.ExpectedException.none;
-import static org.mule.extension.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
-
-@Story("Invalid Transfer Encoding")
-@Feature("Reject Invalid Transfer Encoding")
+@Feature(HTTP_EXTENSION)
+@Story(REJECT_INVALID_TRANSFER_ENCODING)
 @Issue("HTTPC-149")
 public class InvalidTransferEncodingValidatorTestCase {
 

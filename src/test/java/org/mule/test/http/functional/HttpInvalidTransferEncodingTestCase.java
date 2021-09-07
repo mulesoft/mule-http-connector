@@ -6,6 +6,15 @@
  */
 package org.mule.test.http.functional;
 
+import static java.lang.Integer.toHexString;
+import static java.lang.System.lineSeparator;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
+import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.REJECT_INVALID_TRANSFER_ENCODING;
+
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
@@ -19,15 +28,8 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.net.Socket;
 
-import static java.lang.Integer.toHexString;
-import static java.lang.System.lineSeparator;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
-
-@Story("Invalid Transfer Encoding")
-@Feature("Reject Invalid Transfer Encoding")
+@Feature(HTTP_EXTENSION)
+@Story(REJECT_INVALID_TRANSFER_ENCODING)
 @Issue("HTTPC-149")
 // TODO HTTPC-151: Migrate this test to MTF.
 public class HttpInvalidTransferEncodingTestCase extends AbstractHttpTestCase {
