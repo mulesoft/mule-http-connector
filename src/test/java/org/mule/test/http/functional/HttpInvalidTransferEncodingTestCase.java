@@ -6,6 +6,7 @@
  */
 package org.mule.test.http.functional;
 
+import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.junit.Rule;
@@ -26,7 +27,9 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 
 @Story("Invalid Transfer Encoding")
+@Feature("Reject Invalid Transfer Encoding")
 @Issue("HTTPC-149")
+// TODO HTTPC-151: Migrate this test to MTF.
 public class HttpInvalidTransferEncodingTestCase extends AbstractHttpTestCase {
 
   @Rule

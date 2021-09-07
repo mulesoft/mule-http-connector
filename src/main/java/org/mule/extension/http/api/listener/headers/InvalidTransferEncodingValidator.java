@@ -30,6 +30,19 @@ public class InvalidTransferEncodingValidator implements HttpHeadersValidator {
   private static final Logger LOGGER = getLogger(InvalidTransferEncodingValidator.class);
   private static final String TRANSFER_ENCODING_LOWERCASE = TRANSFER_ENCODING.toLowerCase(Locale.ROOT);
   private static final int ERRORS_LIMIT_TO_PRINT_WARNING = 2 << 20;
+
+  // Valid Transfer-Encoding values given the RFCs.
+  private static final String CHUNKED_LOWER_CASE = "chunked";
+  private static final String DEFLATE_LOWER_CASE = "deflate";
+  private static final String COMPRESS_LOWER_CASE = "compress";
+  private static final String IDENTITY_LOWER_CASE = "identity";
+  private static final String GZIP_LOWER_CASE = "gzip";
+
+  // Preset these values to optimize performance.
+  private static final int CHUNKED_AND_DEFLATE_LENGTH = 7;
+  private static final int COMPRESS_AND_IDENTITY_LENGTH = 8;
+  private static final int GZIP_LENGTH = 4;
+
   private final boolean throwException;
   private final AtomicInteger errorsFound = new AtomicInteger();
 
@@ -51,13 +64,13 @@ public class InvalidTransferEncodingValidator implements HttpHeadersValidator {
   @Override
   public void validateHeaders(MultiMap<String, String> headers) throws HttpHeadersException {
     List<String> allTransferEncodings = headers.getAll(TRANSFER_ENCODING_LOWERCASE);
-    int numberOfHeaders = allTransferEncodings.size();
+    int numberOfTransferEncodings = allTransferEncodings.size();
 
     // avoid creating the implicit iterator in order to optimize performance
-    if (numberOfHeaders == 0) {
+    if (numberOfTransferEncodings == 0) {
       return;
     }
-    if (numberOfHeaders == 1) {
+    if (numberOfTransferEncodings == 1) {
       if (!isValidTransferEncodingHeader(allTransferEncodings.get(0))) {
         reportError();
       }
@@ -84,7 +97,7 @@ public class InvalidTransferEncodingValidator implements HttpHeadersValidator {
   }
 
   private static boolean isValidTransferEncodingHeader(String headerValue) {
-    if ("chunked".equals(headerValue)) {
+    if (CHUNKED_LOWER_CASE.equals(headerValue)) {
       // optimize the common case
       return true;
     }
@@ -102,41 +115,17 @@ public class InvalidTransferEncodingValidator implements HttpHeadersValidator {
   }
 
   private static boolean isSingleHeaderValid(String transferEncoding) {
-    String trimmed = trimIfNeeded(transferEncoding);
+    final String trimmed = transferEncoding.trim();
     int size = trimmed.length();
     switch (size) {
-      case 7:
-        return ("chunked".equals(toLowerIfNeeded(trimmed)) || "deflate".equals(toLowerIfNeeded(trimmed)));
-      case 8:
-        return ("compress".equals(toLowerIfNeeded(trimmed)) || "identity".equals(toLowerIfNeeded(trimmed)));
-      case 4:
-        return ("gzip".equals(toLowerIfNeeded(trimmed)));
+      case CHUNKED_AND_DEFLATE_LENGTH:
+        return CHUNKED_LOWER_CASE.equalsIgnoreCase(trimmed) || DEFLATE_LOWER_CASE.equalsIgnoreCase(trimmed);
+      case COMPRESS_AND_IDENTITY_LENGTH:
+        return COMPRESS_LOWER_CASE.equalsIgnoreCase(trimmed) || IDENTITY_LOWER_CASE.equalsIgnoreCase(trimmed);
+      case GZIP_LENGTH:
+        return GZIP_LOWER_CASE.equalsIgnoreCase(trimmed);
       default:
         return false;
     }
-  }
-
-  private static String toLowerIfNeeded(String input) {
-    if (isStringLowerCase(input)) {
-      return input;
-    } else {
-      return input.toLowerCase(Locale.ROOT);
-    }
-  }
-
-  private static boolean isStringLowerCase(CharSequence input) {
-    int size = input.length();
-    for (int i = 0; i < size; ++i) {
-      char c = input.charAt(i);
-      if (c < 'a' || c > 'z') {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  private static String trimIfNeeded(String input) {
-    // trim returns same instance if no trim is needed.
-    return input.trim();
   }
 }

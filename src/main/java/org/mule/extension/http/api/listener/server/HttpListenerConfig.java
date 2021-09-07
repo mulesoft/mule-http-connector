@@ -57,7 +57,9 @@ public class HttpListenerConfig implements Initialisable {
 
   /**
    * If true, request with an invalid value for "Transfer-Encoding" header will be rejected with a 400 Bad Request.
+   *
    * @see InvalidTransferEncodingValidator
+   * @since 1.6.0
    */
   @Parameter
   @Optional(defaultValue = "false")
