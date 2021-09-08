@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+
+    <munit:config name="invalid-transfer-encoding-test-case.xml" />
+
+    <munit:dynamic-port propertyName="dynamic.port"/>
+
+    <!-- Target Application -->
+    <http:listener-config name="InvalidTransferEncodingHttpListenerConfig" rejectInvalidTransferEncoding="true">
+        <http:listener-connection host="0.0.0.0" port="${dynamic.port}" usePersistentConnections="false" />
+    </http:listener-config>
+    <flow name="invalidTransferEncodingFlow" >
+        <http:listener config-ref="InvalidTransferEncodingHttpListenerConfig" path="/test" />
+        <logger level="INFO" />
+    </flow>
+
+    <!-- Test configuration -->
+    <sockets:request-config name="SocketsRequestConfig">
+        <sockets:tcp-requester-connection host="localhost" port="${dynamic.port}">
+            <sockets:protocol >
+                <sockets:eof-protocol />
+            </sockets:protocol>
+        </sockets:tcp-requester-connection>
+    </sockets:request-config>
+
+    <munit:test name="invalid-transfer-encoding-test-case" description="Test">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="invalidTransferEncodingFlow" />
+        </munit:enable-flow-sources>
+
+        <munit:execution>
+            <sockets:send-and-receive config-ref="SocketsRequestConfig">
+                <sockets:content><![CDATA[POST /test HTTP/1.1
+Host: localhost:8081
+Content-Length:2
+Transfer-Encoding:INVALID
+
+OK
+]]></sockets:content>
+            </sockets:send-and-receive>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that is="#[MunitTools::containsString('HTTP/1.1 400')]" expression="#[payload as String]"/>
+        </munit:validation>
+    </munit:test>
+</mule>

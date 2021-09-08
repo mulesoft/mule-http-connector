@@ -11,6 +11,9 @@ import static java.util.Optional.of;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
+import org.mule.extension.http.api.listener.headers.HttpHeadersException;
+import org.mule.extension.http.api.listener.headers.HttpHeadersValidator;
+import org.mule.extension.http.api.listener.headers.InvalidTransferEncodingValidator;
 import org.mule.extension.http.internal.listener.HttpListener;
 import org.mule.extension.http.internal.listener.HttpListenerProvider;
 import org.mule.extension.http.internal.listener.ListenerPath;
@@ -18,6 +21,7 @@ import org.mule.extension.http.internal.listener.intercepting.HttpListenerInterc
 import org.mule.extension.http.api.listener.intercepting.cors.CorsInterceptorWrapper;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Sources;
@@ -51,9 +55,23 @@ public class HttpListenerConfig implements Initialisable {
   @Expression(NOT_SUPPORTED)
   private CorsInterceptorWrapper listenerInterceptors;
 
+  /**
+   * If true, request with an invalid value for "Transfer-Encoding" header will be rejected with a 400 Bad Request.
+   *
+   * @see InvalidTransferEncodingValidator
+   * @since 1.6.0
+   */
+  @Parameter
+  @Optional(defaultValue = "false")
+  @Expression(NOT_SUPPORTED)
+  private boolean rejectInvalidTransferEncoding;
+
+  private HttpHeadersValidator httpHeaderValidators;
+
   @Override
   public void initialise() throws InitialisationException {
     basePath = sanitizePathWithStartSlash(this.basePath);
+    httpHeaderValidators = new InvalidTransferEncodingValidator(rejectInvalidTransferEncoding);
   }
 
   public ListenerPath getFullListenerPath(String listenerPath) {
@@ -70,5 +88,15 @@ public class HttpListenerConfig implements Initialisable {
 
   public java.util.Optional<HttpListenerInterceptor> getInterceptor() {
     return listenerInterceptors != null ? of(listenerInterceptors.getInterceptor()) : empty();
+  }
+
+  /**
+   * Calls the configured header validator.
+   *
+   * @param headers dictionary containing the headers from an HTTP request.
+   * @throws HttpHeadersException if an error related to headers is found.
+   */
+  public void validateHeaders(MultiMap<String, String> headers) throws HttpHeadersException {
+    httpHeaderValidators.validateHeaders(headers);
   }
 }

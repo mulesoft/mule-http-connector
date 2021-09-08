@@ -38,6 +38,8 @@ import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.listener.builder.HttpListenerErrorResponseBuilder;
 import org.mule.extension.http.api.listener.builder.HttpListenerSuccessResponseBuilder;
+import org.mule.extension.http.api.listener.headers.HttpHeadersException;
+import org.mule.extension.http.api.listener.headers.HttpHeadersValidator;
 import org.mule.extension.http.api.listener.server.HttpListenerConfig;
 import org.mule.extension.http.api.streaming.HttpStreamingType;
 import org.mule.extension.http.internal.HttpMetadataResolver;
@@ -399,6 +401,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
           responseContext.setSupportStreaming(supportsTransferEncoding(httpVersion));
           responseContext.setResponseCallback(responseCallback);
           MultiMap<String, String> headers = getHeaders(result);
+          config.validateHeaders(headers);
           config.getInterceptor().ifPresent(interceptor -> responseContext
               .setInterception(interceptor.request(getMethod(result), headers)));
 
@@ -408,6 +411,8 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
           resolveCorrelationId(headers, context);
 
           sourceCallback.handle(result, context);
+        } catch (HttpHeadersException httpHeadersError) {
+          sendErrorResponse(httpHeadersError.getStatusCode(), getEscapedErrorBody(httpHeadersError), responseCallback);
         } catch (IllegalArgumentException e) {
           if (LOGGER.isDebugEnabled()) {
             LOGGER.warn("Exception occurred parsing request:", e);
