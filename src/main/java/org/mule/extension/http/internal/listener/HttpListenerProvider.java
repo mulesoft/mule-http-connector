@@ -16,11 +16,13 @@ import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.ADV
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.SECURITY_TAB;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTP;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
+import static org.mule.runtime.core.api.util.ClassUtils.getMethod;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
@@ -45,6 +47,8 @@ import org.mule.runtime.http.api.server.ServerCreationException;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import javax.inject.Inject;
 
@@ -109,6 +113,14 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
     @Placement(tab = ADVANCED, order = 2)
     private Integer connectionIdleTimeout;
 
+    /**
+     * Read timeout to configure in milliseconds
+     */
+    @Parameter
+    @Optional(defaultValue = "30000")
+    @Expression(NOT_SUPPORTED)
+    private long readTimeout;
+
     public HttpConstants.Protocol getProtocol() {
       return protocol;
     }
@@ -127,6 +139,10 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
 
     public Integer getConnectionIdleTimeout() {
       return connectionIdleTimeout;
+    }
+
+    public long getReadTimeout() {
+      return readTimeout;
     }
 
   }
@@ -208,6 +224,15 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
         .setTlsContextFactory(tlsContext).setUsePersistentConnections(connectionParams.getUsePersistentConnections())
         .setConnectionIdleTimeout(connectionParams.getConnectionIdleTimeout())
         .setName(configName);
+
+    Method method = getMethod(HttpServerConfiguration.Builder.class, "setReadTimeout", new Class[] {long.class});
+    if (method != null) {
+      try {
+        method.invoke(builder, connectionParams.getReadTimeout());
+      } catch (InvocationTargetException | IllegalAccessException e) {
+        throw new MuleRuntimeException(createStaticMessage("Exception while calling method by reflection"), e);
+      }
+    }
 
     if (useIOScheduler()) {
       builder.setSchedulerSupplier(() -> schedulerService
