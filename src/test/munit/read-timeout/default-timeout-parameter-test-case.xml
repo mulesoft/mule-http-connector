@@ -9,7 +9,7 @@
 		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
 		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
 
-    <munit:config name="default-timeout-parameter-test-case.xml"/>
+    <munit:config name="default-timeout-parameter-test-case.xml" minMuleVersion="4.5.0"/>
 
     <munit:dynamic-port propertyName="dynamic.port"/>
 
