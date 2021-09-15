@@ -254,20 +254,24 @@ public class HttpRequestOperations implements Initialisable, Disposable {
   public void initialise() throws InitialisationException {
     defaultStatusCodeValidator = new SuccessStatusCodeValidator("0..399");
     defaultRequestBuilder = new HttpRequesterRequestBuilder();
-    // Profiling API is only available for use in 4.5.0 or if enabled
-    httpResponseProfilingEnabled = runtimeVersion.atLeast("4.5.0-SNAPSHOT") || getBoolean(HTTP_ENABLE_PROFILING);
+    // Profiling API is only available with this system property
+    httpResponseProfilingEnabled = getBoolean(HTTP_ENABLE_PROFILING);
     initializeHttpRequester();
 
     this.scheduler = schedulerService.ioScheduler();
   }
 
-  private void initializeHttpRequester() {
+  private void initializeHttpRequester() throws InitialisationException {
 
-    httpRequester = new HttpRequester(new HttpRequestFactory(), new HttpResponseToResult(), new HttpErrorMessageGenerator(),
-                                      getProfilingDataProducer());
+    try {
+      httpRequester = new HttpRequester(new HttpRequestFactory(), new HttpResponseToResult(), new HttpErrorMessageGenerator(),
+                                        getProfilingDataProducer());
+    } catch (MuleException e) {
+      throw new InitialisationException(e, this);
+    }
   }
 
-  private HttpRequestResponseProfilingDataProducerAdaptor getProfilingDataProducer() {
+  private HttpRequestResponseProfilingDataProducerAdaptor getProfilingDataProducer() throws MuleException {
     if (!httpResponseProfilingEnabled) {
       return null;
     }
@@ -275,12 +279,7 @@ public class HttpRequestOperations implements Initialisable, Disposable {
     HttpProfilingServiceAdaptor profilingServiceAdaptor = new HttpProfilingServiceAdaptor();
 
     // Manually inject the profiling service
-    try {
-      muleContext.getInjector().inject(profilingServiceAdaptor);
-    } catch (MuleException e) {
-      LOGGER.error("Exception attempting to obtain a profiling data producer", e);
-      return null;
-    }
+    muleContext.getInjector().inject(profilingServiceAdaptor);
 
     return profilingServiceAdaptor.getProfilingHttpRequestDataProducer();
   }
