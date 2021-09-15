@@ -22,7 +22,7 @@ import javax.inject.Inject;
 public class HttpProfilingServiceAdaptor {
 
   @Inject
-  ProfilingService profilingService;
+  private ProfilingService profilingService;
 
   /**
    * @return the adaptor for the {@link org.mule.runtime.api.profiling.ProfilingDataProducer}
