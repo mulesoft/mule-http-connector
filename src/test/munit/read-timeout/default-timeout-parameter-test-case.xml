@@ -9,7 +9,7 @@
 		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
 		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
 
-    <munit:config name="default-timeout-parameter-test-case.xml" minMuleVersion="4.5.0"/>
+    <munit:config name="default-timeout-parameter-test-case.xml" minMuleVersion="4.3.1" ignore="4.4.0"/>
 
     <munit:dynamic-port propertyName="dynamic.port"/>
 
@@ -36,7 +36,9 @@
         </sockets:tcp-requester-connection>
     </sockets:request-config>
 
-    <munit:test name="serverStopsReadingWhenDefaultTimeout" description="serverStopsReadingWhenDefaultTimeoutEnds" timeOut="32000" >
+    <!--  Setting test timeout to 32 seconds since the default read timeout time is 30 seconds -->
+    <munit:test name="serverStopsReadingWhenDefaultTimeout" description="serverStopsReadingWhenDefaultTimeoutEnds" timeOut="32000"
+                ignore="#[Munit::muleVersionEqualTo('4.4.0')]" >
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="noReadTimeoutParameterFlow" />
         </munit:enable-flow-sources>

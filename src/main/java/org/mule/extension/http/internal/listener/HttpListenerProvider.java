@@ -225,6 +225,17 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
         .setConnectionIdleTimeout(connectionParams.getConnectionIdleTimeout())
         .setName(configName);
 
+    setReadTimeout(builder);
+
+    if (useIOScheduler()) {
+      builder.setSchedulerSupplier(() -> schedulerService
+          .ioScheduler(SchedulerConfig.config().withName(getSchedulerName(connectionParams))));
+    }
+
+    return builder.build();
+  }
+
+  private void setReadTimeout(HttpServerConfiguration.Builder builder) {
     Method method = getMethod(HttpServerConfiguration.Builder.class, "setReadTimeout", new Class[] {long.class});
     if (method != null) {
       try {
@@ -233,13 +244,6 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
         throw new MuleRuntimeException(createStaticMessage("Exception while calling method by reflection"), e);
       }
     }
-
-    if (useIOScheduler()) {
-      builder.setSchedulerSupplier(() -> schedulerService
-          .ioScheduler(SchedulerConfig.config().withName(getSchedulerName(connectionParams))));
-    }
-
-    return builder.build();
   }
 
   private boolean useIOScheduler() {

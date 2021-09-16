@@ -36,6 +36,7 @@
         </sockets:tcp-requester-connection>
     </sockets:request-config>
 
+    <!--  Setting test timeout to 12 seconds since the set read timeout time is 10 seconds -->
     <munit:test name="serverStopsReadingWhenReadTimeout" description="serverStopsReadingWhenTheSetReadTimeoutEnds" timeOut="12000" >
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="readTimeoutParameterFlow" />
