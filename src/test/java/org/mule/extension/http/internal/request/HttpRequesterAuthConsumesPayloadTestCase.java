@@ -147,7 +147,7 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     boolean checkRetry = true;
     httpRequester.doRequest(client, config, uri, "dummyMethod", null, null, false, authentication, 0, responseValidator, null,
                             requestBuilder, checkRetry, muleContext, null, notificationEmitter, streamingHelper, callback,
-                            injectedHeaders);
+                            injectedHeaders, "correlationId");
 
     // Then
     InOrder order = inOrder(streamingHelper, httpResponseToResult, authentication, callback);
@@ -184,7 +184,7 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     // When
     httpRequester.doRequest(client, config, uri, "dummyMethod", null, null, false, authentication, 0, responseValidator, null,
                             requestBuilder, checkRetry, muleContext, null, notificationEmitter, streamingHelper, callback,
-                            injectedHeaders);
+                            injectedHeaders, "correlationId");
 
     // Then
     InOrder order = inOrder(streamingHelper, httpResponseToResult, authentication, callback);
@@ -216,7 +216,7 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     // When
     httpRequester.doRequest(client, config, uri, "dummyMethod", null, null, false, authentication, 0, responseValidator, null,
                             requestBuilder, checkRetry, muleContext, null, notificationEmitter, streamingHelper, callback,
-                            injectedHeaders);
+                            injectedHeaders, "correlationId");
 
     // Then
     ArgumentCaptor<Result> argumentCaptor = ArgumentCaptor.forClass(Result.class);
@@ -251,7 +251,7 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     // When
     httpRequester.doRequest(client, config, uri, "dummyMethod", null, null, false, authentication, 0, responseValidator, null,
                             requestBuilder, checkRetry, muleContext, null, notificationEmitter, streamingHelper, callback,
-                            injectedHeaders);
+                            injectedHeaders, "correlationId");
 
     // Then
     ArgumentCaptor<Result> argumentCaptor = ArgumentCaptor.forClass(Result.class);
@@ -285,7 +285,7 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     // When
     httpRequester.doRequest(client, config, uri, "dummyMethod", null, null, false, authentication, 0, responseValidator, null,
                             requestBuilder, checkRetry, muleContext, null, notificationEmitter, streamingHelper, callback,
-                            injectedHeaders);
+                            injectedHeaders, "correlationId");
 
     // Then
     verify(streamingHelper, never()).resolveCursorProvider(entity.getContent());

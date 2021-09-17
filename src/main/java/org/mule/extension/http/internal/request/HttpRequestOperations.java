@@ -6,10 +6,13 @@
  */
 package org.mule.extension.http.internal.request;
 
+import static java.lang.Boolean.getBoolean;
 import static java.lang.Integer.MAX_VALUE;
 import static org.mule.extension.http.internal.HttpConnectorConstants.CONNECTOR_OVERRIDES;
+import static org.mule.extension.http.internal.HttpConnectorConstants.HTTP_ENABLE_PROFILING;
 import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST;
 import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE;
+import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
@@ -20,10 +23,14 @@ import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.request.validator.SuccessStatusCodeValidator;
 import org.mule.extension.http.internal.HttpMetadataResolver;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
+import org.mule.extension.http.internal.request.profiling.HttpRequestResponseProfilingDataProducerAdaptor;
+import org.mule.extension.http.internal.request.profiling.HttpProfilingServiceAdaptor;
 import org.mule.runtime.api.exception.DefaultMuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
@@ -67,6 +74,7 @@ public class HttpRequestOperations implements Initialisable, Disposable {
   private static final Logger LOGGER = LoggerFactory.getLogger(HttpRequestOperations.class);
   private static final int WAIT_FOR_EVER = MAX_VALUE;
   private static final Map<Character, String> RESERVED_CONVERSION;
+  private static final MuleVersion runtimeVersion = new MuleVersion(getProductVersion());
 
   // We are not currently depending on Guava to be able to use ImmutableMap
   static {
@@ -105,6 +113,8 @@ public class HttpRequestOperations implements Initialisable, Disposable {
   private HashMap<String, List<String>> injectedHeaders;
 
   private Scheduler scheduler;
+
+  private boolean httpResponseProfilingEnabled;
 
   /**
    * Consumes an HTTP service.
@@ -165,7 +175,7 @@ public class HttpRequestOperations implements Initialisable, Disposable {
                               overrides.getFollowRedirects(), client.getDefaultAuthentication(), resolvedTimeout,
                               responseValidator,
                               transformationService, resolvedBuilder, true, muleContext, scheduler, notificationEmitter,
-                              streamingHelper, callback, injectedHeaders);
+                              streamingHelper, callback, injectedHeaders, correlationInfo.getCorrelationId());
     } catch (Throwable t) {
       callback.error(t instanceof Exception ? (Exception) t : new DefaultMuleException(t));
     }
@@ -244,8 +254,34 @@ public class HttpRequestOperations implements Initialisable, Disposable {
   public void initialise() throws InitialisationException {
     defaultStatusCodeValidator = new SuccessStatusCodeValidator("0..399");
     defaultRequestBuilder = new HttpRequesterRequestBuilder();
-    httpRequester = new HttpRequester(new HttpRequestFactory(), new HttpResponseToResult(), new HttpErrorMessageGenerator());
+    // Profiling API is only available with this system property
+    httpResponseProfilingEnabled = getBoolean(HTTP_ENABLE_PROFILING);
+    initializeHttpRequester();
+
     this.scheduler = schedulerService.ioScheduler();
+  }
+
+  private void initializeHttpRequester() throws InitialisationException {
+
+    try {
+      httpRequester = new HttpRequester(new HttpRequestFactory(), new HttpResponseToResult(), new HttpErrorMessageGenerator(),
+                                        getProfilingDataProducer());
+    } catch (MuleException e) {
+      throw new InitialisationException(e, this);
+    }
+  }
+
+  private HttpRequestResponseProfilingDataProducerAdaptor getProfilingDataProducer() throws MuleException {
+    if (!httpResponseProfilingEnabled) {
+      return null;
+    }
+
+    HttpProfilingServiceAdaptor profilingServiceAdaptor = new HttpProfilingServiceAdaptor();
+
+    // Manually inject the profiling service
+    muleContext.getInjector().inject(profilingServiceAdaptor);
+
+    return profilingServiceAdaptor.getProfilingHttpRequestDataProducer();
   }
 
   @Override
