@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.internal.listener;
 
+import static java.lang.Long.parseLong;
 import static java.lang.String.format;
 import static org.mule.extension.http.internal.HttpConnectorConstants.TLS_CONFIGURATION;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
@@ -52,6 +53,9 @@ import java.lang.reflect.Method;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Connection provider for a {@link HttpListener}, handles the creation of {@link HttpServer} instances.
  *
@@ -59,6 +63,9 @@ import javax.inject.Inject;
  */
 @Alias("listener")
 public class HttpListenerProvider implements CachedConnectionProvider<HttpServer>, Lifecycle {
+
+  private static final String DEFAULT_READ_TIME_OUT_IN_MILLIS = "30000";
+  private static final Logger logger = LoggerFactory.getLogger(HttpListenerProvider.class);
 
   public static final class ConnectionParams {
 
@@ -115,6 +122,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
 
     /**
      * Read timeout to configure in milliseconds
+     * @since 1.6.0
      */
     @Parameter
     @Optional(defaultValue = "30000")
@@ -243,6 +251,9 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
       } catch (InvocationTargetException | IllegalAccessException e) {
         throw new MuleRuntimeException(createStaticMessage("Exception while calling method by reflection"), e);
       }
+    } else if (connectionParams.getReadTimeout() != parseLong(DEFAULT_READ_TIME_OUT_IN_MILLIS)) {
+      logger
+          .warn("The current Mule version does not support the configuration of the Read Timeout parameter, please update to the newest version");
     }
   }
 
