@@ -18,6 +18,8 @@ import static org.mule.runtime.extension.api.annotation.param.display.Placement.
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTP;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
 import static org.mule.runtime.core.api.util.ClassUtils.getMethod;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -54,7 +56,6 @@ import java.lang.reflect.Method;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Connection provider for a {@link HttpListener}, handles the creation of {@link HttpServer} instances.
@@ -65,7 +66,7 @@ import org.slf4j.LoggerFactory;
 public class HttpListenerProvider implements CachedConnectionProvider<HttpServer>, Lifecycle {
 
   private static final String DEFAULT_READ_TIME_OUT_IN_MILLIS = "30000";
-  private static final Logger logger = LoggerFactory.getLogger(HttpListenerProvider.class);
+  private static final Logger logger = getLogger(HttpListenerProvider.class);
 
   public static final class ConnectionParams {
 
