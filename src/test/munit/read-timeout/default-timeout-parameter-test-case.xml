@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+
+    <munit:config name="default-timeout-parameter-test-case.xml" minMuleVersion="4.3.1"/>
+
+    <munit:dynamic-port propertyName="dynamic.port"/>
+
+    <!-- Target Application -->
+    <http:listener-config name="NoReadTimeoutParameterHttpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="${dynamic.port}"/>
+    </http:listener-config>
+    <flow name="noReadTimeoutParameterFlow" >
+        <http:listener config-ref="NoReadTimeoutParameterHttpListenerConfig" path="/test" />
+        <logger level="ERROR" message="#[payload]"/>
+        <error-handler >
+            <on-error-continue>
+                <set-payload value="#[error.cause.cause.cause.class]"/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+
+    <!-- Test configuration -->
+    <sockets:request-config name="socketConfig">
+        <sockets:tcp-requester-connection host="localhost" port="${dynamic.port}">
+            <sockets:protocol >
+                <sockets:direct-protocol />
+            </sockets:protocol>
+        </sockets:tcp-requester-connection>
+    </sockets:request-config>
+
+    <!--  Setting test timeout to 32 seconds since the default read timeout time is 30 seconds -->
+    <munit:test name="serverStopsReadingWhenDefaultTimeout" description="serverStopsReadingWhenDefaultTimeoutEnds" timeOut="32000"
+                ignore="#[Munit::muleVersionEqualTo('4.4.0')]" >
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="noReadTimeoutParameterFlow" />
+        </munit:enable-flow-sources>
+
+        <munit:execution>
+            <sockets:send-and-receive config-ref="socketConfig">
+                <sockets:content><![CDATA[POST /test HTTP/1.1
+Host: localhost:8081
+Content-Length: 10000
+
+2
+
+]]></sockets:content>
+            </sockets:send-and-receive>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that is="#[MunitTools::containsString('Timeout')]" expression="#[payload as String]"/>
+        </munit:validation>
+    </munit:test>
+</mule>
