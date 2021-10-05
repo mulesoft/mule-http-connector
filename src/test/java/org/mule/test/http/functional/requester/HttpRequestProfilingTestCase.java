@@ -22,6 +22,7 @@ import io.qameta.allure.Story;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.ProfilingService;
+import org.mule.runtime.api.profiling.threading.ThreadSnapshotCollector;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 
 import java.io.IOException;
@@ -95,6 +96,11 @@ public class HttpRequestProfilingTestCase extends AbstractHttpRequestTestCase {
     public <T extends ProfilingEventContext> void registerProfilingDataProducer(ProfilingEventType<T> profilingEventType,
                                                                                 ProfilingDataProducer<T> profilingDataProducer) {
       // Nothing to to in this test.
+    }
+
+    @Override
+    public ThreadSnapshotCollector getThreadSnapshotCollector() {
+      return () -> null;
     }
   }
 

@@ -28,7 +28,7 @@
     </flow>
 
     <!-- Test configuration -->
-    <sockets:request-config name="socketConfig">
+    <sockets:request-config name="socketDefaultTimeoutConfig">
         <sockets:tcp-requester-connection host="localhost" port="${dynamic.port}">
             <sockets:protocol >
                 <sockets:direct-protocol />
@@ -44,7 +44,7 @@
         </munit:enable-flow-sources>
 
         <munit:execution>
-            <sockets:send-and-receive config-ref="socketConfig">
+            <sockets:send-and-receive config-ref="socketDefaultTimeoutConfig">
                 <sockets:content><![CDATA[POST /test HTTP/1.1
 Host: localhost:8081
 Content-Length: 10000
