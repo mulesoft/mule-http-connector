@@ -30,7 +30,8 @@
         <http:request-connection host="localhost" port="${dynamic.port.moved}"/>
     </http:request-config>
 
-    <munit:test name="parallel-redirect-test" description="Create multiple request to an endpoint that return 301.">
+    <munit:test name="parallel-redirect-test" description="Create multiple request to an endpoint that return 301."
+                ignore="#[Munit::muleVersionEqualTo('4.4.0')]">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="parallel-moved" />
             <munit:enable-flow-source value="parallel-response" />
