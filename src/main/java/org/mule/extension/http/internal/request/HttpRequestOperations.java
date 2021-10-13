@@ -12,8 +12,8 @@ import static org.mule.extension.http.internal.HttpConnectorConstants.CONNECTOR_
 import static org.mule.extension.http.internal.HttpConnectorConstants.HTTP_ENABLE_PROFILING;
 import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST;
 import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE;
-import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
+import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.encodeSpaces;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.error.HttpErrorMessageGenerator;
@@ -30,7 +30,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
@@ -61,7 +60,6 @@ import org.mule.runtime.http.api.HttpConstants;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -73,31 +71,6 @@ public class HttpRequestOperations implements Initialisable, Disposable {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HttpRequestOperations.class);
   private static final int WAIT_FOR_EVER = MAX_VALUE;
-  private static final Map<Character, String> RESERVED_CONVERSION;
-  private static final MuleVersion runtimeVersion = new MuleVersion(getProductVersion());
-
-  // We are not currently depending on Guava to be able to use ImmutableMap
-  static {
-    Map<Character, String> map = new HashMap<>();
-    map.put(' ', "%20");
-    // RFC-3986: delims
-    map.put(':', "%3A");
-    map.put('#', "%24");
-    map.put('[', "%5B");
-    map.put(']', "%5D");
-    map.put('@', "%40");
-    // RFC-3986: sub-delims
-    map.put('!', "%21");
-    map.put('$', "%24");
-    map.put('\'', "%27");
-    map.put('(', "%28");
-    map.put(')', "%29");
-    map.put('+', "%2B");
-    map.put(',', "%2C");
-    map.put(';', "%3B");
-    RESERVED_CONVERSION = map;
-  }
-
   private SuccessStatusCodeValidator defaultStatusCodeValidator;
   private HttpRequesterRequestBuilder defaultRequestBuilder;
   private HttpRequester httpRequester;
@@ -203,24 +176,9 @@ public class HttpRequestOperations implements Initialisable, Disposable {
     }
   }
 
-  private static String encodeReservedCharacters(String path) {
-    StringBuilder builder = new StringBuilder();
-
-    for (int i = 0; i < path.length(); i++) {
-      char c = path.charAt(i);
-      if (RESERVED_CONVERSION.containsKey(c)) {
-        builder.append(RESERVED_CONVERSION.get(c));
-      } else {
-        builder.append(c);
-      }
-    }
-
-    return builder.toString();
-  }
-
   private String resolveUri(HttpConstants.Protocol scheme, String host, Integer port, String path) {
     // Encode spaces to generate a valid HTTP request.
-    return scheme.getScheme() + "://" + host + ":" + port + encodeReservedCharacters(path);
+    return scheme.getScheme() + "://" + host + ":" + port + encodeSpaces(path);
   }
 
   private int resolveResponseTimeout(Integer responseTimeout) {
