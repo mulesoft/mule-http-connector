@@ -15,10 +15,12 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.SECURITY_TAB;
+import static org.mule.runtime.http.api.HttpConstants.Method.GET;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTP;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
+import org.mule.extension.http.api.request.authentication.UsernamePasswordAuthentication;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.proxy.HttpProxyConfig;
 import org.mule.extension.http.internal.request.HttpRequesterConnectionManager.ShareableHttpClient;
@@ -47,11 +49,16 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.connectivity.NoConnectivityTest;
 import org.mule.runtime.http.api.HttpConstants;
 import org.mule.runtime.http.api.client.HttpClientConfiguration;
+import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.client.proxy.ProxyConfig;
 
 import javax.inject.Inject;
 
+import org.mule.runtime.http.api.domain.message.request.HttpRequest;
+import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.slf4j.Logger;
+
+import java.util.concurrent.ExecutionException;
 
 /**
  * Connection provider for a HTTP request, handles the creation of {@link HttpExtensionClient} instances.
@@ -59,8 +66,7 @@ import org.slf4j.Logger;
  * @since 1.0
  */
 @Alias("request")
-public class HttpRequesterProvider implements CachedConnectionProvider<HttpExtensionClient>, Initialisable, Disposable,
-    NoConnectivityTest {
+public class HttpRequesterProvider implements CachedConnectionProvider<HttpExtensionClient>, Initialisable, Disposable {
 
   private static final Logger LOGGER = getLogger(HttpRequesterProvider.class);
 
@@ -104,6 +110,10 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
   @Placement(tab = AUTHENTICATION)
   private HttpRequestAuthentication authentication;
 
+  @ParameterGroup(name = "Test Connection Settings")
+  @Placement(tab = "Test Connection")
+  private TestConnectionParams testConnectionParams;
+
   @Inject
   private HttpRequesterConnectionManager connectionManager;
 
@@ -111,7 +121,25 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
 
   @Override
   public ConnectionValidationResult validate(HttpExtensionClient httpClient) {
-    return ConnectionValidationResult.success();
+    try {
+      HttpExtensionClient temporalClient = connect();
+      HttpRequest request = HttpRequest.builder()
+          .uri(testConnectionParams.getUrl())
+          .method(testConnectionParams.getMethod())
+          .headers(testConnectionParams.getHeaders())
+          .queryParams(testConnectionParams.getQueryParams())
+          .build();
+
+      HttpResponse response =
+          temporalClient.send(request, 999999, false, resolveAuthentication(temporalClient.getDefaultAuthentication())).get();
+      if (response.getStatusCode() == 200) {
+        return ConnectionValidationResult.success();
+      } else {
+        return ConnectionValidationResult.failure("Status code isn't 200", new Exception("Invalid status code"));
+      }
+    } catch (ConnectionException | ExecutionException | InterruptedException e) {
+      return ConnectionValidationResult.failure(e.getMessage(), e);
+    }
   }
 
   @Override
@@ -239,4 +267,19 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
     return authentication;
   }
 
+  public TestConnectionParams getTestConnectionParams() {
+    return testConnectionParams;
+  }
+
+  public void setTestConnectionParams(TestConnectionParams testConnectionParams) {
+    this.testConnectionParams = testConnectionParams;
+  }
+
+  private HttpAuthentication resolveAuthentication(HttpRequestAuthentication authentication) {
+    HttpAuthentication requestAuthentication = null;
+    if (authentication instanceof UsernamePasswordAuthentication) {
+      requestAuthentication = (HttpAuthentication) authentication;
+    }
+    return requestAuthentication;
+  }
 }
