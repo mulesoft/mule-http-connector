@@ -12,7 +12,8 @@
 		       http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <munit:config name="parallel-redirect-test-case" minMuleVersion="4.3.1"/>
+    <!--MULE-19908: Ignored until we enabled the fix by default.-->
+    <munit:config name="parallel-redirect-test-case" minMuleVersion="4.3.1" ignore="true"/>
 
     <munit:dynamic-port propertyName="dynamic.port.moved"/>
 
