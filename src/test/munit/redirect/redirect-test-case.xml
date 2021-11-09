@@ -164,6 +164,22 @@
         </munit:validation>
     </munit:test>
 
+    <munit:test name="moved-test-with-query" description="Create a request to an endpoint that return 301 with query params.
+     Should return those query params">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="moved-with-query" />
+            <munit:enable-flow-source value="response-with-query" />
+        </munit:enable-flow-sources>
+
+        <munit:execution>
+            <http:request method="GET" config-ref="followRedirects" path="/move-with-query?test=otherParams"/>
+            <set-variable value="#[payload as String]" variableName="moved_response"/>
+        </munit:execution>
+
+        <munit:validation>
+            <munit-tools:assert-equals actual="#[vars.moved_response]" expected='#["response-with-query"]'/>
+        </munit:validation>
+    </munit:test>
 
     <flow name="moved">
         <http:listener config-ref="HTTP_Listener_config" path="/move">
@@ -246,5 +262,21 @@
         <set-payload value='#["response"]'/>
     </flow>
 
+    <flow name="moved-with-query">
+        <http:listener config-ref="HTTP_Listener_config" path="/move-with-query">
+            <http:response statusCode="301" reasonPhrase="Moved Permanently">
+                <http:headers ><![CDATA[#[output application/java
+---
+{
+	"Location" : "http://localhost:${dynamic.port}/response-with-query?test=response-with-query"
+}]]]></http:headers>
+            </http:response>
+        </http:listener>
+        <set-payload value='#["moved"]' />
+    </flow>
 
+    <flow name="response-with-query">
+        <http:listener config-ref="HTTP_Listener_config" path="/response-with-query"/>
+        <set-payload value="#[attributes.queryParams.test]"/>
+    </flow>
 </mule>
