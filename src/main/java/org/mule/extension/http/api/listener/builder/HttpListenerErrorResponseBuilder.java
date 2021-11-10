@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.api.listener.builder;
 
-import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSES;
+import static org.mule.extension.http.api.HttpConnectorConstants.RESPONSES;
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 
 import org.mule.runtime.api.metadata.TypedValue;

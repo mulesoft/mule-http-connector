@@ -11,7 +11,7 @@ import static org.eclipse.jetty.server.HttpConnection.getCurrentConnection;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.http.api.HttpMessageBuilder.refreshSystemProperties;
-import static org.mule.extension.http.internal.HttpConnectorConstants.RETRY_ATTEMPTS_PROPERTY;
+import static org.mule.extension.http.api.HttpConnectorConstants.RETRY_ATTEMPTS_PROPERTY;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.RETRY_POLICY;
 
 import org.mule.tck.junit4.rule.DynamicPort;

@@ -7,6 +7,7 @@
 package org.mule.extension.http.api.error;
 
 import static org.mule.extension.http.api.error.HttpError.getErrorByCode;
+
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 
 import java.util.Optional;

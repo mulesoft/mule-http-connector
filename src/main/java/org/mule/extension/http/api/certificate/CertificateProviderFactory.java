@@ -4,9 +4,8 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.http.internal.certificate;
+package org.mule.extension.http.api.certificate;
 
-import static org.mule.extension.http.internal.certificate.DefaultCertificateProvider.SERIALIZABLE_LAZY_VALUE_CLASS_NAME;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.ClassUtils.isClassOnPath;
 
@@ -20,6 +19,8 @@ import java.util.function.Supplier;
  * Factory class responsible for creating the correct {@link CertificateProvider} according to the available classes.
  */
 public class CertificateProviderFactory {
+
+  public static final String SERIALIZABLE_LAZY_VALUE_CLASS_NAME = "org.mule.runtime.api.util.SerializableLazyValue";
 
   private static boolean isSerializableLazyValuePresent;
 

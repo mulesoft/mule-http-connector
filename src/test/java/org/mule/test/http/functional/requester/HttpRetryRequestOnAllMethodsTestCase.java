@@ -6,7 +6,7 @@
  */
 package org.mule.test.http.functional.requester;
 
-import static org.mule.extension.http.internal.HttpConnectorConstants.RETRY_ON_ALL_METHODS_PROPERTY;
+import static org.mule.extension.http.api.HttpConnectorConstants.RETRY_ON_ALL_METHODS_PROPERTY;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.junit.Rule;

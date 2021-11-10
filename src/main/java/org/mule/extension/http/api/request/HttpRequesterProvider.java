@@ -4,28 +4,28 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.http.internal.request;
+package org.mule.extension.http.api.request;
 
 import static java.lang.String.format;
-import static org.mule.extension.http.internal.HttpConnectorConstants.AUTHENTICATION;
-import static org.mule.extension.http.internal.HttpConnectorConstants.TLS_CONFIGURATION;
+import static org.mule.extension.http.api.HttpConnectorConstants.AUTHENTICATION;
+import static org.mule.extension.http.api.HttpConnectorConstants.TLS_CONFIGURATION;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.SECURITY_TAB;
-import static org.mule.runtime.http.api.HttpConstants.Method.GET;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTP;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
-import org.mule.extension.http.api.request.authentication.UsernamePasswordAuthentication;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.proxy.HttpProxyConfig;
-import org.mule.extension.http.internal.request.HttpRequesterConnectionManager.ShareableHttpClient;
+import org.mule.extension.http.api.request.HttpRequesterConnectionManager.ShareableHttpClient;
+import org.mule.extension.http.internal.request.RequestConnectionParams;
 import org.mule.extension.http.internal.request.client.DefaultUriParameters;
-import org.mule.extension.http.internal.request.client.HttpExtensionClient;
+import org.mule.extension.http.api.request.client.HttpExtensionClient;
 import org.mule.extension.socket.api.socket.tcp.TcpClientSocketProperties;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -39,6 +39,7 @@ import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
+import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -46,19 +47,12 @@ import org.mule.runtime.extension.api.annotation.param.RefName;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
-import org.mule.runtime.extension.api.connectivity.NoConnectivityTest;
 import org.mule.runtime.http.api.HttpConstants;
 import org.mule.runtime.http.api.client.HttpClientConfiguration;
-import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.client.proxy.ProxyConfig;
-
-import javax.inject.Inject;
-
-import org.mule.runtime.http.api.domain.message.request.HttpRequest;
-import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.slf4j.Logger;
 
-import java.util.concurrent.ExecutionException;
+import javax.inject.Inject;
 
 /**
  * Connection provider for a HTTP request, handles the creation of {@link HttpExtensionClient} instances.
@@ -78,6 +72,9 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
 
   @RefName
   private String configName;
+
+  @Config
+  private HttpRequesterConfig config;
 
   @ParameterGroup(name = CONNECTION)
   private RequestConnectionParams connectionParams;
@@ -110,9 +107,10 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
   @Placement(tab = AUTHENTICATION)
   private HttpRequestAuthentication authentication;
 
-  @ParameterGroup(name = "Test Connection Settings")
+  @Parameter
+  @Optional
   @Placement(tab = "Test Connection")
-  private TestConnectionParams testConnectionParams;
+  private HttpConnectivityValidator testConnection;
 
   @Inject
   private HttpRequesterConnectionManager connectionManager;
@@ -121,25 +119,15 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
 
   @Override
   public ConnectionValidationResult validate(HttpExtensionClient httpClient) {
-    try {
-      HttpExtensionClient temporalClient = connect();
-      HttpRequest request = HttpRequest.builder()
-          .uri(testConnectionParams.getUrl())
-          .method(testConnectionParams.getMethod())
-          .headers(testConnectionParams.getHeaders())
-          .queryParams(testConnectionParams.getQueryParams())
-          .build();
-
-      HttpResponse response =
-          temporalClient.send(request, 999999, false, resolveAuthentication(temporalClient.getDefaultAuthentication())).get();
-      if (response.getStatusCode() == 200) {
-        return ConnectionValidationResult.success();
-      } else {
-        return ConnectionValidationResult.failure("Status code isn't 200", new Exception("Invalid status code"));
-      }
-    } catch (ConnectionException | ExecutionException | InterruptedException e) {
-      return ConnectionValidationResult.failure(e.getMessage(), e);
-    }
+    return ConnectionValidationResult.success();
+    //    try {
+    //      HttpExtensionClient temporalClient = connect();
+    //      testConnection.validate(temporalClient);
+    //      disconnect(temporalClient);
+    //      return ConnectionValidationResult.success();
+    //    } catch (ConnectionException | ExecutionException | InterruptedException e) {
+    //      return ConnectionValidationResult.failure(e.getMessage(), e);
+    //    }
   }
 
   @Override
@@ -267,19 +255,11 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
     return authentication;
   }
 
-  public TestConnectionParams getTestConnectionParams() {
-    return testConnectionParams;
+  public HttpConnectivityValidator getTestConnection() {
+    return testConnection;
   }
 
-  public void setTestConnectionParams(TestConnectionParams testConnectionParams) {
-    this.testConnectionParams = testConnectionParams;
-  }
-
-  private HttpAuthentication resolveAuthentication(HttpRequestAuthentication authentication) {
-    HttpAuthentication requestAuthentication = null;
-    if (authentication instanceof UsernamePasswordAuthentication) {
-      requestAuthentication = (HttpAuthentication) authentication;
-    }
-    return requestAuthentication;
+  public void setTestConnection(HttpConnectivityValidator testConnection) {
+    this.testConnection = testConnection;
   }
 }

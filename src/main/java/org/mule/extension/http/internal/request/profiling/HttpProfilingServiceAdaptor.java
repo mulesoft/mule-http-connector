@@ -8,7 +8,7 @@ package org.mule.extension.http.internal.request.profiling;
 
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.EXTENSION_PROFILING_EVENT;
 
-import org.mule.extension.http.internal.request.HttpRequestOperations;
+import org.mule.extension.http.api.request.HttpRequestOperations;
 import org.mule.runtime.api.profiling.ProfilingService;
 
 import javax.inject.Inject;

@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.api.listener.intercepting.cors;
 
-import org.mule.extension.http.internal.listener.intercepting.HttpListenerInterceptor;
+import org.mule.extension.http.api.listener.intercepting.HttpListenerInterceptor;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.util.Objects;

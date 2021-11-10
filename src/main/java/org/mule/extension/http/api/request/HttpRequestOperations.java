@@ -4,27 +4,29 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.http.internal.request;
+package org.mule.extension.http.api.request;
 
 import static java.lang.Boolean.getBoolean;
 import static java.lang.Integer.MAX_VALUE;
-import static org.mule.extension.http.internal.HttpConnectorConstants.CONNECTOR_OVERRIDES;
-import static org.mule.extension.http.internal.HttpConnectorConstants.HTTP_ENABLE_PROFILING;
-import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST;
-import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE;
+import static org.mule.extension.http.api.HttpConnectorConstants.CONNECTOR_OVERRIDES;
+import static org.mule.extension.http.api.HttpConnectorConstants.HTTP_ENABLE_PROFILING;
+import static org.mule.extension.http.api.HttpConnectorConstants.REQUEST;
+import static org.mule.extension.http.api.HttpConnectorConstants.RESPONSE;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
-import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.encodeSpaces;
 
+import org.mule.extension.http.api.HttpMetadataResolver;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.error.HttpErrorMessageGenerator;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
-import org.mule.extension.http.api.request.client.UriParameters;
+import org.mule.extension.http.api.request.client.HttpExtensionClient;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.request.validator.SuccessStatusCodeValidator;
-import org.mule.extension.http.internal.HttpMetadataResolver;
-import org.mule.extension.http.internal.request.client.HttpExtensionClient;
-import org.mule.extension.http.internal.request.profiling.HttpRequestResponseProfilingDataProducerAdaptor;
+import org.mule.extension.http.internal.request.HttpRequestFactory;
+import org.mule.extension.http.internal.request.RequestErrorTypeProvider;
+import org.mule.extension.http.internal.request.RequestNotificationActionProvider;
+import org.mule.extension.http.internal.request.ResponseValidationSettings;
 import org.mule.extension.http.internal.request.profiling.HttpProfilingServiceAdaptor;
+import org.mule.extension.http.internal.request.profiling.HttpRequestResponseProfilingDataProducerAdaptor;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -55,17 +57,14 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
-import org.mule.runtime.http.api.HttpConstants;
-
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.List;
 
 public class HttpRequestOperations implements Initialisable, Disposable {
 
@@ -122,21 +121,9 @@ public class HttpRequestOperations implements Initialisable, Disposable {
                       CompletionCallback<InputStream, HttpResponseAttributes> callback) {
     try {
       HttpRequesterRequestBuilder resolvedBuilder = requestBuilder != null ? requestBuilder : defaultRequestBuilder;
-
       handleCursor(resolvedBuilder);
-
       resolvedBuilder.setCorrelationInfo(correlationInfo);
-
-      String resolvedUri;
-      if (uriSettings.getUrl() == null) {
-        UriParameters uriParameters = client.getDefaultUriParameters();
-        String resolvedBasePath = config.getBasePath();
-        String resolvedPath = resolvedBuilder.replaceUriParams(buildPath(resolvedBasePath, uriSettings.getPath()));
-        resolvedUri =
-            resolveUri(uriParameters.getScheme(), uriParameters.getHost().trim(), uriParameters.getPort(), resolvedPath);
-      } else {
-        resolvedUri = resolvedBuilder.replaceUriParams(uriSettings.getUrl());
-      }
+      String resolvedUri = uriSettings.getResolvedUri(client, config.getBasePath(), resolvedBuilder);
 
       int resolvedTimeout = resolveResponseTimeout(overrides.getResponseTimeout());
       ResponseValidator responseValidator = responseValidationSettings.getResponseValidator();
@@ -176,11 +163,6 @@ public class HttpRequestOperations implements Initialisable, Disposable {
     }
   }
 
-  private String resolveUri(HttpConstants.Protocol scheme, String host, Integer port, String path) {
-    // Encode spaces to generate a valid HTTP request.
-    return scheme.getScheme() + "://" + host + ":" + port + encodeSpaces(path);
-  }
-
   private int resolveResponseTimeout(Integer responseTimeout) {
     if (muleContext.getConfiguration().isDisableTimeouts()) {
       return WAIT_FOR_EVER;
@@ -189,24 +171,6 @@ public class HttpRequestOperations implements Initialisable, Disposable {
     }
   }
 
-  protected String buildPath(String basePath, String path) {
-    String resolvedBasePath = basePath;
-    String resolvedRequestPath = path;
-
-    if (!resolvedBasePath.startsWith("/")) {
-      resolvedBasePath = "/" + resolvedBasePath;
-    }
-
-    if (resolvedBasePath.endsWith("/") && resolvedRequestPath.startsWith("/")) {
-      resolvedBasePath = resolvedBasePath.substring(0, resolvedBasePath.length() - 1);
-    }
-
-    if (!resolvedBasePath.endsWith("/") && !resolvedRequestPath.startsWith("/") && !resolvedRequestPath.isEmpty()) {
-      resolvedBasePath += "/";
-    }
-
-    return resolvedBasePath + resolvedRequestPath;
-  }
 
   @Override
   public void initialise() throws InitialisationException {

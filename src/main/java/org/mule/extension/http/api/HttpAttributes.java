@@ -9,14 +9,13 @@ package org.mule.extension.http.api;
 import static java.lang.System.lineSeparator;
 import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.io.Serializable;
 import java.util.Map;
 import java.util.stream.Stream;
-
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 /**
  * Base representation of HTTP message attributes.

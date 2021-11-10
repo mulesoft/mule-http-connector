@@ -8,6 +8,7 @@ package org.mule.extension.http.api.request.validator;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
+
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.exception.ErrorMessageAwareException;
 import org.mule.runtime.api.exception.MuleRuntimeException;

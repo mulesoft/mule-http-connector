@@ -27,7 +27,7 @@ import static org.mule.runtime.http.api.HttpHeaders.Values.CLOSE;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.api.streaming.HttpStreamingType;
-import org.mule.extension.http.internal.listener.intercepting.Interception;
+import org.mule.extension.http.api.listener.intercepting.Interception;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;

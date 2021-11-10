@@ -4,9 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.http.internal.certificate;
+package org.mule.extension.http.api.certificate;
 
 import static java.lang.Class.forName;
+import static org.mule.extension.http.api.certificate.CertificateProviderFactory.SERIALIZABLE_LAZY_VALUE_CLASS_NAME;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -25,7 +26,6 @@ import java.util.function.Supplier;
  */
 public class DefaultCertificateProvider implements CertificateProvider {
 
-  static final String SERIALIZABLE_LAZY_VALUE_CLASS_NAME = "org.mule.runtime.api.util.SerializableLazyValue";
   private static final String GET_METHOD_NAME = "get";
 
   private static final long serialVersionUID = -4010056097536262602L;

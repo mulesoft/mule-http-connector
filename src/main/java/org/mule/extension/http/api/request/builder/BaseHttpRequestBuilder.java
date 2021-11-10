@@ -17,7 +17,6 @@ import static java.util.regex.Pattern.compile;
 import static org.mule.extension.http.api.HttpConnectorConstants.ENCODE_URI_PARAMS_PROPERTY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
-import static org.mule.runtime.extension.api.runtime.parameter.OutboundCorrelationStrategy.AUTO;
 import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
 
 import org.mule.extension.http.api.HttpMessageBuilder;
@@ -25,14 +24,11 @@ import org.mule.extension.http.api.request.HttpRequesterConfig;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.MultiMap;
-import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
-import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
-import org.mule.runtime.extension.api.runtime.parameter.OutboundCorrelationStrategy;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
 
@@ -45,7 +41,7 @@ import java.util.regex.Pattern;
  *
  * @since 1.0
  */
-public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
+public class BaseHttpRequestBuilder extends HttpMessageBuilder {
 
   private static final Pattern WRONGLY_ENCODED_SPACES = compile("\\+");
 
@@ -84,22 +80,6 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
   @Content
   @DisplayName("Query Parameters")
   private MultiMap<String, String> queryParams = emptyMultiMap();
-
-  /**
-   * Options on whether to include an outbound correlation id or not
-   */
-  @Parameter
-  @ConfigOverride
-  private OutboundCorrelationStrategy sendCorrelationId = AUTO;
-
-  /**
-   * Allows to set a custom correlation id
-   */
-  @Parameter
-  @Optional
-  private String correlationId;
-
-  private CorrelationInfo correlationInfo;
 
   @Override
   public TypedValue<Object> getBody() {
@@ -158,22 +138,6 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
     this.uriParams = uriParams;
   }
 
-  public CorrelationInfo getCorrelationInfo() {
-    return correlationInfo;
-  }
-
-  public void setCorrelationInfo(CorrelationInfo correlationInfo) {
-    this.correlationInfo = correlationInfo;
-  }
-
-  public OutboundCorrelationStrategy getSendCorrelationId() {
-    return sendCorrelationId;
-  }
-
-  public String getCorrelationId() {
-    return correlationId;
-  }
-
   public HttpRequestBuilder configure(HttpRequesterConfig config) {
     return HttpRequest.builder(PRESERVE_HEADER_CASE || config.isPreserveHeadersCase())
         .headers(headers)
@@ -183,6 +147,4 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
   public static void refreshSystemProperties() {
     ENCODE_URI_PARAMS = getBoolean(ENCODE_URI_PARAMS_PROPERTY);
   }
-
-
 }

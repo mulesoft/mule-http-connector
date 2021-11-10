@@ -22,8 +22,8 @@ import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 
-import org.mule.extension.http.internal.request.HttpRequesterConnectionManager;
-import org.mule.extension.http.internal.request.HttpRequesterProvider;
+import org.mule.extension.http.api.request.HttpRequesterConnectionManager;
+import org.mule.extension.http.api.request.HttpRequesterProvider;
 import org.mule.extension.http.internal.request.RequestConnectionParams;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.tck.junit4.rule.SystemProperty;

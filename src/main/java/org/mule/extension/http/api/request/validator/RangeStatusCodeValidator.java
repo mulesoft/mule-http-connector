@@ -10,6 +10,7 @@ import static java.lang.Integer.parseInt;
 import static org.mule.extension.http.api.error.HttpError.getErrorByCode;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.util.ClassUtils.memoize;
+
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.error.HttpErrorMessageGenerator;
 import org.mule.runtime.api.message.Message;

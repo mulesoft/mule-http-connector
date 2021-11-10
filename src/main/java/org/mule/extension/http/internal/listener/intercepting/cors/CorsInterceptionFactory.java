@@ -10,7 +10,7 @@ import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.http.api.HttpHeaders.Names.ACCESS_CONTROL_ALLOW_ORIGIN;
 
-import org.mule.extension.http.internal.listener.intercepting.Interception;
+import org.mule.extension.http.api.listener.intercepting.Interception;
 import org.mule.extension.http.internal.listener.intercepting.NoInterception;
 import org.mule.extension.http.internal.listener.intercepting.RequestInterruptedException;
 import org.mule.modules.cors.response.AddCorsHeaders;

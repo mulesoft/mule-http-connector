@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.http.internal.request.builder;
+package org.mule.extension.http.api.request.builder;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;

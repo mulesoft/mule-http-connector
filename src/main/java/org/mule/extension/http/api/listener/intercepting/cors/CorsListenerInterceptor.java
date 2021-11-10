@@ -6,8 +6,8 @@
  */
 package org.mule.extension.http.api.listener.intercepting.cors;
 
-import org.mule.extension.http.internal.listener.intercepting.HttpListenerInterceptor;
-import org.mule.extension.http.internal.listener.intercepting.Interception;
+import org.mule.extension.http.api.listener.intercepting.HttpListenerInterceptor;
+import org.mule.extension.http.api.listener.intercepting.Interception;
 import org.mule.extension.http.internal.listener.intercepting.cors.CorsInterceptionFactory;
 import org.mule.modules.cors.CorsKernel;
 import org.mule.modules.cors.response.CorsAction;

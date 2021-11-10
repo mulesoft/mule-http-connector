@@ -9,7 +9,7 @@ package org.mule.test.http.functional.requester;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.http.api.HttpMessageBuilder.refreshSystemProperties;
-import static org.mule.extension.http.internal.HttpConnectorConstants.ENCODE_URI_PARAMS_PROPERTY;
+import static org.mule.extension.http.api.HttpConnectorConstants.ENCODE_URI_PARAMS_PROPERTY;
 
 import org.mule.tck.junit4.rule.SystemProperty;
 

@@ -24,7 +24,7 @@ import static org.mule.extension.http.api.HttpHeaders.Names.AUTHORIZATION;
 import org.mule.apache.xerces.impl.dv.util.Base64;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.listener.HttpBasicAuthenticationFilter;
-import org.mule.extension.http.internal.filter.BasicUnauthorisedException;
+import org.mule.extension.http.api.filter.BasicUnauthorisedException;
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.CredentialsBuilder;
 import org.mule.runtime.api.security.DefaultMuleAuthentication;

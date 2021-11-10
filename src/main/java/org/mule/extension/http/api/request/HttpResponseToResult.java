@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.http.internal.request;
+package org.mule.extension.http.api.request;
 
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
@@ -19,13 +19,12 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.SET_COOKIE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.SET_COOKIE2;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.extension.http.internal.request.builder.HttpResponseAttributesBuilder;
+import org.mule.extension.http.api.request.builder.HttpResponseAttributesBuilder;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,9 +55,9 @@ public class HttpResponseToResult {
 
   private static final ConcurrentMap<String, MediaType> parsedMediaTypes = new ConcurrentHashMap<>();
 
-  Result<Object, HttpResponseAttributes> convert(HttpRequesterCookieConfig config, MuleContext muleContext,
-                                                 HttpResponse response, HttpEntity entity,
-                                                 Supplier<Object> payloadSupplier, URI uri) {
+  public Result<Object, HttpResponseAttributes> convert(HttpRequesterCookieConfig config, MuleContext muleContext,
+                                                        HttpResponse response, HttpEntity entity,
+                                                        Supplier<Object> payloadSupplier, URI uri) {
 
     if (config.isEnableCookies()) {
       processCookies(config, response, uri);

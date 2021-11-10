@@ -7,6 +7,7 @@
 package org.mule.extension.http.api.request.builder;
 
 import static java.util.Objects.hash;
+
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.util.Objects;

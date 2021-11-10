@@ -21,9 +21,8 @@ import org.mule.runtime.core.api.policy.PolicyProvider;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.runtime.policy.api.SourcePolicyPointcutParametersFactory;
 
-import java.util.Optional;
-
 import javax.inject.Inject;
+import java.util.Optional;
 
 /**
  * HTTP request operation policy pointcut parameters factory.

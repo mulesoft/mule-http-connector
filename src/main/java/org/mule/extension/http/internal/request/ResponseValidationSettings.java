@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.internal.request;
 
-import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE;
+import static org.mule.extension.http.api.HttpConnectorConstants.RESPONSE;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
 import org.mule.runtime.extension.api.annotation.param.Parameter;

@@ -8,6 +8,7 @@ package org.mule.extension.http.internal.listener.intercepting;
 
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 
+import org.mule.extension.http.api.listener.intercepting.Interception;
 import org.mule.runtime.api.util.MultiMap;
 
 /**

@@ -13,7 +13,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.http.internal.request.profiling.HttpRequestProfilingEventContext.REASON_PHRASE;
 import static org.mule.extension.http.internal.request.profiling.HttpRequestProfilingEventContext.STATUS_CODE;
-import static org.mule.extension.http.internal.HttpConnectorConstants.HTTP_ENABLE_PROFILING;
+import static org.mule.extension.http.api.HttpConnectorConstants.HTTP_ENABLE_PROFILING;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.PROFILING;
 

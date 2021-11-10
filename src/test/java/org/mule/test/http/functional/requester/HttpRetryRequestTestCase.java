@@ -11,9 +11,9 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.http.api.HttpMessageBuilder.refreshSystemProperties;
-import static org.mule.extension.http.internal.HttpConnectorConstants.DEFAULT_RETRY_ATTEMPTS;
-import static org.mule.extension.http.internal.HttpConnectorConstants.REMOTELY_CLOSED;
-import static org.mule.extension.http.internal.HttpConnectorConstants.RETRY_ATTEMPTS_PROPERTY;
+import static org.mule.extension.http.api.HttpConnectorConstants.DEFAULT_RETRY_ATTEMPTS;
+import static org.mule.extension.http.api.HttpConnectorConstants.REMOTELY_CLOSED;
+import static org.mule.extension.http.api.HttpConnectorConstants.RETRY_ATTEMPTS_PROPERTY;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.RETRY_POLICY;
 
 import org.mule.functional.api.flow.FlowRunner;

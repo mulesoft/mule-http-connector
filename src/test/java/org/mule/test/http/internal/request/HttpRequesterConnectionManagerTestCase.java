@@ -20,8 +20,8 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mule.extension.http.internal.request.HttpRequesterConnectionManager;
-import org.mule.extension.http.internal.request.HttpRequesterConnectionManager.ShareableHttpClient;
+import org.mule.extension.http.api.request.HttpRequesterConnectionManager;
+import org.mule.extension.http.api.request.HttpRequesterConnectionManager.ShareableHttpClient;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.http.api.client.HttpClient;
 import org.mule.runtime.http.api.client.HttpClientConfiguration;

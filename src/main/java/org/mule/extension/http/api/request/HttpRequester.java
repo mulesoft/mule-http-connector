@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.http.internal.request;
+package org.mule.extension.http.api.request;
 
 import static java.lang.Boolean.getBoolean;
 import static java.lang.Integer.getInteger;
@@ -12,15 +12,15 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
+import static org.mule.extension.http.api.HttpConnectorConstants.DEFAULT_RETRY_ATTEMPTS;
+import static org.mule.extension.http.api.HttpConnectorConstants.IDEMPOTENT_METHODS;
+import static org.mule.extension.http.api.HttpConnectorConstants.REMOTELY_CLOSED;
+import static org.mule.extension.http.api.HttpConnectorConstants.RETRY_ATTEMPTS_PROPERTY;
+import static org.mule.extension.http.api.HttpConnectorConstants.RETRY_ON_ALL_METHODS_PROPERTY;
 import static org.mule.extension.http.api.error.HttpError.CONNECTIVITY;
 import static org.mule.extension.http.api.error.HttpError.TIMEOUT;
 import static org.mule.extension.http.api.notification.HttpNotificationAction.REQUEST_COMPLETE;
 import static org.mule.extension.http.api.notification.HttpNotificationAction.REQUEST_START;
-import static org.mule.extension.http.internal.HttpConnectorConstants.DEFAULT_RETRY_ATTEMPTS;
-import static org.mule.extension.http.internal.HttpConnectorConstants.IDEMPOTENT_METHODS;
-import static org.mule.extension.http.internal.HttpConnectorConstants.REMOTELY_CLOSED;
-import static org.mule.extension.http.internal.HttpConnectorConstants.RETRY_ATTEMPTS_PROPERTY;
-import static org.mule.extension.http.internal.HttpConnectorConstants.RETRY_ON_ALL_METHODS_PROPERTY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
 
@@ -30,14 +30,14 @@ import org.mule.extension.http.api.error.HttpErrorMessageGenerator;
 import org.mule.extension.http.api.error.HttpRequestFailedException;
 import org.mule.extension.http.api.notification.HttpRequestNotificationData;
 import org.mule.extension.http.api.notification.HttpResponseNotificationData;
-import org.mule.extension.http.api.request.HttpSendBodyMode;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
 import org.mule.extension.http.api.request.authentication.UsernamePasswordAuthentication;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
+import org.mule.extension.http.api.request.client.HttpExtensionClient;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.streaming.HttpStreamingType;
-import org.mule.extension.http.internal.request.client.HttpExtensionClient;
+import org.mule.extension.http.internal.request.HttpRequestFactory;
 import org.mule.extension.http.internal.request.profiling.HttpRequestResponseProfilingDataProducerAdaptor;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.metadata.DataType;
@@ -56,6 +56,8 @@ import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -69,9 +71,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Component capable of performing an HTTP request given a request.

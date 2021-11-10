@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.internal.listener;
 
-import org.mule.extension.http.internal.listener.intercepting.Interception;
+import org.mule.extension.http.api.listener.intercepting.Interception;
 import org.mule.extension.http.internal.listener.intercepting.NoInterception;
 import org.mule.runtime.http.api.server.async.HttpResponseReadyCallback;
 

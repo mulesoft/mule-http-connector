@@ -7,6 +7,7 @@
 package org.mule.extension.http.api.notification;
 
 import static org.mule.runtime.api.metadata.DataType.fromType;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.extension.api.notification.NotificationActionDefinition;
 

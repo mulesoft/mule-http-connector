@@ -12,7 +12,7 @@ import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 
 import org.mule.extension.http.api.error.ResourceNotFoundException;
 import org.mule.extension.http.api.listener.HttpBasicAuthenticationFilter;
-import org.mule.extension.http.internal.filter.BasicUnauthorisedException;
+import org.mule.extension.http.api.filter.BasicUnauthorisedException;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;

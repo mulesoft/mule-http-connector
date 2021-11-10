@@ -7,8 +7,12 @@
 package org.mule.extension.http.internal.request;
 
 import static org.mule.extension.http.api.error.HttpError.getHttpRequestOperationErrors;
+
+import org.mule.extension.http.api.request.ConfigurationOverrides;
+import org.mule.extension.http.api.request.HttpRequestOperations;
+import org.mule.extension.http.api.request.HttpRequesterConfig;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
-import org.mule.extension.http.internal.request.client.HttpExtensionClient;
+import org.mule.extension.http.api.request.client.HttpExtensionClient;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;

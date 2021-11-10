@@ -8,7 +8,7 @@ package org.mule.extension.http.internal.listener.intercepting.cors;
 
 import static org.mule.runtime.http.api.HttpHeaders.Names.ACCESS_CONTROL_ALLOW_ORIGIN;
 
-import org.mule.extension.http.internal.listener.intercepting.Interception;
+import org.mule.extension.http.api.listener.intercepting.Interception;
 import org.mule.modules.cors.response.AddCorsHeaders;
 import org.mule.runtime.api.util.MultiMap;
 

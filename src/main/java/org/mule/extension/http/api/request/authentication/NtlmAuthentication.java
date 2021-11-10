@@ -7,6 +7,7 @@
 package org.mule.extension.http.api.request.authentication;
 
 import static org.mule.runtime.http.api.client.auth.HttpAuthenticationType.NTLM;
+
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication.HttpNtlmAuthentication;

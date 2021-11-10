@@ -4,21 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.http.internal;
+package org.mule.extension.http.api;
 
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
-import org.mule.metadata.api.model.BinaryType;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.metadata.MetadataContext;
-import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.OutputStaticTypeResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
-
-import java.io.InputStream;
 
 /**
  * HTTP {@link OutputTypeResolver} implementation for the basic operations that always return an {@link AnyType}, since HTTP

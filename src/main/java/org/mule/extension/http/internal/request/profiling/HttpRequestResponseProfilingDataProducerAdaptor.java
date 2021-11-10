@@ -9,7 +9,7 @@ package org.mule.extension.http.internal.request.profiling;
 import static org.mule.extension.http.internal.request.profiling.HttpProfilingUtils.getHttpRequestResponseProfilingEventContext;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.extension.http.internal.request.HttpRequestOperations;
+import org.mule.extension.http.api.request.HttpRequestOperations;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.type.context.ExtensionProfilingEventContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
