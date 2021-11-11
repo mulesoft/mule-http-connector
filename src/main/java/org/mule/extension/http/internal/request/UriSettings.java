@@ -7,12 +7,18 @@
 package org.mule.extension.http.internal.request;
 
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.DEFAULT_TAB;
+import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.encodeSpaces;
+
+import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
+import org.mule.extension.http.api.request.client.UriParameters;
+import org.mule.extension.http.internal.request.client.HttpExtensionClient;
 import org.mule.runtime.extension.api.annotation.param.ExclusiveOptionals;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.http.api.HttpConstants;
 
 @ExclusiveOptionals(isOneRequired = true)
 public class UriSettings {
@@ -41,5 +47,48 @@ public class UriSettings {
 
   public String getUrl() {
     return url;
+  }
+
+  @Override
+  public String toString() {
+    return "UriSettings{" +
+        "path='" + path + '\'' +
+        ", url='" + url + '\'' +
+        '}';
+  }
+
+  public String getResolvedUri(HttpExtensionClient client, String basePath,
+                               HttpRequesterRequestBuilder requestBuilder) {
+    if (url == null) {
+      UriParameters uriParameters = client.getDefaultUriParameters();
+      String resolvedPath = requestBuilder.replaceUriParams(buildPath(basePath, path));
+      return resolveUri(uriParameters.getScheme(), uriParameters.getHost().trim(), uriParameters.getPort(), resolvedPath);
+    } else {
+      return requestBuilder.replaceUriParams(url);
+    }
+  }
+
+  private String resolveUri(HttpConstants.Protocol scheme, String host, Integer port, String path) {
+    // Encode spaces to generate a valid HTTP request.
+    return scheme.getScheme() + "://" + host + ":" + port + encodeSpaces(path);
+  }
+
+  protected String buildPath(String basePath, String path) {
+    String resolvedBasePath = basePath;
+    String resolvedRequestPath = path;
+
+    if (!resolvedBasePath.startsWith("/")) {
+      resolvedBasePath = "/" + resolvedBasePath;
+    }
+
+    if (resolvedBasePath.endsWith("/") && resolvedRequestPath.startsWith("/")) {
+      resolvedBasePath = resolvedBasePath.substring(0, resolvedBasePath.length() - 1);
+    }
+
+    if (!resolvedBasePath.endsWith("/") && !resolvedRequestPath.startsWith("/") && !resolvedRequestPath.isEmpty()) {
+      resolvedBasePath += "/";
+    }
+
+    return resolvedBasePath + resolvedRequestPath;
   }
 }

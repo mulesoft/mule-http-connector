@@ -122,21 +122,9 @@ public class HttpRequestOperations implements Initialisable, Disposable {
                       CompletionCallback<InputStream, HttpResponseAttributes> callback) {
     try {
       HttpRequesterRequestBuilder resolvedBuilder = requestBuilder != null ? requestBuilder : defaultRequestBuilder;
-
       handleCursor(resolvedBuilder);
-
       resolvedBuilder.setCorrelationInfo(correlationInfo);
-
-      String resolvedUri;
-      if (uriSettings.getUrl() == null) {
-        UriParameters uriParameters = client.getDefaultUriParameters();
-        String resolvedBasePath = config.getBasePath();
-        String resolvedPath = resolvedBuilder.replaceUriParams(buildPath(resolvedBasePath, uriSettings.getPath()));
-        resolvedUri =
-            resolveUri(uriParameters.getScheme(), uriParameters.getHost().trim(), uriParameters.getPort(), resolvedPath);
-      } else {
-        resolvedUri = resolvedBuilder.replaceUriParams(uriSettings.getUrl());
-      }
+      String resolvedUri = uriSettings.getResolvedUri(client, config.getBasePath(), resolvedBuilder);
 
       int resolvedTimeout = resolveResponseTimeout(overrides.getResponseTimeout());
       ResponseValidator responseValidator = responseValidationSettings.getResponseValidator();
@@ -176,36 +164,12 @@ public class HttpRequestOperations implements Initialisable, Disposable {
     }
   }
 
-  private String resolveUri(HttpConstants.Protocol scheme, String host, Integer port, String path) {
-    // Encode spaces to generate a valid HTTP request.
-    return scheme.getScheme() + "://" + host + ":" + port + encodeSpaces(path);
-  }
-
   private int resolveResponseTimeout(Integer responseTimeout) {
     if (muleContext.getConfiguration().isDisableTimeouts()) {
       return WAIT_FOR_EVER;
     } else {
       return responseTimeout != null ? responseTimeout : muleContext.getConfiguration().getDefaultResponseTimeout();
     }
-  }
-
-  protected String buildPath(String basePath, String path) {
-    String resolvedBasePath = basePath;
-    String resolvedRequestPath = path;
-
-    if (!resolvedBasePath.startsWith("/")) {
-      resolvedBasePath = "/" + resolvedBasePath;
-    }
-
-    if (resolvedBasePath.endsWith("/") && resolvedRequestPath.startsWith("/")) {
-      resolvedBasePath = resolvedBasePath.substring(0, resolvedBasePath.length() - 1);
-    }
-
-    if (!resolvedBasePath.endsWith("/") && !resolvedRequestPath.startsWith("/") && !resolvedRequestPath.isEmpty()) {
-      resolvedBasePath += "/";
-    }
-
-    return resolvedBasePath + resolvedRequestPath;
   }
 
   @Override
