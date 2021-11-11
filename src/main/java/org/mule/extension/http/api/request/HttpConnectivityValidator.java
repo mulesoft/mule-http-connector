@@ -72,7 +72,7 @@ public class HttpConnectivityValidator {
   @Content
   @NullSafe
   @Placement(order = 4)
-  protected MultiMap<String, String> headers = emptyMultiMap();
+  private MultiMap<String, String> testHeaders = emptyMultiMap();
 
   /**
    * Query parameters the request should include.
@@ -82,7 +82,7 @@ public class HttpConnectivityValidator {
   @Content
   @DisplayName("Query Parameters")
   @Placement(order = 5)
-  protected MultiMap<String, String> queryParameters = emptyMultiMap();
+  private MultiMap<String, String> queryParameters = emptyMultiMap();
 
   /**
    * URI parameters that should be used to create the request.
@@ -92,7 +92,7 @@ public class HttpConnectivityValidator {
   @Content
   @DisplayName("URI Parameters")
   @Placement(order = 6)
-  protected Map<String, String> uriParameters = emptyMap();
+  private Map<String, String> uriParameters = emptyMap();
 
   @Parameter
   @Optional
@@ -106,7 +106,7 @@ public class HttpConnectivityValidator {
     return "TestConnectionParams{" +
         ", method='" + method + '\'' +
         ", body=" + body +
-        ", headers=" + headers +
+        ", headers=" + testHeaders +
         ", uriParams=" + uriParameters +
         ", queryParameters=" + queryParameters +
         ", responseValidator=" + responseValidator +
@@ -143,7 +143,7 @@ public class HttpConnectivityValidator {
     return HttpRequest.builder()
         .uri(uriString)
         .method(method)
-        .headers(headers)
+        .headers(testHeaders)
         .queryParams(queryParameters)
         .build();
   }
@@ -179,8 +179,8 @@ public class HttpConnectivityValidator {
     }
   }
 
-  public void setHeaders(MultiMap<String, String> headers) {
-    this.headers = headers;
+  public void setTestHeaders(MultiMap<String, String> testHeaders) {
+    this.testHeaders = testHeaders;
   }
 
   public void setMethod(String method) {
