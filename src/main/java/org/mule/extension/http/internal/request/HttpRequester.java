@@ -145,12 +145,6 @@ public class HttpRequester {
                        RETRY_ATTEMPTS, correlationId, reRunRequest);
   }
 
-
-
-  public void doPollingRequest(PollContext<Object, HttpResponseAttributes> pollContext) {
-
-  }
-
   private void doRequestWithRetry(HttpExtensionClient client, HttpRequesterConfig config, boolean followRedirects,
                                   HttpRequestAuthentication authentication, int responseTimeout,
                                   ResponseValidator responseValidator, boolean checkRetry, MuleContext muleContext,

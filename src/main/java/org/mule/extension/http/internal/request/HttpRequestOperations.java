@@ -12,31 +12,23 @@ import static org.mule.extension.http.internal.HttpConnectorConstants.CONNECTOR_
 import static org.mule.extension.http.internal.HttpConnectorConstants.HTTP_ENABLE_PROFILING;
 import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST;
 import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE;
+import static org.mule.extension.http.internal.request.HttpRequestUtils.createHttpRequester;
+import static org.mule.extension.http.internal.request.HttpRequestUtils.handleCursor;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
-import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.encodeSpaces;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.extension.http.api.error.HttpErrorMessageGenerator;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
-import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.request.validator.SuccessStatusCodeValidator;
 import org.mule.extension.http.internal.HttpMetadataResolver;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
-import org.mule.extension.http.internal.request.profiling.HttpRequestResponseProfilingDataProducerAdaptor;
-import org.mule.extension.http.internal.request.profiling.HttpProfilingServiceAdaptor;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
-import org.mule.runtime.api.streaming.Cursor;
-import org.mule.runtime.api.streaming.CursorProvider;
-import org.mule.runtime.api.streaming.bytes.CursorStream;
-import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.Streaming;
@@ -55,7 +47,6 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
-import org.mule.runtime.http.api.HttpConstants;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -142,28 +133,6 @@ public class HttpRequestOperations implements Initialisable, Disposable {
     }
   }
 
-  /**
-   * If the body is a {@link Cursor}, we need to change it for the {@link CursorProvider} to re-read the content in the case we
-   * need to make a retry of a request.
-   */
-  protected void handleCursor(HttpRequesterRequestBuilder resolvedBuilder) {
-    if (resolvedBuilder.getBody().getValue() instanceof CursorStream) {
-      CursorStream cursor = (CursorStream) (resolvedBuilder.getBody().getValue());
-
-      long position = cursor.getPosition();
-      CursorStreamProvider provider = (CursorStreamProvider) cursor.getProvider();
-
-      if (position == 0) {
-        resolvedBuilder.setBody(new TypedValue<Object>(provider, resolvedBuilder.getBody().getDataType(),
-                                                       resolvedBuilder.getBody().getByteLength()));
-      } else {
-        resolvedBuilder.setBody(new TypedValue<Object>(new OffsetCursorProviderWrapper(provider, position),
-                                                       resolvedBuilder.getBody().getDataType(),
-                                                       resolvedBuilder.getBody().getByteLength()));
-      }
-    }
-  }
-
   private int resolveResponseTimeout(Integer responseTimeout) {
     if (muleContext.getConfiguration().isDisableTimeouts()) {
       return WAIT_FOR_EVER;
@@ -178,32 +147,13 @@ public class HttpRequestOperations implements Initialisable, Disposable {
     defaultRequestBuilder = new HttpRequesterRequestBuilder();
     // Profiling API is only available with this system property
     httpResponseProfilingEnabled = getBoolean(HTTP_ENABLE_PROFILING);
-    initializeHttpRequester();
-
-    this.scheduler = schedulerService.ioScheduler();
-  }
-
-  private void initializeHttpRequester() throws InitialisationException {
-
     try {
-      httpRequester = new HttpRequester(new HttpRequestFactory(), new HttpResponseToResult(), new HttpErrorMessageGenerator(),
-                                        getProfilingDataProducer());
+      httpRequester = createHttpRequester(httpResponseProfilingEnabled, muleContext);
     } catch (MuleException e) {
       throw new InitialisationException(e, this);
     }
-  }
 
-  private HttpRequestResponseProfilingDataProducerAdaptor getProfilingDataProducer() throws MuleException {
-    if (!httpResponseProfilingEnabled) {
-      return null;
-    }
-
-    HttpProfilingServiceAdaptor profilingServiceAdaptor = new HttpProfilingServiceAdaptor();
-
-    // Manually inject the profiling service
-    muleContext.getInjector().inject(profilingServiceAdaptor);
-
-    return profilingServiceAdaptor.getProfilingHttpRequestDataProducer();
+    this.scheduler = schedulerService.ioScheduler();
   }
 
   @Override
