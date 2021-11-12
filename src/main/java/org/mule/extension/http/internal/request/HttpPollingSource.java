@@ -104,7 +104,7 @@ public class HttpPollingSource extends PollingSource<InputStream, HttpResponseAt
   @Parameter
   @Placement(order = 3)
   @Example("0..399")
-  @Optional(defaultValue =  "0..399")
+  @Optional(defaultValue = "0..399")
   private String responseValidatorCodes;
   private SuccessStatusCodeValidator responseValidator;
 
@@ -128,30 +128,32 @@ public class HttpPollingSource extends PollingSource<InputStream, HttpResponseAt
     HttpRequesterRequestBuilder resolvedBuilder = defaultRequestBuilder;
     handleCursor(resolvedBuilder);
     //resolvedBuilder.setCorrelationInfo(correlationInfo);
-    String resolvedUri = uriSettings.getResolvedUri(client, config.getBasePath(), resolvedBuilder);
+    String resolvedUri = null;//uriSettings.getResolvedUri(client, config.getBasePath(), resolvedBuilder);
 
-    CompletionCallback<InputStream, HttpResponseAttributes> callback = new CompletionCallback<InputStream, HttpResponseAttributes>() {
-      @Override
-      public void success(Result<InputStream, HttpResponseAttributes> result) {
-        pollContext.accept(item -> {
-          item.setResult(result);
-        });
-      }
+    CompletionCallback<InputStream, HttpResponseAttributes> callback =
+        new CompletionCallback<InputStream, HttpResponseAttributes>() {
 
-      @Override
-      public void error(Throwable throwable) {
-        LOGGER.error("There was an error", throwable);
-      }
-    };
+          @Override
+          public void success(Result<InputStream, HttpResponseAttributes> result) {
+            pollContext.accept(item -> {
+              item.setResult(result);
+            });
+          }
+
+          @Override
+          public void error(Throwable throwable) {
+            LOGGER.error("There was an error", throwable);
+          }
+        };
 
     LOGGER.debug("Sending '{}' request to '{}'.", method, resolvedUri);
     httpRequester.doRequest(client, config, resolvedUri, method, config.getRequestStreamingMode(),
-            config.getSendBodyMode(),
-            config.getFollowRedirects(), client.getDefaultAuthentication(), config.getResponseTimeout(),
-            responseValidator,
-            transformationService, resolvedBuilder, true, muleContext, scheduler, notificationEmitter,
-            streamingHelper, callback, injectedHeaders, null);
-            //correlationInfo.getCorrelationId());
+                            config.getSendBodyMode(),
+                            config.getFollowRedirects(), client.getDefaultAuthentication(), config.getResponseTimeout(),
+                            responseValidator,
+                            transformationService, resolvedBuilder, true, muleContext, scheduler, null,
+                            null, callback, injectedHeaders, null);
+    //correlationInfo.getCorrelationId());
   }
 
   @Override
