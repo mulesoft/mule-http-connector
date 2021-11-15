@@ -17,14 +17,16 @@
     </http:request-config>
 
 
-    <http:request-config name="requestConfig">
-        <http:request-connection protocol="HTTPS" host="httpbin.org" port="443" >
+    <http:request-config name="requestConfigWithTheOptionalParameters">
+        <http:request-connection protocol="HTTP" host="localhost" port="${unusedPort}" >
             <http:test-connection testPath="/post" testMethod="POST" testBody="The Body">
                 <http:test-headers>
-                    <http:key-value-pair key="Key" value="Value" />
+                    <http:key-value-pair key="Key" value="Value1" />
+                    <http:key-value-pair key="Key" value="Value2" />
                 </http:test-headers>
                 <http:test-query-params>
-                    <http:key-value-pair key="Key" value="Value" />
+                    <http:key-value-pair key="Key1" value="Value1" />
+                    <http:key-value-pair key="Key2" value="Value2" />
                 </http:test-query-params>
                 <http:response-validator>
                     <http:success-status-code-validator values="200" />

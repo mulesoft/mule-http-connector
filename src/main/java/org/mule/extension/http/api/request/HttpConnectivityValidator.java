@@ -7,7 +7,9 @@
 package org.mule.extension.http.api.request;
 
 import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
+import static org.apache.commons.io.IOUtils.toInputStream;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.DEFAULT_TAB;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -30,6 +32,9 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
+import org.mule.runtime.http.api.domain.entity.EmptyHttpEntity;
+import org.mule.runtime.http.api.domain.entity.HttpEntity;
+import org.mule.runtime.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.slf4j.Logger;
@@ -124,7 +129,16 @@ public class HttpConnectivityValidator {
         .method(testMethod)
         .headers(toMultiMap(testHeaders))
         .queryParams(toMultiMap(testQueryParams))
+        .entity(buildEntity())
         .build();
+  }
+
+  private HttpEntity buildEntity() {
+    if (testBody == null || testBody.isEmpty()) {
+      return new EmptyHttpEntity();
+    } else {
+      return new InputStreamHttpEntity(toInputStream(testBody, UTF_8));
+    }
   }
 
   private static MultiMap<String, String> toMultiMap(List<? extends KeyValuePair> asList) {
