@@ -25,7 +25,6 @@ import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.REQUEST_C
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -59,9 +58,6 @@ public class HttpRequestConfigTestConnectivityTestCase extends AbstractHttpExten
   protected String getConfigFile() {
     return "http-request-config-test-connectivity.xml";
   }
-
-  @Before
-  public void setup() throws MuleException {}
 
   @Test
   // This test ensures that old applications which don't configure this new feature will deploy without problems.
