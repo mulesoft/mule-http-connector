@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:request-config name="requestConfigWithoutTestConnection">
+        <http:request-connection protocol="HTTP" host="localhost" port="${unusedPort}" />
+    </http:request-config>
+
+    <http:request-config name="requestConfigWithOnlyPath">
+        <http:request-connection host="localhost" port="${unusedPort}" >
+            <http:test-connection testPath="/irrelevantPath" />
+        </http:request-connection>
+    </http:request-config>
+
+
+    <http:request-config name="requestConfig">
+        <http:request-connection protocol="HTTPS" host="httpbin.org" port="443" >
+            <http:test-connection testPath="/post" testMethod="POST" testBody="The Body">
+                <http:test-headers>
+                    <http:key-value-pair key="Key" value="Value" />
+                </http:test-headers>
+                <http:test-query-params>
+                    <http:key-value-pair key="Key" value="Value" />
+                </http:test-query-params>
+                <http:response-validator>
+                    <http:success-status-code-validator values="200" />
+                </http:response-validator>
+            </http:test-connection>
+        </http:request-connection>
+    </http:request-config>
+</mule>

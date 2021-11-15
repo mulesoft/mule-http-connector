@@ -24,6 +24,7 @@ import org.mule.extension.http.api.request.HttpConnectivityValidator;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.proxy.HttpProxyConfig;
+import org.mule.extension.http.api.request.validator.ResponseValidatorTypedException;
 import org.mule.extension.http.internal.request.HttpRequesterConnectionManager.ShareableHttpClient;
 import org.mule.extension.http.internal.request.client.DefaultUriParameters;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
@@ -110,7 +111,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
   @Parameter
   @Optional
   @Placement(tab = "Test Connection")
-  protected HttpConnectivityValidator testConnection;
+  private HttpConnectivityValidator testConnection;
 
   @Inject
   private HttpRequesterConnectionManager connectionManager;
@@ -127,7 +128,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
     try {
       testConnection.validate(httpClient, connectionParams);
       return ConnectionValidationResult.success();
-    } catch (ExecutionException e) {
+    } catch (ExecutionException | ResponseValidatorTypedException e) {
       return ConnectionValidationResult.failure(e.getMessage(), e);
     } catch (InterruptedException e) {
       currentThread().interrupt();
