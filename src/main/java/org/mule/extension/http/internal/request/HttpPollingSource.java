@@ -6,8 +6,11 @@
  */
 package org.mule.extension.http.internal.request;
 
+import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST;
 import static org.mule.extension.http.internal.request.HttpRequestUtils.createHttpRequester;
 import static org.mule.extension.http.internal.request.HttpRequestUtils.handleCursor;
+import static org.mule.extension.http.internal.request.UriSettingsUtils.buildPath;
+import static org.mule.extension.http.internal.request.UriSettingsUtils.resolveUri;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.http.api.HttpConstants.Method.GET;
 
@@ -15,16 +18,20 @@ import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
 import org.mule.extension.http.api.request.authentication.UsernamePasswordAuthentication;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
+import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.validator.SuccessStatusCodeValidator;
 import org.mule.extension.http.internal.HttpMetadataResolver;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.meta.ExpressionSupport;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.*;
@@ -37,6 +44,7 @@ import org.mule.runtime.extension.api.runtime.source.BackPressureMode;
 import org.mule.runtime.extension.api.runtime.source.PollContext;
 import org.mule.runtime.extension.api.runtime.source.PollingSource;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
+import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.slf4j.Logger;
@@ -80,12 +88,7 @@ public class HttpPollingSource extends PollingSource<InputStream, HttpResponseAt
   private MuleContext muleContext;
 
   private HttpExtensionClient client;
-
-  //  private final String watermarkExpression;
-  //  private final String identityExpression;
-  //  private final String itemsExpression;
-  //  private final String requestBodyExpression;
-  //  private final String eventExpression;
+  private String resolvedUri;
 
   /**
    * Relative path from the path set in the HTTP Requester configuration
@@ -108,6 +111,11 @@ public class HttpPollingSource extends PollingSource<InputStream, HttpResponseAt
   private String responseValidatorCodes;
   private SuccessStatusCodeValidator responseValidator;
 
+  @Parameter
+  @Placement(order = 4)
+  @Optional(defaultValue = "")
+  private String body;
+
   @Override
   protected void doStart() throws MuleException {
     LOGGER.error("Starting source");
@@ -116,6 +124,7 @@ public class HttpPollingSource extends PollingSource<InputStream, HttpResponseAt
     defaultRequestBuilder = new HttpRequesterRequestBuilder();
     client = clientProvider.connect();
     httpRequester = createHttpRequester(false, muleContext);
+    resolvedUri = getResolvedUri();
   }
 
   @Override
@@ -124,12 +133,15 @@ public class HttpPollingSource extends PollingSource<InputStream, HttpResponseAt
 
   }
 
-  private void sendRequest(PollContext<InputStream, HttpResponseAttributes> pollContext) {
-    HttpRequesterRequestBuilder resolvedBuilder = defaultRequestBuilder;
-    handleCursor(resolvedBuilder);
-    //resolvedBuilder.setCorrelationInfo(correlationInfo);
-    String resolvedUri = null;//uriSettings.getResolvedUri(client, config.getBasePath(), resolvedBuilder);
+  private String getResolvedUri() {
+    UriParameters uriParameters = client.getDefaultUriParameters();
+    String resolvedPath = defaultRequestBuilder.replaceUriParams(buildPath(config.getBasePath(), path));
+    return resolveUri(uriParameters.getScheme(), uriParameters.getHost().trim(), uriParameters.getPort(), resolvedPath);
+  }
 
+  private void sendRequest(PollContext<InputStream, HttpResponseAttributes> pollContext) {
+    defaultRequestBuilder.setBody(TypedValue.of(body));
+    handleCursor(defaultRequestBuilder);
     CompletionCallback<InputStream, HttpResponseAttributes> callback =
         new CompletionCallback<InputStream, HttpResponseAttributes>() {
 
@@ -151,25 +163,17 @@ public class HttpPollingSource extends PollingSource<InputStream, HttpResponseAt
                             config.getSendBodyMode(),
                             config.getFollowRedirects(), client.getDefaultAuthentication(), config.getResponseTimeout(),
                             responseValidator,
-                            transformationService, resolvedBuilder, true, muleContext, scheduler, null,
+                            transformationService, defaultRequestBuilder, true, muleContext, scheduler, null,
                             null, callback, injectedHeaders, null);
-    //correlationInfo.getCorrelationId());
   }
 
   @Override
   public void poll(PollContext<InputStream, HttpResponseAttributes> pollContext) {
-    HttpRequest request = HttpRequest.builder()
-        .uri(config.getBasePath())
-        .method(GET)
-        .build();
-
+    if (pollContext.isSourceStopping()) {
+      return;
+    }
     LOGGER.trace("POLL");
     sendRequest(pollContext);
-    client.send(request, config.getResponseTimeout(), config.getFollowRedirects(),
-                resolveAuthentication(client.getDefaultAuthentication()))
-        .whenComplete((response, exception) -> {
-
-        });
   }
 
   private HttpAuthentication resolveAuthentication(HttpRequestAuthentication authentication) {

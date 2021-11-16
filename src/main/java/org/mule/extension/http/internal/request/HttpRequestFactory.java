@@ -119,27 +119,9 @@ public class HttpRequestFactory {
     config.getDefaultQueryParams()
         .forEach(param -> builder.addQueryParam(param.getKey(), param.getValue()));
 
-    requestBuilder.getSendCorrelationId()
-        .getOutboundCorrelationId(requestBuilder.getCorrelationInfo(), requestBuilder.getCorrelationId())
-        .ifPresent(correlationId -> {
-          String xCorrelationId;
-          if (builder.getHeaderValue(X_CORRELATION_ID_HEADER).isPresent()) {
-            if (LOGGER.isDebugEnabled()) {
-              LOGGER.debug(
-                           X_CORRELATION_ID
-                               + " was specified both as explicit header and through the standard propagation of the mule "
-                               + "correlation ID. The explicit header will prevail.");
-            }
-            xCorrelationId = builder.getHeaderValue(X_CORRELATION_ID_HEADER).get();
-          } else {
-            xCorrelationId = correlationId;
-            builder.addHeader(X_CORRELATION_ID_HEADER, correlationId);
-          }
-          builder.getHeaderValue(MULE_CORRELATION_ID_PROPERTY_HEADER)
-              .ifPresent(muleCorrelationId -> LOGGER
-                  .warn("Explicitly configured 'MULE_CORRELATION_ID: {}' header could interfere with 'X-Correlation-ID: {}' header.",
-                        muleCorrelationId, xCorrelationId));
-        });
+    if (requestBuilder.getCorrelationInfo() != null) {
+      addCorrelationIdResolution(requestBuilder, builder);
+    }
 
     if (config.isEnableCookies()) {
       addCookiesHeader(config, uri, builder);
@@ -161,6 +143,30 @@ public class HttpRequestFactory {
     }
 
     return builder.build();
+  }
+
+  private void addCorrelationIdResolution(HttpRequesterRequestBuilder requestBuilder, HttpRequestBuilder builder) {
+    requestBuilder.getSendCorrelationId()
+        .getOutboundCorrelationId(requestBuilder.getCorrelationInfo(), requestBuilder.getCorrelationId())
+        .ifPresent(correlationId -> {
+          String xCorrelationId;
+          if (builder.getHeaderValue(X_CORRELATION_ID_HEADER).isPresent()) {
+            if (LOGGER.isDebugEnabled()) {
+              LOGGER.debug(
+                           X_CORRELATION_ID
+                               + " was specified both as explicit header and through the standard propagation of the mule "
+                               + "correlation ID. The explicit header will prevail.");
+            }
+            xCorrelationId = builder.getHeaderValue(X_CORRELATION_ID_HEADER).get();
+          } else {
+            xCorrelationId = correlationId;
+            builder.addHeader(X_CORRELATION_ID_HEADER, correlationId);
+          }
+          builder.getHeaderValue(MULE_CORRELATION_ID_PROPERTY_HEADER)
+              .ifPresent(muleCorrelationId -> LOGGER
+                  .warn("Explicitly configured 'MULE_CORRELATION_ID: {}' header could interfere with 'X-Correlation-ID: {}' header.",
+                        muleCorrelationId, xCorrelationId));
+        });
   }
 
   private void addCookiesHeader(HttpRequesterConfig config, String uri, HttpRequestBuilder builder) {

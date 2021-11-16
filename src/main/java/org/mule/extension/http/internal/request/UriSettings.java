@@ -6,6 +6,8 @@
  */
 package org.mule.extension.http.internal.request;
 
+import static org.mule.extension.http.internal.request.UriSettingsUtils.buildPath;
+import static org.mule.extension.http.internal.request.UriSettingsUtils.resolveUri;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.DEFAULT_TAB;
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.encodeSpaces;
 
@@ -68,27 +70,4 @@ public class UriSettings {
     }
   }
 
-  private String resolveUri(HttpConstants.Protocol scheme, String host, Integer port, String path) {
-    // Encode spaces to generate a valid HTTP request.
-    return scheme.getScheme() + "://" + host + ":" + port + encodeSpaces(path);
-  }
-
-  protected String buildPath(String basePath, String path) {
-    String resolvedBasePath = basePath;
-    String resolvedRequestPath = path;
-
-    if (!resolvedBasePath.startsWith("/")) {
-      resolvedBasePath = "/" + resolvedBasePath;
-    }
-
-    if (resolvedBasePath.endsWith("/") && resolvedRequestPath.startsWith("/")) {
-      resolvedBasePath = resolvedBasePath.substring(0, resolvedBasePath.length() - 1);
-    }
-
-    if (!resolvedBasePath.endsWith("/") && !resolvedRequestPath.startsWith("/") && !resolvedRequestPath.isEmpty()) {
-      resolvedBasePath += "/";
-    }
-
-    return resolvedBasePath + resolvedRequestPath;
-  }
 }
