@@ -27,7 +27,6 @@ import org.mule.extension.http.internal.request.HttpRequesterProvider;
 import org.mule.extension.http.internal.request.HttpResponseToResult;
 import org.mule.extension.http.internal.request.RequestConnectionParams;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
-import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -39,7 +38,6 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.entity.EmptyHttpEntity;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
@@ -128,9 +126,6 @@ public class HttpConnectivityValidator implements Initialisable, Disposable {
   @Inject
   // It's only used to propagate the initialisation to response validator.
   private MuleContext muleContext;
-
-  @Inject
-  private Registry registry;
 
   public void validate(HttpExtensionClient client, RequestConnectionParams connectionParams)
       throws ExecutionException, InterruptedException, ResponseValidatorTypedException {
