@@ -9,14 +9,16 @@ package org.mule.extension.http.api.request;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
-import static org.apache.commons.io.IOUtils.toInputStream;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.DEFAULT_TAB;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.extension.http.api.KeyValuePair;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
 import org.mule.extension.http.api.request.authentication.UsernamePasswordAuthentication;
+import org.mule.extension.http.api.request.builder.KeyValuePair;
+import org.mule.extension.http.api.request.builder.QueryParam;
+import org.mule.extension.http.api.request.builder.TestHttpHeader;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.request.validator.ResponseValidatorTypedException;
 import org.mule.extension.http.api.request.validator.SuccessStatusCodeValidator;
@@ -25,12 +27,19 @@ import org.mule.extension.http.internal.request.HttpRequesterProvider;
 import org.mule.extension.http.internal.request.HttpResponseToResult;
 import org.mule.extension.http.internal.request.RequestConnectionParams;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
+import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.entity.EmptyHttpEntity;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
@@ -39,6 +48,8 @@ import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.slf4j.Logger;
 
+import javax.inject.Inject;
+import java.io.ByteArrayInputStream;
 import java.net.CookieManager;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -48,57 +59,78 @@ import java.util.concurrent.ExecutionException;
  *
  * @since 1.7
  */
-public class HttpConnectivityValidator {
+public class HttpConnectivityValidator implements Initialisable, Disposable {
 
   private static final Logger LOGGER = getLogger(HttpConnectivityValidator.class);
 
+  /**
+   * Path used in the connectivity test request URI.
+   */
   @Parameter
-  @DisplayName("Request Path")
-  @Placement(tab = DEFAULT_TAB, order = 1)
+  @DisplayName("Test Request Path")
+  @Placement(order = 1)
+  @Expression(NOT_SUPPORTED)
   private String testPath = "/";
 
   /**
-   * HTTP Method for the request to be sent.
+   * HTTP Method for the connectivity test request.
    */
   @Parameter
   @DisplayName("Request HTTP Method")
   @Optional(defaultValue = "GET")
   @Placement(order = 2)
+  @Expression(NOT_SUPPORTED)
   private String testMethod;
 
   /**
-   * The body of the response message
+   * The body in the connectivity test request. It can?t be an expression because it doesn?t make sense in a
+   * connectivity testing context.
    */
   @Parameter
   @DisplayName("Request Body")
   @Optional(defaultValue = "")
   @Placement(order = 3)
+  @Expression(NOT_SUPPORTED)
   private String testBody;
 
   /**
-   * HTTP headers the message should include.
+   * HTTP headers the connectivity test request should include. It allows multiple headers with the same key.
    */
   @Parameter
   @Optional
   @DisplayName("HTTP Headers")
   @Placement(order = 4)
-  private List<KeyValuePair> testHeaders = emptyList();
+  @Expression(NOT_SUPPORTED)
+  private List<TestHttpHeader> testHeaders = emptyList();
 
   /**
-   * Query parameters the request should include.
+   * Query parameters the connectivity test request should include. It allows multiple query params with the same key.
    */
   @Parameter
   @Optional
   @DisplayName("Query Parameters")
   @Placement(order = 5)
-  private List<KeyValuePair> testQueryParams = emptyList();
+  @Expression(NOT_SUPPORTED)
+  private List<QueryParam> testQueryParams = emptyList();
 
+  /**
+   * Validation applied to the connectivity test response.
+   */
   @Parameter
   @Optional
+  @DisplayName("Response Validator")
   @Placement(order = 6)
+  @Expression(NOT_SUPPORTED)
   private ResponseValidator responseValidator;
 
   private SuccessStatusCodeValidator defaultStatusCodeValidator = new SuccessStatusCodeValidator("0..399");
+
+  @Inject
+  // It's only used to propagate the initialisation to response validator.
+  private MuleContext muleContext;
+
+  @Inject
+  private Registry registry;
 
   public void validate(HttpExtensionClient client, RequestConnectionParams connectionParams)
       throws ExecutionException, InterruptedException, ResponseValidatorTypedException {
@@ -137,11 +169,11 @@ public class HttpConnectivityValidator {
     if (testBody == null || testBody.isEmpty()) {
       return new EmptyHttpEntity();
     } else {
-      return new InputStreamHttpEntity(toInputStream(testBody, UTF_8));
+      return new InputStreamHttpEntity(new ByteArrayInputStream(testBody.getBytes(UTF_8)));
     }
   }
 
-  private static MultiMap<String, String> toMultiMap(List<? extends KeyValuePair> asList) {
+  private static MultiMap<String, String> toMultiMap(Iterable<? extends KeyValuePair> asList) {
     MultiMap<String, String> asMultiMap = new MultiMap<>();
     asList.forEach(pair -> asMultiMap.put(pair.getKey(), pair.getValue()));
     return asMultiMap;
@@ -154,6 +186,18 @@ public class HttpConnectivityValidator {
 
   private ResponseValidator getResponseValidator() {
     return responseValidator == null ? defaultStatusCodeValidator : responseValidator;
+  }
+
+  @Override
+  public void dispose() {
+    // Added just for symmetry with initialise.
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    if (responseValidator != null) {
+      initialiseIfNeeded(responseValidator, true, muleContext);
+    }
   }
 
   private static class VoidHttpRequesterCookieConfig implements HttpRequesterCookieConfig {

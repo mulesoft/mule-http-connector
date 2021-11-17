@@ -159,7 +159,8 @@ public class HttpRequester {
 
               HttpEntity entity = response.getEntity();
 
-              Supplier<Object> resultInputStreamSupplier = resultInputStreamSupplier(streamingHelper, entity, authentication);
+              Supplier<Object> resultInputStreamSupplier =
+                  resultInputStreamSupplier(streamingHelper, entity, authentication, responseValidator);
 
               Result<Object, HttpResponseAttributes> result = httpResponseToResult
                   .convert(config, muleContext, response, entity, resultInputStreamSupplier, httpRequest.getUri());
@@ -207,8 +208,9 @@ public class HttpRequester {
   }
 
   private Supplier<Object> resultInputStreamSupplier(StreamingHelper streamingHelper, HttpEntity entity,
-                                                     HttpRequestAuthentication authentication) {
-    if (authentication == null || !authentication.readsAuthenticatedResponseBody()) {
+                                                     HttpRequestAuthentication authentication,
+                                                     ResponseValidator responseValidator) {
+    if (!bodyCanBeConsumed(authentication, responseValidator)) {
       return entity::getContent;
     }
 
@@ -219,6 +221,12 @@ public class HttpRequester {
     }
 
     return () -> (InputStream) resolved;
+  }
+
+  private static boolean bodyCanBeConsumed(HttpRequestAuthentication authentication, ResponseValidator responseValidator) {
+    boolean authCanConsumeBody = authentication != null && authentication.readsAuthenticatedResponseBody();
+    boolean validatorCanConsumeBody = responseValidator != null && responseValidator.mayConsumeBody();
+    return authCanConsumeBody || validatorCanConsumeBody;
   }
 
   private String getExceptionMessage(Throwable t) {

@@ -4,9 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.http.api;
-
-import org.mule.runtime.extension.api.annotation.param.Parameter;
+package org.mule.extension.http.api.request.builder;
 
 /**
  * A single two-strings pair used for key-values used in contexts where using expressions for building maps doesn't
@@ -14,19 +12,9 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
  *
  * @since 1.7
  */
-public class KeyValuePair {
+public interface KeyValuePair {
 
-  @Parameter
-  private String key;
+  String getKey();
 
-  @Parameter
-  private String value;
-
-  public String getKey() {
-    return key;
-  }
-
-  public String getValue() {
-    return value;
-  }
+  String getValue();
 }

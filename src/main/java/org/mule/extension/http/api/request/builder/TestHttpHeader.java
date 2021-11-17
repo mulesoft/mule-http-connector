@@ -16,8 +16,8 @@ import java.util.Objects;
  *
  * @since 1.1
  */
-@Alias("defaultHeader")
-public class RequestHeader implements KeyValuePair {
+@Alias("testHeader")
+public class TestHttpHeader implements KeyValuePair {
 
   @Parameter
   private String key;
@@ -43,14 +43,12 @@ public class RequestHeader implements KeyValuePair {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    RequestHeader that = (RequestHeader) o;
-    return Objects.equals(key, that.key) &&
-        Objects.equals(value, that.value);
+    TestHttpHeader that = (TestHttpHeader) o;
+    return Objects.equals(key, that.key) && Objects.equals(value, that.value);
   }
 
   @Override
   public int hashCode() {
     return Objects.hash(key, value);
   }
-
 }

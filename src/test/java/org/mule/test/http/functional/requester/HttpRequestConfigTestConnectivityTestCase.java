@@ -32,6 +32,7 @@ import org.mule.extension.http.internal.request.client.HttpExtensionClient;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
@@ -153,6 +154,48 @@ public class HttpRequestConfigTestConnectivityTestCase extends AbstractHttpExten
     List<String> queryParamsForKey2 = validationRequest.getQueryParams().getAll("Key2");
     assertThat(queryParamsForKey2.size(), is(1));
     assertThat(queryParamsForKey2.contains("Value2"), is(true));
+  }
+
+  @Test
+  public void expressionResponseValidatorTrue() throws MuleException {
+    // Given a request config with an expression response validator evaluating to true.
+    ConnectionProvider connectionProvider = getConnectionProvider("requestConfigWithCustomResponseValidatorEvaluatingToTrue");
+
+    // When we execute a validation.
+    int irrelevantStatusCode = 200;
+    HttpExtensionClient connection = mockConnection(irrelevantStatusCode);
+    ConnectionValidationResult validationResult = connectionProvider.validate(connection);
+
+    // Then the validation is successful.
+    assertThat(validationResult.isValid(), is(true));
+  }
+
+  @Test
+  public void expressionResponseValidatorFalse() throws MuleException {
+    // Given a request config with an expression response validator evaluating to false.
+    ConnectionProvider connectionProvider = getConnectionProvider("requestConfigWithCustomResponseValidatorEvaluatingToFalse");
+
+    // When we execute a validation.
+    int irrelevantStatusCode = 200;
+    HttpExtensionClient connection = mockConnection(irrelevantStatusCode);
+    ConnectionValidationResult validationResult = connectionProvider.validate(connection);
+
+    // Then the validation fails.
+    assertThat(validationResult.isValid(), is(false));
+  }
+
+  @Test
+  public void expressionResponseValidatorUsingBindings() throws MuleException {
+    // Given a request config with an expression response validator evaluating to false.
+    ConnectionProvider connectionProvider = getConnectionProvider("requestConfigWithCustomResponseValidatorUsingAllBindings");
+
+    // When we execute a validation.
+    int irrelevantStatusCode = 200;
+    HttpExtensionClient connection = mockConnection(irrelevantStatusCode);
+    ConnectionValidationResult validationResult = connectionProvider.validate(connection);
+
+    // Then the validation fails.
+    assertThat(validationResult.isValid(), is(true));
   }
 
   private ConnectionProvider getConnectionProvider(String configName) throws MuleException {

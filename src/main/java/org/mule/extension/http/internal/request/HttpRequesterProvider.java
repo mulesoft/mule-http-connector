@@ -110,6 +110,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
 
   @Parameter
   @Optional
+  @Expression(NOT_SUPPORTED)
   @Placement(tab = "Test Connection")
   private HttpConnectivityValidator testConnection;
 
@@ -156,6 +157,9 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
     }
     if (authentication != null) {
       initialiseIfNeeded(authentication, true, muleContext);
+    }
+    if (testConnection != null) {
+      initialiseIfNeeded(testConnection, true, muleContext);
     }
 
     verifyConnectionsParameters();
