@@ -6,6 +6,8 @@
  */
 package org.mule.test.http.internal.request;
 
+import static java.lang.Thread.sleep;
+import static java.util.concurrent.Executors.newFixedThreadPool;
 import static org.mule.tck.junit4.matcher.IsEmptyOptional.empty;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.hamcrest.Matchers.is;
@@ -19,7 +21,9 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.slf4j.LoggerFactory.getLogger;
 
+import io.qameta.allure.Issue;
 import org.mule.extension.http.internal.request.HttpRequesterConnectionManager;
 import org.mule.extension.http.internal.request.HttpRequesterConnectionManager.ShareableHttpClient;
 import org.mule.runtime.http.api.HttpService;
@@ -36,10 +40,24 @@ import org.mockito.Mockito;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.slf4j.Logger;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
 
 @Feature(HTTP_EXTENSION)
 @Story("HTTP Request")
 public class HttpRequesterConnectionManagerTestCase extends AbstractMuleTestCase {
+
+  private final Logger LOGGER = getLogger(HttpRequesterConnectionManagerTestCase.class);
 
   private static final String CONFIG_NAME = "config";
 
@@ -51,12 +69,17 @@ public class HttpRequesterConnectionManagerTestCase extends AbstractMuleTestCase
   private HttpClient otherHttpClient = spy(HttpClient.class);
   private HttpRequesterConnectionManager connectionManager = new HttpRequesterConnectionManager(httpService);
 
+  private AtomicBoolean clientFactoryIsSlow = new AtomicBoolean(false);
+
   @Before
   public void setUp() {
     HttpClientFactory httpClientFactory = mock(HttpClientFactory.class);
     when(httpService.getClientFactory()).thenReturn(httpClientFactory);
     when(httpClientFactory.create(any())).thenAnswer(
                                                      invocation -> {
+                                                       if (clientFactoryIsSlow.get()) {
+                                                         sleep(500L);
+                                                       }
                                                        HttpClientConfiguration configuration =
                                                            (HttpClientConfiguration) invocation.getArguments()[0];
                                                        if (CONFIG_NAME.equals(configuration.getName())) {
@@ -129,6 +152,58 @@ public class HttpRequesterConnectionManagerTestCase extends AbstractMuleTestCase
     }
     client.start();
     verify(delegateHttpClient, Mockito.times(2)).start();
+  }
+
+  @Test
+  @Issue("HTTPC-142")
+  public void noExceptionIsRaisedWhenUsingLookupOrCreate() throws Exception {
+    boolean someExceptionWasCaught = executeSeveralGetOrCreateConcurrentlyAndCheckIfAnExceptionOccurs(this::getOrCreateClient);
+    assertThat(someExceptionWasCaught, is(false));
+  }
+
+  @Test
+  @Issue("HTTPC-142")
+  public void exceptionMayBeRaisedWhenUsingOldLookupAndCreateCombination() throws Exception {
+    boolean someExceptionWasCaught = executeSeveralGetOrCreateConcurrentlyAndCheckIfAnExceptionOccurs(this::getOrCreateClientOld);
+    assertThat(someExceptionWasCaught, is(true));
+  }
+
+  private boolean executeSeveralGetOrCreateConcurrentlyAndCheckIfAnExceptionOccurs(BiFunction<String, Supplier<? extends HttpClientConfiguration>, ShareableHttpClient> getOrCreateCallback)
+      throws InterruptedException, ExecutionException {
+    // Given a slow client factory.
+    clientFactoryIsSlow.set(true);
+
+    // When we try to getOrCreate clients concurrently
+    int poolSize = 10;
+    ExecutorService executorService = newFixedThreadPool(poolSize);
+    AtomicBoolean someExceptionWasCaught = new AtomicBoolean(false);
+    Collection<Future<?>> futures = new ArrayList<>(poolSize);
+    for (int i = 0; i < poolSize; ++i) {
+      futures.add(executorService.submit(() -> {
+        try {
+          getOrCreateCallback.apply(CONFIG_NAME, () -> getHttpClientConfiguration(CONFIG_NAME));
+        } catch (IllegalArgumentException e) {
+          LOGGER.error("Exception caught", e);
+          someExceptionWasCaught.set(true);
+        }
+      }));
+    }
+
+    for (Future<?> future : futures) {
+      future.get();
+    }
+
+    // The "then" part should be checked in the caller.
+    return someExceptionWasCaught.get();
+  }
+
+  private ShareableHttpClient getOrCreateClientOld(String configName,
+                                                   Supplier<? extends HttpClientConfiguration> configSupplier) {
+    return connectionManager.lookup(configName).orElseGet(() -> connectionManager.create(configName, configSupplier.get()));
+  }
+
+  private ShareableHttpClient getOrCreateClient(String configName, Supplier<? extends HttpClientConfiguration> configSupplier) {
+    return connectionManager.lookupOrCreate(configName, configSupplier);
   }
 
   private HttpClientConfiguration getHttpClientConfiguration(String configName) {

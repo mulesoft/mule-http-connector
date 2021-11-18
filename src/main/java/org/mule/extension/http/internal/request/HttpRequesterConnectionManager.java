@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
@@ -48,7 +49,9 @@ public class HttpRequesterConnectionManager implements Disposable {
    *
    * @param configName the name of the client to look for
    * @return an {@link Optional} with an {@link ShareableHttpClient} if found or an empty one otherwise
+   * @deprecated use {@link #lookupOrCreate} instead.
    */
+  @Deprecated
   public Optional<ShareableHttpClient> lookup(String configName) {
     return ofNullable(clients.get(configName));
   }
@@ -60,12 +63,28 @@ public class HttpRequesterConnectionManager implements Disposable {
    * @param configName
    * @param clientConfiguration
    * @return
+   * @deprecated use {@link #lookupOrCreate} instead.
    */
+  @Deprecated
   public synchronized ShareableHttpClient create(String configName, HttpClientConfiguration clientConfiguration) {
     checkArgument(!clients.containsKey(configName), format("There's an HttpClient available for %s already.", configName));
     ShareableHttpClient client = new ShareableHttpClient(httpService.getClientFactory().create(clientConfiguration));
     clients.put(configName, client);
     return client;
+  }
+
+  /**
+   * Searches for an already existing {@link ShareableHttpClient} associated with the desired configuration name.
+   * If there isn't a {@link ShareableHttpClient} present, it creates an {@link ShareableHttpClient}.
+   *
+   * @param configName the name of the client to look for.
+   * @param configSupplier a supplier from {@link HttpClientConfiguration}. It's only utilised if a new {@link ShareableHttpClient} is created.
+   * @return the corresponding {@link ShareableHttpClient} if found or a new {@link ShareableHttpClient} otherwise.
+   */
+  public synchronized ShareableHttpClient lookupOrCreate(String configName,
+                                                         Supplier<? extends HttpClientConfiguration> configSupplier) {
+    return clients.computeIfAbsent(configName,
+                                   name -> new ShareableHttpClient(httpService.getClientFactory().create(configSupplier.get())));
   }
 
   @Override
@@ -88,7 +107,7 @@ public class HttpRequesterConnectionManager implements Disposable {
    * Wrapper implementation of an {@link HttpClient} that allows being shared by only configuring the client when first required
    * and only disabling it when last required.
    */
-  public class ShareableHttpClient {
+  public static class ShareableHttpClient {
 
     private HttpClient delegate;
     private Integer usageCount = new Integer(0);
