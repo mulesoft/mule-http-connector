@@ -78,7 +78,7 @@ public class HttpConnectivityValidator implements Initialisable, Disposable {
   @Optional(defaultValue = "GET")
   @Placement(order = 2)
   @Expression(NOT_SUPPORTED)
-  private String testMethod;
+  private String testMethod = "GET";
 
   /**
    * The body in the connectivity test request. It can?t be an expression because it doesn?t make sense in a
@@ -89,7 +89,7 @@ public class HttpConnectivityValidator implements Initialisable, Disposable {
   @Optional(defaultValue = "")
   @Placement(order = 3)
   @Expression(NOT_SUPPORTED)
-  private String testBody;
+  private String testBody = "";
 
   /**
    * HTTP headers the connectivity test request should include. It allows multiple headers with the same key.
@@ -121,6 +121,22 @@ public class HttpConnectivityValidator implements Initialisable, Disposable {
   @Expression(NOT_SUPPORTED)
   private ResponseValidator responseValidator;
 
+  /**
+   * Specifies whether to follow redirects or not.
+   */
+  @Parameter
+  @Optional(defaultValue = "false")
+  @Placement(order = 7)
+  private boolean followRedirects = false;
+
+  /**
+   * Maximum time that the request element will block the execution of the flow waiting for the HTTP response.
+   */
+  @Parameter
+  @Optional(defaultValue = "10")
+  @Placement(order = 8)
+  private Integer responseTimeout = 10;
+
   private SuccessStatusCodeValidator defaultStatusCodeValidator = new SuccessStatusCodeValidator("0..399");
 
   @Inject
@@ -141,12 +157,11 @@ public class HttpConnectivityValidator implements Initialisable, Disposable {
   private Result<Object, HttpResponseAttributes> sendRequest(HttpExtensionClient client, HttpRequest request)
       throws InterruptedException, ExecutionException {
     HttpResponse response =
-        client.send(request, 999999, false, resolveAuthentication(client)).get();
+        client.send(request, responseTimeout.intValue(), followRedirects, resolveAuthentication(client)).get();
 
-    Result<Object, HttpResponseAttributes> result = new HttpResponseToResult()
-        .convert(new VoidHttpRequesterCookieConfig(), null, response, response.getEntity(), response.getEntity()::getContent,
+    return new HttpResponseToResult()
+        .convert(new VoidHttpRequesterCookieConfig(), muleContext, response, response.getEntity(), response.getEntity()::getContent,
                  request.getUri());
-    return result;
   }
 
   private HttpRequest buildTestRequest(RequestConnectionParams connectionParams) {

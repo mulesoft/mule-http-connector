@@ -13,7 +13,6 @@
     <flow name="repeatableStreamingFlow">
         <http:request config-ref="simpleConfig" path="testPath" responseTimeout="500" >
             <http:response-validator>
-<!--                <http:success-status-code-validator values="200"/>-->
                 <http:expression-response-validator expression="#[message.payload as String == '&lt;h1&gt;Response&lt;/h1&gt;']" />
             </http:response-validator>
         </http:request>

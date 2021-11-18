@@ -15,8 +15,6 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
@@ -32,7 +30,6 @@ import org.mule.extension.http.internal.request.client.HttpExtensionClient;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
@@ -111,7 +108,9 @@ public class HttpRequestConfigTestConnectivityTestCase extends AbstractHttpExten
     // When we execute a validation.
     int irrelevantStatusCode = 200;
     ArgumentCaptor<HttpRequest> requestArgumentCaptor = forClass(HttpRequest.class);
-    HttpExtensionClient connection = mockConnection(irrelevantStatusCode, requestArgumentCaptor);
+    ArgumentCaptor<Integer> responseTimeoutArgumentCaptor = forClass(Integer.class);
+    ArgumentCaptor<Boolean> followRedirectsArgumentCaptor = forClass(Boolean.class);
+    HttpExtensionClient connection = mockConnection(irrelevantStatusCode, requestArgumentCaptor, responseTimeoutArgumentCaptor, followRedirectsArgumentCaptor);
     connectionProvider.validate(connection);
 
     // Then the request optional parameter have the default values.
@@ -122,6 +121,9 @@ public class HttpRequestConfigTestConnectivityTestCase extends AbstractHttpExten
     assertThat(validationRequest.getMethod(), is("GET"));
     assertThat(validationRequest.getHeaders().isEmpty(), is(true));
     assertThat(validationRequest.getQueryParams().isEmpty(), is(true));
+
+    assertThat(responseTimeoutArgumentCaptor.getValue(), is(10));
+    assertThat(followRedirectsArgumentCaptor.getValue(), is(false));
   }
 
   @Test
@@ -132,7 +134,9 @@ public class HttpRequestConfigTestConnectivityTestCase extends AbstractHttpExten
     // When we execute a validation.
     int irrelevantStatusCode = 200;
     ArgumentCaptor<HttpRequest> requestArgumentCaptor = forClass(HttpRequest.class);
-    HttpExtensionClient connection = mockConnection(irrelevantStatusCode, requestArgumentCaptor);
+    ArgumentCaptor<Integer> responseTimeoutArgumentCaptor = forClass(Integer.class);
+    ArgumentCaptor<Boolean> followRedirectsArgumentCaptor = forClass(Boolean.class);
+    HttpExtensionClient connection = mockConnection(irrelevantStatusCode, requestArgumentCaptor, responseTimeoutArgumentCaptor, followRedirectsArgumentCaptor);
     connectionProvider.validate(connection);
 
     // Then the request optional parameters have the configured values.
@@ -154,6 +158,9 @@ public class HttpRequestConfigTestConnectivityTestCase extends AbstractHttpExten
     List<String> queryParamsForKey2 = validationRequest.getQueryParams().getAll("Key2");
     assertThat(queryParamsForKey2.size(), is(1));
     assertThat(queryParamsForKey2.contains("Value2"), is(true));
+
+    assertThat(responseTimeoutArgumentCaptor.getValue(), is(30));
+    assertThat(followRedirectsArgumentCaptor.getValue(), is(true));
   }
 
   @Test
@@ -208,11 +215,21 @@ public class HttpRequestConfigTestConnectivityTestCase extends AbstractHttpExten
     return mockConnection(responseStatusCode, requestArgumentCaptor);
   }
 
-  private HttpExtensionClient mockConnection(int responseStatusCode, ArgumentCaptor<HttpRequest> requestArgumentCaptor) {
+  private HttpExtensionClient mockConnection(int responseStatusCode, ArgumentCaptor<? extends HttpRequest> requestArgumentCaptor) {
+    ArgumentCaptor<Integer> responseTimeoutArgumentCaptor = forClass(Integer.class);
+    return mockConnection(responseStatusCode, requestArgumentCaptor, responseTimeoutArgumentCaptor);
+  }
+
+  private HttpExtensionClient mockConnection(int responseStatusCode, ArgumentCaptor<? extends HttpRequest> requestArgumentCaptor, ArgumentCaptor<Integer> responseTimeoutArgumentCaptor) {
+    ArgumentCaptor<Boolean> followRedirectsArgumentCaptor = forClass(Boolean.class);
+    return mockConnection(responseStatusCode, requestArgumentCaptor, responseTimeoutArgumentCaptor, followRedirectsArgumentCaptor);
+  }
+
+  private HttpExtensionClient mockConnection(int responseStatusCode, ArgumentCaptor<? extends HttpRequest> requestArgumentCaptor, ArgumentCaptor<Integer> responseTimeoutArgumentCaptor, ArgumentCaptor<Boolean> followRedirectsArgumentCaptor) {
     HttpExtensionClient client = mock(HttpExtensionClient.class);
     HttpResponse httpResponse = mockResponse(responseStatusCode);
-    when(client.send(requestArgumentCaptor.capture(), anyInt(), anyBoolean(), any(HttpAuthentication.class)))
-        .thenReturn(completedFuture(httpResponse));
+    when(client.send(requestArgumentCaptor.capture(), responseTimeoutArgumentCaptor.capture(), followRedirectsArgumentCaptor.capture(), any(HttpAuthentication.class)))
+            .thenReturn(completedFuture(httpResponse));
     return client;
   }
 

@@ -18,7 +18,7 @@
 
     <http:request-config name="requestConfigWithTheOptionalParameters">
         <http:request-connection protocol="HTTP" host="localhost" port="${unusedPort}" >
-            <http:test-connection testPath="/post" testMethod="POST" testBody="The Body">
+            <http:test-connection testPath="/post" testMethod="POST" testBody="The Body" responseTimeout="30" followRedirects="true">
                 <http:test-headers>
                     <http:test-header key="Key" value="Value1" />
                     <http:test-header key="Key" value="Value2" />
