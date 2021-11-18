@@ -110,7 +110,8 @@ public class HttpRequestConfigTestConnectivityTestCase extends AbstractHttpExten
     ArgumentCaptor<HttpRequest> requestArgumentCaptor = forClass(HttpRequest.class);
     ArgumentCaptor<Integer> responseTimeoutArgumentCaptor = forClass(Integer.class);
     ArgumentCaptor<Boolean> followRedirectsArgumentCaptor = forClass(Boolean.class);
-    HttpExtensionClient connection = mockConnection(irrelevantStatusCode, requestArgumentCaptor, responseTimeoutArgumentCaptor, followRedirectsArgumentCaptor);
+    HttpExtensionClient connection =
+        mockConnection(irrelevantStatusCode, requestArgumentCaptor, responseTimeoutArgumentCaptor, followRedirectsArgumentCaptor);
     connectionProvider.validate(connection);
 
     // Then the request optional parameter have the default values.
@@ -136,7 +137,8 @@ public class HttpRequestConfigTestConnectivityTestCase extends AbstractHttpExten
     ArgumentCaptor<HttpRequest> requestArgumentCaptor = forClass(HttpRequest.class);
     ArgumentCaptor<Integer> responseTimeoutArgumentCaptor = forClass(Integer.class);
     ArgumentCaptor<Boolean> followRedirectsArgumentCaptor = forClass(Boolean.class);
-    HttpExtensionClient connection = mockConnection(irrelevantStatusCode, requestArgumentCaptor, responseTimeoutArgumentCaptor, followRedirectsArgumentCaptor);
+    HttpExtensionClient connection =
+        mockConnection(irrelevantStatusCode, requestArgumentCaptor, responseTimeoutArgumentCaptor, followRedirectsArgumentCaptor);
     connectionProvider.validate(connection);
 
     // Then the request optional parameters have the configured values.
@@ -215,21 +217,27 @@ public class HttpRequestConfigTestConnectivityTestCase extends AbstractHttpExten
     return mockConnection(responseStatusCode, requestArgumentCaptor);
   }
 
-  private HttpExtensionClient mockConnection(int responseStatusCode, ArgumentCaptor<? extends HttpRequest> requestArgumentCaptor) {
+  private HttpExtensionClient mockConnection(int responseStatusCode,
+                                             ArgumentCaptor<? extends HttpRequest> requestArgumentCaptor) {
     ArgumentCaptor<Integer> responseTimeoutArgumentCaptor = forClass(Integer.class);
     return mockConnection(responseStatusCode, requestArgumentCaptor, responseTimeoutArgumentCaptor);
   }
 
-  private HttpExtensionClient mockConnection(int responseStatusCode, ArgumentCaptor<? extends HttpRequest> requestArgumentCaptor, ArgumentCaptor<Integer> responseTimeoutArgumentCaptor) {
+  private HttpExtensionClient mockConnection(int responseStatusCode, ArgumentCaptor<? extends HttpRequest> requestArgumentCaptor,
+                                             ArgumentCaptor<Integer> responseTimeoutArgumentCaptor) {
     ArgumentCaptor<Boolean> followRedirectsArgumentCaptor = forClass(Boolean.class);
-    return mockConnection(responseStatusCode, requestArgumentCaptor, responseTimeoutArgumentCaptor, followRedirectsArgumentCaptor);
+    return mockConnection(responseStatusCode, requestArgumentCaptor, responseTimeoutArgumentCaptor,
+                          followRedirectsArgumentCaptor);
   }
 
-  private HttpExtensionClient mockConnection(int responseStatusCode, ArgumentCaptor<? extends HttpRequest> requestArgumentCaptor, ArgumentCaptor<Integer> responseTimeoutArgumentCaptor, ArgumentCaptor<Boolean> followRedirectsArgumentCaptor) {
+  private HttpExtensionClient mockConnection(int responseStatusCode, ArgumentCaptor<? extends HttpRequest> requestArgumentCaptor,
+                                             ArgumentCaptor<Integer> responseTimeoutArgumentCaptor,
+                                             ArgumentCaptor<Boolean> followRedirectsArgumentCaptor) {
     HttpExtensionClient client = mock(HttpExtensionClient.class);
     HttpResponse httpResponse = mockResponse(responseStatusCode);
-    when(client.send(requestArgumentCaptor.capture(), responseTimeoutArgumentCaptor.capture(), followRedirectsArgumentCaptor.capture(), any(HttpAuthentication.class)))
-            .thenReturn(completedFuture(httpResponse));
+    when(client.send(requestArgumentCaptor.capture(), responseTimeoutArgumentCaptor.capture(),
+                     followRedirectsArgumentCaptor.capture(), any(HttpAuthentication.class)))
+                         .thenReturn(completedFuture(httpResponse));
     return client;
   }
 

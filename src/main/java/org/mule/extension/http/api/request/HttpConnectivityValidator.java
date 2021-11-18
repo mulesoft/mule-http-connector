@@ -160,7 +160,8 @@ public class HttpConnectivityValidator implements Initialisable, Disposable {
         client.send(request, responseTimeout.intValue(), followRedirects, resolveAuthentication(client)).get();
 
     return new HttpResponseToResult()
-        .convert(new VoidHttpRequesterCookieConfig(), muleContext, response, response.getEntity(), response.getEntity()::getContent,
+        .convert(new VoidHttpRequesterCookieConfig(), muleContext, response, response.getEntity(),
+                 response.getEntity()::getContent,
                  request.getUri());
   }
 
