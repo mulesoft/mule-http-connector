@@ -163,27 +163,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
 
   @Override
   public HttpExtensionClient connect() throws ConnectionException {
-    ShareableHttpClient httpClient;
-    java.util.Optional<ShareableHttpClient> client = connectionManager.lookup(getConfigurationId());
-    if (client.isPresent()) {
-      httpClient = client.get();
-    } else {
-      String name = format(NAME_PATTERN, configName);
-
-      HttpClientConfiguration configuration = new HttpClientConfiguration.Builder()
-          .setTlsContextFactory(tlsContext)
-          .setProxyConfig(proxyConfig)
-          .setClientSocketProperties(buildTcpProperties(connectionParams.getClientSocketProperties()))
-          .setMaxConnections(connectionParams.getMaxConnections())
-          .setUsePersistentConnections(connectionParams.getUsePersistentConnections())
-          .setConnectionIdleTimeout(connectionParams.getConnectionIdleTimeout())
-          .setStreaming(connectionParams.getStreamResponse())
-          .setResponseBufferSize(connectionParams.getResponseBufferSize())
-          .setName(name)
-          .build();
-
-      httpClient = connectionManager.create(getConfigurationId(), configuration);
-    }
+    ShareableHttpClient httpClient = connectionManager.lookupOrCreate(getConfigurationId(), this::getHttpClientConfiguration);
     UriParameters uriParameters = new DefaultUriParameters(connectionParams.getProtocol(), connectionParams.getHost(),
                                                            connectionParams.getPort());
     HttpExtensionClient extensionClient = new HttpExtensionClient(httpClient, uriParameters, authentication);
@@ -194,6 +174,23 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
     }
 
     return extensionClient;
+  }
+
+  private HttpClientConfiguration getHttpClientConfiguration() {
+    String name = format(NAME_PATTERN, configName);
+
+    HttpClientConfiguration configuration = new HttpClientConfiguration.Builder()
+        .setTlsContextFactory(tlsContext)
+        .setProxyConfig(proxyConfig)
+        .setClientSocketProperties(buildTcpProperties(connectionParams.getClientSocketProperties()))
+        .setMaxConnections(connectionParams.getMaxConnections())
+        .setUsePersistentConnections(connectionParams.getUsePersistentConnections())
+        .setConnectionIdleTimeout(connectionParams.getConnectionIdleTimeout())
+        .setStreaming(connectionParams.getStreamResponse())
+        .setResponseBufferSize(connectionParams.getResponseBufferSize())
+        .setName(name)
+        .build();
+    return configuration;
   }
 
   private String getConfigurationId() {
