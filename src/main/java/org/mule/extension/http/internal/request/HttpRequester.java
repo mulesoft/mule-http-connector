@@ -7,6 +7,7 @@
 package org.mule.extension.http.internal.request;
 
 import static java.lang.Boolean.getBoolean;
+import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Integer.getInteger;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
@@ -82,6 +83,7 @@ public class HttpRequester {
 
   private static final Logger logger = LoggerFactory.getLogger(HttpRequester.class);
 
+  private static final int WAIT_FOR_EVER = MAX_VALUE;
   private static int RETRY_ATTEMPTS = getInteger(RETRY_ATTEMPTS_PROPERTY, DEFAULT_RETRY_ATTEMPTS);
   private static boolean RETRY_ON_ALL_METHODS = getBoolean(RETRY_ON_ALL_METHODS_PROPERTY);
 
@@ -120,16 +122,26 @@ public class HttpRequester {
     this.profilingDataProducer = ofNullable(profilingDataProducer);
   }
 
+  private int resolveResponseTimeout(MuleContext muleContext, Integer responseTimeout) {
+    if (muleContext.getConfiguration().isDisableTimeouts()) {
+      return WAIT_FOR_EVER;
+    } else {
+      return responseTimeout != null ? responseTimeout : muleContext.getConfiguration().getDefaultResponseTimeout();
+    }
+  }
+
   public void doRequest(HttpExtensionClient client, HttpRequesterConfig config, String uri, String method,
                         HttpStreamingType streamingMode, HttpSendBodyMode sendBodyMode,
                         boolean followRedirects, HttpRequestAuthentication authentication,
-                        int responseTimeout, ResponseValidator responseValidator,
+                        Integer responseTimeout, ResponseValidator responseValidator,
                         TransformationService transformationService, HttpRequesterRequestBuilder requestBuilder,
                         boolean checkRetry, MuleContext muleContext, Scheduler scheduler, NotificationEmitter notificationEmitter,
                         StreamingHelper streamingHelper, CompletionCallback<InputStream, HttpResponseAttributes> callback,
                         Map<String, List<String>> injectedHeaders,
                         String correlationId) {
-    doRequestWithRetry(client, config, uri, method, streamingMode, sendBodyMode, followRedirects, authentication, responseTimeout,
+
+    int resolvedTimeout = resolveResponseTimeout(muleContext, responseTimeout);
+    doRequestWithRetry(client, config, uri, method, streamingMode, sendBodyMode, followRedirects, authentication, resolvedTimeout,
                        responseValidator, transformationService, requestBuilder, checkRetry, muleContext, scheduler,
                        notificationEmitter, streamingHelper, callback,
                        httpRequestFactory.create(config, uri, method, streamingMode, sendBodyMode, transformationService,
@@ -208,7 +220,8 @@ public class HttpRequester {
 
   private Supplier<Object> resultInputStreamSupplier(StreamingHelper streamingHelper, HttpEntity entity,
                                                      HttpRequestAuthentication authentication) {
-    if (authentication == null || !authentication.readsAuthenticatedResponseBody()) {
+    // TODO: Add test with streamingHelper = null when Polling Source is added (HTTP-166)
+    if (authentication == null || !authentication.readsAuthenticatedResponseBody() || streamingHelper == null) {
       return entity::getContent;
     }
 
@@ -244,17 +257,21 @@ public class HttpRequester {
 
   private void fireNotification(NotificationEmitter notificationEmitter, NotificationActionDefinition action,
                                 Supplier<?> data, DataType dataType) {
-    if (fireNotificationMethod != null) {
-      try {
-        fireNotificationMethod.invoke(notificationEmitter, action, data, dataType);
-      } catch (InvocationTargetException e) {
-        throw new MuleRuntimeException(e.getCause());
-      } catch (IllegalAccessException | IllegalArgumentException e) {
-        notificationEmitter.fire(action, new TypedValue(data.get(), dataType));
-      }
-    } else {
+    if (notificationEmitter == null) {
+      return;
+    }
+    if (fireNotificationMethod == null) {
+      notificationEmitter.fire(action, new TypedValue(data.get(), dataType));
+      return;
+    }
+    try {
+      fireNotificationMethod.invoke(notificationEmitter, action, data, dataType);
+    } catch (InvocationTargetException e) {
+      throw new MuleRuntimeException(e.getCause());
+    } catch (IllegalAccessException | IllegalArgumentException e) {
       notificationEmitter.fire(action, new TypedValue(data.get(), dataType));
     }
+
   }
 
   private String getErrorMessage(HttpRequest httpRequest) {
