@@ -14,30 +14,24 @@ import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST;
 import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE;
 import static org.mule.extension.http.internal.request.UriUtils.buildPath;
 import static org.mule.extension.http.internal.request.UriUtils.resolveUri;
+import static org.mule.extension.http.internal.request.HttpRequestUtils.createHttpRequester;
+import static org.mule.extension.http.internal.request.HttpRequestUtils.handleCursor;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.extension.http.api.error.HttpErrorMessageGenerator;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.request.validator.SuccessStatusCodeValidator;
 import org.mule.extension.http.internal.HttpMetadataResolver;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
-import org.mule.extension.http.internal.request.profiling.HttpProfilingServiceAdaptor;
-import org.mule.extension.http.internal.request.profiling.HttpRequestResponseProfilingDataProducerAdaptor;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
-import org.mule.runtime.api.streaming.Cursor;
-import org.mule.runtime.api.streaming.CursorProvider;
-import org.mule.runtime.api.streaming.bytes.CursorStream;
-import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.Streaming;
@@ -136,49 +130,18 @@ public class HttpRequestOperations implements Initialisable, Disposable {
         resolvedUri = resolvedBuilder.replaceUriParams(uriSettings.getUrl());
       }
 
-      int resolvedTimeout = resolveResponseTimeout(overrides.getResponseTimeout());
       ResponseValidator responseValidator = responseValidationSettings.getResponseValidator();
       responseValidator = responseValidator != null ? responseValidator : defaultStatusCodeValidator;
 
       LOGGER.debug("Sending '{}' request to '{}'.", method, resolvedUri);
       httpRequester.doRequest(client, config, resolvedUri, method, overrides.getRequestStreamingMode(),
                               overrides.getSendBodyMode(),
-                              overrides.getFollowRedirects(), client.getDefaultAuthentication(), resolvedTimeout,
-                              responseValidator,
-                              transformationService, resolvedBuilder, true, muleContext, scheduler, notificationEmitter,
-                              streamingHelper, callback, injectedHeaders, correlationInfo.getCorrelationId());
+                              overrides.getFollowRedirects(), client.getDefaultAuthentication(), overrides.getResponseTimeout(),
+                              responseValidator, transformationService, resolvedBuilder, true, muleContext, scheduler,
+                              notificationEmitter, streamingHelper, callback, injectedHeaders,
+                              correlationInfo.getCorrelationId());
     } catch (Throwable t) {
       callback.error(t instanceof Exception ? (Exception) t : new DefaultMuleException(t));
-    }
-  }
-
-  /**
-   * If the body is a {@link Cursor}, we need to change it for the {@link CursorProvider} to re-read the content in the case we
-   * need to make a retry of a request.
-   */
-  protected void handleCursor(HttpRequesterRequestBuilder resolvedBuilder) {
-    if (resolvedBuilder.getBody().getValue() instanceof CursorStream) {
-      CursorStream cursor = (CursorStream) (resolvedBuilder.getBody().getValue());
-
-      long position = cursor.getPosition();
-      CursorStreamProvider provider = (CursorStreamProvider) cursor.getProvider();
-
-      if (position == 0) {
-        resolvedBuilder.setBody(new TypedValue<Object>(provider, resolvedBuilder.getBody().getDataType(),
-                                                       resolvedBuilder.getBody().getByteLength()));
-      } else {
-        resolvedBuilder.setBody(new TypedValue<Object>(new OffsetCursorProviderWrapper(provider, position),
-                                                       resolvedBuilder.getBody().getDataType(),
-                                                       resolvedBuilder.getBody().getByteLength()));
-      }
-    }
-  }
-
-  private int resolveResponseTimeout(Integer responseTimeout) {
-    if (muleContext.getConfiguration().isDisableTimeouts()) {
-      return WAIT_FOR_EVER;
-    } else {
-      return responseTimeout != null ? responseTimeout : muleContext.getConfiguration().getDefaultResponseTimeout();
     }
   }
 
@@ -194,26 +157,11 @@ public class HttpRequestOperations implements Initialisable, Disposable {
   }
 
   private void initializeHttpRequester() throws InitialisationException {
-
     try {
-      httpRequester = new HttpRequester(new HttpRequestFactory(), new HttpResponseToResult(), new HttpErrorMessageGenerator(),
-                                        getProfilingDataProducer());
+      httpRequester = createHttpRequester(httpResponseProfilingEnabled, muleContext);
     } catch (MuleException e) {
       throw new InitialisationException(e, this);
     }
-  }
-
-  private HttpRequestResponseProfilingDataProducerAdaptor getProfilingDataProducer() throws MuleException {
-    if (!httpResponseProfilingEnabled) {
-      return null;
-    }
-
-    HttpProfilingServiceAdaptor profilingServiceAdaptor = new HttpProfilingServiceAdaptor();
-
-    // Manually inject the profiling service
-    muleContext.getInjector().inject(profilingServiceAdaptor);
-
-    return profilingServiceAdaptor.getProfilingHttpRequestDataProducer();
   }
 
   @Override
