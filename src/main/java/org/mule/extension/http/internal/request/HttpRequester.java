@@ -220,6 +220,7 @@ public class HttpRequester {
 
   private Supplier<Object> resultInputStreamSupplier(StreamingHelper streamingHelper, HttpEntity entity,
                                                      HttpRequestAuthentication authentication) {
+    // TODO: Add test with streamingHelper = null when Polling Source is added (HTTP-166)
     if (authentication == null || !authentication.readsAuthenticatedResponseBody() || streamingHelper == null) {
       return entity::getContent;
     }
