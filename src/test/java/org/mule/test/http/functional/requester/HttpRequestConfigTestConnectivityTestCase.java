@@ -60,7 +60,7 @@ public class HttpRequestConfigTestConnectivityTestCase extends AbstractHttpExten
   @Test
   // This test ensures that old applications which don't configure this new feature will deploy without problems.
   public void whenNoTestConnectionIsPresentTheValidationIsSuccessful() throws MuleException {
-    // Given a request config without test-connection.
+    // Given a request config without connectivity-test.
     ConnectionProvider connectionProvider = getConnectionProvider("requestConfigWithoutTestConnection");
 
     // When we validate a connection.

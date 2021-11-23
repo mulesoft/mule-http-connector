@@ -12,13 +12,13 @@
 
     <http:request-config name="requestConfigWithOnlyPath">
         <http:request-connection host="localhost" port="${unusedPort}" >
-            <http:test-connection testPath="/irrelevantPath" />
+            <http:connectivity-test testPath="/irrelevantPath" />
         </http:request-connection>
     </http:request-config>
 
     <http:request-config name="requestConfigWithTheOptionalParameters">
         <http:request-connection protocol="HTTP" host="localhost" port="${unusedPort}" >
-            <http:test-connection testPath="/post" testMethod="POST" testBody="The Body" responseTimeout="30" followRedirects="true">
+            <http:connectivity-test testPath="/post" testMethod="POST" testBody="The Body" responseTimeout="30" followRedirects="true">
                 <http:test-headers>
                     <http:test-header key="Key" value="Value1" />
                     <http:test-header key="Key" value="Value2" />
@@ -30,33 +30,33 @@
                 <http:response-validator>
                     <http:success-status-code-validator values="200" />
                 </http:response-validator>
-            </http:test-connection>
+            </http:connectivity-test>
         </http:request-connection>
     </http:request-config>
 
     <http:request-config name="requestConfigWithCustomResponseValidatorEvaluatingToTrue">
         <http:request-connection host="localhost" port="${unusedPort}" >
-            <http:test-connection testPath="/irrelevantPath" >
+            <http:connectivity-test testPath="/irrelevantPath" >
                 <http:response-validator>
                     <http:expression-response-validator expression="#[true]" />
                 </http:response-validator>
-            </http:test-connection>
+            </http:connectivity-test>
         </http:request-connection>
     </http:request-config>
 
     <http:request-config name="requestConfigWithCustomResponseValidatorEvaluatingToFalse">
         <http:request-connection host="localhost" port="${unusedPort}" >
-            <http:test-connection testPath="/irrelevantPath" >
+            <http:connectivity-test testPath="/irrelevantPath" >
                 <http:response-validator>
                     <http:expression-response-validator expression="#[false]" />
                 </http:response-validator>
-            </http:test-connection>
+            </http:connectivity-test>
         </http:request-connection>
     </http:request-config>
 
     <http:request-config name="requestConfigWithCustomResponseValidatorUsingAllBindings">
         <http:request-connection host="localhost" port="${unusedPort}" >
-            <http:test-connection testPath="/irrelevantPath" >
+            <http:connectivity-test testPath="/irrelevantPath" >
                 <http:response-validator>
                     <http:expression-response-validator expression="#[
                         message.attributes.statusCode == 200 and
@@ -64,7 +64,7 @@
                         sizeOf(message.attributes.headers) == 0 and
                         message.payload as String == 'some text payload']" />
                 </http:response-validator>
-            </http:test-connection>
+            </http:connectivity-test>
         </http:request-connection>
     </http:request-config>
 </mule>

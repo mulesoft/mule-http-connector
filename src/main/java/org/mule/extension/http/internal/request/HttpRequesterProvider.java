@@ -111,8 +111,8 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
   @Parameter
   @Optional
   @Expression(NOT_SUPPORTED)
-  @Placement(tab = "Test Connection")
-  private HttpConnectivityValidator testConnection;
+  @Placement(tab = "Connectivity Test")
+  private HttpConnectivityValidator connectivityTest;
 
   @Inject
   private HttpRequesterConnectionManager connectionManager;
@@ -121,13 +121,13 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
 
   @Override
   public ConnectionValidationResult validate(HttpExtensionClient httpClient) {
-    if (testConnection == null) {
+    if (connectivityTest == null) {
       // If nothing was configured, the connectivity test will be successful. This rule ensures backwards compatibility.
       return ConnectionValidationResult.success();
     }
 
     try {
-      testConnection.validate(httpClient, connectionParams);
+      connectivityTest.validate(httpClient, connectionParams);
       return ConnectionValidationResult.success();
     } catch (ExecutionException | ResponseValidatorTypedException e) {
       return ConnectionValidationResult.failure(e.getMessage(), e);
@@ -158,8 +158,8 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
     if (authentication != null) {
       initialiseIfNeeded(authentication, true, muleContext);
     }
-    if (testConnection != null) {
-      initialiseIfNeeded(testConnection, true, muleContext);
+    if (connectivityTest != null) {
+      initialiseIfNeeded(connectivityTest, true, muleContext);
     }
 
     verifyConnectionsParameters();
