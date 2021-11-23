@@ -138,17 +138,16 @@ public class HttpRequestOperations implements Initialisable, Disposable {
         resolvedUri = resolvedBuilder.replaceUriParams(uriSettings.getUrl());
       }
 
-      int resolvedTimeout = resolveResponseTimeout(overrides.getResponseTimeout());
       ResponseValidator responseValidator = responseValidationSettings.getResponseValidator();
       responseValidator = responseValidator != null ? responseValidator : defaultStatusCodeValidator;
 
       LOGGER.debug("Sending '{}' request to '{}'.", method, resolvedUri);
       httpRequester.doRequest(client, config, resolvedUri, method, overrides.getRequestStreamingMode(),
                               overrides.getSendBodyMode(),
-                              overrides.getFollowRedirects(), client.getDefaultAuthentication(), resolvedTimeout,
-                              responseValidator,
-                              transformationService, resolvedBuilder, true, muleContext, scheduler, notificationEmitter,
-                              streamingHelper, callback, injectedHeaders, correlationInfo.getCorrelationId());
+                              overrides.getFollowRedirects(), client.getDefaultAuthentication(), overrides.getResponseTimeout(),
+                              responseValidator, transformationService, resolvedBuilder, true, muleContext, scheduler,
+                              notificationEmitter, streamingHelper, callback, injectedHeaders,
+                              correlationInfo.getCorrelationId());
     } catch (Throwable t) {
       callback.error(t instanceof Exception ? (Exception) t : new DefaultMuleException(t));
     }
@@ -179,14 +178,6 @@ public class HttpRequestOperations implements Initialisable, Disposable {
   private String resolveUri(HttpConstants.Protocol scheme, String host, Integer port, String path) {
     // Encode spaces to generate a valid HTTP request.
     return scheme.getScheme() + "://" + host + ":" + port + encodeSpaces(path);
-  }
-
-  private int resolveResponseTimeout(Integer responseTimeout) {
-    if (muleContext.getConfiguration().isDisableTimeouts()) {
-      return WAIT_FOR_EVER;
-    } else {
-      return responseTimeout != null ? responseTimeout : muleContext.getConfiguration().getDefaultResponseTimeout();
-    }
   }
 
   protected String buildPath(String basePath, String path) {
