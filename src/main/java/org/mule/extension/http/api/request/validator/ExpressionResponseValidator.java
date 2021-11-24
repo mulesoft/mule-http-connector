@@ -14,7 +14,7 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.el.BindingContext;
-import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -57,13 +57,14 @@ public class ExpressionResponseValidator implements ResponseValidator {
   }
 
   private BindingContext buildBindingContext(Result<InputStream, HttpResponseAttributes> result) {
-    Message message = Message.builder()
-        .value(result.getOutput())
-        .attributesValue(result.getAttributes().orElse(null))
-        .mediaType(result.getMediaType().orElse(ANY))
-        .build();
+    InputStream payload = result.getOutput();
+    HttpResponseAttributes attributes = result.getAttributes().orElse(null);
+    MediaType mediaType = result.getMediaType().orElse(ANY);
     return builder()
-        .addBinding("message", new TypedValue<>(message, fromType(Message.class))).build();
+        .addBinding("payload", new TypedValue<>(payload, fromType(InputStream.class)))
+        .addBinding("attributes", new TypedValue<>(attributes, fromType(HttpResponseAttributes.class)))
+        .addBinding("mediaType", new TypedValue<>(mediaType, fromType(MediaType.class)))
+        .build();
   }
 
   public Literal<String> getExpression() {

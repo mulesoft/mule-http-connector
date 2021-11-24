@@ -59,10 +59,10 @@
             <http:connectivity-test testPath="/irrelevantPath" >
                 <http:response-validator>
                     <http:expression-response-validator expression="#[
-                        message.attributes.statusCode == 200 and
-                        message.attributes.reasonPhrase == null and
-                        sizeOf(message.attributes.headers) == 0 and
-                        message.payload as String == 'some text payload']" />
+                        attributes.statusCode == 200 and
+                        attributes.reasonPhrase == null and
+                        sizeOf(attributes.headers) == 0 and
+                        payload as String == 'some text payload']" />
                 </http:response-validator>
             </http:connectivity-test>
         </http:request-connection>
