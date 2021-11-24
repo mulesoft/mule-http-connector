@@ -17,6 +17,7 @@ import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
@@ -31,6 +32,7 @@ import java.util.Optional;
  *
  * @since 1.0
  */
+@TypeDsl(allowTopLevelDefinition = true)
 public class ExpressionResponseValidator implements ResponseValidator {
 
   /**

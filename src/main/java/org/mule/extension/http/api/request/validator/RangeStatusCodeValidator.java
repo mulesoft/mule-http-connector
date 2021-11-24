@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.memoize;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.error.HttpErrorMessageGenerator;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
@@ -28,6 +29,7 @@ import java.util.function.Function;
  *
  * @since 1.0
  */
+@TypeDsl(allowTopLevelDefinition = true)
 public abstract class RangeStatusCodeValidator implements ResponseValidator {
 
   /**

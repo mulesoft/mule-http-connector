@@ -30,4 +30,10 @@ public class ExpressionResponseValidatorTestCase extends AbstractHttpRequestTest
     assertThat(flowRunner("repeatableStreamingFlow").keepStreamsOpen().run().getMessage(),
                hasPayload(equalTo(DEFAULT_RESPONSE)));
   }
+
+  @Test
+  public void globalResponseValidator() throws Exception {
+    assertThat(flowRunner("globalValidatorFlow").keepStreamsOpen().run().getMessage(),
+               hasPayload(equalTo(DEFAULT_RESPONSE)));
+  }
 }
