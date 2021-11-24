@@ -123,7 +123,7 @@ public class HttpRequestConfigTestConnectivityTestCase extends AbstractHttpExten
     assertThat(validationRequest.getHeaders().isEmpty(), is(true));
     assertThat(validationRequest.getQueryParams().isEmpty(), is(true));
 
-    assertThat(responseTimeoutArgumentCaptor.getValue(), is(10));
+    assertThat(responseTimeoutArgumentCaptor.getValue(), is(10000));
     assertThat(followRedirectsArgumentCaptor.getValue(), is(false));
   }
 
@@ -161,7 +161,7 @@ public class HttpRequestConfigTestConnectivityTestCase extends AbstractHttpExten
     assertThat(queryParamsForKey2.size(), is(1));
     assertThat(queryParamsForKey2.contains("Value2"), is(true));
 
-    assertThat(responseTimeoutArgumentCaptor.getValue(), is(30));
+    assertThat(responseTimeoutArgumentCaptor.getValue(), is(30000));
     assertThat(followRedirectsArgumentCaptor.getValue(), is(true));
   }
 

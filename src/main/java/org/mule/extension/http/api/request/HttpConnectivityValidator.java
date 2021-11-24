@@ -9,6 +9,7 @@ package org.mule.extension.http.api.request;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -51,6 +52,7 @@ import java.io.ByteArrayInputStream;
 import java.net.CookieManager;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Requester connectivity validator. It validates the connections created by the {@link HttpRequesterProvider}.
@@ -133,9 +135,17 @@ public class HttpConnectivityValidator implements Initialisable, Disposable {
    * Maximum time that the request element will block the execution of the flow waiting for the HTTP response.
    */
   @Parameter
-  @Optional(defaultValue = "10")
+  @Optional(defaultValue = "10000")
   @Placement(order = 8)
-  private Integer responseTimeout = 10;
+  private Integer responseTimeout = 10000;
+
+  /**
+   * Response timeout time unit.
+   */
+  @Parameter
+  @Optional(defaultValue = "MILLISECONDS")
+  @Placement(order = 9)
+  private TimeUnit responseTimeoutUnit = MILLISECONDS;
 
   private SuccessStatusCodeValidator defaultStatusCodeValidator = new SuccessStatusCodeValidator("0..399");
 
@@ -156,8 +166,9 @@ public class HttpConnectivityValidator implements Initialisable, Disposable {
 
   private Result<Object, HttpResponseAttributes> sendRequest(HttpExtensionClient client, HttpRequest request)
       throws InterruptedException, ExecutionException {
+    int responseTimeoutInt = (int) responseTimeoutUnit.toMillis(responseTimeout.longValue());
     HttpResponse response =
-        client.send(request, responseTimeout.intValue(), followRedirects, resolveAuthentication(client)).get();
+        client.send(request, responseTimeoutInt, followRedirects, resolveAuthentication(client)).get();
 
     return new HttpResponseToResult()
         .convert(new VoidHttpRequesterCookieConfig(), muleContext, response, response.getEntity(),
