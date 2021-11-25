@@ -26,65 +26,65 @@ import java.util.regex.Pattern;
 
 public final class UriUtils {
 
-    private static final Pattern WRONGLY_ENCODED_SPACES = compile("\\+");
+  private static final Pattern WRONGLY_ENCODED_SPACES = compile("\\+");
 
-    private static boolean ENCODE_URI_PARAMS = getBoolean(ENCODE_URI_PARAMS_PROPERTY);
+  private static boolean ENCODE_URI_PARAMS = getBoolean(ENCODE_URI_PARAMS_PROPERTY);
 
-    private UriUtils() {
-        // Empty private constructor to avoid instantiation.
+  private UriUtils() {
+    // Empty private constructor to avoid instantiation.
+  }
+
+  public static String replaceUriParams(String path, Map<String, String> uriParams) {
+    for (Entry<String, String> entry : uriParams.entrySet()) {
+      String uriParamName = entry.getKey();
+      String uriParamValue = entry.getValue();
+      path = replaceUriParam(path, uriParamName, uriParamValue);
+    }
+    return path;
+  }
+
+  private static String replaceUriParam(String path, String uriParamName, String uriParamValue) {
+    if (uriParamValue == null) {
+      throw new NullPointerException(format("Expression {%s} evaluated to null.", uriParamName));
+    }
+    if (ENCODE_URI_PARAMS) {
+      try {
+        uriParamValue = WRONGLY_ENCODED_SPACES.matcher(encode(uriParamValue, UTF_8.displayName()))
+            // Spaces in path segments cannot be encoded as `+`
+            .replaceAll("%20");
+      } catch (UnsupportedEncodingException e) {
+        throw new MuleRuntimeException(createStaticMessage("Could not encode URI parameter '%s'", uriParamValue), e);
+      }
+    }
+    path = path.replaceAll("\\{" + uriParamName + "\\}", quoteReplacement(uriParamValue));
+    return path;
+  }
+
+  public static String buildPath(String basePath, String path) {
+    String resolvedBasePath = basePath;
+    String resolvedRequestPath = path;
+
+    if (!resolvedBasePath.startsWith("/")) {
+      resolvedBasePath = "/" + resolvedBasePath;
     }
 
-    public static String replaceUriParams(String path, Map<String, String> uriParams) {
-        for (Entry<String, String> entry : uriParams.entrySet()) {
-            String uriParamName = entry.getKey();
-            String uriParamValue = entry.getValue();
-            path = replaceUriParam(path, uriParamName, uriParamValue);
-        }
-        return path;
+    if (resolvedBasePath.endsWith("/") && resolvedRequestPath.startsWith("/")) {
+      resolvedBasePath = resolvedBasePath.substring(0, resolvedBasePath.length() - 1);
     }
 
-    private static String replaceUriParam(String path, String uriParamName, String uriParamValue) {
-        if (uriParamValue == null) {
-            throw new NullPointerException(format("Expression {%s} evaluated to null.", uriParamName));
-        }
-        if (ENCODE_URI_PARAMS) {
-            try {
-                uriParamValue = WRONGLY_ENCODED_SPACES.matcher(encode(uriParamValue, UTF_8.displayName()))
-                        // Spaces in path segments cannot be encoded as `+`
-                        .replaceAll("%20");
-            } catch (UnsupportedEncodingException e) {
-                throw new MuleRuntimeException(createStaticMessage("Could not encode URI parameter '%s'", uriParamValue), e);
-            }
-        }
-        path = path.replaceAll("\\{" + uriParamName + "\\}", quoteReplacement(uriParamValue));
-        return path;
+    if (!resolvedBasePath.endsWith("/") && !resolvedRequestPath.startsWith("/") && !resolvedRequestPath.isEmpty()) {
+      resolvedBasePath += "/";
     }
 
-    public static String buildPath(String basePath, String path) {
-        String resolvedBasePath = basePath;
-        String resolvedRequestPath = path;
+    return resolvedBasePath + resolvedRequestPath;
+  }
 
-        if (!resolvedBasePath.startsWith("/")) {
-            resolvedBasePath = "/" + resolvedBasePath;
-        }
+  public static String resolveUri(HttpConstants.Protocol scheme, String host, Integer port, String path) {
+    // Encode spaces to generate a valid HTTP request.
+    return scheme.getScheme() + "://" + host + ":" + port + encodeSpaces(path);
+  }
 
-        if (resolvedBasePath.endsWith("/") && resolvedRequestPath.startsWith("/")) {
-            resolvedBasePath = resolvedBasePath.substring(0, resolvedBasePath.length() - 1);
-        }
-
-        if (!resolvedBasePath.endsWith("/") && !resolvedRequestPath.startsWith("/") && !resolvedRequestPath.isEmpty()) {
-            resolvedBasePath += "/";
-        }
-
-        return resolvedBasePath + resolvedRequestPath;
-    }
-
-    public static String resolveUri(HttpConstants.Protocol scheme, String host, Integer port, String path) {
-        // Encode spaces to generate a valid HTTP request.
-        return scheme.getScheme() + "://" + host + ":" + port + encodeSpaces(path);
-    }
-
-    public static void refreshSystemProperties() {
-        ENCODE_URI_PARAMS = getBoolean(ENCODE_URI_PARAMS_PROPERTY);
-    }
+  public static void refreshSystemProperties() {
+    ENCODE_URI_PARAMS = getBoolean(ENCODE_URI_PARAMS_PROPERTY);
+  }
 }
