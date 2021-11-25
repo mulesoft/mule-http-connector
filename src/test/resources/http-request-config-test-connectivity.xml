@@ -18,7 +18,10 @@
 
     <http:request-config name="requestConfigWithTheOptionalParameters">
         <http:request-connection protocol="HTTP" host="localhost" port="${unusedPort}" >
-            <http:connectivity-test testPath="/post" testMethod="POST" testBody="The Body" responseTimeout="30" responseTimeoutUnit="SECONDS" followRedirects="true">
+            <http:connectivity-test testPath="/post" testMethod="POST" responseTimeout="30" responseTimeoutUnit="SECONDS" followRedirects="true">
+                <http:test-body>
+                    <![CDATA[ The Body ]]>
+                </http:test-body>
                 <http:test-headers>
                     <http:test-header key="Key" value="Value1" />
                     <http:test-header key="Key" value="Value2" />

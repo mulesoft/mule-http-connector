@@ -38,6 +38,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.extension.api.annotation.param.display.Text;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.entity.EmptyHttpEntity;
@@ -89,6 +90,7 @@ public class HttpConnectivityValidator implements Initialisable, Disposable {
   @Parameter
   @DisplayName("Request Body")
   @Optional(defaultValue = "")
+  @Text
   @Placement(order = 3)
   @Expression(NOT_SUPPORTED)
   private String testBody = "";
