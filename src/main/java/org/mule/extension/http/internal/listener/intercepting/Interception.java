@@ -14,7 +14,7 @@ import org.mule.runtime.api.util.MultiMap;
 public interface Interception {
 
   /**
-   * Returns the headers used for response decoration, blacklist or other operation defined by the interceptor.
+   * Returns the headers used for response decoration, deny-list or other operation defined by the interceptor.
    * 
    * @return headers to operate with.
    */
