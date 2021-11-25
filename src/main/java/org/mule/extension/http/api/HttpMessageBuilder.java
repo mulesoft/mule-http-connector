@@ -8,6 +8,7 @@ package org.mule.extension.http.api;
 
 import org.mule.api.annotation.NoExtend;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
+import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilderUtils;
 import org.mule.extension.http.internal.request.HttpRequester;
 import org.mule.extension.http.internal.request.HttpResponseToResult;
 import org.mule.extension.http.internal.request.UriUtils;
