@@ -60,19 +60,19 @@ public class HttpRequesterSimpleRequestBuilder {
   @DisplayName("Query Parameters")
   private MultiMap<String, String> requestQueryParams = emptyMultiMap();
 
-  public TypedValue<Object> getBody() {
+  public TypedValue<Object> getRequestBody() {
     return TypedValue.of(requestBody);
   }
 
-  public void setBody(Literal<String> body) {
+  public void setRequestBody(Literal<String> body) {
     this.requestBody = body;
   }
 
-  public MultiMap<String, String> getHeaders() {
+  public MultiMap<String, String> getRequestHeaders() {
     return requestHeaders;
   }
 
-  public void setHeaders(MultiMap<String, String> headers) {
+  public void setRequestHeaders(MultiMap<String, String> headers) {
     this.requestHeaders = headers != null ? headers : emptyMultiMap();
   }
 
@@ -80,25 +80,25 @@ public class HttpRequesterSimpleRequestBuilder {
     return UriUtils.replaceUriParams(path, requestUriParams);
   }
 
-  public MultiMap<String, String> getQueryParams() {
+  public MultiMap<String, String> getRequestQueryParams() {
     return requestQueryParams.toImmutableMultiMap();
   }
 
-  public Map<String, String> getUriParams() {
+  public Map<String, String> getRequestUriParams() {
     return unmodifiableMap(requestUriParams);
   }
 
-  public void setQueryParams(MultiMap<String, String> queryParams) {
+  public void setRequestQueryParams(MultiMap<String, String> queryParams) {
     this.requestQueryParams = queryParams;
   }
 
-  public void setUriParams(Map<String, String> uriParams) {
+  public void setRequestUriParams(Map<String, String> uriParams) {
     this.requestUriParams = uriParams;
   }
 
   public HttpRequestBuilder configure(HttpRequesterConfig config) {
     return HttpRequest.builder(PRESERVE_HEADER_CASE || config.isPreserveHeadersCase())
-        .headers(getHeaders())
-        .queryParams(getQueryParams());
+        .headers(getRequestHeaders())
+        .queryParams(getRequestQueryParams());
   }
 }
