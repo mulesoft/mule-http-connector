@@ -33,7 +33,7 @@ public class HttpRequesterSimpleRequestBuilder {
   @Parameter
   @Optional
   @DisplayName("Body")
-  private Literal<String> pollerBody;
+  private Literal<String> requestBody;
 
   /**
    * HTTP headers the message should include.
@@ -42,7 +42,7 @@ public class HttpRequesterSimpleRequestBuilder {
   @Optional
   @NullSafe
   @DisplayName("Headers")
-  protected MultiMap<String, String> pollerHeaders = emptyMultiMap();
+  protected MultiMap<String, String> requestHeaders = emptyMultiMap();
 
   /**
    * URI parameters that should be used to create the request.
@@ -50,7 +50,7 @@ public class HttpRequesterSimpleRequestBuilder {
   @Parameter
   @Optional
   @DisplayName("URI Parameters")
-  private Map<String, String> pollerUriParams = emptyMap();
+  private Map<String, String> requestUriParams = emptyMap();
 
   /**
    * Query parameters the request should include.
@@ -58,42 +58,42 @@ public class HttpRequesterSimpleRequestBuilder {
   @Parameter
   @Optional
   @DisplayName("Query Parameters")
-  private MultiMap<String, String> pollerQueryParams = emptyMultiMap();
+  private MultiMap<String, String> requestQueryParams = emptyMultiMap();
 
   public TypedValue<Object> getBody() {
-    return TypedValue.of(pollerBody);
+    return TypedValue.of(requestBody);
   }
 
   public void setBody(Literal<String> body) {
-    this.pollerBody = body;
+    this.requestBody = body;
   }
 
   public MultiMap<String, String> getHeaders() {
-    return pollerHeaders;
+    return requestHeaders;
   }
 
   public void setHeaders(MultiMap<String, String> headers) {
-    this.pollerHeaders = headers != null ? headers : emptyMultiMap();
+    this.requestHeaders = headers != null ? headers : emptyMultiMap();
   }
 
   public String replaceUriParams(String path) {
-    return UriUtils.replaceUriParams(path, pollerUriParams);
+    return UriUtils.replaceUriParams(path, requestUriParams);
   }
 
   public MultiMap<String, String> getQueryParams() {
-    return pollerQueryParams.toImmutableMultiMap();
+    return requestQueryParams.toImmutableMultiMap();
   }
 
   public Map<String, String> getUriParams() {
-    return unmodifiableMap(pollerUriParams);
+    return unmodifiableMap(requestUriParams);
   }
 
   public void setQueryParams(MultiMap<String, String> queryParams) {
-    this.pollerQueryParams = queryParams;
+    this.requestQueryParams = queryParams;
   }
 
   public void setUriParams(Map<String, String> uriParams) {
-    this.pollerUriParams = uriParams;
+    this.requestUriParams = uriParams;
   }
 
   public HttpRequestBuilder configure(HttpRequesterConfig config) {
