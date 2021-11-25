@@ -13,6 +13,9 @@ import static org.mule.extension.http.internal.HttpConnectorConstants.HTTP_ENABL
 import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST;
 import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE;
 import static org.mule.extension.http.internal.request.UriUtils.buildPath;
+import static org.mule.extension.http.internal.request.UriUtils.replaceUriParams;
+import static org.mule.extension.http.internal.request.UriUtils.resolveUri;
+import static org.mule.extension.http.internal.request.UriUtils.buildPath;
 import static org.mule.extension.http.internal.request.UriUtils.resolveUri;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 

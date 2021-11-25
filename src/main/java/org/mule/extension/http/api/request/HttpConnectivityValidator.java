@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.mule.extension.http.internal.request.UriUtils.replaceUriParams;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -20,6 +21,7 @@ import org.mule.extension.http.api.request.authentication.UsernamePasswordAuthen
 import org.mule.extension.http.api.request.builder.KeyValuePair;
 import org.mule.extension.http.api.request.builder.QueryParam;
 import org.mule.extension.http.api.request.builder.TestHttpHeader;
+import org.mule.extension.http.api.request.builder.UriParam;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.request.validator.ResponseValidatorTypedException;
 import org.mule.extension.http.api.request.validator.SuccessStatusCodeValidator;
@@ -27,6 +29,7 @@ import org.mule.extension.http.internal.request.HttpRequesterCookieConfig;
 import org.mule.extension.http.internal.request.HttpRequesterProvider;
 import org.mule.extension.http.internal.request.HttpResponseToResult;
 import org.mule.extension.http.internal.request.RequestConnectionParams;
+import org.mule.extension.http.internal.request.UriUtils;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -116,12 +119,22 @@ public class HttpConnectivityValidator implements Initialisable, Disposable {
   private List<QueryParam> testQueryParams = emptyList();
 
   /**
+   * URI parameters the connectivity test request should include.
+   */
+  @Parameter
+  @Optional
+  @DisplayName("URI Parameters")
+  @Placement(order = 6)
+  @Expression(NOT_SUPPORTED)
+  private List<UriParam> testUriParams = emptyList();
+
+  /**
    * Validation applied to the connectivity test response.
    */
   @Parameter
   @Optional
   @DisplayName("Response Validator")
-  @Placement(order = 6)
+  @Placement(order = 7)
   @Expression(NOT_SUPPORTED)
   private ResponseValidator responseValidator;
 
@@ -130,7 +143,7 @@ public class HttpConnectivityValidator implements Initialisable, Disposable {
    */
   @Parameter
   @Optional(defaultValue = "false")
-  @Placement(order = 7)
+  @Placement(order = 8)
   private boolean followRedirects = false;
 
   /**
@@ -138,7 +151,7 @@ public class HttpConnectivityValidator implements Initialisable, Disposable {
    */
   @Parameter
   @Optional(defaultValue = "10000")
-  @Placement(order = 8)
+  @Placement(order = 9)
   private Integer responseTimeout = 10000;
 
   /**
@@ -146,7 +159,7 @@ public class HttpConnectivityValidator implements Initialisable, Disposable {
    */
   @Parameter
   @Optional(defaultValue = "MILLISECONDS")
-  @Placement(order = 9)
+  @Placement(order = 10)
   private TimeUnit responseTimeoutUnit = MILLISECONDS;
 
   private SuccessStatusCodeValidator defaultStatusCodeValidator = new SuccessStatusCodeValidator("0..399");
@@ -204,8 +217,9 @@ public class HttpConnectivityValidator implements Initialisable, Disposable {
   }
 
   private String getUriString(RequestConnectionParams connectionParams) {
+    String pathWithUriParams = replaceUriParams(testPath, testUriParams);
     return format("%s://%s:%s%s", connectionParams.getProtocol().getScheme(), connectionParams.getHost(),
-                  connectionParams.getPort(), testPath);
+                  connectionParams.getPort(), pathWithUriParams);
   }
 
   private ResponseValidator getResponseValidator() {

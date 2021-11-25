@@ -6,18 +6,16 @@
  */
 package org.mule.extension.http.api.request.builder;
 
-import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.util.Objects;
 
 /**
- * Represents an HTTP Header
+ * Represents an HTTP URI Parameter
  *
  * @since 1.7
  */
-@Alias("testHeader")
-public class TestHttpHeader implements KeyValuePair {
+public class UriParam implements KeyValuePair {
 
   @Parameter
   private String key;
@@ -43,7 +41,7 @@ public class TestHttpHeader implements KeyValuePair {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    TestHttpHeader that = (TestHttpHeader) o;
+    UriParam that = (UriParam) o;
     return Objects.equals(key, that.key) && Objects.equals(value, that.value);
   }
 
