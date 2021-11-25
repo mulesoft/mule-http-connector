@@ -10,6 +10,7 @@ import org.mule.api.annotation.NoExtend;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.internal.request.HttpRequester;
 import org.mule.extension.http.internal.request.HttpResponseToResult;
+import org.mule.extension.http.internal.request.UriUtils;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.server.HttpServerProperties;
@@ -37,6 +38,6 @@ public abstract class HttpMessageBuilder {
     HttpRequester.refreshSystemProperties();
     HttpResponseToResult.refreshSystemProperties();
     HttpServerProperties.refreshSystemProperties();
-    HttpRequesterRequestBuilder.refreshSystemProperties();
+    UriUtils.refreshSystemProperties();
   }
 }
