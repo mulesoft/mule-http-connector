@@ -23,7 +23,35 @@
     </flow>
 
     <!-- Test configuration -->
-    <sockets:request-config name="SocketsRequestConfig">
+    <sockets:request-config name="chunkedTransferEncodingIsAllowedConfig">
+        <sockets:tcp-requester-connection host="localhost" port="${dynamic.port}">
+            <sockets:protocol >
+                <sockets:eof-protocol />
+            </sockets:protocol>
+        </sockets:tcp-requester-connection>
+    </sockets:request-config>
+    <sockets:request-config name="chunkedWithQuotesTransferEncodingIsForbiddenConfig">
+        <sockets:tcp-requester-connection host="localhost" port="${dynamic.port}">
+            <sockets:protocol >
+                <sockets:eof-protocol />
+            </sockets:protocol>
+        </sockets:tcp-requester-connection>
+    </sockets:request-config>
+    <sockets:request-config name="bothContentLengthAndTransferEncodingConfig">
+        <sockets:tcp-requester-connection host="localhost" port="${dynamic.port}">
+            <sockets:protocol >
+                <sockets:eof-protocol />
+            </sockets:protocol>
+        </sockets:tcp-requester-connection>
+    </sockets:request-config>
+    <sockets:request-config name="multipleValidTransferEncodingSpecifiedInSameHeaderConfig">
+        <sockets:tcp-requester-connection host="localhost" port="${dynamic.port}">
+            <sockets:protocol >
+                <sockets:eof-protocol />
+            </sockets:protocol>
+        </sockets:tcp-requester-connection>
+    </sockets:request-config>
+    <sockets:request-config name="multipleValidTransferEncodingSpecifiedInMultipleHeadersConfig">
         <sockets:tcp-requester-connection host="localhost" port="${dynamic.port}">
             <sockets:protocol >
                 <sockets:eof-protocol />
@@ -31,24 +59,120 @@
         </sockets:tcp-requester-connection>
     </sockets:request-config>
 
-    <munit:test name="invalid-transfer-encoding-test-case" description="Test">
+    <munit:test name="chunkedTransferEncodingIsAllowed" description="chunkedTransferEncodingIsAllowed">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="invalidTransferEncodingFlow" />
         </munit:enable-flow-sources>
 
         <munit:execution>
-            <sockets:send-and-receive config-ref="SocketsRequestConfig">
+            <sockets:send-and-receive config-ref="chunkedTransferEncodingIsAllowedConfig">
                 <sockets:content><![CDATA[POST /test HTTP/1.1
 Host: localhost:8081
-Content-Length:2
-Transfer-Encoding:INVALID
+Transfer-Encoding: chunked
 
+2
 OK
+0
+
+]]></sockets:content>
+            </sockets:send-and-receive>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that is="#[MunitTools::containsString('HTTP/1.1 200')]" expression="#[payload as String]"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="chunkedWithQuotesTransferEncodingIsForbidden" description="chunkedWithQuotesTransferEncodingIsForbidden">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="invalidTransferEncodingFlow" />
+        </munit:enable-flow-sources>
+
+        <munit:execution>
+            <sockets:send-and-receive config-ref="chunkedWithQuotesTransferEncodingIsForbiddenConfig">
+                <sockets:content><![CDATA[POST /test HTTP/1.1
+Host: localhost:8081
+Transfer-Encoding: 'chunked'
+
+2
+OK
+0
+
 ]]></sockets:content>
             </sockets:send-and-receive>
         </munit:execution>
         <munit:validation>
             <munit-tools:assert-that is="#[MunitTools::containsString('HTTP/1.1 400')]" expression="#[payload as String]"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="bothContentLengthAndTransferEncoding" description="bothContentLengthAndTransferEncoding">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="invalidTransferEncodingFlow" />
+        </munit:enable-flow-sources>
+
+        <munit:execution>
+            <sockets:send-and-receive config-ref="bothContentLengthAndTransferEncodingConfig">
+                <sockets:content><![CDATA[POST /test HTTP/1.1
+Host: localhost:8081
+Content-Length: 2
+Transfer-Encoding: chunked
+
+2
+OK
+0
+
+]]></sockets:content>
+            </sockets:send-and-receive>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that is="#[MunitTools::containsString('HTTP/1.1 200')]" expression="#[payload as String]"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="multipleValidTransferEncodingSpecifiedInSameHeader" description="multipleValidTransferEncodingSpecifiedInSameHeader">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="invalidTransferEncodingFlow" />
+        </munit:enable-flow-sources>
+
+        <munit:execution>
+            <sockets:send-and-receive config-ref="multipleValidTransferEncodingSpecifiedInSameHeaderConfig">
+                <sockets:content><![CDATA[POST /test HTTP/1.1
+Host: localhost:8081
+Transfer-Encoding: chunked, deflate
+
+2
+OK
+0
+
+]]></sockets:content>
+            </sockets:send-and-receive>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that is="#[MunitTools::containsString('HTTP/1.1 200')]" expression="#[payload as String]"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="multipleValidTransferEncodingSpecifiedInMultipleHeaders" description="multipleValidTransferEncodingSpecifiedInMultipleHeaders">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="invalidTransferEncodingFlow" />
+        </munit:enable-flow-sources>
+
+        <munit:execution>
+            <sockets:send-and-receive config-ref="multipleValidTransferEncodingSpecifiedInMultipleHeadersConfig">
+                <sockets:content><![CDATA[POST /test HTTP/1.1
+Host: localhost:8081
+Transfer-Encoding: chunked
+Transfer-Encoding: deflate
+
+2
+OK
+0
+
+]]></sockets:content>
+            </sockets:send-and-receive>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that is="#[MunitTools::containsString('HTTP/1.1 200')]" expression="#[payload as String]"/>
         </munit:validation>
     </munit:test>
 </mule>
