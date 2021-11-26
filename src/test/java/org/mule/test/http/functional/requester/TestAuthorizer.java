@@ -16,9 +16,9 @@ public interface TestAuthorizer {
   /**
    * Method to implement the authorization test logic.
    * 
-   * @param address target address
-   * @param request HTTP request
-   * @param response HTTP response
+   * @param address                    target address
+   * @param request                    HTTP request
+   * @param response                   HTTP response
    * @param addAuthorizeMessageInProxy whether the authorization has to be sent from proxy
    * 
    * @return request authorized

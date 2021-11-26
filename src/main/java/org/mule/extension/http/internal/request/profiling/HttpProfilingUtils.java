@@ -20,7 +20,7 @@ public class HttpProfilingUtils {
   /**
    * Creates an {@link ExtensionProfilingEventContext} for a HTTP Request.
    *
-   * @param result the {@link Result} corresponding to a HTTP Request
+   * @param result        the {@link Result} corresponding to a HTTP Request
    * @param correlationId the correlation id associated to the event involved in the HTTP request
    * @return the {@link ExtensionProfilingEventContext} with the profiling data.
    */

@@ -79,9 +79,9 @@ public abstract class RangeStatusCodeValidator implements ResponseValidator {
   /**
    * Creates the exception to be thrown if the validation didn't pass.
    *
-   * @param result the result of the request operation
+   * @param result  the result of the request operation
    * @param request the HTTP request sent
-   * @param status the HTTP response status code
+   * @param status  the HTTP response status code
    * @throws ResponseValidatorTypedException
    * @throws ResponseValidatorException
    */
@@ -99,7 +99,7 @@ public abstract class RangeStatusCodeValidator implements ResponseValidator {
    *
    * @param message the message for the exception
    * @param request the HTTP request sent
-   * @param status the HTTP response status code
+   * @param status  the HTTP response status code
    * @throws ResponseValidatorTypedException
    * @throws ResponseValidatorException
    */

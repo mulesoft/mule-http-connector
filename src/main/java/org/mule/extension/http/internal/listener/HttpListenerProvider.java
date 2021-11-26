@@ -112,8 +112,8 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
      * The number of milliseconds that a connection can remain idle before it is closed. The value of this attribute is only used
      * when persistent connections are enabled.
      *
-     * The listener default timeout is bigger than our requester default timeout to avoid 'Remotely closed' exception
-     * when you start sending a request on an existing connection just before the timeout occurs.
+     * The listener default timeout is bigger than our requester default timeout to avoid 'Remotely closed' exception when you
+     * start sending a request on an existing connection just before the timeout occurs.
      */
     @Parameter
     @Optional(defaultValue = "40000")
@@ -123,6 +123,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
 
     /**
      * Read timeout to configure in milliseconds
+     * 
      * @since 1.6.0
      */
     @Parameter

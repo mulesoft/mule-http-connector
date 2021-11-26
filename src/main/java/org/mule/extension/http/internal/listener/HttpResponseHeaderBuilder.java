@@ -6,31 +6,28 @@
  */
 package org.mule.extension.http.internal.listener;
 
+import static java.lang.String.CASE_INSENSITIVE_ORDER;
+import static java.util.Collections.addAll;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.http.api.HttpHeaders.Names.ACCESS_CONTROL_ALLOW_ORIGIN;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 import org.mule.runtime.http.api.domain.message.response.HttpResponseBuilder;
 
 import java.util.Collection;
-import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class HttpResponseHeaderBuilder {
 
-  // This is a Map instead of a Set because of MULE-15249
-  // While already fixed, it might be present in older versions of the runtime used with this connector
-  private static final Map<String, String> uniqueHeadersNames;
+  private static final Set<String> uniqueHeadersNames;
 
   static {
-    CaseInsensitiveMultiMap uniqueHeadersMap = new CaseInsensitiveMultiMap();
-    uniqueHeadersMap.put(TRANSFER_ENCODING, "");
-    uniqueHeadersMap.put(CONTENT_LENGTH, "");
-    uniqueHeadersMap.put(CONTENT_TYPE, "");
-    uniqueHeadersMap.put(ACCESS_CONTROL_ALLOW_ORIGIN, "");
-    uniqueHeadersNames = uniqueHeadersMap;
+    uniqueHeadersNames = new TreeSet(CASE_INSENSITIVE_ORDER);
+    addAll(uniqueHeadersNames, ACCESS_CONTROL_ALLOW_ORIGIN, CONTENT_LENGTH, CONTENT_TYPE, TRANSFER_ENCODING);
   }
 
   private final HttpResponseBuilder responseBuilder;
@@ -61,7 +58,7 @@ public class HttpResponseHeaderBuilder {
   }
 
   private void failIfHeaderDoesNotSupportMultipleValues(String headerName) {
-    if (uniqueHeadersNames.containsKey(headerName)) {
+    if (uniqueHeadersNames.contains(headerName)) {
       throw new MuleRuntimeException(createStaticMessage("Header " + headerName + " does not support multiple values"));
     }
   }
