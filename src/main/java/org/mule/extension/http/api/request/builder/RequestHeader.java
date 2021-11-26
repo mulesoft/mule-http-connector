@@ -17,7 +17,7 @@ import java.util.Objects;
  * @since 1.1
  */
 @Alias("defaultHeader")
-public class RequestHeader {
+public class RequestHeader implements KeyValuePair {
 
   @Parameter
   private String key;
@@ -25,10 +25,12 @@ public class RequestHeader {
   @Parameter
   private String value;
 
+  @Override
   public String getKey() {
     return key;
   }
 
+  @Override
   public String getValue() {
     return value;
   }
