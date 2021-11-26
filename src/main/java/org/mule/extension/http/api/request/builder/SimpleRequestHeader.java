@@ -14,10 +14,10 @@ import java.util.Objects;
 /**
  * Represents an HTTP Header
  *
- * @since 1.1
+ * @since 1.7
  */
-@Alias("defaultHeader")
-public class RequestHeader {
+@Alias("requestHeader")
+public class SimpleRequestHeader implements KeyValuePair {
 
   @Parameter
   private String key;
@@ -25,10 +25,12 @@ public class RequestHeader {
   @Parameter
   private String value;
 
+  @Override
   public String getKey() {
     return key;
   }
 
+  @Override
   public String getValue() {
     return value;
   }
@@ -41,7 +43,7 @@ public class RequestHeader {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    RequestHeader that = (RequestHeader) o;
+    SimpleRequestHeader that = (SimpleRequestHeader) o;
     return Objects.equals(key, that.key) &&
         Objects.equals(value, that.value);
   }

@@ -51,7 +51,7 @@ public class HttpRequesterSimpleRequestBuilder {
   @Optional
   @NullSafe
   @DisplayName("Headers")
-  protected List<RequestHeader> requestHeaders = emptyList();
+  protected List<SimpleRequestHeader> requestHeaders = emptyList();
 
   /**
    * URI parameters that should be used to create the request.
@@ -77,11 +77,11 @@ public class HttpRequesterSimpleRequestBuilder {
     this.requestBody = body;
   }
 
-  public List<RequestHeader> getRequestHeaders() {
+  public List<SimpleRequestHeader> getRequestHeaders() {
     return unmodifiableList(requestHeaders);
   }
 
-  public void setRequestHeaders(List<RequestHeader> headers) {
+  public void setRequestHeaders(List<SimpleRequestHeader> headers) {
     this.requestHeaders = headers != null ? headers : emptyList();
   }
 
