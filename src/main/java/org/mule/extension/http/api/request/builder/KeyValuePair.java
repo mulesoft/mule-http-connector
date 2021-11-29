@@ -14,8 +14,14 @@ package org.mule.extension.http.api.request.builder;
  */
 public interface KeyValuePair {
 
+  /**
+   * @return the key of the {@link KeyValuePair}, that could be use as a key for a {@link java.util.Map}
+   */
   String getKey();
 
+  /**
+   * @return the value of the {@link KeyValuePair}
+   */
   String getValue();
 
 }

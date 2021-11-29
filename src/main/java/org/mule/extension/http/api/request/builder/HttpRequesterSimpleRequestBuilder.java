@@ -69,8 +69,8 @@ public class HttpRequesterSimpleRequestBuilder {
   @DisplayName("Query Parameters")
   private List<QueryParam> requestQueryParams = emptyList();
 
-  public TypedValue<Object> getRequestBody() {
-    return TypedValue.of(requestBody);
+  public String getRequestBody() {
+    return requestBody;
   }
 
   public void setRequestBody(String body) {
@@ -85,7 +85,7 @@ public class HttpRequesterSimpleRequestBuilder {
     this.requestHeaders = headers != null ? headers : emptyList();
   }
 
-  public String replaceUriParams(String path) {
+  public String replaceUriParamsOf(String path) {
     return UriUtils.replaceUriParams(path, requestUriParams);
   }
 
@@ -105,7 +105,7 @@ public class HttpRequesterSimpleRequestBuilder {
     this.requestUriParams = uriParams;
   }
 
-  public HttpRequestBuilder configure(HttpRequesterConfig config) {
+  public HttpRequestBuilder toHttpRequestBuilder(HttpRequesterConfig config) {
     return HttpRequest.builder(PRESERVE_HEADER_CASE || config.isPreserveHeadersCase())
         .headers(toMultiMap(getRequestHeaders()))
         .queryParams(toMultiMap(getRequestQueryParams()));

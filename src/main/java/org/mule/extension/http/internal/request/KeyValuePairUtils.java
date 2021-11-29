@@ -10,7 +10,7 @@ import org.mule.extension.http.api.request.builder.KeyValuePair;
 import org.mule.runtime.api.util.MultiMap;
 
 
-public class KeyValuePairUtils {
+public final class KeyValuePairUtils {
 
   private KeyValuePairUtils() {
     // Empty private constructor to avoid instantiation.
@@ -23,7 +23,9 @@ public class KeyValuePairUtils {
    */
   public static MultiMap<String, String> toMultiMap(Iterable<? extends KeyValuePair> iterable) {
     MultiMap<String, String> asMultiMap = new MultiMap<>();
-    iterable.forEach(pair -> asMultiMap.put(pair.getKey(), pair.getValue()));
+    for (KeyValuePair pair : iterable) {
+      asMultiMap.put(pair.getKey(), pair.getValue());
+    }
     return asMultiMap;
   }
 }
