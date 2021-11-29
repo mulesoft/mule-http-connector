@@ -18,9 +18,15 @@ import java.util.Objects;
  */
 public class QueryParam implements KeyValuePair {
 
+  /**
+   * Represents the Key of this HTTP Query Parameter
+   */
   @Parameter
   private String key;
 
+  /**
+   * Represents the Value of this HTTP Query Parameter
+   */
   @Parameter
   private String value;
 
