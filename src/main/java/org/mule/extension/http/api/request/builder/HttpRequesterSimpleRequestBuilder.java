@@ -73,7 +73,7 @@ public class HttpRequesterSimpleRequestBuilder {
     return requestBody;
   }
 
-  public void setRequestBody(String body) {
+  protected void setRequestBody(String body) {
     this.requestBody = body;
   }
 
@@ -81,7 +81,7 @@ public class HttpRequesterSimpleRequestBuilder {
     return unmodifiableList(requestHeaders);
   }
 
-  public void setRequestHeaders(List<SimpleRequestHeader> headers) {
+  protected void setRequestHeaders(List<SimpleRequestHeader> headers) {
     this.requestHeaders = headers != null ? headers : emptyList();
   }
 
@@ -97,11 +97,11 @@ public class HttpRequesterSimpleRequestBuilder {
     return unmodifiableMap(requestUriParams);
   }
 
-  public void setRequestQueryParams(List<QueryParam> queryParams) {
+  protected void setRequestQueryParams(List<QueryParam> queryParams) {
     this.requestQueryParams = queryParams;
   }
 
-  public void setRequestUriParams(Map<String, String> uriParams) {
+  protected void setRequestUriParams(Map<String, String> uriParams) {
     this.requestUriParams = uriParams;
   }
 
