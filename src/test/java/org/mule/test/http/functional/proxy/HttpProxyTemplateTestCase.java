@@ -432,7 +432,6 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
    * Simulates the modification of the payload when policies are applied to a proxy.
    */
   public static class ProxyPolicyProcessor extends ProxyProcessor {
-
     @Override
     protected Message.Builder getBuilder(CoreEvent event) {
       return policy.apply(super.getBuilder(event));
