@@ -72,7 +72,7 @@ public class HttpListenerCloseConnectionOnHeadRequestTestCase extends AbstractHt
     writer.flush();
   }
 
-  private static class PayloadSetterStreamingProcessor implements Processor {
+  public static class PayloadSetterStreamingProcessor implements Processor {
 
     @Override
     public CoreEvent process(CoreEvent event) throws MuleException {

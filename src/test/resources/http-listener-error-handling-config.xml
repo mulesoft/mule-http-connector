@@ -8,6 +8,8 @@
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
+    <object name="trackPassageMessageProcessor" class="org.mule.test.http.functional.listener.AbstractHttpListenerErrorHandlingTestCase$TrackPassageMessageProcessor"/>
+
     <configuration>
         <expression-language>
             <import class="org.mule.test.http.functional.listener.AbstractHttpListenerErrorHandlingTestCase"/>
@@ -30,7 +32,7 @@
         <set-payload value="#[mel:inputStreamPayload]"/>
         <error-handler>
             <on-error-continue type="EXPRESSION">
-                <custom-processor class="org.mule.test.http.functional.listener.AbstractHttpListenerErrorHandlingTestCase$TrackPassageMessageProcessor"/>
+                <flow-ref name="trackPassageMessageProcessor"/>
                 <set-payload value="#['Exception Handled']"/>
             </on-error-continue>
             <on-error-continue>
@@ -60,7 +62,7 @@
         <set-payload value="#[mel:inputStreamPayload]"/>
         <error-handler>
             <on-error-propagate type="ANY">
-                <custom-processor class="org.mule.test.http.functional.listener.AbstractHttpListenerErrorHandlingTestCase$TrackPassageMessageProcessor"/>
+                <flow-ref name="trackPassageMessageProcessor"/>
                 <set-payload value="#['Exception Handled']"/>
             </on-error-propagate>
         </error-handler>
@@ -75,7 +77,7 @@
         <set-payload value="#[thisFails]"/>
         <error-handler>
             <on-error-propagate type="EXPRESSION">
-                <custom-processor class="org.mule.test.http.functional.listener.AbstractHttpListenerErrorHandlingTestCase$TrackPassageMessageProcessor"/>
+                <flow-ref name="trackPassageMessageProcessor"/>
                 <set-payload value="#[mel:inputStreamPayload]"/>
             </on-error-propagate>
             <on-error-continue type="ANY">

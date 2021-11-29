@@ -6,6 +6,10 @@
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
+    <object name="statusProcessor" class="org.mule.test.http.functional.requester.AbstractHttpRequestResponseStreamingTestCase$StatusProcessor"/>
+
+    <object name="fillAndWaitInputStreamProcessor" class="org.mule.test.http.functional.requester.AbstractHttpRequestResponseStreamingTestCase$FillAndWaitInputStreamProcessor"/>
+
     <http:request-config name="requestConfig">
         <http:request-connection host="localhost" port="${httpPort}" streamResponse="${streaming}"/>
     </http:request-config>
@@ -16,13 +20,13 @@
 
     <flow name="client">
         <http:request config-ref="requestConfig" method="GET" path="/"/>
-        <custom-processor class="org.mule.test.http.functional.requester.AbstractHttpRequestResponseStreamingTestCase$StatusProcessor"/>
+        <flow-ref name="statusProcessor"/>
         <object-to-string-transformer/>
     </flow>
 
     <flow name="server">
         <http:listener path="/" config-ref="listenerConfig"/>
-        <custom-processor class="org.mule.test.http.functional.requester.AbstractHttpRequestResponseStreamingTestCase$FillAndWaitInputStreamProcessor"/>
+        <flow-ref name="fillAndWaitInputStreamProcessor"/>
     </flow>
 
 </mule>

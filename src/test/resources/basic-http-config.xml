@@ -4,7 +4,9 @@
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
-    
+
+    <object name="requestCheckerMessageProcessor" class="org.mule.test.http.functional.BasicHttpTestCase$RequestCheckerMessageProcessor"/>
+
     <http:request-config name="reqConfig">
         <http:request-connection host="localhost" protocol="HTTP" port="${httpPort}"/>
     </http:request-config>
@@ -36,7 +38,7 @@
                 <http:headers>#[{'Name':'Value'}]</http:headers>
             </http:error-response>
         </http:listener>
-        <custom-processor class="org.mule.test.http.functional.BasicHttpTestCase$RequestCheckerMessageProcessor"/>
+        <flow-ref name="requestCheckerMessageProcessor"/>
         <set-payload value="HEY"/>
     </flow>
 
