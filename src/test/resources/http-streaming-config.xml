@@ -18,7 +18,7 @@
     </http:listener-config>
 
     <flow name="client">
-        <test:assert-intercepting responseSameTask="false"/>
+        <test-components:assert-intercepting responseSameTask="false"/>
         <http:request config-ref="requestConfig" method="GET" path="/"/>
     </flow>
 
