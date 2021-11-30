@@ -41,7 +41,7 @@
     </http:listener-config>
     <flow name="persistentStreaming">
         <http:listener path="/" config-ref="persistentConfigStreaming" responseStreamingMode="ALWAYS" />
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <http:listener-config name="persistentConfigStreamingTransformer">

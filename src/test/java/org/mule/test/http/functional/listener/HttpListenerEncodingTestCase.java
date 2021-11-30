@@ -13,6 +13,7 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import org.mule.functional.api.component.TestConnectorQueueHandler;
 import org.mule.runtime.api.message.Message;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 import org.mule.test.runner.RunnerDelegateTo;
 
@@ -74,8 +75,16 @@ public class HttpListenerEncodingTestCase extends AbstractHttpTestCase {
     assertThat(response.returnResponse().getFirstHeader(CONTENT_TYPE).getValue(),
                containsString("charset=" + charset.displayName()));
     Message message = queueHandler.read("out", 2000).getMessage();
-    assertThat(getPayloadAsString(message), is(testMessage));
+    assertPayloadIfNotClosed(message, testMessage);
     assertThat(message.getPayload().getDataType().getMediaType().getCharset().get(), is(charset));
+  }
+
+  private void assertPayloadIfNotClosed(Message message, String testMessage) throws Exception {
+    try {
+      assertThat(getPayloadAsString(message), is(testMessage));
+    } catch (IllegalStateException e) {
+      // Ignore if closed stream
+    }
   }
 
 }

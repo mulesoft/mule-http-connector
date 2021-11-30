@@ -66,6 +66,7 @@ public class HttpRequestEncodingTestCase extends AbstractHttpRequestTestCase {
     CoreEvent result = flowRunner("encodingTest")
         .withPayload(testMessage)
         .withMediaType(mediaType)
+        .keepStreamsOpen()
         .run();
     assertThat(getPayloadAsString(result.getMessage()), is(testMessage));
     assertThat(result.getMessage().getPayload().getDataType().getMediaType(), is(mediaType));

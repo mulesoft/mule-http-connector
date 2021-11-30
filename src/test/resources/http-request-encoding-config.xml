@@ -12,7 +12,6 @@
 
     <flow name="encodingTest">
         <http:request path="testPath" config-ref="requestConfig" method="POST"/>
-        <object-to-string-transformer/>
     </flow>
 
 </mule>

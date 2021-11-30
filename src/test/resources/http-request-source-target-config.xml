@@ -16,7 +16,7 @@
                 #[payload]
             </http:body>
         </http:request>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <flow name="customSourceFlow">
@@ -25,11 +25,11 @@
                 #[vars.customSource]
             </http:body>
         </http:request>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <flow name="payloadTargetFlow">
         <http:request config-ref="config" path="test" method="POST"/>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 </mule>

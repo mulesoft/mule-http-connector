@@ -23,7 +23,7 @@
 
     <flow name="httpFlow">
         <http:request config-ref="httpProxy" path="testPath"/>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
 </mule>

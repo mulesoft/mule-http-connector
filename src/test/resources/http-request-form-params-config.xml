@@ -23,13 +23,13 @@
                 }]
             </http:body>
         </http:request>
-        <object-to-string-transformer/>
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <flow name="formParamInbound">
         <http:request config-ref="config" path="testPath" method="GET"/>
         <set-payload value="#[output text/plain --- payload.testName1 ++ payload.testName2]"/>
-        <object-to-string-transformer/>
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
 </mule>

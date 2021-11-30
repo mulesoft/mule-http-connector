@@ -13,7 +13,7 @@
     </http:request-config>
     <flow name="refAnonymousProxy">
         <http:request config-ref="configRefAnonymousProxy" path="requestPath"/>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
 
@@ -24,7 +24,7 @@
     </http:request-config>
     <flow name="nonProxyParamProxy">
         <http:request config-ref="configNonProxyParam" path="requestPath" />
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <!-- nonProxyHosts Param Inner -->
@@ -37,7 +37,7 @@
     </http:request-config>
     <flow name="innerNonProxyParamProxy">
         <http:request config-ref="configInnerNonProxyParamProxy" path="requestPath" />
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <!-- Multple Hosts nonProxyHosts Param Inner -->
@@ -50,7 +50,7 @@
     </http:request-config>
     <flow name="innerNonProxyParamProxyMultipleHosts">
         <http:request config-ref="configInnerNonProxyParamProxyMultipleHosts" path="requestPath" />
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <!-- nonProxyHosts another host  -->
@@ -63,7 +63,7 @@
     </http:request-config>
     <flow name="innerNonProxyParamProxyAnotherHost">
         <http:request config-ref="configInnerNonProxyParamProxyAnotherHost" path="requestPath" />
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <!-- No Proxy -->
@@ -72,6 +72,6 @@
     </http:request-config>
     <flow name="noProxy">
         <http:request config-ref="configNoProxy" path="requestPath" />
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 </mule>

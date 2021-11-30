@@ -20,17 +20,17 @@
 
     <flow name="requestFlow">
         <http:request config-ref="requestConfig" method="POST" path="requestPath"/>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <flow name="requestFlowWithCustomCorrelationId">
         <http:request config-ref="requestConfig" method="POST" path="requestPath" correlationId="customCorrelationId"/>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <flow name="neverSendCorrelationId">
         <http:request config-ref="requestConfig" method="POST" path="requestPath" sendCorrelationId="NEVER" correlationId="customCorrelationId"/>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <flow name="clashingCorrelationIds">
@@ -39,7 +39,7 @@
                 #[{'X-Correlation-ID' : 'customCorrelationId'}]
             </http:headers>
         </http:request>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <flow name="requestPropertiesFlow">
@@ -54,7 +54,7 @@
                 #[{'query1' : 4, 'query2' : '5'}]
             </http:query-params>
         </http:request>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <!-- MULE-8956 -->
@@ -75,7 +75,7 @@
     <flow name="blockingRequest">
         <http:request config-ref="blockingRequestConfig" path="remote" method="GET"/>
         <set-payload value="#[output application/java --- payload.root.node]"/>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
 </mule>

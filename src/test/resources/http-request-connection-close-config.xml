@@ -26,7 +26,7 @@
 
     <flow name="testFlowHttps">
         <http:request path="testPath" config-ref="httpsConfig"/>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
 </mule>

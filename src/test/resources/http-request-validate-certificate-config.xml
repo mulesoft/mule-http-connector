@@ -31,7 +31,7 @@
 
     <flow name="validCertFlow">
         <http:request config-ref="validCertHttpConfig" path="requestPath" method="POST"/>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <flow name="missingCertFlow">

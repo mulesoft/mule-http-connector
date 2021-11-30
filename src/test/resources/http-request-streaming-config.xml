@@ -15,19 +15,19 @@
 
     <flow name="streamingAutoConfigMode">
         <http:request config-ref="requestConfigMode" method="POST" path="path" />
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <flow name="streamingAlwaysConfigMode">
         <http:request config-ref="requestConfigMode" method="POST" path="path" requestStreamingMode="ALWAYS" />
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <flow name="streamingAuto">
         <http:request config-ref="requestConfig"  method="POST" path="path">
             <http:headers>#[vars.headers]</http:headers>
         </http:request>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <flow name="streamingAutoBothHeaders">
@@ -36,20 +36,20 @@
                 #[{'Transfer-Encoding' : 'chunked' , 'Content-Length' : '12'}]
             </http:headers>
         </http:request>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <flow name="streamingAlways">
         <http:request config-ref="requestConfig"  method="POST" path="path" requestStreamingMode="ALWAYS">
             <http:headers>#[vars.headers]</http:headers>
         </http:request>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <flow name="streamingNever">
         <http:request config-ref="requestConfig"  method="POST" path="path" requestStreamingMode="NEVER">
             <http:headers>#[vars.headers]</http:headers>
         </http:request>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 </mule>

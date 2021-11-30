@@ -13,7 +13,6 @@
 
     <flow name="encodingTest">
         <http:listener path="test" config-ref="listenerConfig"/>
-        <object-to-string-transformer/>
         <test:queue name="out"/>
     </flow>
 

@@ -2,9 +2,11 @@
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+               http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
                http://www.mulesoft.org/schema/mule/test  http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <object name="proxyPolicyProcessor" class="org.mule.test.http.functional.proxy.HttpProxyTemplateTestCase$ProxyPolicyProcessor"/>
@@ -26,8 +28,12 @@
             </http:response>
         </http:listener>
 
-        <test:assert count="1" expression="#[mel:Thread.currentThread().getName().startsWith('[MuleRuntime].io')]"/>
-        <test:assert-intercepting responseSameTask="false"/>
+        <script:execute engine="groovy" target="isExpectedThreadName">
+            <script:code>
+                return java.lang.Thread.currentThread().getName().startsWith('[MuleRuntime].io')
+            </script:code>
+        </script:execute>
+        <test:assert count="1" expression="#[vars.isExpectedThreadName]"/>
 
         <flow-ref name="proxyPolicyProcessor" />
 
@@ -35,7 +41,12 @@
             <http:headers>#[attributes.headers ++ {'X-Forwarded-For':attributes.remoteAddress}]</http:headers>
             <http:query-params>#[attributes.queryParams]</http:query-params>
         </http:request>
-        <test:assert count="1" expression="#[mel:Thread.currentThread().getName().startsWith('[MuleRuntime].io')]"/>
+        <script:execute engine="groovy" target="isExpectedThreadName">
+            <script:code>
+                return java.lang.Thread.currentThread().getName().startsWith('[MuleRuntime].io')
+            </script:code>
+        </script:execute>
+        <test:assert count="1" expression="#[vars.isExpectedThreadName]"/>
 
         <flow-ref name="proxyPolicyProcessor" />
     </flow>
@@ -47,8 +58,12 @@
             </http:response>
         </http:listener>
 
-        <test:assert count="1" expression="#[mel:Thread.currentThread().getName().startsWith('[MuleRuntime].io')]"/>
-        <test:assert-intercepting responseSameTask="false"/>
+        <script:execute engine="groovy" target="isExpectedThreadName">
+            <script:code>
+                return java.lang.Thread.currentThread().getName().startsWith('[MuleRuntime].io')
+            </script:code>
+        </script:execute>
+        <test:assert count="1" expression="#[vars.isExpectedThreadName]"/>
 
         <flow-ref name="proxyProcessor"/>
 
@@ -56,7 +71,12 @@
             <http:headers>#[attributes.headers ++ {'X-Forwarded-For':attributes.remoteAddress}]</http:headers>
             <http:query-params>#[attributes.queryParams]</http:query-params>
         </http:request>
-        <test:assert count="1" expression="#[mel:Thread.currentThread().getName().startsWith('[MuleRuntime].io')]"/>
+        <script:execute engine="groovy" target="isExpectedThreadName">
+            <script:code>
+                return java.lang.Thread.currentThread().getName().startsWith('[MuleRuntime].io')
+            </script:code>
+        </script:execute>
+        <test:assert count="1" expression="#[vars.isExpectedThreadName]"/>
 
         <flow-ref name="proxyProcessor"/>
     </flow>

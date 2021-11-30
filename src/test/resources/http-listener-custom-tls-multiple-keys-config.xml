@@ -46,12 +46,12 @@
 
     <flow name="testFlowClientWithCertificate">
         <http:request config-ref="requestConfigWithCertificate" path="/" method="POST"/>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <flow name="testFlowClientWithoutCertificate">
         <http:request config-ref="requestConfigWithoutCertificate" path="/" method="POST"/>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
 

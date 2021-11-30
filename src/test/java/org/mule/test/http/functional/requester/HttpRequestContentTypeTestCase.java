@@ -124,7 +124,7 @@ public class HttpRequestContentTypeTestCase extends AbstractHttpRequestTestCase 
   }
 
   private Message runFlow(String flowName, String method) throws Exception {
-    return flowRunner(flowName).withPayload(TEST_MESSAGE).withVariable("method", method).run().getMessage();
+    return flowRunner(flowName).keepStreamsOpen().withPayload(TEST_MESSAGE).withVariable("method", method).run().getMessage();
   }
 
   @Override

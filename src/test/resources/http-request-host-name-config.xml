@@ -12,7 +12,7 @@
 
     <flow name="hostNameWithSpacesFlow">
         <http:request path="testPath" config-ref="requestConfig" method="POST"/>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
 </mule>
