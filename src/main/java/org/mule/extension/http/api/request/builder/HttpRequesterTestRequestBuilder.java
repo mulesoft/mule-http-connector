@@ -27,11 +27,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Component that specifies how to create a proper HTTP simple request, that can be used in a Polling Source
+ * Component that specifies how to create a proper HTTP simple request, that can be used in a connectivity testing.
  *
  * @since 1.7
  */
-public class HttpRequesterSimpleRequestBuilder {
+public class HttpRequesterTestRequestBuilder {
 
   /**
    * The body of the response message
@@ -49,7 +49,7 @@ public class HttpRequesterSimpleRequestBuilder {
   @Optional
   @NullSafe
   @DisplayName("Headers")
-  protected List<SimpleRequestHeader> requestHeaders = emptyList();
+  protected List<TestRequestHeader> requestHeaders = emptyList();
 
   /**
    * URI parameters that should be used to create the request.
@@ -67,7 +67,7 @@ public class HttpRequesterSimpleRequestBuilder {
   @Optional
   @NullSafe
   @DisplayName("Query Parameters")
-  private List<QueryParam> requestQueryParams = emptyList();
+  private List<TestQueryParam> requestQueryParams = emptyList();
 
   public String getRequestBody() {
     return requestBody;
@@ -77,11 +77,11 @@ public class HttpRequesterSimpleRequestBuilder {
     this.requestBody = body;
   }
 
-  public List<SimpleRequestHeader> getRequestHeaders() {
+  public List<TestRequestHeader> getRequestHeaders() {
     return unmodifiableList(requestHeaders);
   }
 
-  protected void setRequestHeaders(List<SimpleRequestHeader> headers) {
+  protected void setRequestHeaders(List<TestRequestHeader> headers) {
     this.requestHeaders = headers != null ? headers : emptyList();
   }
 
@@ -89,7 +89,7 @@ public class HttpRequesterSimpleRequestBuilder {
     return UriUtils.replaceUriParams(path, requestUriParams);
   }
 
-  public List<QueryParam> getRequestQueryParams() {
+  public List<TestQueryParam> getRequestQueryParams() {
     return unmodifiableList(requestQueryParams);
   }
 
@@ -97,7 +97,7 @@ public class HttpRequesterSimpleRequestBuilder {
     return unmodifiableMap(requestUriParams);
   }
 
-  protected void setRequestQueryParams(List<QueryParam> queryParams) {
+  protected void setRequestQueryParams(List<TestQueryParam> queryParams) {
     this.requestQueryParams = queryParams;
   }
 
