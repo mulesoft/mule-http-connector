@@ -15,7 +15,6 @@ import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
 import org.mule.extension.http.api.request.authentication.UsernamePasswordAuthentication;
-import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.api.request.builder.HttpRequesterSimpleRequestBuilder;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.internal.HttpMetadataResolver;
