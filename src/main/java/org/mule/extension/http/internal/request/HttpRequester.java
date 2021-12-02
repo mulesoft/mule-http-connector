@@ -185,7 +185,7 @@ public class HttpRequester {
                           streamingHelper, callback, injectedHeaders, correlationId);
               }, () -> {
                 if (responseValidator != null) {
-                  // change when having response validator from Eze
+                  // TODO (HTTPC-181)
                   responseValidator.validate((Result) result, httpRequest, streamingHelper);
                 }
 
