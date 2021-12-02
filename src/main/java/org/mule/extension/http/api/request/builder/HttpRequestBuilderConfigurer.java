@@ -10,6 +10,11 @@ import org.mule.extension.http.internal.request.HttpRequesterConfig;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
 
+/**
+ * ADD JAVA DOC HERE
+ *
+ * @since 1.7
+ */
 public interface HttpRequestBuilderConfigurer {
 
   HttpRequestBuilder toHttpRequestBuilder(HttpRequesterConfig config);
