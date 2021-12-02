@@ -6,28 +6,36 @@
  */
 package org.mule.extension.http.api.request.builder;
 
-import static java.util.Objects.hash;
+import org.mule.runtime.api.meta.ExpressionSupport;
+import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.util.Objects;
 
+import static java.util.Objects.hash;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+
 /**
  * Represents an HTTP Query Parameter
- * 
- * @since 1.1
+ *
+ * @since 1.7
  */
-public class QueryParam implements KeyValuePair {
+@Alias("queryParam")
+public class TestQueryParam implements KeyValuePair {
 
   /**
    * Represents the Key of this HTTP Query Parameter
    */
   @Parameter
+  @Expression(value = NOT_SUPPORTED)
   private String key;
 
   /**
    * Represents the Value of this HTTP Query Parameter
    */
   @Parameter
+  @Expression(value = NOT_SUPPORTED)
   private String value;
 
   @Override
@@ -42,8 +50,8 @@ public class QueryParam implements KeyValuePair {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof QueryParam) {
-      QueryParam other = (QueryParam) obj;
+    if (obj instanceof TestQueryParam) {
+      TestQueryParam other = (TestQueryParam) obj;
       return Objects.equals(key, other.key) && Objects.equals(value, other.value);
     }
 
