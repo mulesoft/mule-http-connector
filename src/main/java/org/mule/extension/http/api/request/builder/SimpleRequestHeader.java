@@ -6,27 +6,22 @@
  */
 package org.mule.extension.http.api.request.builder;
 
-import static java.util.Objects.hash;
+import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.util.Objects;
 
 /**
- * Represents an HTTP Query Parameter
- * 
- * @since 1.1
+ * Represents an HTTP Header
+ *
+ * @since 1.7
  */
-public class QueryParam implements KeyValuePair {
+@Alias("requestHeader")
+public class SimpleRequestHeader implements KeyValuePair {
 
-  /**
-   * Represents the Key of this HTTP Query Parameter
-   */
   @Parameter
   private String key;
 
-  /**
-   * Represents the Value of this HTTP Query Parameter
-   */
   @Parameter
   private String value;
 
@@ -41,17 +36,21 @@ public class QueryParam implements KeyValuePair {
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (obj instanceof QueryParam) {
-      QueryParam other = (QueryParam) obj;
-      return Objects.equals(key, other.key) && Objects.equals(value, other.value);
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
     }
-
-    return false;
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    SimpleRequestHeader that = (SimpleRequestHeader) o;
+    return Objects.equals(key, that.key) &&
+        Objects.equals(value, that.value);
   }
 
   @Override
   public int hashCode() {
-    return hash(key, value);
+    return Objects.hash(key, value);
   }
+
 }
