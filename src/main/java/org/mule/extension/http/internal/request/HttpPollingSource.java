@@ -161,14 +161,6 @@ public class HttpPollingSource extends PollingSource<InputStream, HttpResponseAt
     sendRequest(pollContext);
   }
 
-  private HttpAuthentication resolveAuthentication(HttpRequestAuthentication authentication) {
-    HttpAuthentication requestAuthentication = null;
-    if (authentication instanceof UsernamePasswordAuthentication) {
-      requestAuthentication = (HttpAuthentication) authentication;
-    }
-    return requestAuthentication;
-  }
-
   @Override
   public void onRejectedItem(Result<InputStream, HttpResponseAttributes> result, SourceCallbackContext sourceCallbackContext) {
     LOGGER.error("onRejectedItem");
