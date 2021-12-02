@@ -17,6 +17,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
+import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
@@ -34,6 +35,7 @@ import javax.inject.Inject;
 @Configuration(name = "requestConfig")
 @ConnectionProviders(HttpRequesterProvider.class)
 @Operations({HttpRequestOperations.class})
+@Sources(HttpPollingSource.class)
 public class HttpRequesterConfig implements Initialisable, HttpRequesterCookieConfig {
 
   @ParameterGroup(name = URL_CONFIGURATION)
