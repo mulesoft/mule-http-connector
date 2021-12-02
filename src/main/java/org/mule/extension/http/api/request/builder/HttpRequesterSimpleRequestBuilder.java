@@ -32,7 +32,7 @@ import java.util.Map;
  *
  * @since 1.7
  */
-public class HttpRequesterSimpleRequestBuilder {
+public class HttpRequesterSimpleRequestBuilder implements HttpRequestBuilderConfigurer {
 
   /**
    * The body of the response message
@@ -106,6 +106,7 @@ public class HttpRequesterSimpleRequestBuilder {
     this.requestUriParams = uriParams;
   }
 
+  @Override
   public HttpRequestBuilder toHttpRequestBuilder(HttpRequesterConfig config) {
     return HttpRequest.builder(PRESERVE_HEADER_CASE || config.isPreserveHeadersCase())
         .headers(toMultiMap(getRequestHeaders()))
@@ -121,4 +122,8 @@ public class HttpRequesterSimpleRequestBuilder {
     return builder;
   }
 
+  @Override
+  public TypedValue<?> getBodyAsTypedValue() {
+    return TypedValue.of(getRequestBody());
+  }
 }
