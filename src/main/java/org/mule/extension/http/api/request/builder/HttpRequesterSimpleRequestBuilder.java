@@ -15,6 +15,7 @@ import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEA
 
 import org.mule.extension.http.internal.request.HttpRequesterConfig;
 import org.mule.extension.http.internal.request.UriUtils;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -110,4 +111,14 @@ public class HttpRequesterSimpleRequestBuilder {
         .headers(toMultiMap(getRequestHeaders()))
         .queryParams(toMultiMap(getRequestQueryParams()));
   }
+
+  public HttpRequesterRequestBuilder toHttpRequesterRequestBuilder() {
+    HttpRequesterRequestBuilder builder = new HttpRequesterRequestBuilder();
+    builder.setBody(TypedValue.of(requestBody));
+    builder.setUriParams(requestUriParams);
+    builder.setQueryParams(toMultiMap(requestQueryParams));
+    builder.setHeaders(toMultiMap(requestHeaders));
+    return builder;
+  }
+
 }
