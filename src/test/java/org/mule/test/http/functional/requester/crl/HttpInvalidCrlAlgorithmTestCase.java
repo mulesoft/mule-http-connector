@@ -20,6 +20,8 @@ import static org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory.c
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_PROVIDER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STARTED;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getExtensionModel;
+import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.getTlsExtensionModel;
 import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.formatInvalidCrlAlgorithm;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
@@ -116,9 +118,11 @@ public class HttpInvalidCrlAlgorithmTestCase extends AbstractMuleTestCase {
   }
 
   private List<ExtensionModel> getRequiredExtensions() {
+    ExtensionModel core = getExtensionModel();
+    ExtensionModel tls = getTlsExtensionModel();
     ExtensionModel sockets = loadExtension(SocketsExtension.class, emptySet());
     ExtensionModel http = loadExtension(HttpConnector.class, singleton(sockets));
-    return asList(http, sockets);
+    return asList(http, sockets, tls, core);
   }
 
   private ExtensionModel loadExtension(Class extension, Set<ExtensionModel> deps) {

@@ -51,7 +51,7 @@ public class HttpRequestProfilingTestCase extends AbstractHttpRequestTestCase {
   @Override
   protected Map<String, Object> getStartUpRegistryObjects() {
     Map<String, Object> registryObjects = new HashMap<>();
-    registryObjects.put("test.profiling.service", new TestProfilingService(profilingDataProducer));
+    registryObjects.put("_muleProfilingService", new TestProfilingService(profilingDataProducer));
     return registryObjects;
   }
 

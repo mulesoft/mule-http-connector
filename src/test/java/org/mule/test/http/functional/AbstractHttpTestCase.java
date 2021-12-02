@@ -28,8 +28,9 @@ public abstract class AbstractHttpTestCase extends MuleArtifactFunctionalTestCas
 
   // Expected validation error message for JDK 1.8.0_262.
   protected static final String J8_262_SSL_ERROR_RESPONSE = "General SSLEngine problem";
-  // Expected validation error message for JDK 1.8.0_275.
-  protected static final String J8_275_SSL_ERROR_RESPONSE = "Certificate signature validation failed";
+  // Expected validation error messages for JDK 1.8.0_275.
+  protected static final String J8_275_SSL_ERROR_RESPONSE_1 = "Certificate signature validation failed";
+  protected static final String J8_275_SSL_ERROR_RESPONSE_2 = "signature check failed";
   // Expected validation error message for JDK 11.
   protected static final String J11_SSL_ERROR_RESPONSE = "PKIX path building failed";
 

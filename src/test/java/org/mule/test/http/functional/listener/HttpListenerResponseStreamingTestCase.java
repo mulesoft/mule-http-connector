@@ -16,6 +16,8 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
+
+import org.junit.Ignore;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
@@ -37,6 +39,8 @@ import org.apache.http.client.fluent.Response;
 import org.junit.Before;
 import org.junit.Rule;
 
+@Ignore("HTTPC-177")
+// TODO HTTPC-177: Remove mel expressions from related XML.
 public abstract class HttpListenerResponseStreamingTestCase extends AbstractHttpTestCase {
 
   private static final int DEFAULT_TIMEOUT = 10000;

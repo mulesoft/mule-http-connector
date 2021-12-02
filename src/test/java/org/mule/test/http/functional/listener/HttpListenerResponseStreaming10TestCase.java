@@ -9,8 +9,11 @@ package org.mule.test.http.functional.listener;
 import java.io.IOException;
 
 import org.apache.http.HttpVersion;
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore("HTTPC-177")
+// TODO HTTPC-177: Remove mel expressions from related XML.
 public class HttpListenerResponseStreaming10TestCase extends HttpListenerResponseStreamingTestCase {
 
   @Override

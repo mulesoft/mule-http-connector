@@ -20,17 +20,17 @@
 
     <flow name="httpFlowWithDefaultResponseTimeout">
         <http:request config-ref="requestConfig" path="/service" method="POST"/>
-        <byte-array-to-string-transformer/>
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <flow name="httpFlowWithCustomResponseTimeout">
         <http:request config-ref="requestConfig" path="/service" method="POST" responseTimeout="200"/>
-        <byte-array-to-string-transformer/>
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <flow name="server">
         <http:listener config-ref="listenerConfig" path="/service"/>
-        <test:processor waitTime="500" appendString=" folks"/>
+        <test:processor waitTime="500" appendString="folks"/>
     </flow>
 
 </mule>

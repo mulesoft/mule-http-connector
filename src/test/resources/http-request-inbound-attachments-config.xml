@@ -14,12 +14,12 @@
 
     <flow name="requestFlow">
         <http:request config-ref="requestConfig" path="path" method="POST"/>
-        <test:assert expression="sizeOf(payload.parts) == 2"/>
-        <test:assert expression="payload.parts.partName1.headers.'Content-Type' == 'text/plain'"/>
-        <test:assert expression="payload.parts.partName1.headers.'Custom' == 'myHeader'"/>
-        <test:assert expression="payload.parts.partName1.content == 'Test part 1'"/>
-        <test:assert expression="payload.parts[1].headers.'Content-Type' == 'text/html'"/>
-        <test:assert expression="payload.parts[1].headers.'Content-Disposition'.filename == 'a.html'"/>
+        <test:assert expression="#[sizeOf(payload.parts) == 2]"/>
+        <test:assert expression="#[payload.parts.partName1.headers.'Content-Type' == 'text/plain']"/>
+        <test:assert expression="#[payload.parts.partName1.headers.'Custom' == 'myHeader']"/>
+        <test:assert expression="#[payload.parts.partName1.content == 'Test part 1']"/>
+        <test:assert expression="#[payload.parts[1].headers.'Content-Type' == 'text/html']"/>
+        <test:assert expression="#[payload.parts[1].headers.'Content-Disposition'.filename == 'a.html']"/>
         <set-payload value="#[payload.parts[1].content]"/>
     </flow>
 

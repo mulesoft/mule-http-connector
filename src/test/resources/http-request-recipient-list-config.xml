@@ -7,10 +7,12 @@
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <flow name="recipientListFlow">
+        <!-- TODO HTTPC-177: Remove mel expression -->
         <recipient-list expression="#[mel:message.inboundProperties['urls']]"/>
     </flow>
 
     <flow name="fireAndForgetFlow">
+        <!-- TODO HTTPC-177: Remove mel expression -->
         <recipient-list expression="#[mel:message.inboundProperties['urls']]" />
     </flow>
 

@@ -21,6 +21,7 @@
 
     <flow name="exceptionBuildingResponse">
         <http:listener config-ref="listenerConfig" path="/exceptionBuildingResponse" responseStreamingMode="NEVER"/>
+        <!-- TODO HTTPC-177: Remove mel expression -->
         <set-payload value="#[mel:inputStreamPayload]"/>
 
         <error-handler>
@@ -33,6 +34,7 @@
 
     <flow name="exceptionSendingResponse">
         <http:listener config-ref="listenerConfig" path="/exceptionSendingResponse" responseStreamingMode="ALWAYS"/>
+        <!-- TODO HTTPC-177: Remove mel expression -->
         <set-payload value="#[mel:inputStreamPayload]"/>
 
         <error-handler>
@@ -45,11 +47,13 @@
 
     <flow name="exceptionBuildingResponseFailAgain">
         <http:listener config-ref="listenerConfig" path="/exceptionBuildingResponseFailAgain" responseStreamingMode="NEVER"/>
+        <!-- TODO HTTPC-177: Remove mel expression -->
         <set-payload value="#[mel:inputStreamPayload]"/>
 
         <error-handler>
             <on-error-propagate>
                 <flow-ref name="trackPassageMessageProcessor"/>
+                <!-- TODO HTTPC-177: Remove mel expression -->
                 <set-payload value="#[mel:inputStreamPayload]"/>
             </on-error-propagate>
         </error-handler>
@@ -57,11 +61,13 @@
 
     <flow name="exceptionSendingResponseFailAgain">
         <http:listener config-ref="listenerConfig" path="/exceptionSendingResponseFailAgain" responseStreamingMode="ALWAYS"/>
+        <!-- TODO HTTPC-177: Remove mel expression -->
         <set-payload value="#[mel:inputStreamPayload]"/>
 
         <error-handler>
             <on-error-continue>
                 <flow-ref name="trackPassageMessageProcessor"/>
+                <!-- TODO HTTPC-177: Remove mel expression -->
                 <set-payload value="#[mel:inputStreamPayload]"/>
             </on-error-continue>
         </error-handler>
