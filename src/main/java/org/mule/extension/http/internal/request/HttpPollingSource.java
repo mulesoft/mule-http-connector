@@ -8,6 +8,7 @@ package org.mule.extension.http.internal.request;
 
 import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST;
 import static org.mule.extension.http.internal.request.HttpRequestUtils.createHttpRequester;
+import static org.mule.extension.http.internal.request.UriUtils.buildPath;
 import static org.mule.extension.http.internal.request.UriUtils.resolveUri;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 
@@ -75,7 +76,6 @@ public class HttpPollingSource extends PollingSource<InputStream, HttpResponseAt
   private HashMap<String, List<String>> injectedHeaders;
 
 
-  private HttpRequesterRequestBuilder fullRequestBuilder;
   private HttpRequester httpRequester;
 
   @Config
@@ -93,7 +93,7 @@ public class HttpPollingSource extends PollingSource<InputStream, HttpResponseAt
   @Parameter
   @Placement(order = 1)
   @Optional
-  private String path;
+  private String path = "";
 
   @Parameter
   @Placement(order = 2)
@@ -124,12 +124,11 @@ public class HttpPollingSource extends PollingSource<InputStream, HttpResponseAt
 
   private String getResolvedUri() {
     UriParameters uriParameters = client.getDefaultUriParameters();
-    String resolvedPath = UriUtils.replaceUriParams(path, requestBuilder.getRequestUriParams());
+    String resolvedPath = UriUtils.replaceUriParams(buildPath(config.getBasePath(), path), requestBuilder.getRequestUriParams());
     return resolveUri(uriParameters.getScheme(), uriParameters.getHost().trim(), uriParameters.getPort(), resolvedPath);
   }
 
   private void sendRequest(PollContext<InputStream, HttpResponseAttributes> pollContext) {
-    fullRequestBuilder = requestBuilder.toHttpRequesterRequestBuilder();
     CompletionCallback<InputStream, HttpResponseAttributes> callback =
         new CompletionCallback<InputStream, HttpResponseAttributes>() {
 
@@ -151,7 +150,7 @@ public class HttpPollingSource extends PollingSource<InputStream, HttpResponseAt
                             config.getSendBodyMode(),
                             config.getFollowRedirects(), client.getDefaultAuthentication(), config.getResponseTimeout(),
                             null,
-                            transformationService, fullRequestBuilder, true, muleContext, scheduler, null,
+                            transformationService, requestBuilder, true, muleContext, scheduler, null,
                             null, callback, injectedHeaders, null);
   }
 
