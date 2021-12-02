@@ -181,6 +181,23 @@
         </munit:validation>
     </munit:test>
 
+    <munit:test name="moved-test-with-set-cookie" description="Create a request to an endpoint that return 301 with set-cookie.
+     Should create a new request with a cookie header">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="moved-with-set-cookie" />
+            <munit:enable-flow-source value="response-with-set-cookie" />
+        </munit:enable-flow-sources>
+
+        <munit:execution>
+            <http:request method="GET" config-ref="followRedirects" path="/move-with-set-cookie"/>
+            <set-variable value="#[payload as String]" variableName="moved_response"/>
+        </munit:execution>
+
+        <munit:validation>
+            <munit-tools:assert-equals actual="#[vars.moved_response]" expected='#["asd=asd"]'/>
+        </munit:validation>
+    </munit:test>
+
     <flow name="moved">
         <http:listener config-ref="HTTP_Listener_config" path="/move">
             <http:response statusCode="301" reasonPhrase="Moved Permanently">
@@ -278,5 +295,24 @@
     <flow name="response-with-query">
         <http:listener config-ref="HTTP_Listener_config" path="/response-with-query"/>
         <set-payload value="#[attributes.queryParams.test]"/>
+    </flow>
+
+    <flow name="moved-with-set-cookie">
+        <http:listener config-ref="HTTP_Listener_config" path="/move-with-set-cookie">
+            <http:response statusCode="301" reasonPhrase="Moved Permanently">
+                <http:headers ><![CDATA[#[output application/java
+---
+{
+	"Location" : "http://localhost:${dynamic.port}/response-with-set-cookie",
+	"Set-Cookie" : "asd=asd"
+}]]]></http:headers>
+            </http:response>
+        </http:listener>
+        <set-payload value='#["moved"]' />
+    </flow>
+
+    <flow name="response-with-set-cookie">
+        <http:listener config-ref="HTTP_Listener_config" path="/response-with-set-cookie"/>
+        <set-payload value="#[attributes.headers.'Cookie']"/>
     </flow>
 </mule>
