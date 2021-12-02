@@ -10,11 +10,14 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableList;
+import static java.util.Objects.hash;
 import static org.mule.extension.http.internal.request.KeyValuePairUtils.toMultiMap;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
 
 import org.mule.extension.http.internal.request.HttpRequesterConfig;
 import org.mule.extension.http.internal.request.UriUtils;
+import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -25,6 +28,7 @@ import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Component that specifies how to create a proper HTTP simple request, that can be used in a connectivity testing.
@@ -39,6 +43,7 @@ public class HttpRequesterTestRequestBuilder {
   @Parameter
   @Optional(defaultValue = "")
   @Text
+  @Expression(value = NOT_SUPPORTED)
   @DisplayName("Body")
   private String requestBody;
 
@@ -48,6 +53,7 @@ public class HttpRequesterTestRequestBuilder {
   @Parameter
   @Optional
   @NullSafe
+  @Expression(value = NOT_SUPPORTED)
   @DisplayName("Headers")
   protected List<TestRequestHeader> requestHeaders = emptyList();
 
@@ -57,6 +63,7 @@ public class HttpRequesterTestRequestBuilder {
   @Parameter
   @Optional
   @NullSafe
+  @Expression(value = NOT_SUPPORTED)
   @DisplayName("URI Parameters")
   private Map<String, String> requestUriParams = emptyMap();
 
@@ -66,6 +73,7 @@ public class HttpRequesterTestRequestBuilder {
   @Parameter
   @Optional
   @NullSafe
+  @Expression(value = NOT_SUPPORTED)
   @DisplayName("Query Parameters")
   private List<TestQueryParam> requestQueryParams = emptyList();
 
@@ -109,5 +117,23 @@ public class HttpRequesterTestRequestBuilder {
     return HttpRequest.builder(PRESERVE_HEADER_CASE || config.isPreserveHeadersCase())
         .headers(toMultiMap(getRequestHeaders()))
         .queryParams(toMultiMap(getRequestQueryParams()));
+  }
+
+  @Override
+  public int hashCode() {
+    return hash(requestBody, requestHeaders, requestQueryParams, requestUriParams);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    HttpRequesterTestRequestBuilder that = (HttpRequesterTestRequestBuilder) o;
+    return Objects.equals(requestBody, that.requestBody) && Objects.equals(requestHeaders, that.requestHeaders)
+        && Objects.equals(requestQueryParams, that.requestQueryParams) && Objects.equals(requestUriParams, that.requestUriParams);
   }
 }
