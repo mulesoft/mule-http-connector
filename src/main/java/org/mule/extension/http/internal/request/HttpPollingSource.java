@@ -149,6 +149,7 @@ public class HttpPollingSource extends PollingSource<InputStream, HttpResponseAt
     httpRequester.doRequest(client, config, resolvedUri, method, config.getRequestStreamingMode(),
                             config.getSendBodyMode(),
                             config.getFollowRedirects(), client.getDefaultAuthentication(), config.getResponseTimeout(),
+                            // TODO (HTTPC-181)
                             null,
                             transformationService, requestBuilder, true, muleContext, scheduler, null,
                             null, callback, injectedHeaders, null);
