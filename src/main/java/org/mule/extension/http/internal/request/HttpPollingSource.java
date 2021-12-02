@@ -8,8 +8,6 @@ package org.mule.extension.http.internal.request;
 
 import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST;
 import static org.mule.extension.http.internal.request.HttpRequestUtils.createHttpRequester;
-import static org.mule.extension.http.internal.request.HttpRequestUtils.handleCursor;
-import static org.mule.extension.http.internal.request.UriUtils.buildPath;
 import static org.mule.extension.http.internal.request.UriUtils.resolveUri;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 
@@ -23,7 +21,6 @@ import org.mule.extension.http.internal.HttpMetadataResolver;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.transformation.TransformationService;
