@@ -22,7 +22,15 @@
 
     <flow name="targetFlow" >
         <http:listener config-ref="targetEndpoint" path="/test" />
-        <set-payload value="test payload"/>
+        <choice>
+            <when expression="#[message.attributes.headers['testHeader'] != null]">
+                <set-payload value="#['Received header: ' ++ message.attributes.headers['testHeader']]"/>
+            </when>
+            <otherwise>
+                <set-payload value="test payload"/>
+            </otherwise>
+        </choice>
+
     </flow>
 
     <flow name="basic-polling">
@@ -37,7 +45,22 @@
         </munit-tools:queue>
     </flow>
 
-    <munit:test name="basic-polling-test-case" description="Test">
+    <flow name="basic-polling-with-header">
+        <http:polling-source config-ref="requestConfig" path="test">
+            <scheduling-strategy >
+                <fixed-frequency frequency="2" timeUnit="SECONDS"/>
+            </scheduling-strategy>
+            <http:request-headers >
+                <http:request-header key="testHeader" value="Messi" />
+            </http:request-headers>
+        </http:polling-source>
+        <logger message="#[payload]"/>
+        <munit-tools:queue queueName="test_queue_2">
+            <munit-tools:value>#[payload]</munit-tools:value>
+        </munit-tools:queue>
+    </flow>
+
+    <munit:test name="basic-polling-test-case">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="targetFlow" />
             <munit:enable-flow-source value="basic-polling" />
@@ -50,7 +73,7 @@
         </munit:validation>
     </munit:test>
 
-    <munit:test name="polling-done-several-times-test-case" description="Test">
+    <munit:test name="polling-done-several-times-test-case">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="targetFlow" />
             <munit:enable-flow-source value="basic-polling" />
@@ -62,6 +85,19 @@
         </munit:execution>
         <munit:validation>
             <munit-tools:assert-that expression="#[payload]" is="#[MunitTools::equalTo('test payload')]"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="polling-with-header-test-case">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="targetFlow" />
+            <munit:enable-flow-source value="basic-polling-with-header" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="test_queue_2"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[payload]" is="#[MunitTools::equalTo('Received header: Messi')]"/>
         </munit:validation>
     </munit:test>
 
