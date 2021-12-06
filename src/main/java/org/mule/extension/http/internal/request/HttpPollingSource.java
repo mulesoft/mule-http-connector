@@ -13,8 +13,6 @@ import static org.mule.extension.http.internal.request.UriUtils.resolveUri;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
-import org.mule.extension.http.api.request.authentication.UsernamePasswordAuthentication;
 import org.mule.extension.http.api.request.builder.HttpRequesterSimpleRequestBuilder;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.internal.HttpMetadataResolver;
@@ -25,6 +23,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
@@ -43,7 +42,6 @@ import org.mule.runtime.extension.api.runtime.source.BackPressureMode;
 import org.mule.runtime.extension.api.runtime.source.PollContext;
 import org.mule.runtime.extension.api.runtime.source.PollingSource;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
-import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +56,7 @@ import java.util.List;
 @MetadataScope(outputResolver = HttpMetadataResolver.class)
 @Streaming
 @BackPressure(defaultMode = BackPressureMode.FAIL, supportedModes = {BackPressureMode.FAIL})
-public class HttpPollingSource extends PollingSource<InputStream, HttpResponseAttributes> {
+public class HttpPollingSource extends PollingSource<String, HttpResponseAttributes> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HttpPollingSource.class);
 
@@ -127,14 +125,18 @@ public class HttpPollingSource extends PollingSource<InputStream, HttpResponseAt
     return resolveUri(uriParameters.getScheme(), uriParameters.getHost().trim(), uriParameters.getPort(), resolvedPath);
   }
 
-  private void sendRequest(PollContext<InputStream, HttpResponseAttributes> pollContext) {
+  private void sendRequest(PollContext<String, HttpResponseAttributes> pollContext) {
     CompletionCallback<InputStream, HttpResponseAttributes> callback =
         new CompletionCallback<InputStream, HttpResponseAttributes>() {
 
           @Override
           public void success(Result<InputStream, HttpResponseAttributes> result) {
             pollContext.accept(item -> {
-              item.setResult(result);
+              // We put here splitting and etc...
+              Result.Builder<String, HttpResponseAttributes> responseBuilder =
+                  Result.<String, HttpResponseAttributes>builder().output(IOUtils.toString(result.getOutput()));
+              result.getAttributes().ifPresent(attr -> responseBuilder.attributes(attr));
+              item.setResult(responseBuilder.build());
             });
           }
 
@@ -152,17 +154,16 @@ public class HttpPollingSource extends PollingSource<InputStream, HttpResponseAt
   }
 
   @Override
-  public void poll(PollContext<InputStream, HttpResponseAttributes> pollContext) {
+  public void poll(PollContext<String, HttpResponseAttributes> pollContext) {
     if (pollContext.isSourceStopping()) {
       return;
     }
 
-    LOGGER.trace("POLL");
     sendRequest(pollContext);
   }
 
   @Override
-  public void onRejectedItem(Result<InputStream, HttpResponseAttributes> result, SourceCallbackContext sourceCallbackContext) {
+  public void onRejectedItem(Result<String, HttpResponseAttributes> result, SourceCallbackContext sourceCallbackContext) {
     LOGGER.error("onRejectedItem");
   }
 }
