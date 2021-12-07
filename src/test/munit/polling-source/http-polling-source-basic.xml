@@ -31,6 +31,16 @@
             </otherwise>
         </choice>
 
+        <choice>
+            <when expression="#[message.attributes.queryParams['testQueryParam'] != null]">
+                <set-payload value="#[payload ++ ' - ' ++ message.attributes.queryParams['testQueryParam']]"/>
+            </when>
+        </choice>
+    </flow>
+
+    <flow name="targetFlowPost" >
+        <http:listener config-ref="targetEndpoint" path="/test-post" allowedMethods="POST"/>
+        <set-payload value="test payload"/>
     </flow>
 
     <flow name="basic-polling">
@@ -41,6 +51,18 @@
         </http:polling-source>
         <logger message="#[payload]"/>
         <munit-tools:queue queueName="test_queue_1">
+            <munit-tools:value>#[payload]</munit-tools:value>
+        </munit-tools:queue>
+    </flow>
+
+    <flow name="basic-polling-post">
+        <http:polling-source config-ref="requestConfig" path="test-post" method="POST">
+            <scheduling-strategy >
+                <fixed-frequency frequency="2" timeUnit="SECONDS"/>
+            </scheduling-strategy>
+        </http:polling-source>
+        <logger message="#[payload]"/>
+        <munit-tools:queue queueName="test_queue_3">
             <munit-tools:value>#[payload]</munit-tools:value>
         </munit-tools:queue>
     </flow>
@@ -56,6 +78,21 @@
         </http:polling-source>
         <logger message="#[payload]"/>
         <munit-tools:queue queueName="test_queue_2">
+            <munit-tools:value>#[payload]</munit-tools:value>
+        </munit-tools:queue>
+    </flow>
+
+    <flow name="basic-polling-with-query-params">
+        <http:polling-source config-ref="requestConfig" path="test">
+            <scheduling-strategy >
+                <fixed-frequency frequency="2" timeUnit="SECONDS"/>
+            </scheduling-strategy>
+            <http:request-query-params >
+                <http:query-param key="testQueryParam" value="parameter value" />
+            </http:request-query-params>
+        </http:polling-source>
+        <logger message="#[payload]"/>
+        <munit-tools:queue queueName="test_queue_4">
             <munit-tools:value>#[payload]</munit-tools:value>
         </munit-tools:queue>
     </flow>
@@ -100,6 +137,33 @@
         </munit:execution>
         <munit:validation>
             <munit-tools:assert-that expression="#[payload]" is="#[MunitTools::equalTo('Received header: Messi')]"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="polling-post-test-case">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="targetFlowPost" />
+            <munit:enable-flow-source value="basic-polling-post" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="test_queue_3"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[payload]" is="#[MunitTools::equalTo('test payload')]"/>
+        </munit:validation>
+    </munit:test>
+
+
+    <munit:test name="polling-query-params-test-case">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="targetFlow" />
+            <munit:enable-flow-source value="basic-polling-with-query-params" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="test_queue_4"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[payload]" is="#[MunitTools::equalTo('test payload - parameter value')]"/>
         </munit:validation>
     </munit:test>
 
