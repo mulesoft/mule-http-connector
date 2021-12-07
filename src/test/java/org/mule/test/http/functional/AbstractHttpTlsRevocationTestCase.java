@@ -33,11 +33,11 @@ public abstract class AbstractHttpTlsRevocationTestCase extends AbstractHttpTest
    * Each CRL has a distant nextUpdate date for avoiding their expiration, except the outdatedCrl that was created for testing
    * undetermined revocation scenarios.
    */
-  protected static final String EMPTY_CRL_FILE_PATH = "src/test/resources/tls/crl/emptyCrl";
+  protected static final String EMPTY_CRL_FILE_PATH = "tls/crl/emptyCrl";
 
-  protected static final String REVOKED_CRL_FILE_PATH = "src/test/resources/tls/crl/validCrl";
+  protected static final String REVOKED_CRL_FILE_PATH = "tls/crl/validCrl";
 
-  protected static final String OUTDATED_CRL_FILE_PATH = "src/test/resources/tls/crl/outdatedCrl";
+  protected static final String OUTDATED_CRL_FILE_PATH = "tls/crl/outdatedCrl";
 
   /**
    * For avoiding flaky tests, it is necessary to use consistently the certified entities. Each certified entity (i.e. each

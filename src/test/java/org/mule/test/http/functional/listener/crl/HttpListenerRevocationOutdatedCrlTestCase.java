@@ -8,8 +8,11 @@ package org.mule.test.http.functional.listener.crl;
 
 import static org.junit.Assert.fail;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore("HTTPC-184")
+// TODO HTTPC-184: Migrate to MUnit or TITA.
 public class HttpListenerRevocationOutdatedCrlTestCase extends AbstractHttpListenerClrTestCase {
 
   public HttpListenerRevocationOutdatedCrlTestCase() {

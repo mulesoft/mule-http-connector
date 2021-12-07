@@ -45,6 +45,7 @@ import org.mule.runtime.http.api.HttpConstants;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.http.api.server.HttpServer;
 import org.mule.runtime.http.api.server.HttpServerConfiguration;
+import org.mule.runtime.http.api.server.HttpServerFactory;
 import org.mule.runtime.http.api.server.ServerAddress;
 import org.mule.runtime.http.api.server.ServerCreationException;
 
@@ -216,7 +217,10 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
     HttpServerConfiguration serverConfiguration = getServerConfiguration();
 
     try {
-      server = httpService.getServerFactory().create(serverConfiguration);
+      HttpServerFactory serverFactory = httpService.getServerFactory();
+      if (serverFactory != null) {
+        server = serverFactory.create(serverConfiguration);
+      }
     } catch (ServerCreationException e) {
       throw new InitialisationException(createStaticMessage(buildFailureMessage("create", e)), e, this);
     }
@@ -261,7 +265,11 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
 
   private boolean useIOScheduler() {
     try {
-      Field result = httpService.getServerFactory().getClass().getDeclaredField("USE_IO_SCHEDULER");
+      HttpServerFactory serverFactory = httpService.getServerFactory();
+      if (serverFactory == null) {
+        return false;
+      }
+      Field result = serverFactory.getClass().getDeclaredField("USE_IO_SCHEDULER");
       return result.getBoolean(httpService);
     } catch (NoSuchFieldException | IllegalAccessException e) {
       return false;

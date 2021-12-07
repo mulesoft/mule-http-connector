@@ -8,15 +8,15 @@
                http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <tls:context name="tlsContext" >
-        <tls:trust-store algorithm="PKIX"/>
-        <tls:revocation-check>
-            <tls:standard-revocation-check/>
-        </tls:revocation-check>
-    </tls:context>
-
     <http:request-config name="config">
-        <http:request-connection protocol="HTTPS" host="www.google.com" port="443" tlsContext="tlsContext"/>
+        <http:request-connection protocol="HTTPS" host="www.google.com" port="443" >
+            <tls:context name="tlsContext" >
+                <tls:trust-store algorithm="PKIX"/>
+                <tls:revocation-check>
+                    <tls:standard-revocation-check/>
+                </tls:revocation-check>
+            </tls:context>
+        </http:request-connection>
     </http:request-config>
 
     <flow name="test">

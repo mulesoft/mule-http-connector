@@ -13,38 +13,6 @@
         <tls:key-store path="tls/crl/${entityCertifiedSubPath}" keyPassword="test" password="test" type="pkcs12" algorithm="PKIX"/>
     </tls:context>
 
-    <tls:context name="clientTlsContextPreferCrl">
-        <tls:trust-store path="tls/crl/trustFile.jceks" password="test" type="jceks" algorithm="PKIX"/>
-        <tls:key-store path="tls/crl/certificate-authority-entity.p12" keyPassword="test" password="test" type="pkcs12" algorithm="PKIX"/>
-        <tls:revocation-check>
-            <tls:standard-revocation-check preferCrls="true"/>
-        </tls:revocation-check>
-    </tls:context>
-
-    <tls:context name="clientTlsContextPreferCrlNoFallback">
-        <tls:trust-store path="tls/crl/trustFile.jceks" password="test" type="jceks" algorithm="PKIX"/>
-        <tls:key-store path="tls/crl/certificate-authority-entity.p12" keyPassword="test" password="test" type="pkcs12" algorithm="PKIX"/>
-        <tls:revocation-check>
-            <tls:standard-revocation-check preferCrls="true" noFallback="true"/>
-        </tls:revocation-check>
-    </tls:context>
-
-    <tls:context name="clientTlsContextNotPreferCrl">
-        <tls:trust-store path="tls/crl/trustFile.jceks" password="test" type="jceks" algorithm="PKIX"/>
-        <tls:key-store path="tls/crl/certificate-authority-entity.p12" keyPassword="test" password="test" type="pkcs12" algorithm="PKIX"/>
-        <tls:revocation-check>
-            <tls:standard-revocation-check preferCrls="false"/>
-        </tls:revocation-check>
-    </tls:context>
-
-    <tls:context name="clientTlsContextNotPreferCrlNoFallback">
-        <tls:trust-store path="tls/crl/trustFile.jceks" password="test" type="jceks" algorithm="PKIX"/>
-        <tls:key-store path="tls/crl/certificate-authority-entity.p12" keyPassword="test" password="test" type="pkcs12" algorithm="PKIX"/>
-        <tls:revocation-check>
-            <tls:standard-revocation-check preferCrls="false" noFallback="true"/>
-        </tls:revocation-check>
-    </tls:context>
-
     <http:listener-config name="crlServer">
         <http:listener-connection protocol="HTTP" host="localhost" port="8093" />
     </http:listener-config>
@@ -54,19 +22,51 @@
     </http:listener-config>
 
     <http:request-config name="clientConfigPreferCrl">
-        <http:request-connection protocol="HTTPS" host="localhost" port="${port}" tlsContext="clientTlsContextPreferCrl" />
+        <http:request-connection protocol="HTTPS" host="localhost" port="${port}" >
+            <tls:context name="clientTlsContextPreferCrl">
+                <tls:trust-store path="tls/crl/trustFile.jceks" password="test" type="jceks" algorithm="PKIX"/>
+                <tls:key-store path="tls/crl/certificate-authority-entity.p12" keyPassword="test" password="test" type="pkcs12" algorithm="PKIX"/>
+                <tls:revocation-check>
+                    <tls:standard-revocation-check preferCrls="true"/>
+                </tls:revocation-check>
+            </tls:context>
+        </http:request-connection>
     </http:request-config>
 
     <http:request-config name="clientConfigPreferCrlNoFallback">
-        <http:request-connection protocol="HTTPS" host="localhost" port="${port}" tlsContext="clientTlsContextPreferCrlNoFallback" />
+        <http:request-connection protocol="HTTPS" host="localhost" port="${port}" >
+            <tls:context name="clientTlsContextPreferCrlNoFallback">
+                <tls:trust-store path="tls/crl/trustFile.jceks" password="test" type="jceks" algorithm="PKIX"/>
+                <tls:key-store path="tls/crl/certificate-authority-entity.p12" keyPassword="test" password="test" type="pkcs12" algorithm="PKIX"/>
+                <tls:revocation-check>
+                    <tls:standard-revocation-check preferCrls="true" noFallback="true"/>
+                </tls:revocation-check>
+            </tls:context>
+        </http:request-connection>
     </http:request-config>
 
     <http:request-config name="clientConfigNotPreferCrl">
-        <http:request-connection protocol="HTTPS" host="localhost" port="${port}" tlsContext="clientTlsContextNotPreferCrl" />
+        <http:request-connection protocol="HTTPS" host="localhost" port="${port}" >
+            <tls:context name="clientTlsContextNotPreferCrl">
+                <tls:trust-store path="tls/crl/trustFile.jceks" password="test" type="jceks" algorithm="PKIX"/>
+                <tls:key-store path="tls/crl/certificate-authority-entity.p12" keyPassword="test" password="test" type="pkcs12" algorithm="PKIX"/>
+                <tls:revocation-check>
+                    <tls:standard-revocation-check preferCrls="false"/>
+                </tls:revocation-check>
+            </tls:context>
+        </http:request-connection>
     </http:request-config>
 
     <http:request-config name="clientConfigNotPreferCrlNoFallback">
-        <http:request-connection protocol="HTTPS" host="localhost" port="${port}" tlsContext="clientTlsContextNotPreferCrlNoFallback" />
+        <http:request-connection protocol="HTTPS" host="localhost" port="${port}" >
+            <tls:context name="clientTlsContextNotPreferCrlNoFallback">
+                <tls:trust-store path="tls/crl/trustFile.jceks" password="test" type="jceks" algorithm="PKIX"/>
+                <tls:key-store path="tls/crl/certificate-authority-entity.p12" keyPassword="test" password="test" type="pkcs12" algorithm="PKIX"/>
+                <tls:revocation-check>
+                    <tls:standard-revocation-check preferCrls="false" noFallback="true"/>
+                </tls:revocation-check>
+            </tls:context>
+        </http:request-connection>
     </http:request-config>
 
     <flow name="testFlowServer">

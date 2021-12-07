@@ -16,6 +16,9 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory.createConfigurationBuilder;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_PROVIDER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
@@ -26,6 +29,7 @@ import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.for
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
 
+import org.junit.Rule;
 import org.mule.extension.http.internal.temporary.HttpConnector;
 import org.mule.extension.socket.api.SocketsExtension;
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -45,6 +49,10 @@ import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.internal.policy.NullPolicyProvider;
+import org.mule.runtime.http.api.HttpService;
+import org.mule.runtime.http.api.server.HttpServer;
+import org.mule.runtime.http.api.server.HttpServerFactory;
+import org.mule.runtime.http.api.server.ServerCreationException;
 import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
@@ -60,12 +68,15 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.inject.Inject;
 
 import org.junit.Test;
-
+import org.mule.tck.junit4.rule.DynamicPort;
 
 public class HttpInvalidCrlAlgorithmTestCase extends AbstractMuleTestCase {
 
   @Inject
   private NotificationListenerRegistry notificationListenerRegistry;
+
+  @Rule
+  public DynamicPort httpsPort = new DynamicPort("httpsPort");
 
   @Test
   public void testInvalidCrlAlgorithm() throws MuleException, InterruptedException {
@@ -93,13 +104,28 @@ public class HttpInvalidCrlAlgorithmTestCase extends AbstractMuleTestCase {
       }
     });
     builders.add(createConfigurationBuilder(configuration));
-    builders.add(new TestServicesConfigurationBuilder());
+    builders.add(new TestServicesConfigurationBuilder() {
+
+      @Override
+      protected HttpService mockHttpService() {
+        try {
+          HttpServerFactory httpServerFactory = mock(HttpServerFactory.class);
+          HttpServer httpServer = mock(HttpServer.class);
+          when(httpServerFactory.create(any())).thenReturn(httpServer);
+          HttpService service = mock(HttpService.class);
+          when(service.getServerFactory()).thenReturn(httpServerFactory);
+          return service;
+        } catch (ServerCreationException e) {
+          return null;
+        }
+      }
+    });
     builders.add(new SimpleConfigurationBuilder(singletonMap(OBJECT_POLICY_PROVIDER, new NullPolicyProvider())));
     MuleContextBuilder contextBuilder = MuleContextBuilder.builder(APP);
     MuleContext muleContext = muleContextFactory.createMuleContext(builders, contextBuilder);
     final AtomicReference<Latch> contextStartedLatch = new AtomicReference<>();
     contextStartedLatch.set(new Latch());
-    notificationListenerRegistry.registerListener(new MuleContextNotificationListener<MuleContextNotification>() {
+    muleContext.getNotificationManager().addListener(new MuleContextNotificationListener<MuleContextNotification>() {
 
       @Override
       public boolean isBlocking() {
