@@ -132,7 +132,7 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
           @Override
           public void success(Result<InputStream, HttpResponseAttributes> result) {
             pollContext.accept(item -> {
-              // TODO (HTTPC-180): We put here splitting and etc...
+              // TODO (HTTPC-180): We put here splitting and etc... For now just consuming the stream
               Result.Builder<String, HttpResponseAttributes> responseBuilder =
                   Result.<String, HttpResponseAttributes>builder().output(IOUtils.toString(result.getOutput()));
               result.getAttributes().ifPresent(attr -> responseBuilder.attributes(attr));
