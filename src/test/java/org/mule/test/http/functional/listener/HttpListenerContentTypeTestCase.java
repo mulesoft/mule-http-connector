@@ -122,7 +122,7 @@ public class HttpListenerContentTypeTestCase extends AbstractHttpTestCase {
     assertThat(contentType, equalTo(expectedContentType));
   }
 
-  private static class NullifyingProcessor implements Processor {
+  public static class NullifyingProcessor implements Processor {
 
     @Override
     public CoreEvent process(CoreEvent event) throws MuleException {

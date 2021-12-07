@@ -14,6 +14,7 @@
     </http:request-config>
 
     <object name="assertRequestHeaderProcessor" class="org.mule.test.http.functional.HttpHeaderCaseTestCase$AssertRequestHeaderProcessor"/>
+    <object name="assertResponseHeaderProcessor" class="org.mule.test.http.functional.HttpHeaderCaseTestCase$AssertResponseHeaderProcessor"/>
 
     <flow name="serverRequest">
         <http:listener path="testRequest" config-ref="listenerConfig"/>
@@ -41,7 +42,7 @@
 
     <flow name="clientResponse">
         <http:request path="testResponse" config-ref="requestConfig"/>
-        <flow-ref name="assertRequestHeaderProcessor"/>
+        <flow-ref name="assertResponseHeaderProcessor"/>
     </flow>
 
     <flow name="proxyRequest">
