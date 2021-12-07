@@ -6,6 +6,8 @@
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
+    <object name="streamProcessor" class="org.mule.test.http.functional.listener.HttpListenerResponseStreamingTestCase$StreamProcessor"/>
+
     <configuration>
         <expression-language>
             <import class="org.mule.test.http.functional.listener.HttpListenerResponseStreamingTestCase"/>
@@ -58,7 +60,7 @@
 
     <flow name="inputStreamFlow">
         <http:listener config-ref="listenerConfig" path="/inputStream"/>
-        <custom-processor class="org.mule.test.http.functional.listener.HttpListenerResponseStreamingTestCase$StreamProcessor"/>
+        <flow-ref name="streamProcessor"/>
     </flow>
 
     <flow name="inputStreamWithContentLengthHeaderFlow">
@@ -69,7 +71,7 @@
                 </http:headers>
             </http:response>
         </http:listener>
-        <custom-processor class="org.mule.test.http.functional.listener.HttpListenerResponseStreamingTestCase$StreamProcessor"/>
+        <flow-ref name="streamProcessor"/>
     </flow>
 
     <flow name="inputStreamWithTransferEncodingFlow">
@@ -80,7 +82,7 @@
                 </http:headers>
             </http:response>
         </http:listener>
-        <custom-processor class="org.mule.test.http.functional.listener.HttpListenerResponseStreamingTestCase$StreamProcessor"/>
+        <flow-ref name="streamProcessor"/>
     </flow>
 
     <flow name="inputStreamWithTransferEncodingAndContentLengthFlow">
@@ -91,7 +93,7 @@
                 </http:headers>
             </http:response>
         </http:listener>
-        <custom-processor class="org.mule.test.http.functional.listener.HttpListenerResponseStreamingTestCase$StreamProcessor"/>
+        <flow-ref name="streamProcessor"/>
     </flow>
 
     <flow name="neverStringFlow">
@@ -112,7 +114,7 @@
 
     <flow name="neverInputStreamFlow">
         <http:listener config-ref="listenerConfig" path="/neverInputStream"  responseStreamingMode="NEVER"/>
-        <custom-processor class="org.mule.test.http.functional.listener.HttpListenerResponseStreamingTestCase$StreamProcessor"/>
+        <flow-ref name="streamProcessor"/>
     </flow>
 
     <flow name="neverInputStreamTransferEncodingHeaderFlow">
@@ -123,7 +125,7 @@
                 </http:headers>
             </http:response>
         </http:listener>
-        <custom-processor class="org.mule.test.http.functional.listener.HttpListenerResponseStreamingTestCase$StreamProcessor"/>
+        <flow-ref name="streamProcessor"/>
     </flow>
 
     <flow name="alwaysStringFlow">
@@ -144,7 +146,7 @@
 
     <flow name="alwaysInputStreamFlow">
         <http:listener config-ref="listenerConfig" path="/alwaysInputStream" responseStreamingMode="ALWAYS"/>
-        <custom-processor class="org.mule.test.http.functional.listener.HttpListenerResponseStreamingTestCase$StreamProcessor"/>
+        <flow-ref name="streamProcessor"/>
     </flow>
 
     <flow name="alwaysInputStreamContentLengthHeaderFlow">
@@ -155,7 +157,7 @@
                 </http:headers>
             </http:response>
         </http:listener>
-        <custom-processor class="org.mule.test.http.functional.listener.HttpListenerResponseStreamingTestCase$StreamProcessor"/>
+        <flow-ref name="streamProcessor"/>
     </flow>
 
     <flow name="mapFlow">

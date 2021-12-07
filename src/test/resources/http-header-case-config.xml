@@ -13,9 +13,12 @@
         <http:request-connection host="localhost" port="${port}"/>
     </http:request-config>
 
+    <object name="assertRequestHeaderProcessor" class="org.mule.test.http.functional.HttpHeaderCaseTestCase$AssertRequestHeaderProcessor"/>
+    <object name="assertResponseHeaderProcessor" class="org.mule.test.http.functional.HttpHeaderCaseTestCase$AssertResponseHeaderProcessor"/>
+
     <flow name="serverRequest">
         <http:listener path="testRequest" config-ref="listenerConfig"/>
-        <custom-processor class="org.mule.test.http.functional.HttpHeaderCaseTestCase$AssertRequestHeaderProcessor"/>
+        <flow-ref name="assertRequestHeaderProcessor"/>
     </flow>
 
     <flow name="serverResponse">
@@ -39,7 +42,7 @@
 
     <flow name="clientResponse">
         <http:request path="testResponse" config-ref="requestConfig"/>
-        <custom-processor class="org.mule.test.http.functional.HttpHeaderCaseTestCase$AssertResponseHeaderProcessor"/>
+        <flow-ref name="assertResponseHeaderProcessor"/>
     </flow>
 
     <flow name="proxyRequest">

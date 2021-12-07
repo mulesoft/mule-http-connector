@@ -8,6 +8,8 @@
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
+    <object name="stoppableInputStreamProcessor" class="org.mule.test.http.functional.HttpStreamingTestCase$StoppableInputStreamProcessor"/>
+
     <http:request-config name="requestConfig">
         <http:request-connection host="localhost" port="${httpPort}" streamResponse="true"/>
     </http:request-config>
@@ -22,7 +24,7 @@
 
     <flow name="server">
         <http:listener path="/" config-ref="listenerConfig"/>
-        <custom-processor class="org.mule.test.http.functional.HttpStreamingTestCase$StoppableInputStreamProcessor"/>
+        <flow-ref name="stoppableInputStreamProcessor"/>
     </flow>
 
 </mule>

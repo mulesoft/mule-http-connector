@@ -6,13 +6,14 @@
             http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
             http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
+    <object name="nullifyingProcessor" class="org.mule.test.http.functional.listener.HttpListenerContentTypeTestCase$NullifyingProcessor"/>
+
     <http:listener-config name="httpConf">
         <http:listener-connection host="localhost" port="${httpPort}"/>
     </http:listener-config>
 
     <flow name="listenerContentType" >
         <http:listener config-ref="httpConf" path="testInput"/>
-
         <set-payload value="{ &quot;key1&quot; : &quot;value, &quot;key2&quot; : 2 }" mimeType="application/json" encoding="UTF-8"/>
     </flow>
 
@@ -30,6 +31,6 @@
 
     <flow name="listenerEmptyResponse">
         <http:listener config-ref="httpConf" path="testEmpty"/>
-        <custom-processor class="org.mule.test.http.functional.listener.HttpListenerContentTypeTestCase$NullifyingProcessor"/>
+        <flow-ref name="nullifyingProcessor"/>
     </flow>
 </mule>

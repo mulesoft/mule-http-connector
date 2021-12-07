@@ -6,6 +6,8 @@
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
+    <object name="streamingProcessor" class="org.mule.test.http.functional.listener.HttpListenerNoBodyStatusTestCase$StreamingProcessor"/>
+
     <http:listener-config name="listenerConfig">
         <http:listener-connection host="localhost" port="${port}"/>
     </http:listener-config>
@@ -14,7 +16,7 @@
         <http:listener path="empty" allowedMethods="GET" config-ref="listenerConfig">
             <http:response statusCode="#[attributes.queryParams.status]"/>
         </http:listener>
-        <custom-processor class="org.mule.test.http.functional.listener.HttpListenerNoBodyStatusTestCase$StreamingProcessor"/>
+        <flow-ref name="streamingProcessor"/>
     </flow>
 
     <flow name="testFlow2">

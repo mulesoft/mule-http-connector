@@ -7,6 +7,10 @@
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
                http://www.mulesoft.org/schema/mule/test  http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
+    <object name="proxyPolicyProcessor" class="org.mule.test.http.functional.proxy.HttpProxyTemplateTestCase$ProxyPolicyProcessor"/>
+
+    <object name="proxyProcessor" class="org.mule.test.http.functional.proxy.HttpProxyTemplateTestCase$ProxyProcessor"/>
+
     <http:listener-config name="proxyConfig">
         <http:listener-connection host="localhost" port="${proxyPort}"/>
     </http:listener-config>
@@ -25,7 +29,7 @@
         <test:assert count="1" expression="#[mel:Thread.currentThread().getName().startsWith('[MuleRuntime].io')]"/>
         <test:assert-intercepting responseSameTask="false"/>
 
-        <custom-processor class="org.mule.test.http.functional.proxy.HttpProxyTemplateTestCase$ProxyPolicyProcessor"/>
+        <flow-ref name="proxyPolicyProcessor" />
 
         <http:request config-ref="requestConfig" method="#[attributes.method]" path="#[attributes.maskedRequestPath]">
             <http:headers>#[attributes.headers ++ {'X-Forwarded-For':attributes.remoteAddress}]</http:headers>
@@ -33,7 +37,7 @@
         </http:request>
         <test:assert count="1" expression="#[mel:Thread.currentThread().getName().startsWith('[MuleRuntime].io')]"/>
 
-        <custom-processor class="org.mule.test.http.functional.proxy.HttpProxyTemplateTestCase$ProxyPolicyProcessor"/>
+        <flow-ref name="proxyPolicyProcessor" />
     </flow>
 
     <flow name="proxyTemplate">
@@ -46,7 +50,7 @@
         <test:assert count="1" expression="#[mel:Thread.currentThread().getName().startsWith('[MuleRuntime].io')]"/>
         <test:assert-intercepting responseSameTask="false"/>
 
-        <custom-processor class="org.mule.test.http.functional.proxy.HttpProxyTemplateTestCase$ProxyProcessor"/>
+        <flow-ref name="proxyProcessor"/>
 
         <http:request config-ref="requestConfig" method="#[attributes.method]" path="#[attributes.maskedRequestPath]">
             <http:headers>#[attributes.headers ++ {'X-Forwarded-For':attributes.remoteAddress}]</http:headers>
@@ -54,7 +58,7 @@
         </http:request>
         <test:assert count="1" expression="#[mel:Thread.currentThread().getName().startsWith('[MuleRuntime].io')]"/>
 
-        <custom-processor class="org.mule.test.http.functional.proxy.HttpProxyTemplateTestCase$ProxyProcessor"/>
+        <flow-ref name="proxyProcessor"/>
     </flow>
 
 </mule>

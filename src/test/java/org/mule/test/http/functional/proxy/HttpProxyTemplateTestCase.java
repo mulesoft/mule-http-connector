@@ -398,7 +398,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
   /**
    * Simulates the header clean up of proxies.
    */
-  private static class ProxyProcessor implements Processor {
+  public static class ProxyProcessor implements Processor {
 
     @Override
     public CoreEvent process(CoreEvent event) throws MuleException {
@@ -431,7 +431,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
   /**
    * Simulates the modification of the payload when policies are applied to a proxy.
    */
-  private static class ProxyPolicyProcessor extends ProxyProcessor {
+  public static class ProxyPolicyProcessor extends ProxyProcessor {
 
     @Override
     protected Message.Builder getBuilder(CoreEvent event) {

@@ -76,7 +76,7 @@ public class HttpListenerNoBodyStatusTestCase extends AbstractHttpTestCase {
     return String.format("http://localhost:%s/%s?status=%s", port.getNumber(), path, status.getStatusCode());
   }
 
-  private static class StreamingProcessor implements Processor {
+  public static class StreamingProcessor implements Processor {
 
     @Override
     public CoreEvent process(CoreEvent event) throws MuleException {
