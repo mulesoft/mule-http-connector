@@ -7,6 +7,7 @@
 package org.mule.extension.http.api.request.validator;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
+import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
@@ -20,6 +21,7 @@ import java.util.function.IntConsumer;
  *
  * @since 1.0
  */
+@TypeDsl(allowTopLevelDefinition = true)
 public class FailureStatusCodeValidator extends RangeStatusCodeValidator {
 
   @Override

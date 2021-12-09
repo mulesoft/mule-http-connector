@@ -52,4 +52,7 @@ public interface ResponseValidator {
     validate(result, request);
   }
 
+  default boolean mayConsumeBody() {
+    return false;
+  }
 }
