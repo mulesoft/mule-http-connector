@@ -90,6 +90,8 @@ public class HttpRequestFactory {
 
   private static final String COOKIES_SEPARATOR = "; ";
 
+  private boolean logFirstIgnoredBody = true;
+
   /**
    * Creates an {@HttpRequest}.
    *
@@ -284,6 +286,13 @@ public class HttpRequestFactory {
       if (sendBodyMode != HttpSendBodyMode.AUTO) {
         emptyBody = (sendBodyMode == HttpSendBodyMode.NEVER);
       }
+    }
+
+    if (emptyBody && body != null && logFirstIgnoredBody) {
+      logFirstIgnoredBody = false;
+      LOGGER.warn(
+                  "Body '{}' is ignored since the HTTP Method is between the empty body methods ({}) and the Send Body Mode is not set to 'ALWAYS'",
+                  body, DEFAULT_EMPTY_BODY_METHODS);
     }
 
     return emptyBody;
