@@ -291,7 +291,7 @@ public class HttpRequestFactory {
     if (emptyBody && body != null && logFirstIgnoredBody) {
       logFirstIgnoredBody = false;
       LOGGER.warn(
-                  "Body '{}' is ignored since the HTTP Method is between the empty body methods ({}) and the Send Body Mode is not set to 'ALWAYS'",
+                  "Body '{}' is ignored since the HTTP Method is between the empty body methods ({}) and the Send Body Mode is not set to 'ALWAYS'. future warnings like this will be suppressed in order to avoid performance degradations",
                   body, DEFAULT_EMPTY_BODY_METHODS);
     }
 
