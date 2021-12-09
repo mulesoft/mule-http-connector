@@ -203,7 +203,7 @@
             <munit:enable-flow-source value="basic-polling-with-header" />
         </munit:enable-flow-sources>
         <munit:execution>
-            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="test_queue_2"/>
+            <munit-tools:dequeue timeout="10" timeoutUnit="SECONDS" queueName="test_queue_2"/>
         </munit:execution>
         <munit:validation>
             <munit-tools:assert-that expression="#[payload]" is="#[MunitTools::equalTo('test payload - Received header: Messi')]"/>
