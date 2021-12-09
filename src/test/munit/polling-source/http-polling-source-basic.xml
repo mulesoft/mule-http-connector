@@ -16,13 +16,14 @@
         <http:listener-connection host="0.0.0.0" port="${dynamic.port}"/>
     </http:listener-config>
 
-    <http:request-config name="requestConfig">
+    <http:request-config name="requestConfig" sendBodyMode="ALWAYS">
         <http:request-connection host="localhost" port="${dynamic.port}" />
     </http:request-config>
 
     <flow name="targetFlow" >
         <http:listener config-ref="targetEndpoint" path="/test" />
 
+        <logger message="#[payload]" level="ERROR"/>
         <choice>
             <when expression="#[isEmpty(payload)]">
                 <set-payload value="test payload"/>
@@ -124,13 +125,18 @@
         </munit-tools:queue>
     </flow>
 
+    <flow name="some-other-stuff">
+        <http:listener config-ref="targetEndpoint" path="/test-body"/>
+        <set-payload value="#[payload]"/>
+    </flow>
+
 
     <flow name="basic-polling-body">
-        <http:polling-source config-ref="requestConfig" path="/test">
+        <http:polling-source config-ref="requestConfig" path="/test-body">
             <scheduling-strategy >
-                <fixed-frequency frequency="2" timeUnit="SECONDS"/>
+                <fixed-frequency frequency="10" timeUnit="HOURS"/>
             </scheduling-strategy>
-            <http:request-body ><![CDATA[Some body]]></http:request-body>
+            <http:request-body ><![CDATA[Some Body]]></http:request-body>
         </http:polling-source>
         <logger message="#[payload]"/>
         <munit-tools:queue queueName="test_queue_6">
@@ -143,17 +149,17 @@
             <scheduling-strategy >
                 <fixed-frequency frequency="2" timeUnit="SECONDS"/>
             </scheduling-strategy>
-            <http:request-body ><![CDATA[{"someBodyValue": 10}]]></http:request-body>
+            <http:request-body ><![CDATA[{'someBodyValue': 10}]]></http:request-body>
             <http:request-headers >
                 <http:request-header key="content" value="application/json" />
                 <http:request-header key="testHeader" value="Messi" />
             </http:request-headers>
-            <!--http:request-query-params >
-                <http:query-param key="testQueryParam" value="parameter value" />
-            </http:request-query-params>
             <http:request-uri-params >
                 <http:request-uri-param key="testPath" value="test" />
-            </http:request-uri-params-->
+            </http:request-uri-params>
+            <http:request-query-params >
+                <http:query-param key="testQueryParam" value="parameter value" />
+            </http:request-query-params>
         </http:polling-source>
         <logger message="#[payload]"/>
         <munit-tools:queue queueName="test_queue_7">
@@ -246,7 +252,7 @@
 
     <munit:test name="polling-body-test-case">
         <munit:enable-flow-sources>
-            <munit:enable-flow-source value="targetFlow" />
+            <munit:enable-flow-source value="some-other-stuff" />
             <munit:enable-flow-source value="basic-polling-body" />
         </munit:enable-flow-sources>
         <munit:execution>
@@ -254,6 +260,19 @@
         </munit:execution>
         <munit:validation>
             <munit-tools:assert-that expression="#[payload]" is="#[MunitTools::equalTo('Some Body')]"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="polling-full-basic-test-case">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="targetFlow" />
+            <munit:enable-flow-source value="basic-polling-full-params" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="test_queue_7"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[payload]" is="#[MunitTools::equalTo('{\'someBodyValue\': 10} - Received header: Messi - parameter value')]"/>
         </munit:validation>
     </munit:test>
 
