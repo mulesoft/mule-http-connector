@@ -74,7 +74,7 @@ public class BasicHttpTestCase extends AbstractHttpRequestTestCase {
     }
   }
 
-  protected static class RequestCheckerMessageProcessor implements Processor {
+  public static class RequestCheckerMessageProcessor implements Processor {
 
     @Override
     public CoreEvent process(CoreEvent event) throws MuleException {

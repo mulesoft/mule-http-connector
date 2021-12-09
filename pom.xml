@@ -46,6 +46,8 @@
         <munit.version>2.2.4</munit.version>
         <mtf-tools.version>1.0.0</mtf-tools.version>
         <mavenResources.version>3.0.2</mavenResources.version>
+
+        <scriptingModuleVersion>1.1.7</scriptingModuleVersion>
     </properties>
 
     <build>
@@ -306,6 +308,14 @@
             <groupId>org.mule.glassfish.grizzly</groupId>
             <artifactId>grizzly-http-client</artifactId>
             <version>${grizzlyAhcVersion}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-scripting-module</artifactId>
+            <classifier>mule-plugin</classifier>
+            <version>${scriptingModuleVersion}</version>
             <scope>test</scope>
         </dependency>
 

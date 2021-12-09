@@ -72,7 +72,7 @@ public abstract class AbstractHttpRequestResponseStreamingTestCase extends Abstr
     executed = new AtomicBoolean(false);
   }
 
-  protected static class StatusProcessor implements Processor {
+  public static class StatusProcessor implements Processor {
 
 
     @Override

@@ -16,7 +16,7 @@
 
     <flow name="ntlmAuthRequestWithDomain">
         <http:request config-ref="ntlmConfigWithDomain" path="/" method="GET"/>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <http:request-config name="ntlmConfigWithoutDomain">
@@ -29,7 +29,7 @@
 
     <flow name="ntlmAuthRequestWithoutDomain">
         <http:request config-ref="ntlmConfigWithoutDomain" path="/" method="GET"/>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <http:request-config name="ntlmConfigWithWorkstation">
@@ -42,7 +42,7 @@
 
     <flow name="ntlmAuthRequestWithWorkstation">
         <http:request config-ref="ntlmConfigWithWorkstation" path="/" method="GET"/>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
 </mule>

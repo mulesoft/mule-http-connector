@@ -14,7 +14,7 @@
 
     <flow name="defaultFlow">
         <http:listener config-ref="listenerConfig"  path="/"/>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
         <test:processor />
     </flow>
 

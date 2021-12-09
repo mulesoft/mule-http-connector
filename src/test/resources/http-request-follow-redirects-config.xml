@@ -31,41 +31,41 @@
 
     <flow name="default">
         <http:request config-ref="noFollowRedirects" path="testPath"/>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <flow name="followRedirects">
         <http:request config-ref="noFollowRedirects" path="testPath" followRedirects="true"/>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <flow name="dontFollowRedirects">
         <http:request config-ref="noFollowRedirects" path="testPath" followRedirects="false"/>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <flow name="followRedirectsExpression">
         <http:request config-ref="noFollowRedirects" path="testPath" followRedirects="#[vars.redirect]"/>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <flow name="fromConfig">
         <http:request config-ref="withFollowRedirects" path="testPath"/>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <flow name="overrideConfig">
         <http:request config-ref="withFollowRedirects" path="testPath" followRedirects="true"/>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <flow name="fromConfigExpression">
         <http:request config-ref="withFollowRedirectsExpression" path="testPath"/>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <flow name="followRedirectsHttps">
         <http:request config-ref="httpsConfig" path="testPath" followRedirects="true"/>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 </mule>

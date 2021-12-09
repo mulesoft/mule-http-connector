@@ -16,17 +16,17 @@
 
     <flow name="requestFlow">
         <http:request config-ref="requestConfig" method="POST" path="requestPath"/>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <flow name="requestFlowWithCustomCorrelationId">
         <http:request config-ref="requestConfig" method="POST" path="requestPath" correlationId="customCorrelationId"/>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <flow name="neverSendCorrelationId">
         <http:request config-ref="requestConfig" method="POST" path="requestPath" sendCorrelationId="NEVER" correlationId="customCorrelationId"/>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <flow name="clashingCorrelationIds">
@@ -35,7 +35,7 @@
                 #[{'X-Correlation-ID' : 'customCorrelationId'}]
             </http:headers>
         </http:request>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <flow name="server">

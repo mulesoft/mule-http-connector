@@ -15,7 +15,7 @@
 
     <flow name="client1">
         <http:request config-ref="dynamicConfig1" path="#[vars.path]" method="#[vars.method]"/>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <flow name="client2" >
@@ -24,6 +24,6 @@
                 #[vars.body]
             </http:body>
         </http:request>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 </mule>

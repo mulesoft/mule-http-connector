@@ -47,12 +47,12 @@
 
     <flow name="testRequestToInsecure">
         <http:request config-ref="clientGlobalConfig" path="/" method="POST"/>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <flow name="testRequestToSecure">
         <http:request config-ref="clientGlobalConfig" path="/" method="POST"/>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
 </mule>

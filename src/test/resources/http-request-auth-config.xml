@@ -16,7 +16,7 @@
 
     <flow name="basicAuthRequest">
         <http:request config-ref="basicConfig" path="/basic" method="GET"/>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <http:request-config name="digestConfig">
@@ -29,7 +29,7 @@
 
     <flow name="digestAuthRequest">
         <http:request config-ref="digestConfig" path="/digest" method="GET"/>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
 </mule>

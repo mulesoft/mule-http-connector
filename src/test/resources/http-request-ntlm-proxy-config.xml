@@ -15,7 +15,7 @@
     </http:request-config>
     <flow name="ntlmFlow">
         <http:request config-ref="ntlmProxy" path="requestPath"/>
-        <object-to-string-transformer />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
 </mule>
