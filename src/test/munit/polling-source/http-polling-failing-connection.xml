@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+
+    <munit:config name="http-polling-failing-connection.xml" />
+
+    <munit:dynamic-port propertyName="dynamic.port"/>
+    
+    <http:request-config name="requestConfig">
+        <http:request-connection host="localhost" port="${dynamic.port}" />
+    </http:request-config>
+
+    <flow name="polling-failing">
+        <http:polling-source config-ref="requestConfig" path="test">
+            <scheduling-strategy >
+                <fixed-frequency frequency="2" timeUnit="SECONDS"/>
+            </scheduling-strategy>
+        </http:polling-source>
+        <logger message="#[payload]"/>
+        <munit-tools:queue queueName="test_queue_01">
+            <munit-tools:value>#[payload]</munit-tools:value>
+        </munit-tools:queue>
+    </flow>
+
+    <munit:test name="polling-failing-test-case">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="polling-failing" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <set-variable variableName="failed" value="#[false]"/>
+            <try>
+                <munit-tools:dequeue timeout="5" timeoutUnit="SECONDS" queueName="test_queue_01"/>
+                <error-handler>
+                    <on-error-continue>
+                        <set-variable variableName="failed" value="#[true]"/>
+                    </on-error-continue>
+                </error-handler>
+            </try>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[vars.failed]" is="#[MunitTools::equalTo(true)]"/>
+        </munit:validation>
+    </munit:test>
+
+</mule>

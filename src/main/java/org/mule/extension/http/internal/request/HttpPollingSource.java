@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.internal.request;
 
+import static java.lang.String.format;
 import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST;
 import static org.mule.extension.http.internal.request.HttpRequestUtils.createHttpRequester;
 import static org.mule.extension.http.internal.request.UriUtils.buildPath;
@@ -19,6 +20,7 @@ import org.mule.extension.http.internal.HttpMetadataResolver;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.transformation.TransformationService;
@@ -125,6 +127,10 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
     return resolveUri(uriParameters.getScheme(), uriParameters.getHost().trim(), uriParameters.getPort(), resolvedPath);
   }
 
+  protected String getId() {
+    return getClass().getSimpleName();
+  }
+
   private void sendRequest(PollContext<String, HttpResponseAttributes> pollContext) {
     CompletionCallback<InputStream, HttpResponseAttributes> callback =
         new CompletionCallback<InputStream, HttpResponseAttributes>() {
@@ -147,10 +153,15 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
         };
 
     LOGGER.debug("Sending '{}' request to '{}'.", method, resolvedUri);
-    httpRequester.doRequest(client, config, resolvedUri, method, config.getRequestStreamingMode(), config.getSendBodyMode(),
-                            config.getFollowRedirects(), client.getDefaultAuthentication(), config.getResponseTimeout(), null,
-                            transformationService, requestBuilder, true, muleContext, scheduler, null, null, callback,
-                            injectedHeaders, null);
+    try {
+      httpRequester.doRequest(client, config, resolvedUri, method, config.getRequestStreamingMode(), config.getSendBodyMode(),
+                              config.getFollowRedirects(), client.getDefaultAuthentication(), config.getResponseTimeout(), null,
+                              transformationService, requestBuilder, true, muleContext, scheduler, null, null, callback,
+                              injectedHeaders, null);
+    } catch (MuleRuntimeException e) {
+      LOGGER.warn(format("Trigger '%s': Mule runtime exception found while executing poll: '%s'", getId(), e.getMessage()), e);
+    }
+
   }
 
   @Override
@@ -164,6 +175,6 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
 
   @Override
   public void onRejectedItem(Result<String, HttpResponseAttributes> result, SourceCallbackContext sourceCallbackContext) {
-    LOGGER.error("onRejectedItem");
+    LOGGER.error("Item rejected");
   }
 }
