@@ -43,7 +43,7 @@ public class ResponseValidatorTypedException extends ModuleException implements 
     this(message, error);
     this.errorMessage = Message.builder()
         .value(result.getOutput())
-        .attributesValue(result.getAttributes().get())
+        .attributesValue(result.getAttributes().orElse(null))
         .mediaType(result.getMediaType().orElse(ANY))
         .build();
   }

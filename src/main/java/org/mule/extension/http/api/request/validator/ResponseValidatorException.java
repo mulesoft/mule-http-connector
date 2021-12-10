@@ -43,7 +43,7 @@ public class ResponseValidatorException extends MuleRuntimeException implements 
     this(message);
     this.errorMessage = Message.builder()
         .value(result.getOutput())
-        .attributesValue(result.getAttributes().get())
+        .attributesValue(result.getAttributes().orElse(null))
         .mediaType(result.getMediaType().orElse(ANY))
         .build();
   }
