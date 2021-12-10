@@ -49,7 +49,9 @@ public class ExpressionResponseValidator implements ResponseValidator {
   public void validate(Result<InputStream, HttpResponseAttributes> result, HttpRequest request) {
     Optional<String> optExpression = expression.getLiteralValue();
     if (!optExpression.isPresent()) {
-      throw new ResponseValidatorTypedException("An expression is required", BAD_REQUEST);
+      // This should never happen because the parameter isn't optional, but the Literal interface returns an Optional
+      // so this check is needed.
+      throw new IllegalStateException("The expression literal value hasn't been provided");
     }
 
     BindingContext bindingContext = buildBindingContext(result);

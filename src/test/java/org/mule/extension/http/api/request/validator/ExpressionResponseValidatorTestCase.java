@@ -16,20 +16,26 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.functional.api.exception.ExpectedError.none;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
+import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.RESPONSE_VALIDATION;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.junit.Rule;
+import org.junit.Test;
 import org.mule.extension.http.api.HttpResponseAttributes;
+import org.mule.functional.api.exception.ExpectedError;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
-import org.mule.runtime.extension.api.runtime.parameter.Literal;
-import org.junit.Test;
-import org.mule.functional.api.exception.ExpectedError;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.test.http.functional.requester.AbstractHttpRequestTestCase;
 
 import java.io.InputStream;
-import java.util.Optional;
 
+@Feature(HTTP_EXTENSION)
+@Story(RESPONSE_VALIDATION)
+@Issue("HTTPC-187")
 public class ExpressionResponseValidatorTestCase extends AbstractHttpRequestTestCase {
 
   @Rule
@@ -68,7 +74,7 @@ public class ExpressionResponseValidatorTestCase extends AbstractHttpRequestTest
     flowRunner("falseExpressionFlow").run();
   }
 
-  @Test(expected = ResponseValidatorTypedException.class)
+  @Test(expected = IllegalStateException.class)
   public void whenLiteralExpressionIsNotPresentTheValidatorThrowsException() {
     ExpressionResponseValidator validator = new ExpressionResponseValidator();
     Literal<String> mockLiteral = mock(Literal.class);

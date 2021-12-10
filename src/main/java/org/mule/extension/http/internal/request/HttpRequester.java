@@ -210,7 +210,7 @@ public class HttpRequester {
   private Supplier<Object> resultInputStreamSupplier(StreamingHelper streamingHelper, HttpEntity entity,
                                                      HttpRequestAuthentication authentication,
                                                      ResponseValidator responseValidator) {
-    if (!bodyCanBeConsumed(authentication, responseValidator)) {
+    if (!bodyMayBeConsumed(authentication, responseValidator)) {
       return entity::getContent;
     }
 
@@ -223,10 +223,10 @@ public class HttpRequester {
     return () -> (InputStream) resolved;
   }
 
-  private static boolean bodyCanBeConsumed(HttpRequestAuthentication authentication, ResponseValidator responseValidator) {
-    boolean authCanConsumeBody = authentication != null && authentication.readsAuthenticatedResponseBody();
-    boolean validatorCanConsumeBody = responseValidator != null && responseValidator.mayConsumeBody();
-    return authCanConsumeBody || validatorCanConsumeBody;
+  private static boolean bodyMayBeConsumed(HttpRequestAuthentication authentication, ResponseValidator responseValidator) {
+    boolean authMayConsumeBody = authentication != null && authentication.readsAuthenticatedResponseBody();
+    boolean validatorMayConsumeBody = responseValidator != null && responseValidator.mayConsumeBody();
+    return authMayConsumeBody || validatorMayConsumeBody;
   }
 
   private String getExceptionMessage(Throwable t) {
