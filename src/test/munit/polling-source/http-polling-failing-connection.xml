@@ -11,7 +11,7 @@
     <munit:config name="http-polling-failing-connection.xml" />
 
     <munit:dynamic-port propertyName="dynamic.port"/>
-    
+
     <http:request-config name="requestConfig">
         <http:request-connection host="localhost" port="${dynamic.port}" />
     </http:request-config>
