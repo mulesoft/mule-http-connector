@@ -9,6 +9,7 @@ package org.mule.extension.http.api.request.validator;
 import static java.lang.String.format;
 import static org.mule.extension.http.api.error.HttpError.BAD_REQUEST;
 import static org.mule.runtime.api.el.BindingContext.builder;
+import static org.mule.runtime.api.metadata.DataType.BOOLEAN;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 
@@ -30,7 +31,7 @@ import java.util.Optional;
 /**
  * Response validator that uses an expression.
  *
- * @since 1.0
+ * @since 1.7
  */
 @TypeDsl(allowTopLevelDefinition = true)
 public class ExpressionResponseValidator implements ResponseValidator {
@@ -52,13 +53,19 @@ public class ExpressionResponseValidator implements ResponseValidator {
     }
 
     BindingContext bindingContext = buildBindingContext(result);
-    Boolean validationResult = (Boolean) expressionManager.evaluate(optExpression.get(), bindingContext).getValue();
-    if (!validationResult.booleanValue()) {
-      throw new ResponseValidatorTypedException(format("The expression '%s' evaluated to false", expression), BAD_REQUEST);
+    TypedValue<?> validationResult = expressionManager.evaluate(optExpression.get(), bindingContext);
+    if (!BOOLEAN.isCompatibleWith(validationResult.getDataType())) {
+      throw new ResponseValidatorTypedException(format("The expression '%s' returned a non boolean value", optExpression.get()),
+                                                BAD_REQUEST);
+    }
+
+    if (!((Boolean) validationResult.getValue()).booleanValue()) {
+      throw new ResponseValidatorTypedException(format("The expression '%s' evaluated to false", optExpression.get()),
+                                                BAD_REQUEST);
     }
   }
 
-  private BindingContext buildBindingContext(Result<InputStream, HttpResponseAttributes> result) {
+  private static BindingContext buildBindingContext(Result<? extends InputStream, ? extends HttpResponseAttributes> result) {
     InputStream payload = result.getOutput();
     HttpResponseAttributes attributes = result.getAttributes().orElse(null);
     MediaType mediaType = result.getMediaType().orElse(ANY);

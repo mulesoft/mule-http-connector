@@ -6,19 +6,34 @@
  */
 package org.mule.extension.http.api.request.validator;
 
+import static java.util.Optional.empty;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
+import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mule.functional.api.exception.ExpectedError.none;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 
 import org.junit.Rule;
+import org.mule.extension.http.api.HttpResponseAttributes;
+import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.parameter.Literal;
+import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.junit.Test;
 import org.mule.functional.api.exception.ExpectedError;
+import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.test.http.functional.requester.AbstractHttpRequestTestCase;
+
+import java.io.InputStream;
+import java.util.Optional;
 
 public class ExpressionResponseValidatorTestCase extends AbstractHttpRequestTestCase {
 
   @Rule
-  public ExpectedError expectedError = ExpectedError.none();
+  public ExpectedError expectedError = none();
 
   @Override
   protected String getConfigFile() {
@@ -35,5 +50,33 @@ public class ExpressionResponseValidatorTestCase extends AbstractHttpRequestTest
   public void globalResponseValidator() throws Exception {
     assertThat(flowRunner("globalValidatorFlow").keepStreamsOpen().run().getMessage(),
                hasPayload(equalTo(DEFAULT_RESPONSE)));
+  }
+
+  @Test
+  public void responseValidatorReturningNonBooleanValue() throws Exception {
+    expectedError.expectErrorType("HTTP", "BAD_REQUEST");
+    expectedError.expectCause(instanceOf(ResponseValidatorTypedException.class));
+    expectedError.expectCause(hasMessage(containsString("The expression '#[4]' returned a non boolean value")));
+    flowRunner("nonBooleanValidatorFlow").run();
+  }
+
+  @Test
+  public void expressionEvaluatingToFalse() throws Exception {
+    expectedError.expectErrorType("HTTP", "BAD_REQUEST");
+    expectedError.expectCause(instanceOf(ResponseValidatorTypedException.class));
+    expectedError.expectCause(hasMessage(containsString("The expression '#[false]' evaluated to false")));
+    flowRunner("falseExpressionFlow").run();
+  }
+
+  @Test(expected = ResponseValidatorTypedException.class)
+  public void whenLiteralExpressionIsNotPresentTheValidatorThrowsException() {
+    ExpressionResponseValidator validator = new ExpressionResponseValidator();
+    Literal<String> mockLiteral = mock(Literal.class);
+    when(mockLiteral.getLiteralValue()).thenReturn(empty());
+    validator.setExpression(mockLiteral);
+
+    Result<InputStream, HttpResponseAttributes> result = mock(Result.class);
+    HttpRequest request = mock(HttpRequest.class);
+    validator.validate(result, request);
   }
 }
