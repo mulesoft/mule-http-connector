@@ -278,7 +278,7 @@ public class HttpRequestFactory {
   private boolean isEmptyBody(Object body, String method, HttpSendBodyMode sendBodyMode) {
     boolean emptyBody;
 
-    boolean hasBody = body != null && body.equals("");
+    boolean hasBody = body != null && !body.equals("");
     if (!hasBody) {
       emptyBody = true;
     } else {
