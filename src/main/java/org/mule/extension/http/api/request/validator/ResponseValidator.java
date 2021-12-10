@@ -31,6 +31,7 @@ public interface ResponseValidator {
    *         specific error type.
    * @deprecated use {@link #validate(Result, HttpRequest, StreamingHelper)} instead
    */
+  @Deprecated
   void validate(Result<InputStream, HttpResponseAttributes> result, HttpRequest request);
 
   /**

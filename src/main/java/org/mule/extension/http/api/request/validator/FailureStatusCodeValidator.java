@@ -12,7 +12,7 @@ import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 
 import java.io.InputStream;
-import java.util.function.Consumer;
+import java.util.function.IntConsumer;
 
 /**
  * Response validator that allows specifying which status codes should be treated as failures. Responses with such status codes
@@ -32,8 +32,8 @@ public class FailureStatusCodeValidator extends RangeStatusCodeValidator {
     validate(result, status -> throwValidationException(toMessage(result, streamingHelper), request, status));
   }
 
-  private void validate(Result<InputStream, HttpResponseAttributes> result, Consumer<Integer> ifInvalid) {
-    int status = result.getAttributes().get().getStatusCode();
+  private void validate(Result<InputStream, HttpResponseAttributes> result, IntConsumer ifInvalid) {
+    int status = getStatusCode(result);
 
     if (belongs(status)) {
       ifInvalid.accept(status);

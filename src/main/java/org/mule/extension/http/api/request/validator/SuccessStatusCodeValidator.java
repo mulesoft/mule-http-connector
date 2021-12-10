@@ -40,7 +40,7 @@ public class SuccessStatusCodeValidator extends RangeStatusCodeValidator {
   }
 
   private void validate(Result<InputStream, HttpResponseAttributes> result, Consumer<Integer> ifInvalid) {
-    int status = result.getAttributes().get().getStatusCode();
+    int status = getStatusCode(result);
 
     if (!belongs(status)) {
       ifInvalid.accept(status);
