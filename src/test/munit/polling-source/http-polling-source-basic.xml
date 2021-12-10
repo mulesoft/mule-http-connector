@@ -49,8 +49,6 @@
         </choice>
     </flow>
 
-
-
     <flow name="targetFlowPost" >
         <http:listener config-ref="targetEndpoint" path="/test-post" allowedMethods="POST"/>
         <set-payload value="test payload"/>
