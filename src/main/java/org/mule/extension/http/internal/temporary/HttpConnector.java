@@ -19,6 +19,7 @@ import org.mule.extension.http.api.request.authentication.NtlmAuthentication;
 import org.mule.extension.http.api.request.proxy.DefaultNtlmProxyConfig;
 import org.mule.extension.http.api.request.proxy.DefaultProxyConfig;
 import org.mule.extension.http.api.request.proxy.HttpProxyConfig;
+import org.mule.extension.http.api.request.validator.ExpressionResponseValidator;
 import org.mule.extension.http.api.request.validator.FailureStatusCodeValidator;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.request.validator.SuccessStatusCodeValidator;
@@ -54,7 +55,7 @@ import org.mule.runtime.extension.api.annotation.notification.NotificationAction
     subTypes = {BasicAuthentication.class, DigestAuthentication.class, NtlmAuthentication.class})
 @SubTypeMapping(baseType = HttpProxyConfig.class, subTypes = {DefaultProxyConfig.class, DefaultNtlmProxyConfig.class})
 @SubTypeMapping(baseType = ResponseValidator.class,
-    subTypes = {SuccessStatusCodeValidator.class, FailureStatusCodeValidator.class})
+    subTypes = {SuccessStatusCodeValidator.class, FailureStatusCodeValidator.class, ExpressionResponseValidator.class})
 @SubTypeMapping(baseType = Origin.class, subTypes = {EveryOrigin.class, SingleOrigin.class})
 @Import(type = TcpClientSocketProperties.class)
 @Import(type = TcpServerSocketProperties.class)
