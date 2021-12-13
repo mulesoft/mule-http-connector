@@ -184,14 +184,12 @@
             <munit:enable-flow-source value="basic-polling" />
         </munit:enable-flow-sources>
         <munit:execution>
-            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="test_queue_1"/>
-            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="test_queue_1"/>
-            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="test_queue_1"/>
-            <munit-tools:sleep time="2" timeUnit="SECONDS"/>
+            <munit-tools:sleep time="9" timeUnit="SECONDS"/>
         </munit:execution>
         <munit:validation>
+            <munit-tools:assert-that expression="#[MunitTools::queueSize('test_queue_1')]" is="#[MunitTools::greaterThanOrEqualTo(4)]" />
+            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="test_queue_1"/>
             <munit-tools:assert-that expression="#[payload]" is="#[MunitTools::equalTo('test payload')]"/>
-            <munit-tools:assert-that expression="#[MunitTools::queueSize('test_queue_1')]" is="#[MunitTools::greaterThanOrEqualTo(1)]" />
         </munit:validation>
     </munit:test>
 
