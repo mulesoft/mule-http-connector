@@ -26,6 +26,7 @@ import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 
 import javax.inject.Inject;
 import java.io.InputStream;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -82,12 +83,25 @@ public class ExpressionResponseValidator implements ResponseValidator {
     return expression;
   }
 
-  public void setExpression(Literal<String> expression) {
-    this.expression = expression;
-  }
-
   @Override
   public boolean mayConsumeBody() {
     return true;
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof ExpressionResponseValidator)) {
+      return false;
+    }
+    ExpressionResponseValidator otherValidator = (ExpressionResponseValidator) other;
+    return Objects.equals(expression, otherValidator.expression);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(expression);
   }
 }

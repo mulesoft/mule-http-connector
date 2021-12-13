@@ -210,6 +210,10 @@ public class HttpRequester {
   private Supplier<Object> resultInputStreamSupplier(StreamingHelper streamingHelper, HttpEntity entity,
                                                      HttpRequestAuthentication authentication,
                                                      ResponseValidator responseValidator) {
+    if (streamingHelper == null) {
+      return entity::getContent;
+    }
+
     if (!bodyMayBeConsumed(authentication, responseValidator)) {
       return entity::getContent;
     }

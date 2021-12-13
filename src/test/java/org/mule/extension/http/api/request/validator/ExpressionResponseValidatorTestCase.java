@@ -32,6 +32,7 @@ import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.test.http.functional.requester.AbstractHttpRequestTestCase;
 
 import java.io.InputStream;
+import java.lang.reflect.Field;
 
 @Feature(HTTP_EXTENSION)
 @Story(RESPONSE_VALIDATION)
@@ -75,14 +76,21 @@ public class ExpressionResponseValidatorTestCase extends AbstractHttpRequestTest
   }
 
   @Test(expected = IllegalStateException.class)
-  public void whenLiteralExpressionIsNotPresentTheValidatorThrowsException() {
+  public void whenLiteralExpressionIsNotPresentTheValidatorThrowsException() throws NoSuchFieldException, IllegalAccessException {
     ExpressionResponseValidator validator = new ExpressionResponseValidator();
     Literal<String> mockLiteral = mock(Literal.class);
     when(mockLiteral.getLiteralValue()).thenReturn(empty());
-    validator.setExpression(mockLiteral);
+    setExpression(validator, mockLiteral);
 
     Result<InputStream, HttpResponseAttributes> result = mock(Result.class);
     HttpRequest request = mock(HttpRequest.class);
     validator.validate(result, request);
+  }
+
+  private void setExpression(ExpressionResponseValidator validator, Literal<String> mockLiteral)
+      throws NoSuchFieldException, IllegalAccessException {
+    Field expressionField = validator.getClass().getDeclaredField("expression");
+    expressionField.setAccessible(true);
+    expressionField.set(validator, mockLiteral);
   }
 }
