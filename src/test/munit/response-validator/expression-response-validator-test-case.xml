@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+      xmlns="http://www.mulesoft.org/schema/mule/core" xsi:schemaLocation="
+      	http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <munit:config name="expression-response-validator-test-case" />
+
+    <munit:dynamic-port propertyName="dynamic.port" />
+
+    <http:expression-response-validator name="globalValidator" expression="#[payload as String == 'The Response']" />
+    <http:expression-response-validator name="failingValidator" expression="#[payload as String == 'Something Different']" />
+
+    <http:request-config name="validatorTestSimpleConfig">
+        <http:request-connection host="localhost" port="${dynamic.port}"/>
+    </http:request-config>
+
+    <munit:test name="global-ok-response-validator-test" description="Global Response Validator Test" >
+        <munit:enable-flow-sources >
+            <munit:enable-flow-source value="responderFlow" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <http:request method="GET" path='/' config-ref="validatorTestSimpleConfig" responseValidator="globalValidator" />
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that is="#[MunitTools::containsString('The Response')]" expression="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="inline-ok-response-validator-test" description="Inline Response Validator Test" >
+        <munit:enable-flow-sources >
+            <munit:enable-flow-source value="responderFlow" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <http:request method="GET" path='/' config-ref="validatorTestSimpleConfig" >
+                <http:response-validator>
+                    <http:expression-response-validator expression="#[payload as String == 'The Response']" />
+                </http:response-validator>
+            </http:request>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that is="#[MunitTools::containsString('The Response')]" expression="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="global-failed-response-validator-test" description="Global Validator Failing Test" >
+        <munit:enable-flow-sources >
+            <munit:enable-flow-source value="responderFlow" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <try>
+                <http:request config-ref="validatorTestSimpleConfig" path="/" responseValidator="failingValidator" />
+                <error-handler >
+                    <on-error-continue enableNotifications="true" logException="true">
+                        <set-variable value="#[error.description]" variableName="errorMessage"/>
+                    </on-error-continue>
+                </error-handler>
+            </try>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that is="#[MunitTools::containsString('evaluated to false')]" expression="#[vars.errorMessage]"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="inline-failed-response-validator-test" description="Inline Validator Failing Test" >
+        <munit:enable-flow-sources >
+            <munit:enable-flow-source value="responderFlow" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <try>
+                <http:request config-ref="validatorTestSimpleConfig" path="/" >
+                    <http:response-validator>
+                        <http:expression-response-validator expression="#[payload as String == 'Something Different']" />
+                    </http:response-validator>
+                </http:request>
+                <error-handler >
+                    <on-error-continue enableNotifications="true" logException="true">
+                        <set-variable value="#[error.description]" variableName="errorMessage"/>
+                    </on-error-continue>
+                </error-handler>
+            </try>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that is="#[MunitTools::containsString('evaluated to false')]" expression="#[vars.errorMessage]"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="non-boolean-test" description="Non Boolean Expression Test" >
+        <munit:enable-flow-sources >
+            <munit:enable-flow-source value="responderFlow" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <try>
+                <http:request config-ref="validatorTestSimpleConfig" path="/" >
+                    <http:response-validator>
+                        <http:expression-response-validator expression="#[4]" />
+                    </http:response-validator>
+                </http:request>
+                <error-handler >
+                    <on-error-continue enableNotifications="true" logException="true">
+                        <set-variable value="#[error.description]" variableName="errorMessage"/>
+                    </on-error-continue>
+                </error-handler>
+            </try>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that is="#[MunitTools::containsString('The expression ')]" expression="#[vars.errorMessage]"/>
+            <munit-tools:assert-that is="#[MunitTools::containsString(' returned a non boolean value')]" expression="#[vars.errorMessage]"/>
+        </munit:validation>
+    </munit:test>
+
+    <http:listener-config name="Listener_config">
+        <http:listener-connection host="0.0.0.0" port="${dynamic.port}" />
+    </http:listener-config>
+
+    <flow name="responderFlow" >
+        <http:listener config-ref="Listener_config" path="/" />
+        <set-payload value='The Response' />
+    </flow>
+</mule>
