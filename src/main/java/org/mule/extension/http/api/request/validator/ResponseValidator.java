@@ -52,4 +52,12 @@ public interface ResponseValidator {
     validate(result, request);
   }
 
+  /**
+   * @return whether the validator may consume the body while executing de validation. It's important to know that in order to
+   *         decide if you want to make the body stream repeatable.
+   * @since 1.7
+   */
+  default boolean mayConsumeBody() {
+    return false;
+  }
 }

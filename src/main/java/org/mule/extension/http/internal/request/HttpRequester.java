@@ -159,7 +159,8 @@ public class HttpRequester {
 
               HttpEntity entity = response.getEntity();
 
-              Supplier<Object> resultInputStreamSupplier = resultInputStreamSupplier(streamingHelper, entity, authentication);
+              Supplier<Object> resultInputStreamSupplier =
+                  resultInputStreamSupplier(streamingHelper, entity, authentication, responseValidator);
 
               Result<Object, HttpResponseAttributes> result = httpResponseToResult
                   .convert(config, muleContext, response, entity, resultInputStreamSupplier, httpRequest.getUri());
@@ -207,8 +208,13 @@ public class HttpRequester {
   }
 
   private Supplier<Object> resultInputStreamSupplier(StreamingHelper streamingHelper, HttpEntity entity,
-                                                     HttpRequestAuthentication authentication) {
-    if (authentication == null || !authentication.readsAuthenticatedResponseBody()) {
+                                                     HttpRequestAuthentication authentication,
+                                                     ResponseValidator responseValidator) {
+    if (streamingHelper == null) {
+      return entity::getContent;
+    }
+
+    if (!bodyMayBeConsumed(authentication, responseValidator)) {
       return entity::getContent;
     }
 
@@ -219,6 +225,12 @@ public class HttpRequester {
     }
 
     return () -> (InputStream) resolved;
+  }
+
+  private static boolean bodyMayBeConsumed(HttpRequestAuthentication authentication, ResponseValidator responseValidator) {
+    boolean authMayConsumeBody = authentication != null && authentication.readsAuthenticatedResponseBody();
+    boolean validatorMayConsumeBody = responseValidator != null && responseValidator.mayConsumeBody();
+    return authMayConsumeBody || validatorMayConsumeBody;
   }
 
   private String getExceptionMessage(Throwable t) {
