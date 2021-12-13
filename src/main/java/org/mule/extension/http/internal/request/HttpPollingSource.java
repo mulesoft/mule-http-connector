@@ -119,6 +119,7 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
   @Override
   protected void doStop() {
     LOGGER.error("Stopping source");
+    scheduler.stop();
   }
 
   private String getResolvedUri() {
