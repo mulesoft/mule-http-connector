@@ -18,11 +18,13 @@
 
     <flow name="noExceptionStrategyFlow">
         <http:listener config-ref="proxyConfig" path="noExceptionStrategy" responseStreamingMode="AUTO" />
+        <!-- TODO HTTPC-177: Remove mel expression -->
         <http:request config-ref="requestConfig" method="#[mel:message.attributes.method]" path="#[mel:message.attributes.requestPath]"/>
     </flow>
 
     <flow name="catchExceptionStrategyFlow">
         <http:listener config-ref="proxyConfig" path="catchExceptionStrategy" responseStreamingMode="AUTO" />
+        <!-- TODO HTTPC-177: Remove mel expression -->
         <http:request config-ref="requestConfig" method="#[mel:message.attributes.method]]" path="#[mel:message.attributes.requestPath]"/>
         <error-handler>
             <on-error-continue>
@@ -35,6 +37,7 @@
 
     <flow name="rollbackExceptionStrategyFlow">
         <http:listener config-ref="proxyConfig" path="rollbackExceptionStrategy" responseStreamingMode="AUTO" />
+        <!-- TODO HTTPC-177: Remove mel expression -->
         <http:request config-ref="requestConfig" method="#[mel:message.attributes.method]]" path="#[mel:message.attributes.requestPath]"/>
         <error-handler>
             <on-error-propagate>

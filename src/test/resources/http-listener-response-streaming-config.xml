@@ -22,6 +22,7 @@
 
     <flow name="stringFlow">
         <http:listener config-ref="listenerConfig" path="/string"/>
+        <!-- TODO HTTPC-177: Remove mel expression -->
         <set-payload value="#[mel:stringPayload]"/>
     </flow>
 
@@ -33,6 +34,7 @@
                 </http:headers>
             </http:response>
         </http:listener>
+        <!-- TODO HTTPC-177: Remove mel expression -->
         <set-payload value="#[mel:stringPayload]"/>
     </flow>
 
@@ -44,6 +46,7 @@
                 </http:headers>
             </http:response>
         </http:listener>
+        <!-- TODO HTTPC-177: Remove mel expression -->
         <set-payload value="#[mel:stringPayload]"/>
     </flow>
 
@@ -55,6 +58,7 @@
                 </http:headers>
             </http:response>
         </http:listener>
+        <!-- TODO HTTPC-177: Remove mel expression -->
         <set-payload value="#[mel:stringPayload]"/>
     </flow>
 
@@ -98,6 +102,7 @@
 
     <flow name="neverStringFlow">
         <http:listener config-ref="listenerConfig" path="/neverString" responseStreamingMode="NEVER"/>
+        <!-- TODO HTTPC-177: Remove mel expression -->
         <set-payload value="#[mel:stringPayload]"/>
     </flow>
 
@@ -109,6 +114,7 @@
                 </http:headers>
             </http:response>
         </http:listener>
+        <!-- TODO HTTPC-177: Remove mel expression -->
         <set-payload value="#[mel:stringPayload]"/>
     </flow>
 
@@ -130,6 +136,7 @@
 
     <flow name="alwaysStringFlow">
         <http:listener config-ref="listenerConfig" path="/alwaysString"  responseStreamingMode="ALWAYS"/>
+        <!-- TODO HTTPC-177: Remove mel expression -->
         <set-payload value="#[mel:stringPayload]"/>
     </flow>
 
@@ -141,6 +148,7 @@
                 </http:headers>
             </http:response>
         </http:listener>
+        <!-- TODO HTTPC-177: Remove mel expression -->
         <set-payload value="#[mel:stringPayload]"/>
     </flow>
 
@@ -168,6 +176,7 @@
                 </http:headers>
             </http:response>
         </http:listener>
+        <!-- TODO HTTPC-177: Remove mel expression -->
         <set-payload value="#[mel:mapPayload]"/>
     </flow>
 
@@ -179,6 +188,7 @@
                 </http:headers>
             </http:response>
         </http:listener>
+        <!-- TODO HTTPC-177: Remove mel expression -->
         <set-payload value="#[mel:mapPayload]"/>
     </flow>
 
@@ -190,6 +200,7 @@
                 </http:headers>
             </http:response>
         </http:listener>
+        <!-- TODO HTTPC-177: Remove mel expression -->
         <set-payload value="#[mel:mapPayload]"/>
     </flow>
 

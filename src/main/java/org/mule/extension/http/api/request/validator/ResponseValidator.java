@@ -23,12 +23,12 @@ public interface ResponseValidator {
   /**
    * Validates whether an HTTP response result should be accepted or not, failing in that case.
    *
-   * @param result the message to validate
+   * @param result  the message to validate
    * @param request the request that cause the {@code result}
    * @throws ResponseValidatorTypedException if the message is not considered valid and the response validator throws a
-   *         {@link org.mule.runtime.extension.api.exception.ModuleException}
-   * @throws ResponseValidatorException if the message is not considered valid and the response validator does not relates to an
-   *         specific error type.
+   *                                         {@link org.mule.runtime.extension.api.exception.ModuleException}
+   * @throws ResponseValidatorException      if the message is not considered valid and the response validator does not relates to
+   *                                         an specific error type.
    * @deprecated use {@link #validate(Result, HttpRequest, StreamingHelper)} instead
    */
   @Deprecated
@@ -39,13 +39,13 @@ public interface ResponseValidator {
    * {@link #validate(Result, HttpRequest)}, but implementations should use the {@code streamingHelper} to guarantee management of
    * streams.
    *
-   * @param result the message to validate
-   * @param request the request that cause the {@code result}
+   * @param result          the message to validate
+   * @param request         the request that cause the {@code result}
    * @param streamingHelper helper component that allows managing the {@code result} stream
    * @throws ResponseValidatorTypedException if the message is not considered valid and the response validator throws a
-   *         {@link org.mule.runtime.extension.api.exception.ModuleException}
-   * @throws ResponseValidatorException if the message is not considered valid and the response validator does not relates to an
-   *         specific error type.
+   *                                         {@link org.mule.runtime.extension.api.exception.ModuleException}
+   * @throws ResponseValidatorException      if the message is not considered valid and the response validator does not relates to
+   *                                         an specific error type.
    */
   default void validate(Result<InputStream, HttpResponseAttributes> result, HttpRequest request,
                         StreamingHelper streamingHelper) {

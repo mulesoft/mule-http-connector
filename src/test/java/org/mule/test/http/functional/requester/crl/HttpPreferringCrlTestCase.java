@@ -12,12 +12,15 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import org.junit.Ignore;
 import org.mule.test.http.functional.AbstractHttpTlsRevocationTestCase;
 
 import java.security.cert.CertPathValidatorException;
 
 import org.junit.Test;
 
+@Ignore("HTTPC-184")
+// TODO HTTPC-184: Migrate to MUnit or TITA.
 public class HttpPreferringCrlTestCase extends AbstractHttpTlsRevocationTestCase {
 
   public static String EXPECTED_OCSP_ERROR_MESSAGE = "Certificate does not specify OCSP responder";

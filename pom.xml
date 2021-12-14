@@ -5,9 +5,7 @@
     <parent>
         <groupId>org.mule.extensions</groupId>
         <artifactId>mule-core-modules-parent</artifactId>
-        <!-- TODO MULE-15249 if this is upgraded, change the Map to Set in HttpResponseHeaderBuilder -->
-        <!-- TODO MULE-15803 if this is upgraded, change HttpRequestAttributes#lazyClientCertificate-->
-        <version>1.1.8</version>
+        <version>1.5.0-SNAPSHOT</version>
         <relativePath/>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -15,7 +13,7 @@
     <groupId>org.mule.connectors</groupId>
     <artifactId>mule-http-connector</artifactId>
     <packaging>mule-extension</packaging>
-    <version>1.7.0-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
 
     <name>HTTP Connector</name>
     <description>A Mule extension that provides HTTP server and client functionality</description>
@@ -26,7 +24,6 @@
         <grizzlyAhcVersion>1.14-MULE-019</grizzlyAhcVersion>
         <javaxActivationVersion>1.2.0</javaxActivationVersion>
         <javaxMailVersion>1.4.3</javaxMailVersion>
-        <jettyVersion>9.0.7.v20131107</jettyVersion>
 
         <commonsTextVersion>1.9</commonsTextVersion>
         <formatterConfigPath>formatter.xml</formatterConfigPath>
@@ -34,20 +31,22 @@
         <muleSocketsConnectorVersion>1.2.2</muleSocketsConnectorVersion>
         <muleCorsKernelVersion>1.1.2</muleCorsKernelVersion>
 
-        <!-- This dependencies must be explicitly defined as long as HTTP supports runtimes prior to 4.1.2 -->
-        <muleHttpPolicyApiVersion>1.1.3</muleHttpPolicyApiVersion>
-        <mulePolicyApiVersion>1.1.3</mulePolicyApiVersion>
         <muleProfilingApiVersion>1.0.0</muleProfilingApiVersion>
+        <muleHttpServiceVersion>1.7.0-SNAPSHOT</muleHttpServiceVersion>
+        <muleSchedulerServiceVersion>1.5.0-SNAPSHOT</muleSchedulerServiceVersion>
+
+        <!-- Test dependencies versions -->
+        <jettyVersion>9.0.7.v20131107</jettyVersion>
+        <muleTestComponentsVersion>${mule.version}</muleTestComponentsVersion>
+        <scriptingModuleVersion>1.1.7</scriptingModuleVersion>
 
         <!-- Remove when a new parent version with MTF is available -->
         <munit.input.directory>src/test/munit</munit.input.directory>
         <munit.output.directory>${basedir}/target/test-mule/munit</munit.output.directory>
-        <munit.extensions.maven.plugin.version>1.1.1</munit.extensions.maven.plugin.version>
+        <munit.extensions.maven.plugin.version>1.1.2-SNAPSHOT</munit.extensions.maven.plugin.version>
         <munit.version>2.2.4</munit.version>
-        <mtf-tools.version>1.0.0</mtf-tools.version>
+        <mtf-tools.version>1.1.1</mtf-tools.version>
         <mavenResources.version>3.0.2</mavenResources.version>
-
-        <scriptingModuleVersion>1.1.7</scriptingModuleVersion>
     </properties>
 
     <build>
@@ -181,15 +180,14 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-policy-api</artifactId>
-            <version>${mulePolicyApiVersion}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-http-policy-api</artifactId>
-            <version>${muleHttpPolicyApiVersion}</version>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-cors-kernel</artifactId>
@@ -230,7 +228,30 @@
             <version>${jettyVersion}</version>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-servlet</artifactId>
+            <version>${jettyVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-util</artifactId>
+            <version>${jettyVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-http</artifactId>
+            <version>${jettyVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-io</artifactId>
+            <version>${jettyVersion}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-proxy</artifactId>
@@ -239,9 +260,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-servlet</artifactId>
-            <version>${jettyVersion}</version>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>4.0.1</version>
             <scope>test</scope>
         </dependency>
 
@@ -326,6 +347,20 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-all</artifactId>
+            <version>1.3</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>test-components</artifactId>
+            <version>${muleTestComponentsVersion}</version>
+            <classifier>mule-plugin</classifier>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <distributionManagement>

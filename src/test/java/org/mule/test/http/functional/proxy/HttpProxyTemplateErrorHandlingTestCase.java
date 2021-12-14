@@ -12,6 +12,8 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.PROXY;
+
+import org.junit.Ignore;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -29,6 +31,8 @@ import org.junit.Rule;
 import org.junit.Test;
 
 @Story(PROXY)
+@Ignore("HTTPC-177")
+// TODO HTTPC-177: Remove mel expressions from related XML.
 public class HttpProxyTemplateErrorHandlingTestCase extends AbstractHttpRequestTestCase {
 
   public static final String SERVICE_DOWN_MESSAGE = "Service Down";

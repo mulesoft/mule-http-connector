@@ -22,6 +22,8 @@ import org.junit.Rule;
 import org.junit.Test;
 
 @Ignore
+// TODO HTTPC-177: Remove mel expressions from related XML.
+// However, this was already ignored.
 public class HttpRequestRecipientListTestCase extends AbstractHttpTestCase {
 
   @Rule

@@ -9,6 +9,7 @@ package org.mule.test.http.functional;
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toSet;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -77,7 +78,7 @@ public class HttpHeaderCaseTestCase extends AbstractHttpTestCase {
 
     assertThat(response.getStatusLine().getStatusCode(), is(OK.getStatusCode()));
     Set<String> headerNames = stream(response.getAllHeaders()).map(h -> h.getName()).collect(toSet());
-    assertThat(headerNames, hasItems("rEsPoNsEhEaDeR", "Transfer-Encoding"));
+    assertThat(headerNames, hasItem("rEsPoNsEhEaDeR"));
   }
 
   @Test

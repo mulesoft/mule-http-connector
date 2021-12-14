@@ -24,8 +24,8 @@ public class HttpPolicyRequestAttributesTestCase extends AbstractHttpAttributesT
           "{" + lineSeparator() +
           "   Request path=/request/path" + lineSeparator() +
           "   Headers=[" + lineSeparator() +
-          "      header2=headerValue2" + lineSeparator() +
           "      header1=headerValue1" + lineSeparator() +
+          "      header2=headerValue2" + lineSeparator() +
           "   ]" + lineSeparator() +
           "   Query Parameters=[" + lineSeparator() +
           "      queryParam1=queryParamValue1" + lineSeparator() +
@@ -75,10 +75,10 @@ public class HttpPolicyRequestAttributesTestCase extends AbstractHttpAttributesT
           "{" + lineSeparator() +
           "   Request path=/request/path" + lineSeparator() +
           "   Headers=[" + lineSeparator() +
-          "      authorization=****" + lineSeparator() +
           "      password=****" + lineSeparator() +
           "      pass=****" + lineSeparator() +
           "      client_secret=****" + lineSeparator() +
+          "      authorization=****" + lineSeparator() +
           "      regular=show me" + lineSeparator() +
           "   ]" + lineSeparator() +
           "   Query Parameters=[" + lineSeparator() +

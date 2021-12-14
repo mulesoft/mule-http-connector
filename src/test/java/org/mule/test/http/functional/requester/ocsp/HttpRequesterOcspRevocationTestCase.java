@@ -9,6 +9,7 @@ package org.mule.test.http.functional.requester.ocsp;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.fail;
 
+import org.junit.Ignore;
 import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Collection;
@@ -17,6 +18,8 @@ import org.junit.Test;
 import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
+@Ignore("HTTPC-184")
+// TODO HTTPC-184: Migrate to MUnit or TITA.
 public class HttpRequesterOcspRevocationTestCase extends AbstractHttpOcspRevocationTestCase {
 
   public HttpRequesterOcspRevocationTestCase(String configFile, String certAlias) {

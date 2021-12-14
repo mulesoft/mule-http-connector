@@ -126,8 +126,8 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
   }
 
   /**
-   * Returns the {@link HttpError} corresponding to a given status code. A match is found if there's an {@link HttpError} with
-   * the same name as the status code's corresponding {@link HttpStatus}.
+   * Returns the {@link HttpError} corresponding to a given status code. A match is found if there's an {@link HttpError} with the
+   * same name as the status code's corresponding {@link HttpStatus}.
    *
    * @param statusCode the HTTP status code to search for
    * @return an {@link Optional} with the

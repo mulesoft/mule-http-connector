@@ -42,7 +42,7 @@ public abstract class AbstractHttpOcspRevocationTestCase extends AbstractHttpTls
   static final String VALID_OCSP_LIST = "valid-ocsp.txt";
 
   /**
-   *  This certified entity was generated to test revocation with OCSP mechanism.
+   * This certified entity was generated to test revocation with OCSP mechanism.
    */
   protected static final String ENTITY_CERTIFIED_REVOCATION_OCSP_SUB_PATH = "entityOcsp1";
 

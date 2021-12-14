@@ -42,7 +42,8 @@ public class HttpListenerCustomTlsConfigMultipleKeysTestCase extends AbstractHtt
   @Test
   public void rejectsConnectionWithInvalidCertificate() throws Exception {
     expectedException.expectMessage(anyOf(containsString(J8_262_SSL_ERROR_RESPONSE),
-                                          containsString(J8_275_SSL_ERROR_RESPONSE),
+                                          containsString(J8_275_SSL_ERROR_RESPONSE_1),
+                                          containsString(J8_275_SSL_ERROR_RESPONSE_2),
                                           containsString(J11_SSL_ERROR_RESPONSE)));
     flowRunner("testFlowClientWithoutCertificate").withPayload(TEST_MESSAGE).run();
   }

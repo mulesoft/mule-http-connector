@@ -11,8 +11,11 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
+
+import org.junit.Rule;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.runner.RunnerDelegateTo;
 
 import java.io.IOException;
@@ -33,10 +36,8 @@ public class HttpRequestEncodingTestCase extends AbstractHttpRequestTestCase {
   private static final String CYRILLIC_MESSAGE = "\u0416";
   private static final String SIMPLE_MESSAGE = "A";
 
-  @Parameterized.Parameter(0)
   public String encoding;
 
-  @Parameterized.Parameter(1)
   public String testMessage;
 
   @Parameterized.Parameters(name = "{0}")
@@ -45,6 +46,15 @@ public class HttpRequestEncodingTestCase extends AbstractHttpRequestTestCase {
         {"ISO-2022-JP", JAPANESE_MESSAGE}, {"UTF-8", JAPANESE_MESSAGE}, {"Arabic", ARABIC_MESSAGE},
         {"Windows-1256", ARABIC_MESSAGE}, {"Windows-1251", CYRILLIC_MESSAGE}, {"Cyrillic", CYRILLIC_MESSAGE},
         {"US-ASCII", SIMPLE_MESSAGE}});
+  }
+
+  @Rule
+  public SystemProperty testEncoding;
+
+  public HttpRequestEncodingTestCase(String encoding, String testMessage) {
+    this.encoding = encoding;
+    this.testMessage = testMessage;
+    this.testEncoding = new SystemProperty("testEncoding", encoding);
   }
 
   @Override
@@ -64,6 +74,7 @@ public class HttpRequestEncodingTestCase extends AbstractHttpRequestTestCase {
     Charset charset = Charset.forName(encoding);
     MediaType mediaType = TEXT.withCharset(charset);
     CoreEvent result = flowRunner("encodingTest")
+        .keepStreamsOpen()
         .withPayload(testMessage)
         .withMediaType(mediaType)
         .keepStreamsOpen()

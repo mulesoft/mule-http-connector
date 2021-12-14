@@ -24,6 +24,7 @@
 
     <flow name="simple">
         <http:request config-ref="simpleConfig" path="testPath">
+            <!-- TODO HTTPC-177: Remove mel expression -->
              <http:query-params>
                 #[mel:['testName1' : 'testValue1']]
             </http:query-params>

@@ -49,8 +49,8 @@ public class HttpListenerPolicyPointcutParameters extends HttpPolicyPointcutPara
    * Creates a new {@link PolicyPointcutParameters}
    *
    * @param component the component where the policy is being applied.
-   * @param path the target path of the incoming request
-   * @param method the HTTP method of the incoming request
+   * @param path      the target path of the incoming request
+   * @param method    the HTTP method of the incoming request
    */
   public HttpListenerPolicyPointcutParameters(Component component, String path, String method) {
     super(component, path, method);
@@ -59,11 +59,11 @@ public class HttpListenerPolicyPointcutParameters extends HttpPolicyPointcutPara
   /**
    * Creates a new {@link PolicyPointcutParameters}
    *
-   * @param component the component where the policy is being applied.
-   * @param path the target path of the incoming request
-   * @param method the HTTP method of the incoming request
+   * @param component         the component where the policy is being applied.
+   * @param path              the target path of the incoming request
+   * @param method            the HTTP method of the incoming request
    * @param maskedRequestPath the target path without the base path where the listener is deployed
-   * @param headers the HTTP headers of the incoming request
+   * @param headers           the HTTP headers of the incoming request
    */
   public HttpListenerPolicyPointcutParameters(Component component, String path, String method, String maskedRequestPath,
                                               MultiMap<String, String> headers) {

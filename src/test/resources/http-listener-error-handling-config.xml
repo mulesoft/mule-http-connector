@@ -29,6 +29,7 @@
                 </http:headers>
             </http:response>
         </http:listener>
+        <!-- TODO HTTPC-177: Remove mel expression -->
         <set-payload value="#[mel:inputStreamPayload]"/>
         <error-handler>
             <on-error-continue type="EXPRESSION">
@@ -59,6 +60,7 @@
 
     <flow name="exceptionBuildingResponse">
         <http:listener config-ref="listenerConfig" path="/exceptionBuildingResponse" responseStreamingMode="NEVER"/>
+        <!-- TODO HTTPC-177: Remove mel expression -->
         <set-payload value="#[mel:inputStreamPayload]"/>
         <error-handler>
             <on-error-propagate type="ANY">
@@ -78,6 +80,7 @@
         <error-handler>
             <on-error-propagate type="EXPRESSION">
                 <flow-ref name="trackPassageMessageProcessor"/>
+                <!-- TODO HTTPC-177: Remove mel expression -->
                 <set-payload value="#[mel:inputStreamPayload]"/>
             </on-error-propagate>
             <on-error-continue type="ANY">

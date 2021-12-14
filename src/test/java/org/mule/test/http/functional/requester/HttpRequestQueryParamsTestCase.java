@@ -6,7 +6,9 @@
  */
 package org.mule.test.http.functional.requester;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
 
 import java.util.HashMap;
@@ -63,7 +65,9 @@ public class HttpRequestQueryParamsTestCase extends AbstractHttpRequestTestCase 
   @Test
   public void queryParamAppendDefault() throws Exception {
     flowRunner("queryParamAppendDefault").withPayload(TEST_MESSAGE).run();
-    assertThat(uri, equalTo("/testPath?filter=username%2Capps&testName1=testValue1"));
+    assertThat(uri, startsWith("/testPath?"));
+    assertThat(uri, containsString("testName1=testValue1"));
+    assertThat(uri, containsString("filter=username%2Capps"));
   }
 
   @Test

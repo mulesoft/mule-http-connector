@@ -38,7 +38,8 @@ public class HttpRequestValidateCertificateTestCase extends AbstractHttpRequestT
   @Test
   public void rejectsMissingCertificate() throws Exception {
     expectedException.expectMessage(anyOf(containsString(J8_262_SSL_ERROR_RESPONSE),
-                                          containsString(J8_275_SSL_ERROR_RESPONSE),
+                                          containsString(J8_275_SSL_ERROR_RESPONSE_1),
+                                          containsString(J8_275_SSL_ERROR_RESPONSE_2),
                                           containsString(J11_SSL_ERROR_RESPONSE)));
     flowRunner("missingCertFlow").withPayload(TEST_MESSAGE).run();
   }

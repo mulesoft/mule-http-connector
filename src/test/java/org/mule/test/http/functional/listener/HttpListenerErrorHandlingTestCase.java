@@ -11,6 +11,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.ERROR_HANDLING;
 
+import org.junit.Ignore;
 import org.mule.runtime.core.api.util.IOUtils;
 
 import org.apache.http.HttpResponse;
@@ -20,6 +21,8 @@ import org.junit.Test;
 import io.qameta.allure.Story;
 
 @Story(ERROR_HANDLING)
+@Ignore("HTTPC-177")
+// TODO HTTPC-177: Remove mel expressions from related XML.
 public class HttpListenerErrorHandlingTestCase extends AbstractHttpListenerErrorHandlingTestCase {
 
   @Override

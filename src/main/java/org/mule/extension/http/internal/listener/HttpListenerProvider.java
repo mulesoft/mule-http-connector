@@ -45,6 +45,7 @@ import org.mule.runtime.http.api.HttpConstants;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.http.api.server.HttpServer;
 import org.mule.runtime.http.api.server.HttpServerConfiguration;
+import org.mule.runtime.http.api.server.HttpServerFactory;
 import org.mule.runtime.http.api.server.ServerAddress;
 import org.mule.runtime.http.api.server.ServerCreationException;
 
@@ -112,8 +113,8 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
      * The number of milliseconds that a connection can remain idle before it is closed. The value of this attribute is only used
      * when persistent connections are enabled.
      *
-     * The listener default timeout is bigger than our requester default timeout to avoid 'Remotely closed' exception
-     * when you start sending a request on an existing connection just before the timeout occurs.
+     * The listener default timeout is bigger than our requester default timeout to avoid 'Remotely closed' exception when you
+     * start sending a request on an existing connection just before the timeout occurs.
      */
     @Parameter
     @Optional(defaultValue = "40000")
@@ -123,6 +124,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
 
     /**
      * Read timeout to configure in milliseconds
+     * 
      * @since 1.6.0
      */
     @Parameter
@@ -215,7 +217,10 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
     HttpServerConfiguration serverConfiguration = getServerConfiguration();
 
     try {
-      server = httpService.getServerFactory().create(serverConfiguration);
+      HttpServerFactory serverFactory = httpService.getServerFactory();
+      if (serverFactory != null) {
+        server = serverFactory.create(serverConfiguration);
+      }
     } catch (ServerCreationException e) {
       throw new InitialisationException(createStaticMessage(buildFailureMessage("create", e)), e, this);
     }
@@ -260,7 +265,11 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
 
   private boolean useIOScheduler() {
     try {
-      Field result = httpService.getServerFactory().getClass().getDeclaredField("USE_IO_SCHEDULER");
+      HttpServerFactory serverFactory = httpService.getServerFactory();
+      if (serverFactory == null) {
+        return false;
+      }
+      Field result = serverFactory.getClass().getDeclaredField("USE_IO_SCHEDULER");
       return result.getBoolean(httpService);
     } catch (NoSuchFieldException | IllegalAccessException e) {
       return false;

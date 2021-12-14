@@ -74,6 +74,6 @@ public class HttpListenerPolicyPointcutParametersFactory implements SourcePolicy
    * When configured in a Domain, Policy provider is not present since it belongs to the App
    */
   private boolean isInDomain() {
-    return !policyProvider.isPresent();
+    return policyProvider == null || !policyProvider.isPresent();
   }
 }
