@@ -29,7 +29,7 @@
         <http:request-connection protocol="HTTP" host="localhost" port="${http.port}" >
             <http:connectivity-test requestPath="/{pathUriParam}" requestMethod="POST" responseTimeout="30" responseTimeoutUnit="SECONDS" followRedirects="true">
                 <http:request-body>
-                    <![CDATA[ The Body ]]>
+                    <![CDATA[The Body]]>
                 </http:request-body>
                 <http:request-headers>
                     <http:request-header key="Key" value="Value1" />
@@ -51,7 +51,7 @@
 
     <http:request-config name="requestConfigWithCustomResponseValidatorEvaluatingToTrue">
         <http:request-connection host="localhost" port="${http.port}" >
-            <http:connectivity-test requestPath="/irrelevantPath" >
+            <http:connectivity-test requestPath="/successPath" >
                 <http:response-validator>
                     <http:expression-response-validator expression="#[true]" />
                 </http:response-validator>
@@ -61,7 +61,7 @@
 
     <http:request-config name="requestConfigWithCustomResponseValidatorEvaluatingToFalse">
         <http:request-connection host="localhost" port="${http.port}" >
-            <http:connectivity-test requestPath="/irrelevantPath" >
+            <http:connectivity-test requestPath="/successPath" >
                 <http:response-validator>
                     <http:expression-response-validator expression="#[false]" />
                 </http:response-validator>
@@ -71,13 +71,13 @@
 
     <http:request-config name="requestConfigWithCustomResponseValidatorUsingAllBindings">
         <http:request-connection host="localhost" port="${http.port}" >
-            <http:connectivity-test requestPath="/irrelevantPath" >
+            <http:connectivity-test requestPath="/successPath" >
                 <http:response-validator>
                     <http:expression-response-validator expression="#[
                         attributes.statusCode == 200 and
-                        attributes.reasonPhrase == null and
-                        sizeOf(attributes.headers) == 0 and
-                        payload as String == 'some text payload']" />
+                        attributes.reasonPhrase == '' and
+                        attributes.headers['content-length'] == '0' and
+                        payload as String == '']" />
                 </http:response-validator>
             </http:connectivity-test>
         </http:request-connection>
@@ -99,13 +99,6 @@
         </munit:execution>
     </munit:test>
 
-    <munit:test name="requestConfigWithOnlyPathToDisabledFlow"
-                expectedErrorType="HTTP:SERVICE_UNAVAILABLE" >
-        <munit:execution>
-            <mtf:test-connectivity config-ref="requestConfigWithOnlyPath"/>
-        </munit:execution>
-    </munit:test>
-
     <munit:test name="requestConfigWithTheOptionalParametersSet">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="allParamsFlow"/>
@@ -116,24 +109,36 @@
         </munit:execution>
     </munit:test>
 
+    <munit:test name="expressionValidatorTrue" >
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="successFlow"/>
+        </munit:enable-flow-sources>
 
+        <munit:execution>
+            <mtf:test-connectivity config-ref="requestConfigWithCustomResponseValidatorEvaluatingToTrue"/>
+        </munit:execution>
+    </munit:test>
 
-    <!--    <munit:test name="invalidConnectionTest"-->
-<!--                expectedException="com.example.MyConnectionException"-->
-<!--                expectedErrorDescription="An error occurred while connecting">-->
-<!--        <munit:execution>-->
-<!--            <mtf:test-connectivity config-ref="invalidConnection"/>-->
-<!--        </munit:execution>-->
-<!--    </munit:test>-->
+    <munit:test name="expressionValidatorFalse"
+                expectedErrorType="HTTP:BAD_REQUEST" >
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="successFlow"/>
+        </munit:enable-flow-sources>
 
-<!--    <munit:test name="invalidConnectionWithErrorTypeTest"-->
-<!--                expectedException="com.example.MyConnectionException"-->
-<!--                expectedErrorType="EXAMPLE:INVALID_CREDENTIALS"-->
-<!--                expectedErrorDescription="An error occurred while connecting">-->
-<!--        <munit:execution>-->
-<!--            <mtf:test-connectivity config-ref="invalidConnectionWithErrorType"/>-->
-<!--        </munit:execution>-->
-<!--    </munit:test>-->
+        <munit:execution>
+            <mtf:test-connectivity config-ref="requestConfigWithCustomResponseValidatorEvaluatingToFalse"/>
+        </munit:execution>
+    </munit:test>
+
+    <munit:test name="expressionValidatorUsingAllBindings" >
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="successFlow"/>
+        </munit:enable-flow-sources>
+
+        <munit:execution>
+            <mtf:test-connectivity config-ref="requestConfigWithCustomResponseValidatorUsingAllBindings"/>
+        </munit:execution>
+    </munit:test>
 
     <http:listener-config name="listenerConfig" >
         <http:listener-connection host="0.0.0.0" port="${http.port}" />
@@ -145,7 +150,16 @@
     </flow>
 
     <flow name="allParamsFlow" >
-        <http:listener path="/testPath" config-ref="listenerConfig" />
-        <logger />
+        <http:listener path="/testPath" allowedMethods="POST" config-ref="listenerConfig" />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
+        <set-variable variableName="isExpectedBody" value="#[payload == 'The Body']" />
+        <set-variable variableName="isExpectedHeaders" value="#[attributes.headers['Key'] == 'Value1']" />
+        <set-variable variableName="isExpectedQueryString" value="#[attributes.queryString == 'Key1=Value1&amp;Key2=Value2']" />
+        <choice>
+            <when expression="#[not vars.isExpectedBody or not vars.isExpectedHeaders or not vars.isExpectedQueryString]"  >
+                <raise-error type="VALIDATION:ERROR"/>
+            </when>
+        </choice>
+        <logger level="ERROR" />
     </flow>
 </mule>
