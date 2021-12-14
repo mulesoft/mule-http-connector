@@ -8,7 +8,7 @@
 		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
 		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
 
-    <munit:config name="http-polling-source-basic.xml" />
+    <munit:config name="http-polling-timeout.xml" />
 
     <munit:dynamic-port propertyName="dynamic.port"/>
 
