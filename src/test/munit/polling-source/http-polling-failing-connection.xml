@@ -12,12 +12,12 @@
 
     <munit:dynamic-port propertyName="dynamic.port"/>
 
-    <http:request-config name="requestConfig">
+    <http:request-config name="requestConfigFailing">
         <http:request-connection host="localhost" port="${dynamic.port}" />
     </http:request-config>
 
     <flow name="polling-failing">
-        <http:polling-source config-ref="requestConfig" path="test">
+        <http:polling-source config-ref="requestConfigFailing" path="test">
             <scheduling-strategy >
                 <fixed-frequency frequency="2" timeUnit="SECONDS"/>
             </scheduling-strategy>

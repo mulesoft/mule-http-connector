@@ -16,7 +16,7 @@
         <http:listener-connection host="0.0.0.0" port="${dynamic.port}"/>
     </http:listener-config>
 
-    <http:request-config name="requestConfig" sendBodyMode="ALWAYS">
+    <http:request-config name="requestConfigBasic" sendBodyMode="ALWAYS">
         <http:request-connection host="localhost" port="${dynamic.port}" />
     </http:request-config>
 
@@ -55,7 +55,7 @@
     </flow>
 
     <flow name="basic-polling">
-        <http:polling-source config-ref="requestConfig" path="test">
+        <http:polling-source config-ref="requestConfigBasic" path="test">
             <scheduling-strategy >
                 <fixed-frequency frequency="2" timeUnit="SECONDS"/>
             </scheduling-strategy>
@@ -67,7 +67,7 @@
     </flow>
 
     <flow name="basic-polling-post">
-        <http:polling-source config-ref="requestConfig" path="test-post" method="POST">
+        <http:polling-source config-ref="requestConfigBasic" path="test-post" method="POST">
             <scheduling-strategy >
                 <fixed-frequency frequency="2" timeUnit="SECONDS"/>
             </scheduling-strategy>
@@ -79,7 +79,7 @@
     </flow>
 
     <flow name="basic-polling-with-header">
-        <http:polling-source config-ref="requestConfig" path="test">
+        <http:polling-source config-ref="requestConfigBasic" path="test">
             <scheduling-strategy >
                 <fixed-frequency frequency="2" timeUnit="SECONDS"/>
             </scheduling-strategy>
@@ -94,7 +94,7 @@
     </flow>
 
     <flow name="basic-polling-with-query-params">
-        <http:polling-source config-ref="requestConfig" path="test">
+        <http:polling-source config-ref="requestConfigBasic" path="test">
             <scheduling-strategy >
                 <fixed-frequency frequency="2" timeUnit="SECONDS"/>
             </scheduling-strategy>
@@ -109,7 +109,7 @@
     </flow>
 
     <flow name="basic-polling-with-uri-params">
-        <http:polling-source config-ref="requestConfig" path="/{testPath}">
+        <http:polling-source config-ref="requestConfigBasic" path="/{testPath}">
             <scheduling-strategy >
                 <fixed-frequency frequency="2" timeUnit="SECONDS"/>
             </scheduling-strategy>
@@ -130,7 +130,7 @@
 
 
     <flow name="basic-polling-body">
-        <http:polling-source config-ref="requestConfig" path="/test-body">
+        <http:polling-source config-ref="requestConfigBasic" path="/test-body">
             <scheduling-strategy >
                 <fixed-frequency frequency="10" timeUnit="HOURS"/>
             </scheduling-strategy>
@@ -143,7 +143,7 @@
     </flow>
 
     <flow name="basic-polling-full-params">
-        <http:polling-source config-ref="requestConfig" path="/{testPath}">
+        <http:polling-source config-ref="requestConfigBasic" path="/{testPath}">
             <scheduling-strategy >
                 <fixed-frequency frequency="2" timeUnit="SECONDS"/>
             </scheduling-strategy>
