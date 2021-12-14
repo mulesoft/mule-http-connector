@@ -40,7 +40,8 @@ import java.util.Objects;
 public class HttpRequesterTestRequestBuilder {
 
   /**
-   * The body of the response message
+   * The body in the connectivity test request. It can't be an expression because it doesn't make sense in a
+   * connectivity testing context.
    */
   @Parameter
   @Optional(defaultValue = "")
@@ -50,7 +51,7 @@ public class HttpRequesterTestRequestBuilder {
   private String requestBody;
 
   /**
-   * HTTP headers the message should include.
+   * HTTP headers the connectivity test request should include. It allows multiple headers with the same key.
    */
   @Parameter
   @Optional
@@ -60,7 +61,7 @@ public class HttpRequesterTestRequestBuilder {
   private List<TestRequestHeader> requestHeaders = emptyList();
 
   /**
-   * Query parameters the request should include.
+   * Query parameters the connectivity test request should include. It allows multiple query params with the same key.
    */
   @Parameter
   @Optional
@@ -70,7 +71,7 @@ public class HttpRequesterTestRequestBuilder {
   private List<TestQueryParam> requestQueryParams = emptyList();
 
   /**
-   * URI parameters that should be used to create the request.
+   * URI parameters the connectivity test request should include.
    */
   @Parameter
   @Optional
