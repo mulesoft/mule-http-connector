@@ -6,6 +6,7 @@
  */
 package org.mule.test.http.functional.requester;
 
+import static java.lang.Thread.sleep;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
@@ -22,6 +23,7 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.util.security.Constraint;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.util.concurrent.Latch;
@@ -56,6 +58,13 @@ public class HttpRequestPollingSourceAuthTestCase extends AbstractHttpRequestTes
     assertThat(DigestAuthProcessor.response, is(DEFAULT_RESPONSE));
   }
 
+  @Test
+  @Ignore("HTTPC-181")
+  public void incorrectAuth() throws InterruptedException {
+    sleep(5000);
+    assertThat(BasicFailingAuth.requests, is(0));
+  }
+
   @Override
   protected AbstractHandler createHandler(Server server) {
     AbstractHandler handler = super.createHandler(server);
@@ -84,7 +93,7 @@ public class HttpRequestPollingSourceAuthTestCase extends AbstractHttpRequestTes
 
       @Override
       public void handle(String pathInContext, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
-              throws IOException, ServletException {
+          throws IOException, ServletException {
         super.handle(pathInContext, baseRequest, request, response);
       }
     };
@@ -148,6 +157,17 @@ public class HttpRequestPollingSourceAuthTestCase extends AbstractHttpRequestTes
         response = event.getMessage().getPayload().getValue().toString();
         digestAuthLatch.release();
       }
+      return event;
+    }
+  }
+
+  public static class BasicFailingAuth implements Processor {
+
+    public static int requests = 0;
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      requests += 1;
       return event;
     }
   }
