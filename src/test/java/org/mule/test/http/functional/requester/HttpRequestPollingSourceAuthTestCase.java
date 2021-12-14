@@ -57,7 +57,8 @@ public class HttpRequestPollingSourceAuthTestCase extends AbstractHttpRequestTes
 
     try {
       String realmPath = FileUtils.getResourcePath("auth/realm.properties", getClass());
-      return HttpRequestAuthUtils.createAuthHandler(server, handler, realmPath, () -> {});
+      return HttpRequestAuthUtils.createAuthHandler(server, handler, realmPath, () -> {
+      });
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
