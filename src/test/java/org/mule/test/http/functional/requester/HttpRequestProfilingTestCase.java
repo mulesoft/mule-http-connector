@@ -21,6 +21,7 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
+import org.mule.runtime.api.profiling.ProfilingProducerScope;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.threading.ThreadSnapshotCollector;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
@@ -28,6 +29,7 @@ import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.eclipse.jetty.server.Request;
 import org.junit.Rule;
@@ -51,7 +53,7 @@ public class HttpRequestProfilingTestCase extends AbstractHttpRequestTestCase {
   @Override
   protected Map<String, Object> getStartUpRegistryObjects() {
     Map<String, Object> registryObjects = new HashMap<>();
-    registryObjects.put("_muleProfilingService", new TestProfilingService(profilingDataProducer));
+    registryObjects.put("test.profiling.service", new TestProfilingService(profilingDataProducer));
     return registryObjects;
   }
 
@@ -87,15 +89,20 @@ public class HttpRequestProfilingTestCase extends AbstractHttpRequestTestCase {
     }
 
     @Override
-    public <T extends ProfilingEventContext> ProfilingDataProducer<T> getProfilingDataProducer(
-                                                                                               ProfilingEventType<T> profilingEventType) {
+    public <T extends ProfilingEventContext, S> ProfilingDataProducer<T, S> getProfilingDataProducer(ProfilingEventType<T> profilingEventType) {
       return profilingDataProducer;
     }
 
     @Override
-    public <T extends ProfilingEventContext> void registerProfilingDataProducer(ProfilingEventType<T> profilingEventType,
-                                                                                ProfilingDataProducer<T> profilingDataProducer) {
-      // Nothing to to in this test.
+    public <T extends ProfilingEventContext, S> ProfilingDataProducer<T, S> getProfilingDataProducer(ProfilingEventType<T> profilingEventType,
+                                                                                                     ProfilingProducerScope producerScope) {
+      return profilingDataProducer;
+    }
+
+    @Override
+    public <T extends ProfilingEventContext, S> void registerProfilingDataProducer(ProfilingEventType<T> profilingEventType,
+                                                                                   ProfilingDataProducer<T, S> profilingDataProducer) {
+      // Nothing to do in this test.
     }
 
     @Override
@@ -108,13 +115,18 @@ public class HttpRequestProfilingTestCase extends AbstractHttpRequestTestCase {
    * A test {@link ProfilingDataProducer}.
    */
   private static final class TestProfilingDataProducer
-      implements ProfilingDataProducer<ExtensionProfilingEventContext> {
+      implements ProfilingDataProducer<ExtensionProfilingEventContext, Object> {
 
     private ExtensionProfilingEventContext lastProfilingEventContext;
 
     @Override
     public void triggerProfilingEvent(ExtensionProfilingEventContext profilingEventContext) {
       this.lastProfilingEventContext = profilingEventContext;
+    }
+
+    @Override
+    public void triggerProfilingEvent(Object sourceData, Function<Object, ExtensionProfilingEventContext> transformation) {
+      triggerProfilingEvent(transformation.apply(sourceData));
     }
 
     public ExtensionProfilingEventContext getLastProfilingEventContext() {

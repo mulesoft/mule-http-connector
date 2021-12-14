@@ -31,7 +31,6 @@
         <muleSocketsConnectorVersion>1.2.2</muleSocketsConnectorVersion>
         <muleCorsKernelVersion>1.1.2</muleCorsKernelVersion>
 
-        <muleProfilingApiVersion>1.0.0</muleProfilingApiVersion>
         <muleHttpServiceVersion>1.7.0-SNAPSHOT</muleHttpServiceVersion>
         <muleSchedulerServiceVersion>1.5.0-SNAPSHOT</muleSchedulerServiceVersion>
 
@@ -343,7 +342,6 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-profiling-api</artifactId>
-            <version>${muleProfilingApiVersion}</version>
             <scope>provided</scope>
         </dependency>
 
