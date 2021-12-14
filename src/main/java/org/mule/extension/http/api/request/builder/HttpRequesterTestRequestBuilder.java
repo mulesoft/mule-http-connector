@@ -10,12 +10,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.hash;
-import static org.mule.extension.http.internal.request.KeyValuePairUtils.toMultiMap;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
-import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
 
-import org.mule.extension.http.internal.request.HttpRequesterConfig;
-import org.mule.extension.http.internal.request.UriUtils;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -25,8 +21,6 @@ import org.mule.runtime.extension.api.annotation.param.display.Text;
 import org.mule.runtime.http.api.domain.entity.EmptyHttpEntity;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
 import org.mule.runtime.http.api.domain.entity.InputStreamHttpEntity;
-import org.mule.runtime.http.api.domain.message.request.HttpRequest;
-import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
@@ -80,24 +74,8 @@ public class HttpRequesterTestRequestBuilder {
   @DisplayName("URI Parameters")
   private List<UriParam> requestUriParams = emptyList();
 
-  public String getRequestBody() {
-    return requestBody;
-  }
-
-  protected void setRequestBody(String body) {
-    this.requestBody = body;
-  }
-
   public List<TestRequestHeader> getRequestHeaders() {
     return unmodifiableList(requestHeaders);
-  }
-
-  protected void setRequestHeaders(List<TestRequestHeader> headers) {
-    this.requestHeaders = headers != null ? headers : emptyList();
-  }
-
-  public String replaceUriParamsOf(String path) {
-    return UriUtils.replaceUriParams(path, requestUriParams);
   }
 
   public List<TestQueryParam> getRequestQueryParams() {
@@ -106,20 +84,6 @@ public class HttpRequesterTestRequestBuilder {
 
   public List<UriParam> getRequestUriParams() {
     return requestUriParams;
-  }
-
-  protected void setRequestQueryParams(List<TestQueryParam> queryParams) {
-    this.requestQueryParams = queryParams;
-  }
-
-  public void setRequestUriParams(List<UriParam> requestUriParams) {
-    this.requestUriParams = requestUriParams;
-  }
-
-  public HttpRequestBuilder toHttpRequestBuilder(HttpRequesterConfig config) {
-    return HttpRequest.builder(PRESERVE_HEADER_CASE || config.isPreserveHeadersCase())
-        .headers(toMultiMap(getRequestHeaders()))
-        .queryParams(toMultiMap(getRequestQueryParams()));
   }
 
   @Override
