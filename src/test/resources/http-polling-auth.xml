@@ -45,8 +45,7 @@
         <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
         <flow-ref name="digestAuthProcessor"/>
     </flow>
-
-
+    
     <http:request-config name="basicFailingConfig">
         <http:request-connection host="localhost" port="${httpPort}">
             <http:authentication>
