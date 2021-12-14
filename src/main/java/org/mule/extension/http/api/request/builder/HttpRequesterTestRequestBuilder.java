@@ -6,9 +6,8 @@
  */
 package org.mule.extension.http.api.request.builder;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.hash;
 import static org.mule.extension.http.internal.request.KeyValuePairUtils.toMultiMap;
@@ -23,11 +22,14 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
+import org.mule.runtime.http.api.domain.entity.EmptyHttpEntity;
+import org.mule.runtime.http.api.domain.entity.HttpEntity;
+import org.mule.runtime.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -55,17 +57,7 @@ public class HttpRequesterTestRequestBuilder {
   @NullSafe
   @Expression(value = NOT_SUPPORTED)
   @DisplayName("Headers")
-  protected List<TestRequestHeader> requestHeaders = emptyList();
-
-  /**
-   * URI parameters that should be used to create the request.
-   */
-  @Parameter
-  @Optional
-  @NullSafe
-  @Expression(value = NOT_SUPPORTED)
-  @DisplayName("URI Parameters")
-  private Map<String, String> requestUriParams = emptyMap();
+  private List<TestRequestHeader> requestHeaders = emptyList();
 
   /**
    * Query parameters the request should include.
@@ -76,6 +68,16 @@ public class HttpRequesterTestRequestBuilder {
   @Expression(value = NOT_SUPPORTED)
   @DisplayName("Query Parameters")
   private List<TestQueryParam> requestQueryParams = emptyList();
+
+  /**
+   * URI parameters that should be used to create the request.
+   */
+  @Parameter
+  @Optional
+  @NullSafe
+  @Expression(value = NOT_SUPPORTED)
+  @DisplayName("URI Parameters")
+  private List<UriParam> requestUriParams = emptyList();
 
   public String getRequestBody() {
     return requestBody;
@@ -101,16 +103,16 @@ public class HttpRequesterTestRequestBuilder {
     return unmodifiableList(requestQueryParams);
   }
 
-  public Map<String, String> getRequestUriParams() {
-    return unmodifiableMap(requestUriParams);
+  public List<UriParam> getRequestUriParams() {
+    return requestUriParams;
   }
 
   protected void setRequestQueryParams(List<TestQueryParam> queryParams) {
     this.requestQueryParams = queryParams;
   }
 
-  protected void setRequestUriParams(Map<String, String> uriParams) {
-    this.requestUriParams = uriParams;
+  public void setRequestUriParams(List<UriParam> requestUriParams) {
+    this.requestUriParams = requestUriParams;
   }
 
   public HttpRequestBuilder toHttpRequestBuilder(HttpRequesterConfig config) {
@@ -135,5 +137,13 @@ public class HttpRequesterTestRequestBuilder {
     HttpRequesterTestRequestBuilder that = (HttpRequesterTestRequestBuilder) o;
     return Objects.equals(requestBody, that.requestBody) && Objects.equals(requestHeaders, that.requestHeaders)
         && Objects.equals(requestQueryParams, that.requestQueryParams) && Objects.equals(requestUriParams, that.requestUriParams);
+  }
+
+  public HttpEntity buildEntity() {
+    if (requestBody == null || requestBody.isEmpty()) {
+      return new EmptyHttpEntity();
+    } else {
+      return new InputStreamHttpEntity(new ByteArrayInputStream(requestBody.getBytes(UTF_8)));
+    }
   }
 }

@@ -7,6 +7,7 @@
 package org.mule.extension.http.internal.request;
 
 import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
 import static org.mule.extension.http.internal.HttpConnectorConstants.AUTHENTICATION;
 import static org.mule.extension.http.internal.HttpConnectorConstants.TLS_CONFIGURATION;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -18,9 +19,12 @@ import static org.mule.runtime.extension.api.annotation.param.display.Placement.
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTP;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
 import static org.slf4j.LoggerFactory.getLogger;
+
+import org.mule.extension.http.api.request.HttpConnectivityValidator;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.proxy.HttpProxyConfig;
+import org.mule.extension.http.api.request.validator.ResponseValidatorTypedException;
 import org.mule.extension.http.internal.request.HttpRequesterConnectionManager.ShareableHttpClient;
 import org.mule.extension.http.internal.request.client.DefaultUriParameters;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
@@ -53,14 +57,15 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
+import java.util.concurrent.ExecutionException;
+
 /**
  * Connection provider for a HTTP request, handles the creation of {@link HttpExtensionClient} instances.
  *
  * @since 1.0
  */
 @Alias("request")
-public class HttpRequesterProvider implements CachedConnectionProvider<HttpExtensionClient>, Initialisable, Disposable,
-    NoConnectivityTest {
+public class HttpRequesterProvider implements CachedConnectionProvider<HttpExtensionClient>, Initialisable, Disposable {
 
   private static final Logger LOGGER = getLogger(HttpRequesterProvider.class);
 
@@ -104,6 +109,12 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
   @Placement(tab = AUTHENTICATION)
   private HttpRequestAuthentication authentication;
 
+  @Parameter
+  @Optional
+  @Expression(NOT_SUPPORTED)
+  @Placement(tab = "Connectivity Test")
+  private HttpConnectivityValidator connectivityTest;
+
   @Inject
   private HttpRequesterConnectionManager connectionManager;
 
@@ -111,7 +122,20 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
 
   @Override
   public ConnectionValidationResult validate(HttpExtensionClient httpClient) {
-    return ConnectionValidationResult.success();
+    if (connectivityTest == null) {
+      // If nothing was configured, the connectivity test will be successful. This rule ensures backwards compatibility.
+      return ConnectionValidationResult.success();
+    }
+
+    try {
+      connectivityTest.validate(httpClient, connectionParams);
+      return ConnectionValidationResult.success();
+    } catch (ExecutionException | ResponseValidatorTypedException e) {
+      return ConnectionValidationResult.failure(e.getMessage(), e);
+    } catch (InterruptedException e) {
+      currentThread().interrupt();
+      return ConnectionValidationResult.failure(e.getMessage(), e);
+    }
   }
 
   @Override
@@ -134,6 +158,9 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
     }
     if (authentication != null) {
       initialiseIfNeeded(authentication, true, muleContext);
+    }
+    if (connectivityTest != null) {
+      initialiseIfNeeded(connectivityTest, true, muleContext);
     }
 
     verifyConnectionsParameters();

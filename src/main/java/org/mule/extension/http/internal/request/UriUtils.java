@@ -16,10 +16,13 @@ import static org.mule.extension.http.internal.HttpConnectorConstants.ENCODE_URI
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.encodeSpaces;
 
+import org.mule.extension.http.api.request.builder.KeyValuePair;
+import org.mule.extension.http.api.request.builder.UriParam;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.http.api.HttpConstants;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
@@ -36,6 +39,15 @@ public final class UriUtils {
 
   public static String replaceUriParams(String path, Map<String, String> uriParams) {
     for (Entry<String, String> entry : uriParams.entrySet()) {
+      String uriParamName = entry.getKey();
+      String uriParamValue = entry.getValue();
+      path = replaceUriParam(path, uriParamName, uriParamValue);
+    }
+    return path;
+  }
+
+  public static String replaceUriParams(String path, List<? extends UriParam> uriParams) {
+    for (UriParam entry : uriParams) {
       String uriParamName = entry.getKey();
       String uriParamValue = entry.getValue();
       path = replaceUriParam(path, uriParamName, uriParamValue);
