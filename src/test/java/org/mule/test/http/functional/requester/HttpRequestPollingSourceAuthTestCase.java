@@ -37,6 +37,7 @@ import java.io.IOException;
 public class HttpRequestPollingSourceAuthTestCase extends AbstractHttpRequestTestCase {
 
   private static Latch basicAuthLatch = new Latch();
+  private static Latch digestAuthLatch = new Latch();
 
   @Override
   protected String getConfigFile() {
@@ -44,9 +45,15 @@ public class HttpRequestPollingSourceAuthTestCase extends AbstractHttpRequestTes
   }
 
   @Test
-  public void correctAuthentication() throws InterruptedException {
+  public void correctBasicAuth() throws InterruptedException {
     basicAuthLatch.await();
     assertThat(BasicAuthProcessor.response, is(DEFAULT_RESPONSE));
+  }
+
+  @Test
+  public void correctDigestAuth() throws InterruptedException {
+    digestAuthLatch.await();
+    assertThat(DigestAuthProcessor.response, is(DEFAULT_RESPONSE));
   }
 
   @Override
@@ -131,8 +138,16 @@ public class HttpRequestPollingSourceAuthTestCase extends AbstractHttpRequestTes
 
   public static class DigestAuthProcessor implements Processor {
 
+    public static int requests = 0;
+    public static String response = null;
+
     @Override
     public CoreEvent process(CoreEvent event) throws MuleException {
+      requests++;
+      if (requests == 2) {
+        response = event.getMessage().getPayload().getValue().toString();
+        digestAuthLatch.release();
+      }
       return event;
     }
   }
