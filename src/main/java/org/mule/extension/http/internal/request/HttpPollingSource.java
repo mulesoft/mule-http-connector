@@ -167,8 +167,8 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
                               responseValidator, transformationService, requestBuilder, true, muleContext, scheduler, null, null,
                               callback, injectedHeaders, null);
     } catch (MuleRuntimeException e) {
-      LOGGER.warn("Trigger '{}': Mule runtime exception found while executing poll: '{}'", getId(), e.getMessage());
-      LOGGER.warn("MuleRuntimeException:", e);
+      LOGGER.error("Trigger '{}': Mule runtime exception found while executing poll: '{}'", getId(), e.getMessage());
+      LOGGER.error("MuleRuntimeException:", e);
     }
 
   }
