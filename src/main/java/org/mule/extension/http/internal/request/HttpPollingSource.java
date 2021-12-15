@@ -159,8 +159,7 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
           @Override
           public void error(Throwable throwable) {
             LOGGER.error("There was an error in HTTP Polling Source at {} of uri '{}'", location.getRootContainerName(),
-                         resolvedUri);
-            LOGGER.error("Error:", throwable);
+                         resolvedUri, throwable);
           }
         };
 
@@ -172,8 +171,7 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
                               callback, injectedHeaders, null);
     } catch (MuleRuntimeException e) {
       LOGGER.error("Trigger '{}': Mule runtime exception found while executing poll to {}: '{}'", getId(), resolvedUri,
-                   e.getMessage());
-      LOGGER.error("MuleRuntimeException:", e);
+                   e.getMessage(), e);
     }
 
   }
