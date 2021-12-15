@@ -8,6 +8,7 @@ package org.mule.extension.http.api.request;
 
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.mule.extension.http.internal.request.KeyValuePairUtils.toMultiMap;
 import static org.mule.extension.http.internal.request.UriUtils.replaceUriParams;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -16,7 +17,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
 import org.mule.extension.http.api.request.builder.HttpRequesterTestRequestBuilder;
-import org.mule.extension.http.api.request.builder.KeyValuePair;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.request.validator.ResponseValidatorTypedException;
 import org.mule.extension.http.api.request.validator.SuccessStatusCodeValidator;
@@ -27,7 +27,6 @@ import org.mule.extension.http.internal.request.RequestConnectionParams;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -121,6 +120,9 @@ public class HttpConnectivityValidator implements Initialisable {
   // It's only used to propagate the initialisation to response validator.
   private MuleContext muleContext;
 
+  // Attribute utilised to avoid re-calculation of the uri as string.
+  private String uriString = null;
+
   public void validate(HttpExtensionClient client, RequestConnectionParams connectionParams)
       throws ExecutionException, InterruptedException, ResponseValidatorTypedException {
     HttpRequest request = buildTestRequest(connectionParams);
@@ -155,16 +157,13 @@ public class HttpConnectivityValidator implements Initialisable {
         .build();
   }
 
-  private static MultiMap<String, String> toMultiMap(Iterable<? extends KeyValuePair> asList) {
-    MultiMap<String, String> asMultiMap = new MultiMap<>();
-    asList.forEach(pair -> asMultiMap.put(pair.getKey(), pair.getValue()));
-    return asMultiMap;
-  }
-
   private String getUriString(RequestConnectionParams connectionParams) {
-    String pathWithUriParams = replaceUriParams(requestPath, requestBuilder.getRequestUriParams());
-    return format("%s://%s:%s%s", connectionParams.getProtocol().getScheme(), connectionParams.getHost(),
-                  connectionParams.getPort(), pathWithUriParams);
+    if (uriString == null) {
+      String pathWithUriParams = replaceUriParams(requestPath, requestBuilder.getRequestUriParams());
+      uriString = format("%s://%s:%s%s", connectionParams.getProtocol().getScheme(), connectionParams.getHost(),
+                         connectionParams.getPort(), pathWithUriParams);
+    }
+    return uriString;
   }
 
   private ResponseValidator getResponseValidator() {
