@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static org.mule.extension.http.internal.HttpConnectorConstants.AUTHENTICATION;
 import static org.mule.extension.http.internal.HttpConnectorConstants.TLS_CONFIGURATION;
+import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -48,15 +49,12 @@ import org.mule.runtime.extension.api.annotation.param.RefName;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
-import org.mule.runtime.extension.api.connectivity.NoConnectivityTest;
 import org.mule.runtime.http.api.HttpConstants;
 import org.mule.runtime.http.api.client.HttpClientConfiguration;
 import org.mule.runtime.http.api.client.proxy.ProxyConfig;
-
-import javax.inject.Inject;
-
 import org.slf4j.Logger;
 
+import javax.inject.Inject;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -124,12 +122,12 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
   public ConnectionValidationResult validate(HttpExtensionClient httpClient) {
     if (connectivityTest == null) {
       // If nothing was configured, the connectivity test will be successful. This rule ensures backwards compatibility.
-      return ConnectionValidationResult.success();
+      return success();
     }
 
     try {
       connectivityTest.validate(httpClient, connectionParams);
-      return ConnectionValidationResult.success();
+      return success();
     } catch (ExecutionException | ResponseValidatorTypedException e) {
       return ConnectionValidationResult.failure(e.getMessage(), e);
     } catch (InterruptedException e) {
