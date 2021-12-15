@@ -9,13 +9,13 @@ package org.mule.test.http.functional.requester;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.api.util.FileUtils.getResourcePath;
 import static org.mule.test.http.functional.requester.HttpRequestAuthUtils.createAuthHandler;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.junit.Test;
-import org.mule.runtime.core.api.util.FileUtils;
 
 import java.io.IOException;
 
@@ -57,7 +57,7 @@ public class HttpRequestAuthTestCase extends AbstractHttpRequestTestCase {
     AbstractHandler handler = super.createHandler(server);
 
     try {
-      String realmPath = FileUtils.getResourcePath("auth/realm.properties", getClass());
+      String realmPath = getResourcePath("auth/realm.properties", getClass());
       return createAuthHandler(server, handler, realmPath, () -> requestCount++);
     } catch (IOException e) {
       throw new RuntimeException(e);

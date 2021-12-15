@@ -13,6 +13,7 @@ import static org.mule.extension.http.internal.request.UriUtils.resolveUri;
 import static org.mule.extension.http.internal.request.UriUtils.replaceUriParams;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.DROP;
+import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.FAIL;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.WAIT;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
@@ -22,6 +23,7 @@ import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.request.validator.SuccessStatusCodeValidator;
 import org.mule.extension.http.internal.HttpMetadataResolver;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -60,7 +62,7 @@ import java.util.List;
 @MediaType(value = ANY, strict = false)
 @MetadataScope(outputResolver = HttpMetadataResolver.class)
 @Streaming
-@BackPressure(defaultMode = DROP, supportedModes = {DROP, WAIT})
+@BackPressure(defaultMode = WAIT, supportedModes = {DROP, WAIT, FAIL})
 public class HttpPollingSource extends PollingSource<String, HttpResponseAttributes> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HttpPollingSource.class);
@@ -88,6 +90,7 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
   private String resolvedUri;
   private Scheduler scheduler;
   private HttpRequester httpRequester;
+  private ComponentLocation location;
 
   /**
    * Relative path from the path set in the HTTP Requester configuration
@@ -115,7 +118,7 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
 
   @Override
   protected void doStart() throws MuleException {
-    LOGGER.debug("Starting HTTP Polling Source");
+    LOGGER.debug("Starting HTTP Polling Source in {}", location.getRootContainerName());
     scheduler = schedulerService.ioScheduler();
     client = clientProvider.connect();
     httpRequester = createHttpRequester(false, muleContext);
@@ -124,7 +127,7 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
 
   @Override
   protected void doStop() {
-    LOGGER.debug("Stopping HTTP Polling Source");
+    LOGGER.debug("Stopping HTTP Polling Source in {}", location.getRootContainerName());
     scheduler.stop();
   }
 
@@ -155,19 +158,21 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
 
           @Override
           public void error(Throwable throwable) {
-            LOGGER.error("There was an error in HTTP Polling Source of uri '{}'", resolvedUri);
+            LOGGER.error("There was an error in HTTP Polling Source at {} of uri '{}'", location.getRootContainerName(),
+                         resolvedUri);
             LOGGER.error("Error:", throwable);
           }
         };
 
-    LOGGER.debug("Sending '{}' request to '{}'.", method, resolvedUri);
+    LOGGER.debug("Sending '{}' request to '{}' in flow '{}'.", method, resolvedUri, location.getRootContainerName());
     try {
       httpRequester.doRequest(client, config, resolvedUri, method, config.getRequestStreamingMode(), config.getSendBodyMode(),
                               config.getFollowRedirects(), client.getDefaultAuthentication(), config.getResponseTimeout(),
                               responseValidator, transformationService, requestBuilder, true, muleContext, scheduler, null, null,
                               callback, injectedHeaders, null);
     } catch (MuleRuntimeException e) {
-      LOGGER.error("Trigger '{}': Mule runtime exception found while executing poll: '{}'", getId(), e.getMessage());
+      LOGGER.error("Trigger '{}': Mule runtime exception found while executing poll to {}: '{}'", getId(), resolvedUri,
+                   e.getMessage());
       LOGGER.error("MuleRuntimeException:", e);
     }
 
@@ -184,6 +189,6 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
 
   @Override
   public void onRejectedItem(Result<String, HttpResponseAttributes> result, SourceCallbackContext sourceCallbackContext) {
-    LOGGER.debug("Item rejected by HTTP Polling Source of uri '{}'", resolvedUri);
+    LOGGER.debug("Item rejected by HTTP Polling Source in flow '{}'", location.getRootContainerName());
   }
 }

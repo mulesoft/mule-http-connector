@@ -122,7 +122,7 @@ public class HttpRequesterTestRequestBuilder implements HttpRequestBuilderConfig
   }
 
   @Override
-  public TypedValue<?> getBodyAsTypedValue() {
+  public TypedValue getBodyAsTypedValue() {
     return TypedValue.of(getRequestBody());
   }
 

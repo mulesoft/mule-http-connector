@@ -9,13 +9,13 @@ package org.mule.test.http.functional.requester;
 import static java.lang.Thread.sleep;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.mule.runtime.core.api.util.FileUtils.getResourcePath;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.POLLING_SOURCE;
 import static org.mule.test.http.functional.requester.HttpRequestAuthUtils.createAuthHandler;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
@@ -24,7 +24,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.util.FileUtils;
 
 import java.io.IOException;
 
@@ -66,7 +65,7 @@ public class HttpRequestPollingSourceAuthTestCase extends AbstractHttpRequestTes
     AbstractHandler handler = super.createHandler(server);
 
     try {
-      String realmPath = FileUtils.getResourcePath("auth/realm.properties", getClass());
+      String realmPath = getResourcePath("auth/realm.properties", getClass());
       return createAuthHandler(server, handler, realmPath, () -> {
       });
     } catch (IOException e) {

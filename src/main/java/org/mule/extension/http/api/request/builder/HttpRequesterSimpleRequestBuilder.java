@@ -123,7 +123,7 @@ public class HttpRequesterSimpleRequestBuilder implements HttpRequestBuilderConf
   }
 
   @Override
-  public TypedValue<?> getBodyAsTypedValue() {
+  public TypedValue getBodyAsTypedValue() {
     return TypedValue.of(getRequestBody());
   }
 }

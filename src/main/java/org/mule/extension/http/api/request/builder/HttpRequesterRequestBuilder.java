@@ -160,7 +160,7 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder implements H
   }
 
   @Override
-  public TypedValue<?> getBodyAsTypedValue() {
+  public TypedValue getBodyAsTypedValue() {
     return getBody();
   }
 }

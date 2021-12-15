@@ -28,5 +28,5 @@ public interface HttpRequestBuilderConfigurer {
   /**
    * @return the body of this request builder, as {@link TypedValue}
    */
-  TypedValue<?> getBodyAsTypedValue();
+  TypedValue getBodyAsTypedValue();
 }
