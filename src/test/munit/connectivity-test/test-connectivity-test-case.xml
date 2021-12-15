@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:mtf="http://www.mulesoft.org/schema/mule/mtf"
+      xsi:schemaLocation="
+      	http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/mtf http://www.mulesoft.org/schema/mule/mtf/current/mule-mtf.xsd">
+
+    <munit:config name="test-connectivity-test-case" minMuleVersion="4.2.0"/>
+
+    <munit:dynamic-port propertyName="http.port"/>
+
+    <http:request-config name="requestConfigWithoutTestConnection">
+        <http:request-connection protocol="HTTP" host="localhost" port="${http.port}" />
+    </http:request-config>
+
+    <http:request-config name="requestConfigWithOnlyPath">
+        <http:request-connection host="localhost" port="${http.port}" >
+            <http:connectivity-test requestPath="/successPath" />
+        </http:request-connection>
+    </http:request-config>
+
+    <http:request-config name="requestConfigWithTheOptionalParameters">
+        <http:request-connection protocol="HTTP" host="localhost" port="${http.port}" >
+            <http:connectivity-test requestPath="/{pathUriParam}" requestMethod="POST" responseTimeout="30" responseTimeoutUnit="SECONDS" followRedirects="true">
+                <http:request-body>
+                    <![CDATA[The Body]]>
+                </http:request-body>
+                <http:request-headers>
+                    <http:request-header key="Key" value="Value1" />
+                    <http:request-header key="Key" value="Value2" />
+                </http:request-headers>
+                <http:request-query-params>
+                    <http:query-param key="Key1" value="Value1" />
+                    <http:query-param key="Key2" value="Value2" />
+                </http:request-query-params>
+                <http:request-uri-params>
+                    <http:uri-param key="pathUriParam" value="testPath" />
+                </http:request-uri-params>
+                <http:response-validator>
+                    <http:success-status-code-validator values="200" />
+                </http:response-validator>
+            </http:connectivity-test>
+        </http:request-connection>
+    </http:request-config>
+
+    <http:request-config name="requestConfigWithCustomResponseValidatorEvaluatingToTrue">
+        <http:request-connection host="localhost" port="${http.port}" >
+            <http:connectivity-test requestPath="/successPath" >
+                <http:response-validator>
+                    <http:expression-response-validator expression="#[true]" />
+                </http:response-validator>
+            </http:connectivity-test>
+        </http:request-connection>
+    </http:request-config>
+
+    <http:request-config name="requestConfigWithCustomResponseValidatorEvaluatingToFalse">
+        <http:request-connection host="localhost" port="${http.port}" >
+            <http:connectivity-test requestPath="/successPath" >
+                <http:response-validator>
+                    <http:expression-response-validator expression="#[false]" />
+                </http:response-validator>
+            </http:connectivity-test>
+        </http:request-connection>
+    </http:request-config>
+
+    <http:request-config name="requestConfigWithCustomResponseValidatorUsingAllBindings">
+        <http:request-connection host="localhost" port="${http.port}" >
+            <http:connectivity-test requestPath="/successPath" >
+                <http:response-validator>
+                    <http:expression-response-validator expression="#[
+                        attributes.statusCode == 200 and
+                        attributes.reasonPhrase == '' and
+                        attributes.headers['content-length'] == '0' and
+                        payload as String == '']" />
+                </http:response-validator>
+            </http:connectivity-test>
+        </http:request-connection>
+    </http:request-config>
+
+    <munit:test name="requestConfigWithoutTestConnectionIsValid">
+        <munit:execution>
+            <mtf:test-connectivity config-ref="requestConfigWithoutTestConnection"/>
+        </munit:execution>
+    </munit:test>
+
+    <munit:test name="requestConfigWithOnlyPathToEnabledFlow">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="successFlow"/>
+        </munit:enable-flow-sources>
+
+        <munit:execution>
+            <mtf:test-connectivity config-ref="requestConfigWithOnlyPath"/>
+        </munit:execution>
+    </munit:test>
+
+    <munit:test name="requestConfigWithTheOptionalParametersSet">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="allParamsFlow"/>
+        </munit:enable-flow-sources>
+
+        <munit:execution>
+            <mtf:test-connectivity config-ref="requestConfigWithTheOptionalParameters"/>
+        </munit:execution>
+    </munit:test>
+
+    <munit:test name="expressionValidatorTrue" >
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="successFlow"/>
+        </munit:enable-flow-sources>
+
+        <munit:execution>
+            <mtf:test-connectivity config-ref="requestConfigWithCustomResponseValidatorEvaluatingToTrue"/>
+        </munit:execution>
+    </munit:test>
+
+    <munit:test name="expressionValidatorFalse"
+                expectedErrorType="HTTP:BAD_REQUEST" >
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="successFlow"/>
+        </munit:enable-flow-sources>
+
+        <munit:execution>
+            <mtf:test-connectivity config-ref="requestConfigWithCustomResponseValidatorEvaluatingToFalse"/>
+        </munit:execution>
+    </munit:test>
+
+    <munit:test name="expressionValidatorUsingAllBindings" >
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="successFlow"/>
+        </munit:enable-flow-sources>
+
+        <munit:execution>
+            <mtf:test-connectivity config-ref="requestConfigWithCustomResponseValidatorUsingAllBindings"/>
+        </munit:execution>
+    </munit:test>
+
+    <http:listener-config name="listenerConfig" >
+        <http:listener-connection host="0.0.0.0" port="${http.port}" />
+    </http:listener-config>
+
+    <flow name="successFlow" >
+        <http:listener path="/successPath" config-ref="listenerConfig" />
+        <logger />
+    </flow>
+
+    <flow name="allParamsFlow" >
+        <http:listener path="/testPath" allowedMethods="POST" config-ref="listenerConfig" />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
+        <set-variable variableName="isExpectedBody" value="#[payload == 'The Body']" />
+        <set-variable variableName="isExpectedHeaders" value="#[attributes.headers['Key'] == 'Value1']" />
+        <set-variable variableName="isExpectedQueryString" value="#[attributes.queryString == 'Key1=Value1&amp;Key2=Value2']" />
+        <choice>
+            <when expression="#[not vars.isExpectedBody or not vars.isExpectedHeaders or not vars.isExpectedQueryString]"  >
+                <raise-error type="VALIDATION:ERROR"/>
+            </when>
+        </choice>
+        <logger level="ERROR" />
+    </flow>
+</mule>
