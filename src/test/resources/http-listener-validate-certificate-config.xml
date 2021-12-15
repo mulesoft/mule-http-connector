@@ -24,7 +24,6 @@
 
     <flow name="listenerWithTrustStoreFlow">
         <http:listener config-ref="listenerConfigWithTrustStore" path="/" allowedMethods="POST"/>
-        <!-- TODO HTTPC-177: Remove mel expression -->
         <flow-ref name="validateClientCertificate" />
         <logger />
     </flow>
