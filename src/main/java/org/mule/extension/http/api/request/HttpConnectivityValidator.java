@@ -26,7 +26,6 @@ import org.mule.extension.http.internal.request.HttpRequesterProvider;
 import org.mule.extension.http.internal.request.HttpResponseToResult;
 import org.mule.extension.http.internal.request.RequestConnectionParams;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
-import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.util.MultiMap;
@@ -53,7 +52,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @since 1.7
  */
-public class HttpConnectivityValidator implements Initialisable, Disposable {
+public class HttpConnectivityValidator implements Initialisable {
 
   private static final Logger LOGGER = getLogger(HttpConnectivityValidator.class);
 
@@ -171,11 +170,6 @@ public class HttpConnectivityValidator implements Initialisable, Disposable {
 
   private ResponseValidator getResponseValidator() {
     return responseValidator == null ? defaultStatusCodeValidator : responseValidator;
-  }
-
-  @Override
-  public void dispose() {
-    // Added just for symmetry with initialise.
   }
 
   @Override
