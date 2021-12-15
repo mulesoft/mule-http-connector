@@ -22,8 +22,7 @@
 
     <flow name="stringFlow">
         <http:listener config-ref="listenerConfig" path="/string"/>
-        <!-- TODO HTTPC-177: Remove mel expression -->
-        <set-payload value="#[mel:stringPayload]"/>
+        <set-payload value="${stringPayload}"/>
     </flow>
 
     <flow name="stringWithContentLengthHeaderFlow">
@@ -34,8 +33,7 @@
                 </http:headers>
             </http:response>
         </http:listener>
-        <!-- TODO HTTPC-177: Remove mel expression -->
-        <set-payload value="#[mel:stringPayload]"/>
+        <set-payload value="${stringPayload}"/>
     </flow>
 
     <flow name="stringWithTransferEncodingFlow">
@@ -46,8 +44,7 @@
                 </http:headers>
             </http:response>
         </http:listener>
-        <!-- TODO HTTPC-177: Remove mel expression -->
-        <set-payload value="#[mel:stringPayload]"/>
+        <set-payload value="${stringPayload}"/>
     </flow>
 
     <flow name="stringWithTransferEncodingAndContentLengthFlow">
@@ -58,8 +55,7 @@
                 </http:headers>
             </http:response>
         </http:listener>
-        <!-- TODO HTTPC-177: Remove mel expression -->
-        <set-payload value="#[mel:stringPayload]"/>
+        <set-payload value="${stringPayload}"/>
     </flow>
 
     <flow name="inputStreamFlow">
@@ -102,8 +98,7 @@
 
     <flow name="neverStringFlow">
         <http:listener config-ref="listenerConfig" path="/neverString" responseStreamingMode="NEVER"/>
-        <!-- TODO HTTPC-177: Remove mel expression -->
-        <set-payload value="#[mel:stringPayload]"/>
+        <set-payload value="${stringPayload}"/>
     </flow>
 
     <flow name="neverStringTransferEncodingHeaderFlow">
@@ -114,8 +109,7 @@
                 </http:headers>
             </http:response>
         </http:listener>
-        <!-- TODO HTTPC-177: Remove mel expression -->
-        <set-payload value="#[mel:stringPayload]"/>
+        <set-payload value="${stringPayload}"/>
     </flow>
 
     <flow name="neverInputStreamFlow">
@@ -136,8 +130,7 @@
 
     <flow name="alwaysStringFlow">
         <http:listener config-ref="listenerConfig" path="/alwaysString"  responseStreamingMode="ALWAYS"/>
-        <!-- TODO HTTPC-177: Remove mel expression -->
-        <set-payload value="#[mel:stringPayload]"/>
+        <set-payload value="${stringPayload}"/>
     </flow>
 
     <flow name="alwaysStringContentLengthHeaderFlow">
@@ -148,8 +141,7 @@
                 </http:headers>
             </http:response>
         </http:listener>
-        <!-- TODO HTTPC-177: Remove mel expression -->
-        <set-payload value="#[mel:stringPayload]"/>
+        <set-payload value="${stringPayload}"/>
     </flow>
 
     <flow name="alwaysInputStreamFlow">
@@ -176,8 +168,7 @@
                 </http:headers>
             </http:response>
         </http:listener>
-        <!-- TODO HTTPC-177: Remove mel expression -->
-        <set-payload value="#[mel:mapPayload]"/>
+        <set-payload value="${mapPayload}"/>
     </flow>
 
     <flow name="alwaysMapFlow">
@@ -188,8 +179,7 @@
                 </http:headers>
             </http:response>
         </http:listener>
-        <!-- TODO HTTPC-177: Remove mel expression -->
-        <set-payload value="#[mel:mapPayload]"/>
+        <set-payload value="${mapPayload}"/>
     </flow>
 
     <flow name="neverMapFlow">
@@ -200,8 +190,7 @@
                 </http:headers>
             </http:response>
         </http:listener>
-        <!-- TODO HTTPC-177: Remove mel expression -->
-        <set-payload value="#[mel:mapPayload]"/>
+        <set-payload value="${mapPayload}"/>
     </flow>
 
 </mule>

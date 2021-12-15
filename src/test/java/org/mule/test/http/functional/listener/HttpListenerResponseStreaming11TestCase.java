@@ -7,11 +7,8 @@
 package org.mule.test.http.functional.listener;
 
 import org.apache.http.HttpVersion;
-import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore("HTTPC-177")
-// TODO HTTPC-177: Remove mel expressions from related XML.
 public class HttpListenerResponseStreaming11TestCase extends HttpListenerResponseStreamingTestCase {
 
   @Override
@@ -140,19 +137,19 @@ public class HttpListenerResponseStreaming11TestCase extends HttpListenerRespons
   @Test
   public void map() throws Exception {
     final String url = getUrl("map");
-    testResponseIsContentLengthEncoding(url, getHttpVersion(), TEST_BODY_MAP);
+    testResponseIsContentLengthEncoding(url, getHttpVersion(), mapPayload.getValue());
   }
 
   @Test
   public void alwaysMap() throws Exception {
     final String url = getUrl("alwaysMap");
-    testResponseIsChunkedEncoding(url, getHttpVersion(), TEST_BODY_MAP);
+    testResponseIsChunkedEncoding(url, getHttpVersion(), mapPayload.getValue());
   }
 
   @Test
   public void neverMap() throws Exception {
     final String url = getUrl("neverMap");
-    testResponseIsContentLengthEncoding(url, getHttpVersion(), TEST_BODY_MAP);
+    testResponseIsContentLengthEncoding(url, getHttpVersion(), mapPayload.getValue());
   }
 
 }
