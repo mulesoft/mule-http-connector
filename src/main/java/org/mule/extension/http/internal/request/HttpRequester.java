@@ -32,7 +32,6 @@ import org.mule.extension.http.api.notification.HttpRequestNotificationData;
 import org.mule.extension.http.api.notification.HttpResponseNotificationData;
 import org.mule.extension.http.api.request.HttpSendBodyMode;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
-import org.mule.extension.http.api.request.authentication.UsernamePasswordAuthentication;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
@@ -56,6 +55,8 @@ import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -69,9 +70,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Component capable of performing an HTTP request given a request.
@@ -294,7 +292,7 @@ public class HttpRequester {
 
   private HttpAuthentication resolveAuthentication(HttpRequestAuthentication authentication) {
     HttpAuthentication requestAuthentication = null;
-    if (authentication instanceof UsernamePasswordAuthentication) {
+    if (authentication instanceof HttpAuthentication) {
       requestAuthentication = (HttpAuthentication) authentication;
     }
     return requestAuthentication;

@@ -15,7 +15,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
-import org.mule.extension.http.api.request.authentication.UsernamePasswordAuthentication;
 import org.mule.extension.http.api.request.builder.HttpRequesterTestRequestBuilder;
 import org.mule.extension.http.api.request.builder.KeyValuePair;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
@@ -194,7 +193,7 @@ public class HttpConnectivityValidator implements Initialisable {
 
   private static HttpAuthentication resolveAuthentication(HttpExtensionClient client) {
     HttpRequestAuthentication authentication = client.getDefaultAuthentication();
-    if (authentication instanceof UsernamePasswordAuthentication) {
+    if (authentication instanceof HttpAuthentication) {
       return (HttpAuthentication) authentication;
     } else {
       return null;
