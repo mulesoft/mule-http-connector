@@ -6,28 +6,24 @@
  */
 package org.mule.extension.http.api.request.builder;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.hash;
-import static org.mule.extension.http.internal.request.KeyValuePairUtils.toMultiMap;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
-import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
 
-import org.mule.extension.http.internal.request.HttpRequesterConfig;
-import org.mule.extension.http.internal.request.UriUtils;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
-import org.mule.runtime.http.api.domain.message.request.HttpRequest;
-import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
+import org.mule.runtime.http.api.domain.entity.EmptyHttpEntity;
+import org.mule.runtime.http.api.domain.entity.HttpEntity;
+import org.mule.runtime.http.api.domain.entity.InputStreamHttpEntity;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -38,7 +34,8 @@ import java.util.Objects;
 public class HttpRequesterTestRequestBuilder {
 
   /**
-   * The body of the response message
+   * The body in the connectivity test request. It can't be an expression because it doesn't make sense in a
+   * connectivity testing context.
    */
   @Parameter
   @Optional(defaultValue = "")
@@ -48,27 +45,17 @@ public class HttpRequesterTestRequestBuilder {
   private String requestBody;
 
   /**
-   * HTTP headers the message should include.
+   * HTTP headers the connectivity test request should include. It allows multiple headers with the same key.
    */
   @Parameter
   @Optional
   @NullSafe
   @Expression(value = NOT_SUPPORTED)
   @DisplayName("Headers")
-  protected List<TestRequestHeader> requestHeaders = emptyList();
+  private List<TestRequestHeader> requestHeaders = emptyList();
 
   /**
-   * URI parameters that should be used to create the request.
-   */
-  @Parameter
-  @Optional
-  @NullSafe
-  @Expression(value = NOT_SUPPORTED)
-  @DisplayName("URI Parameters")
-  private Map<String, String> requestUriParams = emptyMap();
-
-  /**
-   * Query parameters the request should include.
+   * Query parameters the connectivity test request should include. It allows multiple query params with the same key.
    */
   @Parameter
   @Optional
@@ -77,46 +64,26 @@ public class HttpRequesterTestRequestBuilder {
   @DisplayName("Query Parameters")
   private List<TestQueryParam> requestQueryParams = emptyList();
 
-  public String getRequestBody() {
-    return requestBody;
-  }
-
-  protected void setRequestBody(String body) {
-    this.requestBody = body;
-  }
+  /**
+   * URI parameters the connectivity test request should include.
+   */
+  @Parameter
+  @Optional
+  @NullSafe
+  @Expression(value = NOT_SUPPORTED)
+  @DisplayName("URI Parameters")
+  private List<UriParam> requestUriParams = emptyList();
 
   public List<TestRequestHeader> getRequestHeaders() {
     return unmodifiableList(requestHeaders);
-  }
-
-  protected void setRequestHeaders(List<TestRequestHeader> headers) {
-    this.requestHeaders = headers != null ? headers : emptyList();
-  }
-
-  public String replaceUriParamsOf(String path) {
-    return UriUtils.replaceUriParams(path, requestUriParams);
   }
 
   public List<TestQueryParam> getRequestQueryParams() {
     return unmodifiableList(requestQueryParams);
   }
 
-  public Map<String, String> getRequestUriParams() {
-    return unmodifiableMap(requestUriParams);
-  }
-
-  protected void setRequestQueryParams(List<TestQueryParam> queryParams) {
-    this.requestQueryParams = queryParams;
-  }
-
-  protected void setRequestUriParams(Map<String, String> uriParams) {
-    this.requestUriParams = uriParams;
-  }
-
-  public HttpRequestBuilder toHttpRequestBuilder(HttpRequesterConfig config) {
-    return HttpRequest.builder(PRESERVE_HEADER_CASE || config.isPreserveHeadersCase())
-        .headers(toMultiMap(getRequestHeaders()))
-        .queryParams(toMultiMap(getRequestQueryParams()));
+  public List<UriParam> getRequestUriParams() {
+    return requestUriParams;
   }
 
   @Override
@@ -135,5 +102,13 @@ public class HttpRequesterTestRequestBuilder {
     HttpRequesterTestRequestBuilder that = (HttpRequesterTestRequestBuilder) o;
     return Objects.equals(requestBody, that.requestBody) && Objects.equals(requestHeaders, that.requestHeaders)
         && Objects.equals(requestQueryParams, that.requestQueryParams) && Objects.equals(requestUriParams, that.requestUriParams);
+  }
+
+  public HttpEntity buildEntity() {
+    if (requestBody == null || requestBody.isEmpty()) {
+      return new EmptyHttpEntity();
+    } else {
+      return new InputStreamHttpEntity(new ByteArrayInputStream(requestBody.getBytes(UTF_8)));
+    }
   }
 }
