@@ -9,10 +9,12 @@ package org.mule.test.http.functional.requester;
 import static java.lang.Thread.sleep;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.POLLING_SOURCE;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Story;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.util.concurrent.Latch;
@@ -22,6 +24,7 @@ import org.mule.runtime.core.api.util.FileUtils;
 
 import java.io.IOException;
 
+@Story(POLLING_SOURCE)
 public class HttpRequestPollingSourceAuthTestCase extends AbstractHttpRequestTestCase {
 
   private static Latch basicAuthLatch = new Latch();
@@ -33,19 +36,21 @@ public class HttpRequestPollingSourceAuthTestCase extends AbstractHttpRequestTes
   }
 
   @Test
+  @Description("Polling source should work correctly when basic auth is set correctly")
   public void correctBasicAuth() throws InterruptedException {
     basicAuthLatch.await();
     assertThat(BasicAuthProcessor.response, is(DEFAULT_RESPONSE));
   }
 
   @Test
+  @Description("Polling source should work correctly when digest auth is set correctly")
   public void correctDigestAuth() throws InterruptedException {
     digestAuthLatch.await();
     assertThat(DigestAuthProcessor.response, is(DEFAULT_RESPONSE));
   }
 
   @Test
-  @Ignore("HTTPC-181")
+  @Description("Polling source should NOT work when basic auth is set incorrectly")
   public void incorrectAuth() throws InterruptedException {
     sleep(5000);
     assertThat(BasicFailingAuth.requests, is(0));

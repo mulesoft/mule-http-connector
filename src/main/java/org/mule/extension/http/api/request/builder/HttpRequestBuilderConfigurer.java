@@ -6,18 +6,27 @@
  */
 package org.mule.extension.http.api.request.builder;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.extension.http.internal.request.HttpRequesterConfig;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
 
 /**
- * ADD JAVA DOC HERE
+ * Builder that can be transform to an {@link HttpRequestBuilder} given an {@link HttpRequesterConfig}
  *
  * @since 1.7
  */
+@NoImplement
 public interface HttpRequestBuilderConfigurer {
 
+  /**
+   * @param config
+   * @return the equivalent HttpRequestBuilder with all the information needed to create the request
+   */
   HttpRequestBuilder toHttpRequestBuilder(HttpRequesterConfig config);
 
+  /**
+   * @return the body of this request builder, as {@link TypedValue}
+   */
   TypedValue<?> getBodyAsTypedValue();
 }

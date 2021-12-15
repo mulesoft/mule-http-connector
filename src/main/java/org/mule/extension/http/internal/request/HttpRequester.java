@@ -184,10 +184,7 @@ public class HttpRequester {
                           requestBuilder, false, muleContext, scheduler, notificationEmitter,
                           streamingHelper, callback, injectedHeaders, correlationId);
               }, () -> {
-                if (responseValidator != null) {
-                  // TODO (HTTPC-181)
-                  responseValidator.validate((Result) result, httpRequest, streamingHelper);
-                }
+                responseValidator.validate((Result) result, httpRequest, streamingHelper);
 
                 Result<Object, HttpResponseAttributes> freshResult = httpResponseToResult
                     .convert(config, muleContext, response, entity, resultInputStreamSupplier, httpRequest.getUri());
