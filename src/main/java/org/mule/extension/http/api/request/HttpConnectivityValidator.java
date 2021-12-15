@@ -6,7 +6,6 @@
  */
 package org.mule.extension.http.api.request;
 
-import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.extension.http.internal.request.KeyValuePairUtils.toMultiMap;
 import static org.mule.extension.http.internal.request.UriUtils.replaceUriParams;
@@ -120,9 +119,6 @@ public class HttpConnectivityValidator implements Initialisable {
   // It's only used to propagate the initialisation to response validator.
   private MuleContext muleContext;
 
-  // Attribute utilised to avoid re-calculation of the uri as string.
-  private String uriString = null;
-
   public void validate(HttpExtensionClient client, RequestConnectionParams connectionParams)
       throws ExecutionException, InterruptedException, ResponseValidatorTypedException {
     HttpRequest request = buildTestRequest(connectionParams);
@@ -158,12 +154,9 @@ public class HttpConnectivityValidator implements Initialisable {
   }
 
   private String getUriString(RequestConnectionParams connectionParams) {
-    if (uriString == null) {
-      String pathWithUriParams = replaceUriParams(requestPath, requestBuilder.getRequestUriParams());
-      uriString = format("%s://%s:%s%s", connectionParams.getProtocol().getScheme(), connectionParams.getHost(),
-                         connectionParams.getPort(), pathWithUriParams);
-    }
-    return uriString;
+    String pathWithUriParams = replaceUriParams(requestPath, requestBuilder.getRequestUriParams());
+    return connectionParams.getProtocol().getScheme() + "://" + connectionParams.getHost() + ":" + connectionParams.getPort()
+        + pathWithUriParams;
   }
 
   private ResponseValidator getResponseValidator() {
