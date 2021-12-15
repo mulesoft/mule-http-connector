@@ -12,7 +12,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
 
 /**
- * Builder that can be transform to an {@link HttpRequestBuilder} given an {@link HttpRequesterConfig}
+ * Builder that can be transform in to an {@link HttpRequestBuilder} given an {@link HttpRequesterConfig}
  *
  * @since 1.7
  */
