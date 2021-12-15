@@ -61,10 +61,9 @@
         <http:listener config-ref="listenerConfig" path="/exceptionBuildingResponse" responseStreamingMode="NEVER" />
         <set-payload value="#[thisFails]"/>
         <error-handler>
-            <on-error-continue type="ANY">
+            <on-error-propagate type="ANY">
                 <flow-ref name="trackPassageMessageProcessor"/>
-                <set-payload value="#['Exception Handled']"/>
-            </on-error-continue>
+            </on-error-propagate>
         </error-handler>
     </flow>
 
