@@ -21,8 +21,6 @@ import org.junit.Test;
 import io.qameta.allure.Story;
 
 @Story(ERROR_HANDLING)
-@Ignore("HTTPC-177")
-// TODO HTTPC-177: Remove mel expressions from related XML.
 public class HttpListenerErrorHandlingTestCase extends AbstractHttpListenerErrorHandlingTestCase {
 
   @Override
