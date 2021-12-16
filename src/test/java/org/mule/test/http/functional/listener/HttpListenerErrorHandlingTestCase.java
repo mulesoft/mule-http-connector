@@ -39,8 +39,7 @@ public class HttpListenerErrorHandlingTestCase extends AbstractHttpListenerError
   public void exceptionBuildingResponseIsHandled() throws Exception {
     final Response response = Get(getUrl("exceptionBuildingResponse")).execute();
     final HttpResponse httpResponse = response.returnResponse();
-    assertExceptionStrategyFailed(httpResponse,
-                                  "\"Script 'thisFails ' has errors: \n\tUnable to resolve reference of: `thisFails`. at 1 : 1\" evaluating expression: \"#[thisFails]\".");
+    assertExceptionStrategyFailed(httpResponse, "Some exception");
   }
 
   @Test
