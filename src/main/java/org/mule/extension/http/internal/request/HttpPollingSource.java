@@ -187,6 +187,7 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
 
   @Override
   public void onRejectedItem(Result<String, HttpResponseAttributes> result, SourceCallbackContext sourceCallbackContext) {
-    LOGGER.debug("Item rejected by HTTP Polling Source in flow '{}'", location.getRootContainerName());
+    LOGGER.debug("Item rejected by HTTP Polling Source in flow '{}' with result: '{}", location.getRootContainerName(),
+                 result.getOutput());
   }
 }
