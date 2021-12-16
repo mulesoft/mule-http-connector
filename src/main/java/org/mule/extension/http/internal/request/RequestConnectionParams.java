@@ -60,6 +60,15 @@ public final class RequestConnectionParams {
   private Integer port;
 
   /**
+   * Base path to use for all requests using this connection.
+   * If not configured, the value configured in the config (deprecated) will be used.
+   */
+  @Parameter
+  @Optional
+  @Placement(order = 4)
+  private String basePath;
+
+  /**
    * If false, each connection will be closed after the first request is completed.
    */
   @Parameter
@@ -185,5 +194,9 @@ public final class RequestConnectionParams {
 
   public void setClientSocketProperties(TcpClientSocketProperties clientSocketProperties) {
     this.clientSocketProperties = clientSocketProperties;
+  }
+
+  public String getBasePath() {
+    return basePath;
   }
 }

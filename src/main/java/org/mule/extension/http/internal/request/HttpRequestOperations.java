@@ -128,7 +128,7 @@ public class HttpRequestOperations implements Initialisable, Disposable {
       String resolvedUri;
       if (uriSettings.getUrl() == null) {
         UriParameters uriParameters = client.getDefaultUriParameters();
-        String resolvedBasePath = config.getBasePath();
+        String resolvedBasePath = resolveBasePath(config, uriParameters);
         String resolvedPath = resolvedBuilder.replaceUriParams(buildPath(resolvedBasePath, uriSettings.getPath()));
         resolvedUri =
             resolveUri(uriParameters.getScheme(), uriParameters.getHost().trim(), uriParameters.getPort(), resolvedPath);
@@ -147,9 +147,22 @@ public class HttpRequestOperations implements Initialisable, Disposable {
                               responseValidator,
                               transformationService, resolvedBuilder, true, muleContext, scheduler, notificationEmitter,
                               streamingHelper, callback, injectedHeaders, correlationInfo.getCorrelationId());
+    } catch (Exception e) {
+      callback.error(e);
     } catch (Throwable t) {
-      callback.error(t instanceof Exception ? (Exception) t : new DefaultMuleException(t));
+      callback.error(new DefaultMuleException(t));
     }
+  }
+
+  private String resolveBasePath(HttpRequesterConfig config, UriParameters uriParameters) {
+    String resolved = uriParameters.getBasePath();
+    if (resolved != null) {
+      return resolved;
+    }
+
+    // TODO HTTPC-?: For the moment, use the deprecated value as default to preserve backwards compatibility. Remove this
+    //  and add a default value to the new parameter.
+    return config.getBasePath();
   }
 
   /**
@@ -164,12 +177,12 @@ public class HttpRequestOperations implements Initialisable, Disposable {
       CursorStreamProvider provider = (CursorStreamProvider) cursor.getProvider();
 
       if (position == 0) {
-        resolvedBuilder.setBody(new TypedValue<Object>(provider, resolvedBuilder.getBody().getDataType(),
-                                                       resolvedBuilder.getBody().getByteLength()));
+        resolvedBuilder.setBody(new TypedValue<>(provider, resolvedBuilder.getBody().getDataType(),
+                                                 resolvedBuilder.getBody().getByteLength()));
       } else {
-        resolvedBuilder.setBody(new TypedValue<Object>(new OffsetCursorProviderWrapper(provider, position),
-                                                       resolvedBuilder.getBody().getDataType(),
-                                                       resolvedBuilder.getBody().getByteLength()));
+        resolvedBuilder.setBody(new TypedValue<>(new OffsetCursorProviderWrapper(provider, position),
+                                                 resolvedBuilder.getBody().getDataType(),
+                                                 resolvedBuilder.getBody().getByteLength()));
       }
     }
   }

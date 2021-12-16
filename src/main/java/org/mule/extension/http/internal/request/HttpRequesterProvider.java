@@ -190,7 +190,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
   public HttpExtensionClient connect() throws ConnectionException {
     ShareableHttpClient httpClient = connectionManager.lookupOrCreate(getConfigurationId(), this::getHttpClientConfiguration);
     UriParameters uriParameters = new DefaultUriParameters(connectionParams.getProtocol(), connectionParams.getHost(),
-                                                           connectionParams.getPort());
+                                                           connectionParams.getPort(), connectionParams.getBasePath());
     HttpExtensionClient extensionClient = new HttpExtensionClient(httpClient, uriParameters, authentication);
     try {
       extensionClient.start();

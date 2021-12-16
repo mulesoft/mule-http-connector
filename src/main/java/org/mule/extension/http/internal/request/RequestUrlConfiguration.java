@@ -8,14 +8,19 @@ package org.mule.extension.http.internal.request;
 
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.sdk.api.annotation.deprecated.Deprecated;
 
 public final class RequestUrlConfiguration {
 
   /**
    * Base path to use for all requests that reference this config.
+   *
+   * @deprecated Since 1.7 use the requester connection provider parameter with the same name.
    */
   @Parameter
   @Optional(defaultValue = "/")
+  @Deprecated(since = "1.7.0", message = "Use the requester connection provider parameter with the same name",
+      toRemoveIn = "2.0.0")
   private String basePath;
 
   public String getBasePath() {

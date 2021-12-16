@@ -29,4 +29,10 @@ public interface UriParameters {
    * @return the function that will resolve to the URI port.
    */
   Integer getPort();
+
+  /**
+   * @return The base path for the URI.
+   * @since 1.7
+   */
+  String getBasePath();
 }

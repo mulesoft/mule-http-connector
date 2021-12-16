@@ -24,12 +24,18 @@ public class DefaultUriParameters implements UriParameters {
   private final Protocol scheme;
   private final String host;
   private final Integer port;
+  private final String basePath;
 
 
   public DefaultUriParameters(Protocol protocol, String host, Integer port) {
+    this(protocol, host, port, null);
+  }
+
+  public DefaultUriParameters(Protocol protocol, String host, Integer port, String basePath) {
     this.scheme = protocol;
     this.host = host;
     this.port = getValidPort(protocol, host, port);
+    this.basePath = basePath;
   }
 
   @Override
@@ -47,16 +53,21 @@ public class DefaultUriParameters implements UriParameters {
     return port;
   }
 
-  private int getValidPort(Protocol protocol, String host, Integer configuredPort) {
+  @Override
+  public String getBasePath() {
+    return basePath;
+  }
+
+  private static int getValidPort(Protocol protocol, String host, Integer configuredPort) {
     int defaultProtocolPort = protocol.getDefaultPort();
     if (configuredPort == null) {
       return defaultProtocolPort;
-    } else if (configuredPort < 0) {
+    } else if (configuredPort.intValue() < 0) {
       if (LOGGER.isWarnEnabled()) {
-        LOGGER.warn("Invalid port: " + configuredPort + " for host " + host + ", defaulting to " + defaultProtocolPort);
+        LOGGER.warn("Invalid port: {} for host {}}, defaulting to {}", configuredPort, host, defaultProtocolPort);
       }
       return defaultProtocolPort;
     }
-    return configuredPort;
+    return configuredPort.intValue();
   }
 }

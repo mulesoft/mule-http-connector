@@ -11,6 +11,7 @@ import static org.mule.extension.http.internal.HttpConnectorConstants.URL_CONFIG
 import org.mule.extension.http.api.request.HttpSendBodyMode;
 import org.mule.extension.http.api.request.builder.QueryParam;
 import org.mule.extension.http.api.request.builder.RequestHeader;
+import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.streaming.HttpStreamingType;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -59,6 +60,12 @@ public class HttpRequesterConfig implements Initialisable, HttpRequesterCookieCo
     }
   }
 
+
+  /**
+   * @deprecated use {@link RequestConnectionParams#getBasePath instead}.
+   * @return The base path.
+   */
+  @Deprecated
   public String getBasePath() {
     return urlConfiguration.getBasePath();
   }
