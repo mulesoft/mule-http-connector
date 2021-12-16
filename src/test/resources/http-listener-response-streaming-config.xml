@@ -8,14 +8,6 @@
 
     <object name="streamProcessor" class="org.mule.test.http.functional.listener.HttpListenerResponseStreamingTestCase$StreamProcessor"/>
 
-    <configuration>
-        <expression-language>
-            <import class="org.mule.test.http.functional.listener.HttpListenerResponseStreamingTestCase"/>
-            <alias name="stringPayload" expression="HttpListenerResponseStreamingTestCase.TEST_BODY"/>
-            <alias name="mapPayload" expression="HttpListenerResponseStreamingTestCase.TEST_BODY_MAP"/>
-        </expression-language>
-    </configuration>
-
     <http:listener-config name="listenerConfig">
         <http:listener-connection host="localhost" port="${port}"/>
     </http:listener-config>
