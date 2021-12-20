@@ -6,8 +6,10 @@
  */
 package org.mule.extension.http.internal.request;
 
+import static java.util.Collections.singletonList;
 import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST;
 import static org.mule.extension.http.internal.request.HttpRequestUtils.createHttpRequester;
+import static org.mule.extension.http.internal.request.SplitUtils.split;
 import static org.mule.extension.http.internal.request.UriUtils.buildPath;
 import static org.mule.extension.http.internal.request.UriUtils.resolveUri;
 import static org.mule.extension.http.internal.request.UriUtils.replaceUriParams;
@@ -19,16 +21,22 @@ import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.WAI
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.request.builder.HttpRequesterSimpleRequestBuilder;
 import org.mule.extension.http.api.request.client.UriParameters;
+import org.mule.extension.http.api.request.response.HttpPollingSourceExpressions;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.request.validator.SuccessStatusCodeValidator;
 import org.mule.extension.http.internal.HttpMetadataResolver;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.util.IOUtils;
@@ -55,8 +63,9 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.List;
+import java.nio.charset.Charset;
+import java.util.*;
+import java.util.function.Consumer;
 
 @Alias("pollingSource")
 @MediaType(value = ANY, strict = false)
@@ -86,6 +95,9 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
   @Inject
   private MuleContext muleContext;
 
+  @Inject
+  private ExpressionLanguage expressionLanguage;
+
   private HttpExtensionClient client;
   private String resolvedUri;
   private Scheduler scheduler;
@@ -112,6 +124,10 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
   @ParameterGroup(name = REQUEST)
   @Placement(order = 3)
   private HttpRequesterSimpleRequestBuilder requestBuilder;
+
+  @ParameterGroup(name = "Expressions")
+  @Placement(order = 4)
+  private HttpPollingSourceExpressions expressions;
 
   // TODO (HTTPC-181) make this a parameter group
   private ResponseValidator responseValidator = new SuccessStatusCodeValidator("0..399");
@@ -141,19 +157,31 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
     return getClass().getSimpleName();
   }
 
+  private Consumer<PollContext.PollItem<String, HttpResponseAttributes>> getPollingItemConsumer(String item,
+                                                                                                org.mule.runtime.api.metadata.MediaType mediaType,
+                                                                                                HttpResponseAttributes attributes) {
+    return pollItem -> {
+      Result.Builder<String, HttpResponseAttributes> responseBuilder =
+          Result.<String, HttpResponseAttributes>builder().attributes(attributes).output(item).mediaType(mediaType);
+
+      pollItem.setResult(responseBuilder.build());
+
+      // TODO (HTTPC - idempotency and watermarking)
+    };
+  }
+
   private void sendRequest(PollContext<String, HttpResponseAttributes> pollContext) {
     CompletionCallback<InputStream, HttpResponseAttributes> callback =
         new CompletionCallback<InputStream, HttpResponseAttributes>() {
 
           @Override
           public void success(Result<InputStream, HttpResponseAttributes> result) {
-            pollContext.accept(item -> {
-              // TODO (HTTPC-180): We put here splitting and etc... For now just consuming the stream
-              Result.Builder<String, HttpResponseAttributes> responseBuilder =
-                  Result.<String, HttpResponseAttributes>builder().output(IOUtils.toString(result.getOutput()));
-              result.getAttributes().ifPresent(attr -> responseBuilder.attributes(attr));
-              item.setResult(responseBuilder.build());
-            });
+            HttpResponseAttributes attributes = result.getAttributes().orElse(null);
+            org.mule.runtime.api.metadata.MediaType mediaType =
+                result.getMediaType().orElse(org.mule.runtime.api.metadata.MediaType.ANY);
+            for (String item : getItems(result.getOutput(), mediaType)) {
+              pollContext.accept(getPollingItemConsumer(item, mediaType, attributes));
+            }
           }
 
           @Override
@@ -186,8 +214,42 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
   }
 
   @Override
-  public void onRejectedItem(Result<String, HttpResponseAttributes> result, SourceCallbackContext sourceCallbackContext) {
-    LOGGER.debug("Item rejected by HTTP Polling Source in flow '{}' with result: '{}", location.getRootContainerName(),
+  public void onRejectedItem(Result<String, HttpResponseAttributes> result,
+                             SourceCallbackContext sourceCallbackContext) {
+    LOGGER.debug("Item rejected by HTTP Polling Source in flow '{}', result: '{}'", location.getRootContainerName(),
                  result.getOutput());
   }
+
+  private BindingContext buildContext(TypedValue<String> payload, TypedValue<CursorStreamProvider> item) {
+    BindingContext.Builder builder = BindingContext.builder().addBinding("payload", payload);
+
+    if (item != null) {
+      builder.addBinding("item", item);
+    }
+
+    return builder.build();
+  }
+
+  private static TypedValue<String> toTypedValue(String value, org.mule.runtime.api.metadata.MediaType mediaType,
+                                                 Charset encoding) {
+    if (mediaType.equals(org.mule.runtime.api.metadata.MediaType.TEXT.withCharset(mediaType.getCharset().orElse(null)))) {
+      return TypedValue.of(value);
+    } else {
+      return new TypedValue<>(value, DataType.builder().mediaType(mediaType).charset(encoding).build());
+    }
+  }
+
+  private List<String> getItems(InputStream fullResponse, org.mule.runtime.api.metadata.MediaType mediaType) {
+    java.util.Optional<String> itemsExpression = expressions.getSplitExpression();
+    String response = IOUtils.toString(fullResponse, mediaType.getCharset().get());
+    if (!itemsExpression.isPresent()) {
+      return singletonList(response);
+    }
+    TypedValue<String> typedValue = toTypedValue(response, mediaType, mediaType.getCharset().get());
+    TypedValue<?> result = expressionLanguage.evaluate(itemsExpression.get(), buildContext(typedValue, null));
+    List<String> splitted = new ArrayList<>();
+    split(expressionLanguage, result, itemsExpression.get()).forEachRemaining(item -> splitted.add(item.getValue().toString()));
+    return splitted;
+  }
+
 }

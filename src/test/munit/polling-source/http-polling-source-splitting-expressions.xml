@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+
+    <munit:config name="http-polling-source-splitting-expressions.xml"/>
+
+    <munit:dynamic-port propertyName="dynamic.port"/>
+
+    <http:listener-config name="mimeTypeEndpoint">
+        <http:listener-connection host="0.0.0.0" port="${dynamic.port}"/>
+    </http:listener-config>
+
+    <http:request-config name="splittingConfig" sendBodyMode="ALWAYS">
+        <http:request-connection host="localhost" port="${dynamic.port}"/>
+    </http:request-config>
+
+    <flow name="jsonListenerFlow">
+        <http:listener config-ref="mimeTypeEndpoint" path="/json"/>
+        <set-payload value="#[output application/json --- [{'name': 'Adam'}, {'name': 'Maks'}, {'name': 'Franek'}]]"/>
+    </flow>
+
+    <flow name="jsonPollingFlow">
+        <http:polling-source config-ref="splittingConfig" path="json">
+            <scheduling-strategy>
+                <fixed-frequency frequency="10" timeUnit="SECONDS"/>
+            </scheduling-strategy>
+            <http:split-expression ><![CDATA[#[payload]]]></http:split-expression>
+        </http:polling-source>
+        <munit-tools:queue queueName="json_queue">
+            <munit-tools:value>#[payload]</munit-tools:value>
+        </munit-tools:queue>
+    </flow>
+
+    <munit:test name="json-test-case">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="jsonListenerFlow"/>
+            <munit:enable-flow-source value="jsonPollingFlow"/>
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="json_queue"/>
+            <set-variable variableName="firstName" value="#[payload.name]"/>
+            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="json_queue"/>
+            <set-variable variableName="secondName" value="#[payload.name]"/>
+            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="json_queue"/>
+            <set-variable variableName="thirdName" value="#[payload.name]"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[vars.firstName]" is="#[MunitTools::equalTo('Adam')]"/>
+            <munit-tools:assert-that expression="#[vars.secondName]" is="#[MunitTools::equalTo('Maks')]"/>
+            <munit-tools:assert-that expression="#[vars.thirdName]" is="#[MunitTools::equalTo('Franek')]"/>
+        </munit:validation>
+    </munit:test>
+
+    <flow name="textListenerFlow">
+        <http:listener config-ref="mimeTypeEndpoint" path="/text"/>
+        <set-payload value="#[output text/plain --- 'Hola Don Pepito, Hola Don José']"/>
+    </flow>
+
+    <flow name="textPollingFlow">
+        <http:polling-source config-ref="splittingConfig" path="text">
+            <scheduling-strategy>
+                <fixed-frequency frequency="10" timeUnit="SECONDS"/>
+            </scheduling-strategy>
+            <http:split-expression ><![CDATA[#[payload as String splitBy(', ')]]]></http:split-expression>
+        </http:polling-source>
+        <munit-tools:queue queueName="text_queue">
+            <munit-tools:value>#[payload]</munit-tools:value>
+        </munit-tools:queue>
+    </flow>
+
+    <munit:test name="text-test-case">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="textListenerFlow"/>
+            <munit:enable-flow-source value="textPollingFlow"/>
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="text_queue"/>
+            <set-variable variableName="firstGreeting" value="#[payload]"/>
+            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="text_queue"/>
+            <set-variable variableName="secondGreeting" value="#[payload]"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[vars.firstGreeting]" is="#[MunitTools::equalTo('Hola Don Pepito')]"/>
+            <munit-tools:assert-that expression="#[vars.secondGreeting]" is="#[MunitTools::equalTo('Hola Don José')]"/>
+        </munit:validation>
+    </munit:test>
+
+</mule>
