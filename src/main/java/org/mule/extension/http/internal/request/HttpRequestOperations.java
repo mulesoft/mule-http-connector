@@ -222,4 +222,57 @@ public class HttpRequestOperations implements Initialisable, Disposable {
       scheduler.shutdownNow();
     }
   }
+
+  public static class Builder {
+
+    private MuleContext muleContext;
+    private TransformationService transformationService;
+    private SchedulerService schedulerService;
+    private HashMap<String, List<String>> injectedHeaders;
+
+    private Builder() {}
+
+    public static Builder newInstance() {
+      return new Builder();
+    }
+
+    public Builder withMuleContext(MuleContext muleContext) {
+      this.muleContext = muleContext;
+      return this;
+    }
+
+    public Builder withTransformationService(TransformationService transformationService) {
+      this.transformationService = transformationService;
+      return this;
+    }
+
+    public Builder withSchedulerService(SchedulerService schedulerService) {
+      this.schedulerService = schedulerService;
+      return this;
+    }
+
+    public Builder withInjectedHeaders(HashMap<String, List<String>> injectedHeaders) {
+      this.injectedHeaders = injectedHeaders;
+      return this;
+    }
+
+    public HttpRequestOperations build() {
+      if (this.muleContext == null) {
+        throw new IllegalStateException("muleContext must be set");
+      }
+      if (this.transformationService == null) {
+        throw new IllegalStateException("transformationService must be set");
+      }
+      if (this.schedulerService == null) {
+        throw new IllegalStateException("schedulerService must be set");
+      }
+      HttpRequestOperations httpRequestOperations = new HttpRequestOperations();
+      httpRequestOperations.muleContext = this.muleContext;
+      httpRequestOperations.transformationService = this.transformationService;
+      httpRequestOperations.schedulerService = this.schedulerService;
+      httpRequestOperations.injectedHeaders = injectedHeaders;
+      return httpRequestOperations;
+    }
+
+  }
 }

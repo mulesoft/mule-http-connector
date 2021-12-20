@@ -105,4 +105,52 @@ public class HttpRequesterConfig implements Initialisable, HttpRequesterCookieCo
     return muleContext;
   }
 
+  public static class Builder {
+
+    private RequestUrlConfiguration urlConfiguration;
+    private RequestSettings requestSettings;
+    private ResponseSettings responseSettings;
+    private MuleContext muleContext;
+
+    private Builder() {}
+
+    public static Builder newInstance() {
+      return new Builder();
+    }
+
+    public Builder withUrlConfiguration(RequestUrlConfiguration urlConfiguration) {
+      this.urlConfiguration = urlConfiguration;
+      return this;
+    }
+
+    public Builder withRequestSettings(RequestSettings requestSettings) {
+      this.requestSettings = requestSettings;
+      return this;
+    }
+
+    public Builder withResponseSettings(ResponseSettings responseSettings) {
+      this.responseSettings = responseSettings;
+      return this;
+    }
+
+    public Builder withMuleContext(MuleContext muleContext) {
+      this.muleContext = muleContext;
+      return this;
+    }
+
+    public HttpRequesterConfig build() {
+      if (this.muleContext == null) {
+        throw new IllegalStateException("muleContext must be set");
+      }
+
+      HttpRequesterConfig config = new HttpRequesterConfig();
+      config.urlConfiguration = this.urlConfiguration;
+      config.requestSettings = this.requestSettings;
+      config.responseSettings = this.responseSettings;
+      config.muleContext = this.muleContext;
+      return config;
+    }
+
+
+  }
 }
