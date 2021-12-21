@@ -16,7 +16,6 @@ import static org.mule.extension.http.internal.HttpConnectorConstants.ENCODE_URI
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.encodeSpaces;
 
-import org.mule.extension.http.api.request.builder.KeyValuePair;
 import org.mule.extension.http.api.request.builder.UriParam;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.http.api.HttpConstants;
@@ -30,8 +29,9 @@ import java.util.regex.Pattern;
 public final class UriUtils {
 
   private static final Pattern WRONGLY_ENCODED_SPACES = compile("\\+");
+  public static final String HTTP_PATH_DELIMITER = "/";
 
-  private static boolean ENCODE_URI_PARAMS = getBoolean(ENCODE_URI_PARAMS_PROPERTY);
+  private static boolean encodeUriParams = getBoolean(ENCODE_URI_PARAMS_PROPERTY);
 
   private UriUtils() {
     // Empty private constructor to avoid instantiation.
@@ -59,7 +59,7 @@ public final class UriUtils {
     if (uriParamValue == null) {
       throw new NullPointerException(format("Expression {%s} evaluated to null.", uriParamName));
     }
-    if (ENCODE_URI_PARAMS) {
+    if (encodeUriParams) {
       try {
         uriParamValue = WRONGLY_ENCODED_SPACES.matcher(encode(uriParamValue, UTF_8.displayName()))
             // Spaces in path segments cannot be encoded as `+`
@@ -76,16 +76,16 @@ public final class UriUtils {
     String resolvedBasePath = basePath;
     String resolvedRequestPath = path;
 
-    if (!resolvedBasePath.startsWith("/")) {
-      resolvedBasePath = "/" + resolvedBasePath;
+    if (!resolvedBasePath.startsWith(HTTP_PATH_DELIMITER)) {
+      resolvedBasePath = HTTP_PATH_DELIMITER + resolvedBasePath;
     }
 
-    if (resolvedBasePath.endsWith("/") && resolvedRequestPath.startsWith("/")) {
+    if (resolvedBasePath.endsWith(HTTP_PATH_DELIMITER) && resolvedRequestPath.startsWith(HTTP_PATH_DELIMITER)) {
       resolvedBasePath = resolvedBasePath.substring(0, resolvedBasePath.length() - 1);
     }
 
-    if (!resolvedBasePath.endsWith("/") && !resolvedRequestPath.startsWith("/") && !resolvedRequestPath.isEmpty()) {
-      resolvedBasePath += "/";
+    if (!resolvedBasePath.endsWith(HTTP_PATH_DELIMITER) && !resolvedRequestPath.startsWith(HTTP_PATH_DELIMITER) && !resolvedRequestPath.isEmpty()) {
+      resolvedBasePath += HTTP_PATH_DELIMITER;
     }
 
     return resolvedBasePath + resolvedRequestPath;
@@ -97,6 +97,6 @@ public final class UriUtils {
   }
 
   public static void refreshSystemProperties() {
-    ENCODE_URI_PARAMS = getBoolean(ENCODE_URI_PARAMS_PROPERTY);
+    encodeUriParams = getBoolean(ENCODE_URI_PARAMS_PROPERTY);
   }
 }
