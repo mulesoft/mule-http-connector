@@ -33,7 +33,7 @@ import org.mule.extension.http.api.notification.HttpRequestNotificationData;
 import org.mule.extension.http.api.notification.HttpResponseNotificationData;
 import org.mule.extension.http.api.request.HttpSendBodyMode;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
-import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
+import org.mule.extension.http.api.request.builder.HttpRequestBuilderConfigurer;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.streaming.HttpStreamingType;
@@ -132,7 +132,7 @@ public class HttpRequester {
                         HttpStreamingType streamingMode, HttpSendBodyMode sendBodyMode,
                         boolean followRedirects, HttpRequestAuthentication authentication,
                         Integer responseTimeout, ResponseValidator responseValidator,
-                        TransformationService transformationService, HttpRequesterRequestBuilder requestBuilder,
+                        TransformationService transformationService, HttpRequestBuilderConfigurer requestBuilder,
                         boolean checkRetry, MuleContext muleContext, Scheduler scheduler, NotificationEmitter notificationEmitter,
                         StreamingHelper streamingHelper, CompletionCallback<InputStream, HttpResponseAttributes> callback,
                         Map<String, List<String>> injectedHeaders,
@@ -151,7 +151,7 @@ public class HttpRequester {
                                   HttpStreamingType streamingMode, HttpSendBodyMode sendBodyMode,
                                   boolean followRedirects, HttpRequestAuthentication authentication,
                                   int responseTimeout, ResponseValidator responseValidator,
-                                  TransformationService transformationService, HttpRequesterRequestBuilder requestBuilder,
+                                  TransformationService transformationService, HttpRequestBuilderConfigurer requestBuilder,
                                   boolean checkRetry, MuleContext muleContext, Scheduler scheduler,
                                   NotificationEmitter notificationEmitter,
                                   StreamingHelper streamingHelper,

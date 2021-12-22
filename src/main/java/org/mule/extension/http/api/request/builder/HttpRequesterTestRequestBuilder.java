@@ -10,13 +10,17 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.hash;
+import static org.mule.extension.http.internal.request.KeyValuePairUtils.toMultiMap;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
 
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.extension.http.internal.request.HttpRequesterConfig;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -27,6 +31,8 @@ import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.http.api.domain.entity.EmptyHttpEntity;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
 import org.mule.runtime.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.runtime.http.api.domain.message.request.HttpRequest;
+import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
 
 import javax.inject.Inject;
 import java.io.ByteArrayInputStream;
@@ -38,7 +44,7 @@ import java.util.Objects;
  *
  * @since 1.7
  */
-public class HttpRequesterTestRequestBuilder implements Initialisable {
+public class HttpRequesterTestRequestBuilder implements Initialisable, HttpRequestBuilderConfigurer {
 
   /**
    * The body in the connectivity test request. It can be an expression, but it won't have any binding.
@@ -96,6 +102,22 @@ public class HttpRequesterTestRequestBuilder implements Initialisable {
 
   public List<UriParam> getRequestUriParams() {
     return requestUriParams;
+  }
+
+  protected void setRequestQueryParams(List<TestQueryParam> queryParams) {
+    this.requestQueryParams = queryParams;
+  }
+
+  @Override
+  public HttpRequestBuilder toHttpRequestBuilder(HttpRequesterConfig config) {
+    return HttpRequest.builder(PRESERVE_HEADER_CASE || config.isPreserveHeadersCase())
+        .headers(toMultiMap(getRequestHeaders()))
+        .queryParams(toMultiMap(getRequestQueryParams()));
+  }
+
+  @Override
+  public TypedValue getBodyAsTypedValue() {
+    return TypedValue.of(resolveRequestBody());
   }
 
   @Override
