@@ -40,6 +40,7 @@ public interface AllureConstants {
       String RETRY_POLICY = "Retry Policy";
       String REJECT_INVALID_TRANSFER_ENCODING = "Reject Invalid Transfer Encoding";
       String PROFILING = "Profiling";
+      String POLLING_SOURCE = "Polling Source";
     }
 
   }
