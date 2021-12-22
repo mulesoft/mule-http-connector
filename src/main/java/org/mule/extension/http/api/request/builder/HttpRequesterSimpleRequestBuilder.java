@@ -15,6 +15,7 @@ import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEA
 
 import org.mule.extension.http.internal.request.HttpRequesterConfig;
 import org.mule.extension.http.internal.request.UriUtils;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -31,7 +32,7 @@ import java.util.Map;
  *
  * @since 1.7
  */
-public class HttpRequesterSimpleRequestBuilder {
+public class HttpRequesterSimpleRequestBuilder implements HttpRequestBuilderConfigurer {
 
   /**
    * The body of the response message
@@ -105,9 +106,24 @@ public class HttpRequesterSimpleRequestBuilder {
     this.requestUriParams = uriParams;
   }
 
+  @Override
   public HttpRequestBuilder toHttpRequestBuilder(HttpRequesterConfig config) {
     return HttpRequest.builder(PRESERVE_HEADER_CASE || config.isPreserveHeadersCase())
         .headers(toMultiMap(getRequestHeaders()))
         .queryParams(toMultiMap(getRequestQueryParams()));
+  }
+
+  public HttpRequesterRequestBuilder toHttpRequesterRequestBuilder() {
+    HttpRequesterRequestBuilder builder = new HttpRequesterRequestBuilder();
+    builder.setBody(TypedValue.of(requestBody));
+    builder.setUriParams(requestUriParams);
+    builder.setQueryParams(toMultiMap(requestQueryParams));
+    builder.setHeaders(toMultiMap(requestHeaders));
+    return builder;
+  }
+
+  @Override
+  public TypedValue getBodyAsTypedValue() {
+    return TypedValue.of(getRequestBody());
   }
 }

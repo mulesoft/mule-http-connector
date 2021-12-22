@@ -17,6 +17,7 @@ import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEA
 
 import org.mule.extension.http.internal.request.HttpRequesterConfig;
 import org.mule.extension.http.internal.request.UriUtils;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -35,7 +36,7 @@ import java.util.Objects;
  *
  * @since 1.7
  */
-public class HttpRequesterTestRequestBuilder {
+public class HttpRequesterTestRequestBuilder implements HttpRequestBuilderConfigurer {
 
   /**
    * The body of the response message
@@ -113,10 +114,16 @@ public class HttpRequesterTestRequestBuilder {
     this.requestUriParams = uriParams;
   }
 
+  @Override
   public HttpRequestBuilder toHttpRequestBuilder(HttpRequesterConfig config) {
     return HttpRequest.builder(PRESERVE_HEADER_CASE || config.isPreserveHeadersCase())
         .headers(toMultiMap(getRequestHeaders()))
         .queryParams(toMultiMap(getRequestQueryParams()));
+  }
+
+  @Override
+  public TypedValue getBodyAsTypedValue() {
+    return TypedValue.of(getRequestBody());
   }
 
   @Override
