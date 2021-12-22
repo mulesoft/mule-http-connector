@@ -35,7 +35,7 @@ import java.util.Map;
  *
  * @since 1.0
  */
-public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
+public class HttpRequesterRequestBuilder extends HttpMessageBuilder implements HttpRequestBuilderConfigurer {
 
   /**
    * The body of the response message
@@ -143,9 +143,24 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
     return correlationId;
   }
 
+  /**
+   * @deprecated
+   * use {@link HttpRequesterRequestBuilder#toHttpRequestBuilder} instead
+   */
+  @Deprecated
   public HttpRequestBuilder configure(HttpRequesterConfig config) {
+    return toHttpRequestBuilder(config);
+  }
+
+  @Override
+  public HttpRequestBuilder toHttpRequestBuilder(HttpRequesterConfig config) {
     return HttpRequest.builder(PRESERVE_HEADER_CASE || config.isPreserveHeadersCase())
         .headers(headers)
         .queryParams(queryParams);
+  }
+
+  @Override
+  public TypedValue getBodyAsTypedValue() {
+    return getBody();
   }
 }
