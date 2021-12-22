@@ -84,7 +84,8 @@ public final class UriUtils {
       resolvedBasePath = resolvedBasePath.substring(0, resolvedBasePath.length() - 1);
     }
 
-    if (!resolvedBasePath.endsWith(HTTP_PATH_DELIMITER) && !resolvedRequestPath.startsWith(HTTP_PATH_DELIMITER) && !resolvedRequestPath.isEmpty()) {
+    if (!resolvedBasePath.endsWith(HTTP_PATH_DELIMITER) && !resolvedRequestPath.startsWith(HTTP_PATH_DELIMITER)
+        && !resolvedRequestPath.isEmpty()) {
       resolvedBasePath += HTTP_PATH_DELIMITER;
     }
 

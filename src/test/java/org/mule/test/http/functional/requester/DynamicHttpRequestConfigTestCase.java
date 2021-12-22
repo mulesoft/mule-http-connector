@@ -11,7 +11,12 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.api.event.CoreEvent.builder;
+
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
@@ -38,5 +43,33 @@ public class DynamicHttpRequestConfigTestCase extends AbstractHttpRequestTestCas
     ConfigurationInstance config2 = configurationProvider.get(testEvent());
 
     assertThat(config1.getValue(), is(sameInstance(config2.getValue())));
+  }
+
+  @Test
+  public void sameInstancesForSamePayload() throws Exception {
+    ConfigurationProvider configurationProvider = registry.<ConfigurationProvider>lookupByName("configDependingOnPayload").get();
+    assertThat(configurationProvider, is(not(nullValue())));
+
+    CoreEvent ev1 = builder(testEvent()).message(of("Same Payload")).build();
+    CoreEvent ev2 = builder(testEvent()).message(of("Same Payload")).build();
+
+    ConfigurationInstance config1 = configurationProvider.get(ev1);
+    ConfigurationInstance config2 = configurationProvider.get(ev2);
+
+    assertThat(config1.getValue(), is(sameInstance(config2.getValue())));
+  }
+
+  @Test
+  public void differentInstancesForNonEquivalentValues() throws Exception {
+    ConfigurationProvider configurationProvider = registry.<ConfigurationProvider>lookupByName("configDependingOnPayload").get();
+    assertThat(configurationProvider, is(not(nullValue())));
+
+    CoreEvent ev1 = builder(testEvent()).message(of("First Payload")).build();
+    CoreEvent ev2 = builder(testEvent()).message(of("Second Payload")).build();
+
+    ConfigurationInstance config1 = configurationProvider.get(ev1);
+    ConfigurationInstance config2 = configurationProvider.get(ev2);
+
+    assertThat(config1.getValue(), is(not(sameInstance(config2.getValue()))));
   }
 }

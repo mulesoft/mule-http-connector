@@ -16,4 +16,11 @@
         </http:default-query-params>
     </http:request-config>
 
+    <http:request-config name="configDependingOnPayload">
+        <http:request-connection host="localhost" port="${httpPort}"/>
+        <http:default-headers>
+            <http:default-header key="payload" value="#[payload]"/>
+        </http:default-headers>
+    </http:request-config>
+
 </mule>
