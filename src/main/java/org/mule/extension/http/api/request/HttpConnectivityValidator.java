@@ -76,9 +76,9 @@ public class HttpConnectivityValidator implements Initialisable {
    * Specifies whether to follow redirects or not.
    */
   @Parameter
-  @Optional(defaultValue = "false")
+  @Optional(defaultValue = "true")
   @Placement(order = 3)
-  private boolean followRedirects = false;
+  private boolean followRedirects = true;
 
   /**
    * Maximum time that the request element will block the execution of the flow waiting for the HTTP response.
