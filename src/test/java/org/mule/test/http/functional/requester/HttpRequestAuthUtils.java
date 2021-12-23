@@ -25,7 +25,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class HttpRequestAuthUtils {
+public final class HttpRequestAuthUtils {
+
+  private HttpRequestAuthUtils() {
+  }
 
   public static AbstractHandler createAuthHandler(Server server, AbstractHandler handler, String realmPath, Runnable callback) {
     LoginService loginService = new HashLoginService("TestRealm", realmPath);

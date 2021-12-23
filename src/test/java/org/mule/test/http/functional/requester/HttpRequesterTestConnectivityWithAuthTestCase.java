@@ -9,7 +9,6 @@ package org.mule.test.http.functional.requester;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.test.http.functional.requester.HttpRequestAuthUtils.createAuthHandler;
 import static org.slf4j.LoggerFactory.getLogger;
 
