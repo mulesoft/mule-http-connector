@@ -168,11 +168,9 @@
         </munit:validation>
     </munit:test>
 
-
     <flow name="csvListenerFlow">
         <http:listener config-ref="mimeTypeEndpoint" path="/csv"/>
         <set-payload value="#[output application/csv --- [{'name': 'Rodrigo Merino', 'alias': 'Rodro'}, {'name': 'Ezequiel Werner', 'alias': 'Eze'}, {'name': 'Esteban Wasinger Espro', 'alias': 'Steve'}]]"/>
-        <logger message="#[payload]" level="ERROR"/>
     </flow>
 
     <flow name="csvPollingFlow">
@@ -187,7 +185,7 @@
         </munit-tools:queue>
     </flow>
 
-    <munit:test name="csv-test-case">
+    <munit:test name="csv-test-case" ignore="true">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="csvListenerFlow"/>
             <munit:enable-flow-source value="csvPollingFlow"/>
@@ -204,6 +202,40 @@
             <munit-tools:assert-that expression="#[vars.firstName]" is="#[MunitTools::equalTo('Rodro')]"/>
             <munit-tools:assert-that expression="#[vars.secondName]" is="#[MunitTools::equalTo('Eze')]"/>
             <munit-tools:assert-that expression="#[vars.thirdName]" is="#[MunitTools::equalTo('Steve')]"/>
+        </munit:validation>
+    </munit:test>
+
+    <flow name="yamlListenerFlow">
+        <http:listener config-ref="mimeTypeEndpoint" path="/yaml"/>
+        <set-payload value="#[output application/yaml --- {'people': [{'name': 'Fernando'}, {'name': 'Julia'}]}]"/>
+    </flow>
+
+    <flow name="yamlPollingFlow">
+        <http:polling-source config-ref="splittingConfig" path="yaml">
+            <scheduling-strategy>
+                <fixed-frequency frequency="10" timeUnit="SECONDS"/>
+            </scheduling-strategy>
+            <http:split-expression ><![CDATA[#[payload.people]]]></http:split-expression>
+        </http:polling-source>
+        <munit-tools:queue queueName="yaml_queue">
+            <munit-tools:value>#[payload]</munit-tools:value>
+        </munit-tools:queue>
+    </flow>
+
+    <munit:test name="yaml-test-case">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="yamlListenerFlow"/>
+            <munit:enable-flow-source value="yamlPollingFlow"/>
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="yaml_queue"/>
+            <set-variable variableName="firstName" value="#[payload.name]"/>
+            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="yaml_queue"/>
+            <set-variable variableName="secondName" value="#[payload.name]"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[vars.firstName]" is="#[MunitTools::equalTo('Fernando')]"/>
+            <munit-tools:assert-that expression="#[vars.secondName]" is="#[MunitTools::equalTo('Julia')]"/>
         </munit:validation>
     </munit:test>
 
