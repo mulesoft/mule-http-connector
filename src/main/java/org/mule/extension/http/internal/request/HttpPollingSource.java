@@ -13,7 +13,7 @@ import static org.mule.extension.http.internal.request.SplitUtils.split;
 import static org.mule.extension.http.internal.request.UriUtils.buildPath;
 import static org.mule.extension.http.internal.request.UriUtils.resolveUri;
 import static org.mule.extension.http.internal.request.UriUtils.replaceUriParams;
-import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
+import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.DROP;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.FAIL;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.WAIT;
@@ -33,6 +33,7 @@ import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
@@ -45,7 +46,6 @@ import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Config;
-import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -68,7 +68,8 @@ import java.util.*;
 import java.util.function.Consumer;
 
 @Alias("pollingSource")
-@MediaType(value = ANY, strict = false)
+@org.mule.runtime.extension.api.annotation.param.MediaType(value = org.mule.runtime.extension.api.annotation.param.MediaType.ANY,
+    strict = false)
 @MetadataScope(outputResolver = HttpMetadataResolver.class)
 @Streaming
 @BackPressure(defaultMode = WAIT, supportedModes = {DROP, WAIT, FAIL})
@@ -157,15 +158,9 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
     return getClass().getSimpleName();
   }
 
-  private Consumer<PollContext.PollItem<String, HttpResponseAttributes>> getPollingItemConsumer(String item,
-                                                                                                org.mule.runtime.api.metadata.MediaType mediaType,
-                                                                                                HttpResponseAttributes attributes) {
+  private Consumer<PollContext.PollItem<String, HttpResponseAttributes>> getPollingItemConsumer(Result<String, HttpResponseAttributes> item) {
     return pollItem -> {
-      Result.Builder<String, HttpResponseAttributes> responseBuilder =
-          Result.<String, HttpResponseAttributes>builder().attributes(attributes).output(item).mediaType(mediaType);
-
-      pollItem.setResult(responseBuilder.build());
-
+      pollItem.setResult(item);
       // TODO (HTTPC - idempotency and watermarking)
     };
   }
@@ -177,10 +172,9 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
           @Override
           public void success(Result<InputStream, HttpResponseAttributes> result) {
             HttpResponseAttributes attributes = result.getAttributes().orElse(null);
-            org.mule.runtime.api.metadata.MediaType mediaType =
-                result.getMediaType().orElse(org.mule.runtime.api.metadata.MediaType.ANY);
-            for (String item : getItems(result.getOutput(), mediaType)) {
-              pollContext.accept(getPollingItemConsumer(item, mediaType, attributes));
+            MediaType mediaType = result.getMediaType().orElse(MediaType.ANY);
+            for (Result<String, HttpResponseAttributes> item : getItems(result.getOutput(), mediaType, attributes)) {
+              pollContext.accept(getPollingItemConsumer(item));
             }
           }
 
@@ -230,25 +224,30 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
     return builder.build();
   }
 
-  private static TypedValue<String> toTypedValue(String value, org.mule.runtime.api.metadata.MediaType mediaType,
-                                                 Charset encoding) {
-    if (mediaType.equals(org.mule.runtime.api.metadata.MediaType.TEXT.withCharset(mediaType.getCharset().orElse(null)))) {
+  private static TypedValue<String> toTypedValue(String value, MediaType mediaType, Charset encoding) {
+    if (mediaType.equals(TEXT.withCharset(mediaType.getCharset().orElse(null)))) {
       return TypedValue.of(value);
     } else {
       return new TypedValue<>(value, DataType.builder().mediaType(mediaType).charset(encoding).build());
     }
   }
 
-  private List<String> getItems(InputStream fullResponse, org.mule.runtime.api.metadata.MediaType mediaType) {
+  private Result<String, HttpResponseAttributes> toResult(String item, MediaType mediaType, HttpResponseAttributes attributes) {
+    return Result.<String, HttpResponseAttributes>builder().attributes(attributes).output(item).mediaType(mediaType).build();
+  }
+
+  private List<Result<String, HttpResponseAttributes>> getItems(InputStream fullResponse, MediaType mediaType,
+                                                                HttpResponseAttributes attributes) {
     java.util.Optional<String> itemsExpression = expressions.getSplitExpression();
     String response = IOUtils.toString(fullResponse, mediaType.getCharset().get());
     if (!itemsExpression.isPresent()) {
-      return singletonList(response);
+      return singletonList(toResult(response, mediaType, attributes));
     }
     TypedValue<String> typedValue = toTypedValue(response, mediaType, mediaType.getCharset().get());
     TypedValue<?> result = expressionLanguage.evaluate(itemsExpression.get(), buildContext(typedValue, null));
-    List<String> splitted = new ArrayList<>();
-    split(expressionLanguage, result, itemsExpression.get()).forEachRemaining(item -> splitted.add(item.getValue().toString()));
+    List<Result<String, HttpResponseAttributes>> splitted = new ArrayList<>();
+    split(expressionLanguage, result, itemsExpression.get()).forEachRemaining(item -> splitted
+        .add(toResult(item.getValue().toString(), item.getDataType().getMediaType(), attributes)));
     return splitted;
   }
 

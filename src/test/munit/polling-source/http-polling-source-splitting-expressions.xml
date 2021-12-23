@@ -60,7 +60,7 @@
 
     <flow name="textListenerFlow">
         <http:listener config-ref="mimeTypeEndpoint" path="/text"/>
-        <set-payload value="#[output text/plain --- 'Hola Don Pepito, Hola Don José']"/>
+        <set-payload value="#['Hola Don Pepito, Hola Don José']"/>
     </flow>
 
     <flow name="textPollingFlow">
@@ -89,6 +89,83 @@
         <munit:validation>
             <munit-tools:assert-that expression="#[vars.firstGreeting]" is="#[MunitTools::equalTo('Hola Don Pepito')]"/>
             <munit-tools:assert-that expression="#[vars.secondGreeting]" is="#[MunitTools::equalTo('Hola Don José')]"/>
+        </munit:validation>
+    </munit:test>
+
+
+    <flow name="xmlListenerFlow">
+        <http:listener config-ref="mimeTypeEndpoint" path="/xml"/>
+        <set-payload value="#[output application/xml --- {'something': {'element': [{name: 'Maks'}, {name: 'Franek'}, {name: 'Jola'}]}}]"/>
+    </flow>
+
+    <flow name="xmlPollingFlow">
+        <http:polling-source config-ref="splittingConfig" path="xml">
+            <scheduling-strategy>
+                <fixed-frequency frequency="10" timeUnit="SECONDS"/>
+            </scheduling-strategy>
+            <http:split-expression ><![CDATA[#[output application/json --- payload.something.*element]]]></http:split-expression>
+        </http:polling-source>
+        <munit-tools:queue queueName="xml_queue">
+            <munit-tools:value>#[payload]</munit-tools:value>
+        </munit-tools:queue>
+    </flow>
+
+    <munit:test name="xml-test-case">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="xmlListenerFlow"/>
+            <munit:enable-flow-source value="xmlPollingFlow"/>
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="xml_queue"/>
+            <set-variable variableName="firstName" value="#[payload.name]"/>
+            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="xml_queue"/>
+            <set-variable variableName="secondName" value="#[payload.name]"/>
+            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="xml_queue"/>
+            <set-variable variableName="thirdName" value="#[payload.name]"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[vars.firstName]" is="#[MunitTools::equalTo('Maks')]"/>
+            <munit-tools:assert-that expression="#[vars.secondName]" is="#[MunitTools::equalTo('Franek')]"/>
+            <munit-tools:assert-that expression="#[vars.thirdName]" is="#[MunitTools::equalTo('Jola')]"/>
+        </munit:validation>
+    </munit:test>
+
+
+    <flow name="javaListenerFlow">
+        <http:listener config-ref="mimeTypeEndpoint" path="/java"/>
+        <set-payload value="#[output application/java --- 'values': [{'name': 'Adam'}, {'name': 'Maks'}, {'name': 'Franek'}]]"/>
+        <logger message="#[payload]" level="ERROR"/>
+    </flow>
+
+    <flow name="javaPollingFlow">
+        <http:polling-source config-ref="splittingConfig" path="java">
+            <scheduling-strategy>
+                <fixed-frequency frequency="10" timeUnit="SECONDS"/>
+            </scheduling-strategy>
+            <http:split-expression ><![CDATA[#[payload.values]]]></http:split-expression>
+        </http:polling-source>
+        <munit-tools:queue queueName="java_queue">
+            <munit-tools:value>#[payload]</munit-tools:value>
+        </munit-tools:queue>
+    </flow>
+
+    <munit:test name="java-test-case" ignore="true">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="javaListenerFlow"/>
+            <munit:enable-flow-source value="javaPollingFlow"/>
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="java_queue"/>
+            <set-variable variableName="firstName" value="#[payload.name]"/>
+            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="java_queue"/>
+            <set-variable variableName="secondName" value="#[payload.name]"/>
+            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="java_queue"/>
+            <set-variable variableName="thirdName" value="#[payload.name]"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[vars.firstName]" is="#[MunitTools::equalTo('Adam')]"/>
+            <munit-tools:assert-that expression="#[vars.secondName]" is="#[MunitTools::equalTo('Maks')]"/>
+            <munit-tools:assert-that expression="#[vars.thirdName]" is="#[MunitTools::equalTo('Franek')]"/>
         </munit:validation>
     </munit:test>
 

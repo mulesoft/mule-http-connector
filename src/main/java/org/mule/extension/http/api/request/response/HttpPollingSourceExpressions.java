@@ -6,6 +6,8 @@
  */
 package org.mule.extension.http.api.request.response;
 
+import static java.util.Optional.empty;
+
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
@@ -30,7 +32,7 @@ public final class HttpPollingSourceExpressions {
   private Literal<String> splitExpression;
 
   public Optional<String> getSplitExpression() {
-    return splitExpression.getLiteralValue();
+    return splitExpression != null ? splitExpression.getLiteralValue() : empty();
   }
 
 }
