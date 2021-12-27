@@ -9,7 +9,20 @@
     <http:request-config name="basicConfig">
         <http:request-connection host="localhost" port="${httpPort}">
             <http:authentication>
-                <http:basic-authentication username="user" password="password"/>
+                <http:basic-authentication username="user" password="password" />
+            </http:authentication>
+            <http:connectivity-test requestPath="/basic" >
+                <http:response-validator>
+                    <http:success-status-code-validator values="200"/>
+                </http:response-validator>
+            </http:connectivity-test>
+        </http:request-connection>
+    </http:request-config>
+
+    <http:request-config name="basicConfigFailing">
+        <http:request-connection host="localhost" port="${httpPort}">
+            <http:authentication>
+                <http:basic-authentication username="failing" password="wrong" />
             </http:authentication>
             <http:connectivity-test requestPath="/basic" >
                 <http:response-validator>
@@ -23,6 +36,19 @@
         <http:request-connection host="localhost" port="${httpPort}">
             <http:authentication>
                 <http:digest-authentication username="user" password="password" />
+            </http:authentication>
+            <http:connectivity-test requestPath="/digest" >
+                <http:response-validator>
+                    <http:success-status-code-validator values="200"/>
+                </http:response-validator>
+            </http:connectivity-test>
+        </http:request-connection>
+    </http:request-config>
+
+    <http:request-config name="digestConfigFailing">
+        <http:request-connection host="localhost" port="${httpPort}">
+            <http:authentication>
+                <http:digest-authentication username="failing" password="wrong" />
             </http:authentication>
             <http:connectivity-test requestPath="/digest" >
                 <http:response-validator>

@@ -45,6 +45,16 @@ public class HttpRequesterTestConnectivityWithAuthTestCase extends AbstractHttpR
     testAuthenticationSuccess("digestConfig");
   }
 
+  @Test
+  public void basicAuthenticationFailing() throws MuleException {
+    testAuthenticationFailing("basicConfigFailing");
+  }
+
+  @Test
+  public void digestAuthenticationFailing() throws MuleException {
+    testAuthenticationFailing("digestConfigFailing");
+  }
+
   private void testAuthenticationSuccess(String configName) throws MuleException {
     // Given a requester connection provider with authentication.
     int requestCountAtBeginning = requestCount;
@@ -53,13 +63,24 @@ public class HttpRequesterTestConnectivityWithAuthTestCase extends AbstractHttpR
     // When we validate a connection.
     Object connection = connectionProvider.connect();
     ConnectionValidationResult validationResult = connectionProvider.validate(connection);
+    connectionProvider.disconnect(connection);
 
     // Then the validation is successful and the requests counter is incremented.
     assertThat(validationResult.getMessage(), validationResult.isValid(), is(true));
     assertThat(requestCount, is(greaterThan(requestCountAtBeginning)));
+  }
 
-    // cleanup the connection.
+  private void testAuthenticationFailing(String configName) throws MuleException {
+    // Given a requester connection provider with incorrect authentication.
+    ConnectionProvider connectionProvider = getConnectionProvider(configName);
+
+    // When we validate a connection.
+    Object connection = connectionProvider.connect();
+    ConnectionValidationResult validationResult = connectionProvider.validate(connection);
     connectionProvider.disconnect(connection);
+
+    // Then the validation fails.
+    assertThat(validationResult.isValid(), is(false));
   }
 
   @Override
