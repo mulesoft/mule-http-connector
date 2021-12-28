@@ -9,29 +9,15 @@ package org.mule.test.http.functional.requester;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.test.http.functional.requester.HttpRequestAuthUtils.createAuthHandler;
+
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.junit.Test;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.FileUtils;
 
 import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.eclipse.jetty.security.ConstraintMapping;
-import org.eclipse.jetty.security.ConstraintSecurityHandler;
-import org.eclipse.jetty.security.HashLoginService;
-import org.eclipse.jetty.security.LoginService;
-import org.eclipse.jetty.security.authentication.BasicAuthenticator;
-import org.eclipse.jetty.security.authentication.DigestAuthenticator;
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.eclipse.jetty.server.handler.ContextHandler;
-import org.eclipse.jetty.server.handler.ContextHandlerCollection;
-import org.eclipse.jetty.util.security.Constraint;
-import org.junit.Test;
 
 public class HttpRequestAuthTestCase extends AbstractHttpRequestTestCase {
 
@@ -69,66 +55,12 @@ public class HttpRequestAuthTestCase extends AbstractHttpRequestTestCase {
   @Override
   protected AbstractHandler createHandler(Server server) {
     AbstractHandler handler = super.createHandler(server);
-
-    String realmPath = null;
-
     try {
-      realmPath = FileUtils.getResourcePath("auth/realm.properties", getClass());
+      String realmPath = FileUtils.getResourcePath("auth/realm.properties", getClass());
+      return createAuthHandler(server, handler, realmPath, () -> requestCount++);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-
-    LoginService loginService = new HashLoginService("TestRealm", realmPath);
-    server.addBean(loginService);
-
-    Constraint basicConstraint = new Constraint();
-    basicConstraint.setName("auth");
-    basicConstraint.setRoles(new String[] {"user"});
-    basicConstraint.setAuthenticate(true);
-
-    ConstraintMapping basicConstraintMapping = new ConstraintMapping();
-    basicConstraintMapping.setConstraint(basicConstraint);
-    basicConstraintMapping.setPathSpec("/*");
-
-    ConstraintSecurityHandler basicSecurityHandler = new ConstraintSecurityHandler() {
-
-      @Override
-      public void handle(String pathInContext, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
-          throws IOException, ServletException {
-        requestCount++;
-        super.handle(pathInContext, baseRequest, request, response);
-      }
-    };
-    basicSecurityHandler.setAuthenticator(new BasicAuthenticator());
-    basicSecurityHandler.setConstraintMappings(new ConstraintMapping[] {basicConstraintMapping});
-
-    ContextHandler basicContext = new ContextHandler("/basic");
-    basicContext.setHandler(basicSecurityHandler);
-
-
-    Constraint digestConstraint = new Constraint();
-    digestConstraint.setName("auth");
-    digestConstraint.setRoles(new String[] {"user"});
-    digestConstraint.setAuthenticate(true);
-
-    ConstraintMapping digestConstraintMapping = new ConstraintMapping();
-    digestConstraintMapping.setConstraint(digestConstraint);
-    digestConstraintMapping.setPathSpec("/*");
-
-    ConstraintSecurityHandler digestSecurityHandler = new ConstraintSecurityHandler();
-    digestSecurityHandler.setAuthenticator(new DigestAuthenticator());
-    digestSecurityHandler.setConstraintMappings(new ConstraintMapping[] {digestConstraintMapping});
-
-    ContextHandler digestContext = new ContextHandler("/digest");
-    digestContext.setHandler(digestSecurityHandler);
-
-    basicSecurityHandler.setHandler(handler);
-    digestSecurityHandler.setHandler(handler);
-
-    ContextHandlerCollection handlers = new ContextHandlerCollection();
-    handlers.setHandlers(new Handler[] {basicContext, digestContext});
-
-    return handlers;
   }
 
 }
