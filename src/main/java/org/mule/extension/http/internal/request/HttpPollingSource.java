@@ -214,9 +214,10 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
                  result.getOutput());
   }
 
-  private BindingContext buildContext(TypedValue<String> payload, TypedValue<CursorStreamProvider> item) {
+  private BindingContext buildContext(TypedValue<String> payload, HttpResponseAttributes attributes,
+                                      TypedValue<CursorStreamProvider> item) {
     BindingContext.Builder builder = BindingContext.builder().addBinding("payload", payload);
-
+    builder.addBinding("attributes", TypedValue.of(attributes));
     if (item != null) {
       builder.addBinding("item", item);
     }
@@ -244,7 +245,7 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
       return singletonList(toResult(response, mediaType, attributes));
     }
     TypedValue<String> typedValue = toTypedValue(response, mediaType, mediaType.getCharset().get());
-    TypedValue<?> result = expressionLanguage.evaluate(itemsExpression.get(), buildContext(typedValue, null));
+    TypedValue<?> result = expressionLanguage.evaluate(itemsExpression.get(), buildContext(typedValue, attributes, null));
     List<Result<String, HttpResponseAttributes>> splitted = new ArrayList<>();
     split(expressionLanguage, result, itemsExpression.get()).forEachRemaining(item -> splitted
         .add(toResult(item.getValue().toString(), item.getDataType().getMediaType(), attributes)));

@@ -327,4 +327,44 @@
     </munit:test>
 
 
+    <flow name="headersListenerFlow">
+        <http:listener config-ref="mimeTypeEndpoint" path="/headers">
+            <http:response>
+                <http:headers>
+                    #[{'h1' : 'value1', 'h2': 'value2'}]
+                </http:headers>
+            </http:response>
+        </http:listener>
+        <set-payload value="#[output application/json --- {'people': [{'name': 'Adam'}, {'name': 'Jola'}]}]"/>
+    </flow>
+
+    <flow name="headersPollingFlow">
+        <http:polling-source config-ref="splittingConfig" path="headers">
+            <scheduling-strategy>
+                <fixed-frequency frequency="10" timeUnit="SECONDS"/>
+            </scheduling-strategy>
+            <http:split-expression><![CDATA[#[output application/json --- [{'name': payload.people[0].name ++ ' ' ++ attributes.headers.h1}, {'name': payload.people[1].name ++ ' ' ++ attributes.headers.h2}]]]]></http:split-expression>
+        </http:polling-source>
+        <munit-tools:queue queueName="headers_queue">
+            <munit-tools:value>#[payload]</munit-tools:value>
+        </munit-tools:queue>
+    </flow>
+
+    <munit:test name="headers-test-case">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="headersListenerFlow"/>
+            <munit:enable-flow-source value="headersPollingFlow"/>
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="headers_queue"/>
+            <set-variable variableName="firstName" value="#[payload.name]"/>
+            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="headers_queue"/>
+            <set-variable variableName="secondName" value="#[payload.name]"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[vars.firstName]" is="#[MunitTools::equalTo('Adam value1')]"/>
+            <munit-tools:assert-that expression="#[vars.secondName]" is="#[MunitTools::equalTo('Jola value2')]"/>
+        </munit:validation>
+    </munit:test>
+
 </mule>
