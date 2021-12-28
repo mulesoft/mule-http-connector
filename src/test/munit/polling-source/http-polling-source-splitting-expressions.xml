@@ -38,7 +38,7 @@
         </munit-tools:queue>
     </flow>
 
-    <munit:test name="json-test-case" ignore="true">
+    <munit:test name="json-test-case">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="jsonListenerFlow"/>
             <munit:enable-flow-source value="jsonPollingFlow"/>
@@ -75,7 +75,7 @@
         </munit-tools:queue>
     </flow>
 
-    <munit:test name="text-test-case" ignore="true">
+    <munit:test name="text-test-case">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="textListenerFlow"/>
             <munit:enable-flow-source value="textPollingFlow"/>
@@ -112,7 +112,7 @@
         </munit-tools:queue>
     </flow>
 
-    <munit:test name="xml-test-case" ignore="true">
+    <munit:test name="xml-test-case">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="xmlListenerFlow"/>
             <munit:enable-flow-source value="xmlPollingFlow"/>
@@ -189,7 +189,7 @@
         </munit-tools:queue>
     </flow>
 
-    <munit:test name="csv-test-case" ignore="true">
+    <munit:test name="csv-test-case">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="csvListenerFlow"/>
             <munit:enable-flow-source value="csvPollingFlow"/>
@@ -226,7 +226,7 @@
         </munit-tools:queue>
     </flow>
 
-    <munit:test name="yaml-test-case" ignore="true">
+    <munit:test name="yaml-test-case">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="yamlListenerFlow"/>
             <munit:enable-flow-source value="yamlPollingFlow"/>
@@ -309,7 +309,7 @@
         </munit-tools:queue>
     </flow>
 
-    <munit:test name="multipart-test-case" ignore="true">
+    <munit:test name="multipart-test-case">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="multipartListenerFlow"/>
             <munit:enable-flow-source value="multipartPollingFlow"/>
