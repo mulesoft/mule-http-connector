@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+
+    <munit:config name="http-polling-source-fileresponse.xml"/>
+
+    <munit:dynamic-port propertyName="dynamic.port"/>
+
+    <http:listener-config name="fileResponsesEndpoint">
+        <http:listener-connection host="0.0.0.0" port="${dynamic.port}"/>
+    </http:listener-config>
+
+    <http:request-config name="splittingFromFileConfig">
+        <http:request-connection host="localhost" port="${dynamic.port}"/>
+    </http:request-config>
+
+
+    <flow name="csvFileListenerFlow">
+        <http:listener config-ref="fileResponsesEndpoint" path="/csv">
+            <http:response>
+                <http:body><![CDATA[
+                #[
+                %dw 2.0
+                output multipart/form-data
+                boundary='34b21'
+                ---
+                {
+                parts : {
+                    text : {
+                        headers : {
+                            "Content-Type": "text/plain"
+                        },
+                        content : "Book"
+                    },
+                    file : {
+                        headers : {
+                            "Content-Disposition" : {
+                                "name" : "file",
+                                "filename": "file.csv"
+                            },
+                            "Content-Type" : "application/csv"
+                        },
+                        content : payload
+                    }
+                }
+                }]
+            ]]></http:body>
+            </http:response>
+        </http:listener>
+        <set-payload
+                value="#[output application/csv --- [{'name': 'Rodrigo Merino', 'alias': 'Rodro'}, {'name': 'Ezequiel Werner', 'alias': 'Eze'}, {'name': 'Esteban Wasinger Espro', 'alias': 'Steve'}]]"/>
+    </flow>
+
+    <flow name="csvFilePollingFlow">
+        <http:polling-source config-ref="splittingFromFileConfig" path="csv">
+            <scheduling-strategy>
+                <fixed-frequency frequency="10" timeUnit="SECONDS"/>
+            </scheduling-strategy>
+            <http:split-expression><![CDATA[#[output application/json --- payload.parts.file.content]]]></http:split-expression>
+        </http:polling-source>
+        <munit-tools:queue queueName="splitfile_queue">
+            <munit-tools:value>#[payload]</munit-tools:value>
+        </munit-tools:queue>
+    </flow>
+
+    <munit:test name="csv-file-test-case">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="csvFileListenerFlow"/>
+            <munit:enable-flow-source value="csvFilePollingFlow"/>
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="splitfile_queue"/>
+            <set-variable variableName="firstName" value="#[payload.alias]"/>
+            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="splitfile_queue"/>
+            <set-variable variableName="secondName" value="#[payload.alias]"/>
+            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="splitfile_queue"/>
+            <set-variable variableName="thirdName" value="#[payload.alias]"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[vars.firstName]" is="#[MunitTools::equalTo('Rodro')]"/>
+            <munit-tools:assert-that expression="#[vars.secondName]" is="#[MunitTools::equalTo('Eze')]"/>
+            <munit-tools:assert-that expression="#[vars.thirdName]" is="#[MunitTools::equalTo('Steve')]"/>
+        </munit:validation>
+    </munit:test>
+
+</mule>

@@ -160,6 +160,7 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
 
   private Consumer<PollContext.PollItem<String, HttpResponseAttributes>> getPollingItemConsumer(Result<String, HttpResponseAttributes> item) {
     return pollItem -> {
+      LOGGER.debug("Setting Result for {}: {}", location.getRootContainerName(), item.getOutput());
       pollItem.setResult(item);
       // TODO (HTTPC - idempotency and watermarking)
     };
@@ -241,6 +242,8 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
                                                                 HttpResponseAttributes attributes) {
     java.util.Optional<String> itemsExpression = expressions.getSplitExpression();
     String response = IOUtils.toString(fullResponse, mediaType.getCharset().get());
+    LOGGER.debug("Received response at {}: {} and headers {}", location.getRootContainerName(), response,
+                 attributes.getHeaders());
     if (!itemsExpression.isPresent()) {
       return singletonList(toResult(response, mediaType, attributes));
     }
