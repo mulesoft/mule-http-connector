@@ -31,7 +31,7 @@
             <scheduling-strategy>
                 <fixed-frequency frequency="10" timeUnit="SECONDS"/>
             </scheduling-strategy>
-            <http:split-expression ><![CDATA[#[payload]]]></http:split-expression>
+            <http:split-expression><![CDATA[#[payload]]]></http:split-expression>
         </http:polling-source>
         <munit-tools:queue queueName="json_queue">
             <munit-tools:value>#[payload]</munit-tools:value>
@@ -68,14 +68,14 @@
             <scheduling-strategy>
                 <fixed-frequency frequency="10" timeUnit="SECONDS"/>
             </scheduling-strategy>
-            <http:split-expression ><![CDATA[#[payload as String splitBy(', ')]]]></http:split-expression>
+            <http:split-expression><![CDATA[#[payload as String splitBy(', ')]]]></http:split-expression>
         </http:polling-source>
         <munit-tools:queue queueName="text_queue">
             <munit-tools:value>#[payload]</munit-tools:value>
         </munit-tools:queue>
     </flow>
 
-    <munit:test name="text-test-case"  ignore="true">
+    <munit:test name="text-test-case" ignore="true">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="textListenerFlow"/>
             <munit:enable-flow-source value="textPollingFlow"/>
@@ -95,7 +95,8 @@
 
     <flow name="xmlListenerFlow">
         <http:listener config-ref="mimeTypeEndpoint" path="/xml"/>
-        <set-payload value="#[output application/xml --- {'something': {'element': [{name: 'Maks'}, {name: 'Franek'}, {name: 'Jola'}]}}]"/>
+        <set-payload
+                value="#[output application/xml --- {'something': {'element': [{name: 'Maks'}, {name: 'Franek'}, {name: 'Jola'}]}}]"/>
     </flow>
 
     <flow name="xmlPollingFlow">
@@ -103,7 +104,8 @@
             <scheduling-strategy>
                 <fixed-frequency frequency="10" timeUnit="SECONDS"/>
             </scheduling-strategy>
-            <http:split-expression ><![CDATA[#[output application/json --- payload.something.*element]]]></http:split-expression>
+            <http:split-expression>
+                <![CDATA[#[output application/json --- payload.something.*element]]]></http:split-expression>
         </http:polling-source>
         <munit-tools:queue queueName="xml_queue">
             <munit-tools:value>#[payload]</munit-tools:value>
@@ -132,7 +134,8 @@
 
     <flow name="javaListenerFlow">
         <http:listener config-ref="mimeTypeEndpoint" path="/java"/>
-        <set-payload value="#[output application/java --- 'values': [{'name': 'Adam'}, {'name': 'Maks'}, {'name': 'Franek'}]]"/>
+        <set-payload
+                value="#[output application/java --- 'values': [{'name': 'Adam'}, {'name': 'Maks'}, {'name': 'Franek'}]]"/>
         <logger message="#[payload]" level="ERROR"/>
     </flow>
 
@@ -141,7 +144,7 @@
             <scheduling-strategy>
                 <fixed-frequency frequency="10" timeUnit="SECONDS"/>
             </scheduling-strategy>
-            <http:split-expression ><![CDATA[#[payload.values]]]></http:split-expression>
+            <http:split-expression><![CDATA[#[payload.values]]]></http:split-expression>
         </http:polling-source>
         <munit-tools:queue queueName="java_queue">
             <munit-tools:value>#[payload]</munit-tools:value>
@@ -170,7 +173,8 @@
 
     <flow name="csvListenerFlow">
         <http:listener config-ref="mimeTypeEndpoint" path="/csv"/>
-        <set-payload value="#[output application/csv --- [{'name': 'Rodrigo Merino', 'alias': 'Rodro'}, {'name': 'Ezequiel Werner', 'alias': 'Eze'}, {'name': 'Esteban Wasinger Espro', 'alias': 'Steve'}]]"/>
+        <set-payload
+                value="#[output application/csv --- [{'name': 'Rodrigo Merino', 'alias': 'Rodro'}, {'name': 'Ezequiel Werner', 'alias': 'Eze'}, {'name': 'Esteban Wasinger Espro', 'alias': 'Steve'}]]"/>
     </flow>
 
     <flow name="csvPollingFlow">
@@ -178,7 +182,7 @@
             <scheduling-strategy>
                 <fixed-frequency frequency="10" timeUnit="SECONDS"/>
             </scheduling-strategy>
-            <http:split-expression ><![CDATA[#[output application/json --- payload]]]></http:split-expression>
+            <http:split-expression><![CDATA[#[output application/json --- payload]]]></http:split-expression>
         </http:polling-source>
         <munit-tools:queue queueName="csv_queue">
             <munit-tools:value>#[payload]</munit-tools:value>
@@ -215,14 +219,14 @@
             <scheduling-strategy>
                 <fixed-frequency frequency="10" timeUnit="SECONDS"/>
             </scheduling-strategy>
-            <http:split-expression ><![CDATA[#[payload.people]]]></http:split-expression>
+            <http:split-expression><![CDATA[#[payload.people]]]></http:split-expression>
         </http:polling-source>
         <munit-tools:queue queueName="yaml_queue">
             <munit-tools:value>#[payload]</munit-tools:value>
         </munit-tools:queue>
     </flow>
 
-    <munit:test name="yaml-test-case">
+    <munit:test name="yaml-test-case" ignore="true">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="yamlListenerFlow"/>
             <munit:enable-flow-source value="yamlPollingFlow"/>
@@ -238,5 +242,89 @@
             <munit-tools:assert-that expression="#[vars.secondName]" is="#[MunitTools::equalTo('Julia')]"/>
         </munit:validation>
     </munit:test>
+
+    <flow name="multipartListenerFlow">
+        <http:listener config-ref="mimeTypeEndpoint" path="/multipart">
+            <http:response>
+                <http:body>
+                    #[
+                    %dw 2.0
+                    output multipart/form-data
+                    boundary='34b21'
+                    ---
+                    {
+                    parts : {
+                        text : {
+                            headers : {
+                            "Content-Type": "text/plain"
+                            },
+                            content : "Book"
+                        },
+                        file1 : {
+                            headers : {
+                                "Content-Disposition" : {
+                                    "name": "file1",
+                                    "filename": "a.json"
+                                },
+                                "Content-Type" : "application/json"
+                            },
+                            content : {
+                                title: "Java 8 in Action",
+                                author: "Mario Fusco",
+                                year: 2014
+                            }
+                        },
+                        file2 : {
+                            headers : {
+                                "Content-Disposition" : {
+                                    "filename": "a.html",
+                                    "name": "file2"
+                                },
+                                "Content-Type" : "application/json"
+                            },
+                            content : {
+                                title: "Java 8 in Action",
+                                author: "Jan Kucharzewski",
+                                year: 2014
+                            }
+                        }
+                    }
+                    }]
+                </http:body>
+            </http:response>
+        </http:listener>
+        <logger message="Returning multipart"/>
+    </flow>
+
+    <flow name="multipartPollingFlow">
+        <http:polling-source config-ref="splittingConfig" path="multipart">
+            <scheduling-strategy>
+                <fixed-frequency frequency="10" timeUnit="SECONDS"/>
+            </scheduling-strategy>
+            <http:request-body><![CDATA[Jan Kucharzewski]]></http:request-body>
+            <http:split-expression><![CDATA[#[output application/json --- [payload.parts.file1.content, payload.parts.file2.content]]]]></http:split-expression>
+        </http:polling-source>
+        <munit-tools:queue queueName="multipart_queue">
+            <munit-tools:value>#[payload]</munit-tools:value>
+        </munit-tools:queue>
+    </flow>
+
+    <munit:test name="multipart-test-case" ignore="true">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="multipartListenerFlow"/>
+            <munit:enable-flow-source value="multipartPollingFlow"/>
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="multipart_queue"/>
+            <set-variable variableName="first" value="#[payload.author]"/>
+            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="multipart_queue"/>
+            <set-variable variableName="second" value="#[payload.author]"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[vars.first]" is="#[MunitTools::equalTo('Mario Fusco')]"/>
+            <munit-tools:assert-that expression="#[vars.second]" is="#[MunitTools::equalTo('Jan Kucharzewski')]"/>
+        </munit:validation>
+    </munit:test>
+
 
 </mule>
