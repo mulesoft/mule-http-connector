@@ -22,7 +22,7 @@ import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 /**
  * Utils class for splitting payloads.
  *
- * @since 1.0
+ * @since 1.7
  */
 public final class SplitUtils {
 
