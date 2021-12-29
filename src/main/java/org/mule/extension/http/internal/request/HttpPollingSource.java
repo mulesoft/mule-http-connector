@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.internal.request;
 
+import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Collections.singletonList;
 import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST;
 import static org.mule.extension.http.internal.request.HttpRequestUtils.createHttpRequester;
@@ -13,6 +14,7 @@ import static org.mule.extension.http.internal.request.SplitUtils.split;
 import static org.mule.extension.http.internal.request.UriUtils.buildPath;
 import static org.mule.extension.http.internal.request.UriUtils.resolveUri;
 import static org.mule.extension.http.internal.request.UriUtils.replaceUriParams;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.DROP;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.FAIL;
@@ -162,7 +164,7 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
     return pollItem -> {
       LOGGER.debug("Setting Result for {}: {}", location.getRootContainerName(), item.getOutput());
       pollItem.setResult(item);
-      // TODO (HTTPC - idempotency and watermarking)
+      // TODO (HTTPC-178 and HTTPC-179 - idempotency and watermarking)
     };
   }
 
@@ -173,7 +175,7 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
           @Override
           public void success(Result<InputStream, HttpResponseAttributes> result) {
             HttpResponseAttributes attributes = result.getAttributes().orElse(null);
-            MediaType mediaType = result.getMediaType().orElse(MediaType.ANY);
+            MediaType mediaType = result.getMediaType().orElse(ANY);
             for (Result<String, HttpResponseAttributes> item : getItems(result.getOutput(), mediaType, attributes)) {
               pollContext.accept(getPollingItemConsumer(item));
             }
@@ -241,13 +243,14 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
   private List<Result<String, HttpResponseAttributes>> getItems(InputStream fullResponse, MediaType mediaType,
                                                                 HttpResponseAttributes attributes) {
     java.util.Optional<String> itemsExpression = expressions.getSplitExpression();
-    String response = IOUtils.toString(fullResponse, mediaType.getCharset().get());
+    Charset charset = mediaType.getCharset().orElse(defaultCharset());
+    String response = IOUtils.toString(fullResponse, charset);
     LOGGER.debug("Received response at {}: {} and headers {}", location.getRootContainerName(), response,
                  attributes.getHeaders());
     if (!itemsExpression.isPresent()) {
       return singletonList(toResult(response, mediaType, attributes));
     }
-    TypedValue<String> typedValue = toTypedValue(response, mediaType, mediaType.getCharset().get());
+    TypedValue<String> typedValue = toTypedValue(response, mediaType, charset);
     TypedValue<?> result = expressionLanguage.evaluate(itemsExpression.get(), buildContext(typedValue, attributes, null));
     List<Result<String, HttpResponseAttributes>> splitted = new ArrayList<>();
     split(expressionLanguage, result, itemsExpression.get()).forEachRemaining(item -> splitted

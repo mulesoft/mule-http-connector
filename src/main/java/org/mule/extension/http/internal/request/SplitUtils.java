@@ -26,6 +26,10 @@ import static org.mule.runtime.core.api.util.StringUtils.isBlank;
  */
 public final class SplitUtils {
 
+  private SplitUtils() {
+
+  }
+
   /**
    * Splits a payload handling its media type and the needed expressions automatically.
    *
