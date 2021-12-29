@@ -218,13 +218,10 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
   }
 
   private BindingContext buildContext(TypedValue<String> payload, HttpResponseAttributes attributes,
-                                      TypedValue<CursorStreamProvider> item) {
+                                      java.util.Optional<TypedValue<CursorStreamProvider>> item) {
     BindingContext.Builder builder = BindingContext.builder().addBinding("payload", payload);
     builder.addBinding("attributes", TypedValue.of(attributes));
-    if (item != null) {
-      builder.addBinding("item", item);
-    }
-
+    item.ifPresent(it -> builder.addBinding("item", it));
     return builder.build();
   }
 
