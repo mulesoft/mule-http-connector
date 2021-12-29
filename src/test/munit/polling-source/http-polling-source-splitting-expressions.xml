@@ -284,7 +284,7 @@
                             },
                             content : {
                                 title: "Java 8 in Action",
-                                author: "Jan Kucharzewski",
+                                author: payload,
                                 year: 2014
                             }
                         }
