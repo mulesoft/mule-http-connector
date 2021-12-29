@@ -21,11 +21,13 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
+import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * Component that specifies how to create a proper HTTP simple request, that can be used in a Polling Source
@@ -41,7 +43,10 @@ public class HttpRequesterSimpleRequestBuilder implements HttpRequestBuilderConf
   @Optional(defaultValue = "")
   @Text
   @DisplayName("Body")
-  private String requestBody;
+  private Literal<String> requestBody;
+
+  // Since the requestBody could be an expression that has to be resolved
+  private String resolvedBody;
 
   /**
    * HTTP headers the message should include.
@@ -71,11 +76,14 @@ public class HttpRequesterSimpleRequestBuilder implements HttpRequestBuilderConf
   private List<QueryParam> requestQueryParams = emptyList();
 
   public String getRequestBody() {
-    return requestBody;
+    if (resolvedBody == null) {
+      resolvedBody = requestBody.getLiteralValue().orElse("");
+    }
+    return resolvedBody;
   }
 
-  protected void setRequestBody(String body) {
-    this.requestBody = body;
+  public void updateRequestBody(Function<String, String> update) {
+    this.resolvedBody = update.apply(requestBody.getLiteralValue().orElse(""));
   }
 
   public List<SimpleRequestHeader> getRequestHeaders() {
@@ -84,10 +92,6 @@ public class HttpRequesterSimpleRequestBuilder implements HttpRequestBuilderConf
 
   protected void setRequestHeaders(List<SimpleRequestHeader> headers) {
     this.requestHeaders = headers != null ? headers : emptyList();
-  }
-
-  public String replaceUriParamsOf(String path) {
-    return UriUtils.replaceUriParams(path, requestUriParams);
   }
 
   public List<QueryParam> getRequestQueryParams() {

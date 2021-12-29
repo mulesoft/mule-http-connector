@@ -16,6 +16,7 @@ import static org.mule.extension.http.internal.request.UriUtils.resolveUri;
 import static org.mule.extension.http.internal.request.UriUtils.replaceUriParams;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
@@ -42,7 +43,6 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
-import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
@@ -53,7 +53,6 @@ import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Config;
-import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
@@ -71,9 +70,11 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -90,6 +91,7 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
   private static final String PAYLOAD_PLACEGHOLDER = "payload";
   private static final String ITEM_PLACEGHOLDER = "item";
   private static final String ATTRIBUTES_PLACEGHOLDER = "attributes";
+  private static final String WATERMARK_PLACEGHOLDER = "watermark";
 
   @Connection
   private ConnectionProvider<HttpExtensionClient> clientProvider;
@@ -124,20 +126,20 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
    */
   @Parameter
   @Placement(order = 1)
-  @Optional
+  @org.mule.runtime.extension.api.annotation.param.Optional
   private String path = "";
 
   @Parameter
   @Placement(order = 2)
   @Example("GET")
-  @Optional(defaultValue = "GET")
+  @org.mule.runtime.extension.api.annotation.param.Optional(defaultValue = "GET")
   private String method;
 
   /**
    * Validation applied to the connectivity test response.
    */
   @Parameter
-  @Optional
+  @org.mule.runtime.extension.api.annotation.param.Optional
   @DisplayName("Response Validator")
   @Placement(order = 3)
   @Expression(NOT_SUPPORTED)
@@ -185,15 +187,21 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
     return getClass().getSimpleName();
   }
 
-  private Consumer<PollContext.PollItem<String, HttpResponseAttributes>> getPollingItemConsumer(Result<String, HttpResponseAttributes> item) {
+  private Consumer<PollContext.PollItem<String, HttpResponseAttributes>> getPollingItemConsumer(TypedValue<String> fullResponse,
+                                                                                                Result<TypedValue<?>, HttpResponseAttributes> item,
+                                                                                                Serializable watermark) {
     return pollItem -> {
       LOGGER.debug("Setting Result for {}: {}", location.getRootContainerName(), item.getOutput());
-      pollItem.setResult(item);
-      // TODO (HTTPC-178 and HTTPC-179 - idempotency and watermarking)
+      pollItem.setResult(toStringResult(item));
+      expressions.getIdExpression().ifPresent(idExp -> pollItem.setId(getItemId(fullResponse, idExp, watermark, item)));
+      expressions.getWatermarkExpression()
+          .ifPresent(wExp -> pollItem.setWatermark(getItemWatermark(fullResponse, wExp, watermark, item)));
     };
   }
 
   private void sendRequest(PollContext<String, HttpResponseAttributes> pollContext) {
+    Serializable currentWatermark = pollContext.getWatermark().orElse(null);
+    requestBuilder.updateRequestBody(body -> resolveRequestBody(body, currentWatermark));
     CompletionCallback<InputStream, HttpResponseAttributes> callback =
         new CompletionCallback<InputStream, HttpResponseAttributes>() {
 
@@ -201,10 +209,12 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
           public void success(Result<InputStream, HttpResponseAttributes> result) {
             HttpResponseAttributes attributes = result.getAttributes().orElse(null);
             MediaType mediaType = result.getMediaType().orElse(ANY);
+            Charset charset = mediaType.getCharset().orElse(defaultCharset());
+            TypedValue<String> response = toTypedValue(IOUtils.toString(result.getOutput(), charset), mediaType, charset);
             Reference<Boolean> atLeastOneResult = new Reference<>(false);
-            getItems(result.getOutput(), mediaType, attributes).forEach(item -> {
+            getItems(response, attributes, currentWatermark).forEach(item -> {
               atLeastOneResult.set(true);
-              pollContext.accept(getPollingItemConsumer(item));
+              pollContext.accept(getPollingItemConsumer(response, item, currentWatermark));
             });
 
             if (!atLeastOneResult.get()) {
@@ -248,10 +258,12 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
                  result.getOutput());
   }
 
-  private BindingContext buildContext(TypedValue<String> payload, HttpResponseAttributes attributes,
-                                      java.util.Optional<TypedValue<CursorStreamProvider>> item) {
-    BindingContext.Builder builder = BindingContext.builder().addBinding(PAYLOAD_PLACEGHOLDER, payload);
-    builder.addBinding(ATTRIBUTES_PLACEGHOLDER, TypedValue.of(attributes));
+  private BindingContext buildContext(Optional<TypedValue<String>> payload, Optional<HttpResponseAttributes> attributes,
+                                      Serializable currentWatermark, Optional<TypedValue> item) {
+    BindingContext.Builder builder = BindingContext.builder();
+    payload.ifPresent(p -> builder.addBinding(PAYLOAD_PLACEGHOLDER, p));
+    attributes.ifPresent(attr -> builder.addBinding(ATTRIBUTES_PLACEGHOLDER, TypedValue.of(attr)));
+    builder.addBinding(WATERMARK_PLACEGHOLDER, TypedValue.of(currentWatermark));
     item.ifPresent(it -> builder.addBinding(ITEM_PLACEGHOLDER, it));
     return builder.build();
   }
@@ -264,34 +276,69 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
     }
   }
 
-  private Result<String, HttpResponseAttributes> toResult(String item, MediaType mediaType, HttpResponseAttributes attributes) {
-    return Result.<String, HttpResponseAttributes>builder().attributes(attributes).output(item).mediaType(mediaType).build();
+  private Result<TypedValue<?>, HttpResponseAttributes> toResult(TypedValue<?> item, MediaType mediaType,
+                                                                 HttpResponseAttributes attributes) {
+    return Result.<TypedValue<?>, HttpResponseAttributes>builder().attributes(attributes).output(item).mediaType(mediaType)
+        .build();
+  }
+
+  private Result<String, HttpResponseAttributes> toStringResult(Result<TypedValue<?>, HttpResponseAttributes> org) {
+    return Result.<String, HttpResponseAttributes>builder().attributes(org.getAttributes().get())
+        .output(org.getOutput().getValue().toString()).mediaType(org.getMediaType().get()).build();
   }
 
   private static boolean isJavaPayload(MediaType mediaType) {
     return mediaType.equals(APPLICATION_JAVA.withCharset(mediaType.getCharset().orElse(null)));
   }
 
-  private Stream<Result<String, HttpResponseAttributes>> getItems(InputStream fullResponse, MediaType mediaType,
-                                                                  HttpResponseAttributes attributes) {
-    if (isJavaPayload(mediaType)) {
+  private Stream<Result<TypedValue<?>, HttpResponseAttributes>> getItems(TypedValue<String> payload,
+                                                                         HttpResponseAttributes attributes,
+                                                                         Serializable currentWatermark) {
+    if (isJavaPayload(payload.getDataType().getMediaType())) {
       throw new MuleRuntimeException(createStaticMessage(format("%s is not an accepted media type",
                                                                 APPLICATION_JAVA.toRfcString())));
     }
-    java.util.Optional<String> itemsExpression = expressions.getSplitExpression();
-    Charset charset = mediaType.getCharset().orElse(defaultCharset());
-    String response = IOUtils.toString(fullResponse, charset);
-    LOGGER.debug("Received response at {}: {} and headers {}", location.getRootContainerName(), response,
-                 attributes.getHeaders());
+    Optional<String> itemsExpression = expressions.getSplitExpression();
+    LOGGER.debug("Received response at {}: {} and headers {}", location.getRootContainerName(), payload, attributes.getHeaders());
     if (!itemsExpression.isPresent()) {
-      return Stream.of(toResult(response, mediaType, attributes));
+      return Stream.of(toResult(payload, payload.getDataType().getMediaType(), attributes));
     }
 
-    TypedValue<String> typedValue = toTypedValue(response, mediaType, charset);
     Iterable<TypedValue<?>> splitted =
-        () -> expressionLanguage.split(itemsExpression.get(), buildContext(typedValue, attributes, empty()));
+        () -> expressionLanguage.split(itemsExpression.get(),
+                                       buildContext(Optional.of(payload), Optional.of(attributes), currentWatermark, empty()));
     return StreamSupport.stream(splitted.spliterator(), false)
-        .map(item -> toResult(item.getValue().toString(), item.getDataType().getMediaType(), attributes));
+        .map(item -> toResult(item, item.getDataType().getMediaType(), attributes));
+  }
+
+  private Serializable getItemWatermark(TypedValue<String> payload, String watermarkExpression, Serializable currentWatermark,
+                                        Result<TypedValue<?>, HttpResponseAttributes> item) {
+    return (Serializable) resolveExpression(payload, watermarkExpression, currentWatermark, item).getValue();
+  }
+
+  private String getItemId(TypedValue<String> payload, String idExpression, Serializable currentWatermark,
+                           Result<TypedValue<?>, HttpResponseAttributes> item) {
+    return (String) resolveExpression(payload, idExpression, currentWatermark, item).getValue();
+  }
+
+  private TypedValue<?> resolveExpression(TypedValue<String> payload, String idExpression, Serializable currentWatermark,
+                                          Result<TypedValue<?>, HttpResponseAttributes> item) {
+    return expressionLanguage
+        .evaluate(idExpression, STRING,
+                  buildContext(Optional.of(payload), item.getAttributes(), currentWatermark, Optional.of(item.getOutput())));
+  }
+
+  private String resolveRequestBody(String body, Serializable watermark) {
+    if (isExpression(body)) {
+      return expressionLanguage.evaluate(body, buildContext(empty(), empty(), watermark, empty())).getValue().toString();
+    } else {
+      return body;
+    }
+  }
+
+  private boolean isExpression(String exp) {
+    String trimmedExp = exp.trim();
+    return trimmedExp.startsWith("#[") && trimmedExp.endsWith("]");
   }
 
 }
