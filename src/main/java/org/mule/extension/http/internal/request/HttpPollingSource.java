@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.internal.request;
 
+import static java.lang.String.format;
 import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Collections.singletonList;
 import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST;
@@ -14,8 +15,8 @@ import static org.mule.extension.http.internal.request.SplitUtils.split;
 import static org.mule.extension.http.internal.request.UriUtils.buildPath;
 import static org.mule.extension.http.internal.request.UriUtils.resolveUri;
 import static org.mule.extension.http.internal.request.UriUtils.replaceUriParams;
-import static org.mule.runtime.api.metadata.MediaType.ANY;
-import static org.mule.runtime.api.metadata.MediaType.TEXT;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.metadata.MediaType.*;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.DROP;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.FAIL;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.WAIT;
@@ -78,6 +79,9 @@ import java.util.function.Consumer;
 public class HttpPollingSource extends PollingSource<String, HttpResponseAttributes> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HttpPollingSource.class);
+  private static final String PAYLOAD_PLACEGHOLDER = "payload";
+  private static final String ITEM_PLACEGHOLDER = "item";
+  private static final String ATTRIBUTES_PLACEGHOLDER = "attributes";
 
   @Connection
   private ConnectionProvider<HttpExtensionClient> clientProvider;
@@ -219,9 +223,9 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
 
   private BindingContext buildContext(TypedValue<String> payload, HttpResponseAttributes attributes,
                                       java.util.Optional<TypedValue<CursorStreamProvider>> item) {
-    BindingContext.Builder builder = BindingContext.builder().addBinding("payload", payload);
-    builder.addBinding("attributes", TypedValue.of(attributes));
-    item.ifPresent(it -> builder.addBinding("item", it));
+    BindingContext.Builder builder = BindingContext.builder().addBinding(PAYLOAD_PLACEGHOLDER, payload);
+    builder.addBinding(ATTRIBUTES_PLACEGHOLDER, TypedValue.of(attributes));
+    item.ifPresent(it -> builder.addBinding(ITEM_PLACEGHOLDER, it));
     return builder.build();
   }
 
@@ -237,8 +241,15 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
     return Result.<String, HttpResponseAttributes>builder().attributes(attributes).output(item).mediaType(mediaType).build();
   }
 
+  private static boolean isJavaPayload(MediaType mediaType) {
+    return mediaType.equals(APPLICATION_JAVA.withCharset(mediaType.getCharset().orElse(null)));
+  }
+
   private List<Result<String, HttpResponseAttributes>> getItems(InputStream fullResponse, MediaType mediaType,
                                                                 HttpResponseAttributes attributes) {
+    if (isJavaPayload(mediaType)) {
+      throw new MuleRuntimeException(createStaticMessage(format("%s is not an accepted media type", APPLICATION_JAVA.toRfcString())));
+    }
     java.util.Optional<String> itemsExpression = expressions.getSplitExpression();
     Charset charset = mediaType.getCharset().orElse(defaultCharset());
     String response = IOUtils.toString(fullResponse, charset);
