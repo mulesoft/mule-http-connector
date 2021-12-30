@@ -168,6 +168,9 @@ public class HttpConnectivityValidator implements Initialisable {
     if (responseValidator != null) {
       initialiseIfNeeded(responseValidator, true, muleContext);
     }
+    if (requestBuilder != null) {
+      initialiseIfNeeded(requestBuilder, true, muleContext);
+    }
   }
 
   private static class VoidHttpRequesterCookieConfig implements HttpRequesterCookieConfig {
