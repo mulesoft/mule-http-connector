@@ -83,6 +83,16 @@
         </http:request-connection>
     </http:request-config>
 
+    <http:request-config name="requestConfigUsingExpressionInBody">
+        <http:request-connection protocol="HTTP" host="localhost" port="${http.port}" >
+            <http:connectivity-test requestPath="/testPath" requestMethod="POST">
+                <http:request-body>
+                    <![CDATA[#['Expected ' ++ 'Body']]]>
+                </http:request-body>
+            </http:connectivity-test>
+        </http:request-connection>
+    </http:request-config>
+
     <munit:test name="requestConfigWithoutTestConnectionIsValid">
         <munit:execution>
             <mtf:test-connectivity config-ref="requestConfigWithoutTestConnection"/>
@@ -140,6 +150,16 @@
         </munit:execution>
     </munit:test>
 
+    <munit:test name="usingExpressionInBody" >
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="expectingBody"/>
+        </munit:enable-flow-sources>
+
+        <munit:execution>
+            <mtf:test-connectivity config-ref="requestConfigUsingExpressionInBody"/>
+        </munit:execution>
+    </munit:test>
+
     <http:listener-config name="listenerConfig" >
         <http:listener-connection host="0.0.0.0" port="${http.port}" />
     </http:listener-config>
@@ -160,6 +180,15 @@
                 <raise-error type="VALIDATION:ERROR"/>
             </when>
         </choice>
-        <logger level="ERROR" />
+    </flow>
+
+    <flow name="expectingBody">
+        <http:listener path="/testPath" allowedMethods="POST" config-ref="listenerConfig" />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
+        <choice>
+            <when expression="#[not payload == 'Expected Body']"  >
+                <raise-error type="VALIDATION:ERROR"/>
+            </when>
+        </choice>
     </flow>
 </mule>
