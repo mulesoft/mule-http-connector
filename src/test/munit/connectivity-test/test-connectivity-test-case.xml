@@ -160,17 +160,17 @@
         </munit:execution>
     </munit:test>
 
-    <http:listener-config name="listenerConfig" >
+    <http:listener-config name="testConnectivityListenerConfig" >
         <http:listener-connection host="0.0.0.0" port="${http.port}" />
     </http:listener-config>
 
     <flow name="successFlow" >
-        <http:listener path="/successPath" config-ref="listenerConfig" />
+        <http:listener path="/successPath" config-ref="testConnectivityListenerConfig" />
         <logger />
     </flow>
 
     <flow name="allParamsFlow" >
-        <http:listener path="/testPath" allowedMethods="POST" config-ref="listenerConfig" />
+        <http:listener path="/testPath" allowedMethods="POST" config-ref="testConnectivityListenerConfig" />
         <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
         <set-variable variableName="isExpectedBody" value="#[payload == 'The Body']" />
         <set-variable variableName="isExpectedHeaders" value="#[attributes.headers['Key'] == 'Value1']" />
@@ -183,7 +183,7 @@
     </flow>
 
     <flow name="expectingBody">
-        <http:listener path="/testPath" allowedMethods="POST" config-ref="listenerConfig" />
+        <http:listener path="/testPath" allowedMethods="POST" config-ref="testConnectivityListenerConfig" />
         <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
         <choice>
             <when expression="#[not payload == 'Expected Body']"  >
