@@ -250,7 +250,8 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
   private List<Result<String, HttpResponseAttributes>> getItems(InputStream fullResponse, MediaType mediaType,
                                                                 HttpResponseAttributes attributes) {
     if (isJavaPayload(mediaType)) {
-      throw new MuleRuntimeException(createStaticMessage(format("%s is not an accepted media type", APPLICATION_JAVA.toRfcString())));
+      throw new MuleRuntimeException(createStaticMessage(format("%s is not an accepted media type",
+                                                                APPLICATION_JAVA.toRfcString())));
     }
     java.util.Optional<String> itemsExpression = expressions.getSplitExpression();
     Charset charset = mediaType.getCharset().orElse(defaultCharset());
@@ -261,7 +262,7 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
       return singletonList(toResult(response, mediaType, attributes));
     }
     TypedValue<String> typedValue = toTypedValue(response, mediaType, charset);
-    TypedValue<?> result = expressionLanguage.evaluate(itemsExpression.get(), buildContext(typedValue, attributes, null));
+    TypedValue<?> result = expressionLanguage.evaluate(itemsExpression.get(), buildContext(typedValue, attributes, java.util.Optional.empty()));
     List<Result<String, HttpResponseAttributes>> splitted = new ArrayList<>();
     split(expressionLanguage, result, itemsExpression.get()).forEachRemaining(item -> splitted
         .add(toResult(item.getValue().toString(), item.getDataType().getMediaType(), attributes)));
