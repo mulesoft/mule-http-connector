@@ -262,7 +262,8 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
       return singletonList(toResult(response, mediaType, attributes));
     }
     TypedValue<String> typedValue = toTypedValue(response, mediaType, charset);
-    TypedValue<?> result = expressionLanguage.evaluate(itemsExpression.get(), buildContext(typedValue, attributes, java.util.Optional.empty()));
+    TypedValue<?> result =
+        expressionLanguage.evaluate(itemsExpression.get(), buildContext(typedValue, attributes, java.util.Optional.empty()));
     List<Result<String, HttpResponseAttributes>> splitted = new ArrayList<>();
     split(expressionLanguage, result, itemsExpression.get()).forEachRemaining(item -> splitted
         .add(toResult(item.getValue().toString(), item.getDataType().getMediaType(), attributes)));
