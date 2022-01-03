@@ -119,7 +119,6 @@
         </munit:enable-flow-sources>
         <munit:execution>
             <munit-tools:dequeue timeout="20" timeoutUnit="SECONDS" queueName="xml_queue"/>
-            <logger message="#[payload]" level="ERROR"/>
             <set-variable variableName="names" value="#[output text/plain --- payload.name]"/>
             <munit-tools:dequeue timeout="20" timeoutUnit="SECONDS" queueName="xml_queue"/>
             <set-variable variableName="names" value="#[output text/plain --- vars.names ++ payload.name]"/>
