@@ -60,7 +60,7 @@
 
     <flow name="textListenerFlow">
         <http:listener config-ref="mimeTypeEndpoint" path="/text"/>
-        <set-payload value="#['Hola Don Pepito, Hola Don José']"/>
+        <set-payload value="#[output text/plain --- 'Hola Don Pepito, Hola Don José']"/>
     </flow>
 
     <flow name="textPollingFlow">
@@ -97,6 +97,9 @@
         <http:listener config-ref="mimeTypeEndpoint" path="/xml"/>
         <set-payload
                 value="#[output application/xml --- {'something': {'element': [{name: 'Maks'}, {name: 'Franek'}, {name: 'Jola'}]}}]"/>
+        <foreach collection="#[payload.something]">
+            <logger message="#[payload]" level="ERROR"/>
+        </foreach>
     </flow>
 
     <flow name="xmlPollingFlow">
