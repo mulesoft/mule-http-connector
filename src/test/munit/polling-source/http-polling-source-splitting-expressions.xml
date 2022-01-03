@@ -105,7 +105,7 @@
                 <fixed-frequency frequency="10" timeUnit="SECONDS"/>
             </scheduling-strategy>
             <http:split-expression>
-                <![CDATA[#[output application/json --- payload.something.*element]]]></http:split-expression>
+                <![CDATA[#[payload.something.*element]]]></http:split-expression>
         </http:polling-source>
         <munit-tools:queue queueName="xml_queue">
             <munit-tools:value>#[payload]</munit-tools:value>
@@ -118,12 +118,13 @@
             <munit:enable-flow-source value="xmlPollingFlow"/>
         </munit:enable-flow-sources>
         <munit:execution>
-            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="xml_queue"/>
-            <set-variable variableName="names" value="#[payload.name]"/>
-            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="xml_queue"/>
-            <set-variable variableName="names" value="#[vars.names ++ payload.name]"/>
-            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="xml_queue"/>
-            <set-variable variableName="names" value="#[vars.names ++ payload.name]"/>
+            <munit-tools:dequeue timeout="20" timeoutUnit="SECONDS" queueName="xml_queue"/>
+            <logger message="#[payload]" level="ERROR"/>
+            <set-variable variableName="names" value="#[output text/plain --- payload.name]"/>
+            <munit-tools:dequeue timeout="20" timeoutUnit="SECONDS" queueName="xml_queue"/>
+            <set-variable variableName="names" value="#[output text/plain --- vars.names ++ payload.name]"/>
+            <munit-tools:dequeue timeout="20" timeoutUnit="SECONDS" queueName="xml_queue"/>
+            <set-variable variableName="names" value="#[output text/plain --- vars.names ++ payload.name]"/>
         </munit:execution>
         <munit:validation>
             <munit-tools:assert-that expression="#[vars.names]" is="#[MunitTools::containsString('Maks')]"/>
