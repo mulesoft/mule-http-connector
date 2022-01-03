@@ -11,7 +11,6 @@ import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Collections.singletonList;
 import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST;
 import static org.mule.extension.http.internal.request.HttpRequestUtils.createHttpRequester;
-import static org.mule.extension.http.internal.request.SplitUtils.split;
 import static org.mule.extension.http.internal.request.UriUtils.buildPath;
 import static org.mule.extension.http.internal.request.UriUtils.resolveUri;
 import static org.mule.extension.http.internal.request.UriUtils.replaceUriParams;
@@ -262,11 +261,10 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
       return singletonList(toResult(response, mediaType, attributes));
     }
     TypedValue<String> typedValue = toTypedValue(response, mediaType, charset);
-    TypedValue<?> result =
-        expressionLanguage.evaluate(itemsExpression.get(), buildContext(typedValue, attributes, java.util.Optional.empty()));
     List<Result<String, HttpResponseAttributes>> splitted = new ArrayList<>();
-    split(expressionLanguage, result, itemsExpression.get()).forEachRemaining(item -> splitted
-        .add(toResult(item.getValue().toString(), item.getDataType().getMediaType(), attributes)));
+    expressionLanguage.split(itemsExpression.get(), buildContext(typedValue, attributes, java.util.Optional.empty()))
+        .forEachRemaining(item -> splitted
+            .add(toResult(item.getValue().toString(), item.getDataType().getMediaType(), attributes)));
     return splitted;
   }
 
