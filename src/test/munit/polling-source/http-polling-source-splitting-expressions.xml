@@ -45,16 +45,16 @@
         </munit:enable-flow-sources>
         <munit:execution>
             <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="json_queue"/>
-            <set-variable variableName="firstName" value="#[payload.name]"/>
+            <set-variable variableName="names" value="#[payload.name]"/>
             <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="json_queue"/>
-            <set-variable variableName="secondName" value="#[payload.name]"/>
+            <set-variable variableName="names" value="#[vars.names ++ payload.name]"/>
             <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="json_queue"/>
-            <set-variable variableName="thirdName" value="#[payload.name]"/>
+            <set-variable variableName="names" value="#[vars.names ++ payload.name]"/>
         </munit:execution>
         <munit:validation>
-            <munit-tools:assert-that expression="#[vars.firstName]" is="#[MunitTools::equalTo('Adam')]"/>
-            <munit-tools:assert-that expression="#[vars.secondName]" is="#[MunitTools::equalTo('Maks')]"/>
-            <munit-tools:assert-that expression="#[vars.thirdName]" is="#[MunitTools::equalTo('Franek')]"/>
+            <munit-tools:assert-that expression="#[vars.names]" is="#[MunitTools::containsString('Adam')]"/>
+            <munit-tools:assert-that expression="#[vars.names]" is="#[MunitTools::containsString('Maks')]"/>
+            <munit-tools:assert-that expression="#[vars.names]" is="#[MunitTools::containsString('Franek')]"/>
         </munit:validation>
     </munit:test>
 
@@ -82,13 +82,13 @@
         </munit:enable-flow-sources>
         <munit:execution>
             <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="text_queue"/>
-            <set-variable variableName="firstGreeting" value="#[payload]"/>
+            <set-variable variableName="text" value="#[payload]"/>
             <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="text_queue"/>
-            <set-variable variableName="secondGreeting" value="#[payload]"/>
+            <set-variable variableName="text" value="#[vars.text ++ payload]"/>
         </munit:execution>
         <munit:validation>
-            <munit-tools:assert-that expression="#[vars.firstGreeting]" is="#[MunitTools::equalTo('Hola Don Pepito')]"/>
-            <munit-tools:assert-that expression="#[vars.secondGreeting]" is="#[MunitTools::equalTo('Hola Don José')]"/>
+            <munit-tools:assert-that expression="#[vars.text]" is="#[MunitTools::containsString('Hola Don Pepito')]"/>
+            <munit-tools:assert-that expression="#[vars.text]" is="#[MunitTools::containsString('Hola Don José')]"/>
         </munit:validation>
     </munit:test>
 
@@ -97,9 +97,6 @@
         <http:listener config-ref="mimeTypeEndpoint" path="/xml"/>
         <set-payload
                 value="#[output application/xml --- {'something': {'element': [{name: 'Maks'}, {name: 'Franek'}, {name: 'Jola'}]}}]"/>
-        <foreach collection="#[payload.something]">
-            <logger message="#[payload]" level="ERROR"/>
-        </foreach>
     </flow>
 
     <flow name="xmlPollingFlow">
@@ -122,16 +119,16 @@
         </munit:enable-flow-sources>
         <munit:execution>
             <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="xml_queue"/>
-            <set-variable variableName="firstName" value="#[payload.name]"/>
+            <set-variable variableName="names" value="#[payload.name]"/>
             <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="xml_queue"/>
-            <set-variable variableName="secondName" value="#[payload.name]"/>
+            <set-variable variableName="names" value="#[vars.names ++ payload.name]"/>
             <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="xml_queue"/>
-            <set-variable variableName="thirdName" value="#[payload.name]"/>
+            <set-variable variableName="names" value="#[vars.names ++ payload.name]"/>
         </munit:execution>
         <munit:validation>
-            <munit-tools:assert-that expression="#[vars.firstName]" is="#[MunitTools::equalTo('Maks')]"/>
-            <munit-tools:assert-that expression="#[vars.secondName]" is="#[MunitTools::equalTo('Franek')]"/>
-            <munit-tools:assert-that expression="#[vars.thirdName]" is="#[MunitTools::equalTo('Jola')]"/>
+            <munit-tools:assert-that expression="#[vars.names]" is="#[MunitTools::containsString('Maks')]"/>
+            <munit-tools:assert-that expression="#[vars.names]" is="#[MunitTools::containsString('Franek')]"/>
+            <munit-tools:assert-that expression="#[vars.names]" is="#[MunitTools::containsString('Jola')]"/>
         </munit:validation>
     </munit:test>
 
@@ -160,16 +157,16 @@
         </munit:enable-flow-sources>
         <munit:execution>
             <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="csv_queue"/>
-            <set-variable variableName="firstName" value="#[payload.alias]"/>
+            <set-variable variableName="alias" value="#[payload.alias]"/>
             <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="csv_queue"/>
-            <set-variable variableName="secondName" value="#[payload.alias]"/>
+            <set-variable variableName="alias" value="#[vars.alias ++ payload.alias]"/>
             <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="csv_queue"/>
-            <set-variable variableName="thirdName" value="#[payload.alias]"/>
+            <set-variable variableName="alias" value="#[vars.alias ++ payload.alias]"/>
         </munit:execution>
         <munit:validation>
-            <munit-tools:assert-that expression="#[vars.firstName]" is="#[MunitTools::equalTo('Rodro')]"/>
-            <munit-tools:assert-that expression="#[vars.secondName]" is="#[MunitTools::equalTo('Eze')]"/>
-            <munit-tools:assert-that expression="#[vars.thirdName]" is="#[MunitTools::equalTo('Steve')]"/>
+            <munit-tools:assert-that expression="#[vars.alias]" is="#[MunitTools::containsString('Rodro')]"/>
+            <munit-tools:assert-that expression="#[vars.alias]" is="#[MunitTools::containsString('Eze')]"/>
+            <munit-tools:assert-that expression="#[vars.alias]" is="#[MunitTools::containsString('Steve')]"/>
         </munit:validation>
     </munit:test>
 
@@ -197,13 +194,13 @@
         </munit:enable-flow-sources>
         <munit:execution>
             <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="yaml_queue"/>
-            <set-variable variableName="firstName" value="#[payload.name]"/>
+            <set-variable variableName="names" value="#[payload.name]"/>
             <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="yaml_queue"/>
-            <set-variable variableName="secondName" value="#[payload.name]"/>
+            <set-variable variableName="names" value="#[vars.names ++ payload.name]"/>
         </munit:execution>
         <munit:validation>
-            <munit-tools:assert-that expression="#[vars.firstName]" is="#[MunitTools::equalTo('Fernando')]"/>
-            <munit-tools:assert-that expression="#[vars.secondName]" is="#[MunitTools::equalTo('Julia')]"/>
+            <munit-tools:assert-that expression="#[vars.names]" is="#[MunitTools::containsString('Fernando')]"/>
+            <munit-tools:assert-that expression="#[vars.names]" is="#[MunitTools::containsString('Julia')]"/>
         </munit:validation>
     </munit:test>
 
@@ -280,13 +277,13 @@
         </munit:enable-flow-sources>
         <munit:execution>
             <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="multipart_queue"/>
-            <set-variable variableName="first" value="#[payload.author]"/>
+            <set-variable variableName="authors" value="#[payload.author]"/>
             <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="multipart_queue"/>
-            <set-variable variableName="second" value="#[payload.author]"/>
+            <set-variable variableName="authors" value="#[vars.authors ++ payload.author]"/>
         </munit:execution>
         <munit:validation>
-            <munit-tools:assert-that expression="#[vars.first]" is="#[MunitTools::equalTo('Mario Fusco')]"/>
-            <munit-tools:assert-that expression="#[vars.second]" is="#[MunitTools::equalTo('Jan Kucharzewski')]"/>
+            <munit-tools:assert-that expression="#[vars.authors]" is="#[MunitTools::containsString('Mario Fusco')]"/>
+            <munit-tools:assert-that expression="#[vars.authors]" is="#[MunitTools::containsString('Jan Kucharzewski')]"/>
         </munit:validation>
     </munit:test>
 
@@ -321,13 +318,13 @@
         </munit:enable-flow-sources>
         <munit:execution>
             <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="headers_queue"/>
-            <set-variable variableName="firstName" value="#[payload.name]"/>
+            <set-variable variableName="names" value="#[payload.name]"/>
             <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="headers_queue"/>
-            <set-variable variableName="secondName" value="#[payload.name]"/>
+            <set-variable variableName="names" value="#[vars.names ++ payload.name]"/>
         </munit:execution>
         <munit:validation>
-            <munit-tools:assert-that expression="#[vars.firstName]" is="#[MunitTools::equalTo('Adam value1')]"/>
-            <munit-tools:assert-that expression="#[vars.secondName]" is="#[MunitTools::equalTo('Jola value2')]"/>
+            <munit-tools:assert-that expression="#[vars.names]" is="#[MunitTools::containsString('Adam value1')]"/>
+            <munit-tools:assert-that expression="#[vars.names]" is="#[MunitTools::containsString('Jola value2')]"/>
         </munit:validation>
     </munit:test>
 
