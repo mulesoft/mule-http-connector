@@ -8,7 +8,7 @@ package org.mule.extension.http.internal.request;
 
 import static java.lang.String.format;
 import static java.nio.charset.Charset.defaultCharset;
-import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
 import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST;
 import static org.mule.extension.http.internal.request.HttpRequestUtils.createHttpRequester;
 import static org.mule.extension.http.internal.request.UriUtils.buildPath;
@@ -43,6 +43,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.transformation.TransformationService;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -68,8 +69,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.List;
+import java.util.HashMap;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @Alias("pollingSource")
 @org.mule.runtime.extension.api.annotation.param.MediaType(value = org.mule.runtime.extension.api.annotation.param.MediaType.ANY,
@@ -181,8 +185,14 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
           public void success(Result<InputStream, HttpResponseAttributes> result) {
             HttpResponseAttributes attributes = result.getAttributes().orElse(null);
             MediaType mediaType = result.getMediaType().orElse(ANY);
-            for (Result<String, HttpResponseAttributes> item : getItems(result.getOutput(), mediaType, attributes)) {
+            Reference<Boolean> atLeastOneResult = new Reference<>(false);
+            getItems(result.getOutput(), mediaType, attributes).forEach(item -> {
+              atLeastOneResult.set(true);
               pollContext.accept(getPollingItemConsumer(item));
+            });
+
+            if (!atLeastOneResult.get()) {
+              LOGGER.info("Empty result in HTTP Polling Source at {} of uri {}", location.getRootContainerName(), resolvedUri);
             }
           }
 
@@ -246,8 +256,8 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
     return mediaType.equals(APPLICATION_JAVA.withCharset(mediaType.getCharset().orElse(null)));
   }
 
-  private List<Result<String, HttpResponseAttributes>> getItems(InputStream fullResponse, MediaType mediaType,
-                                                                HttpResponseAttributes attributes) {
+  private Stream<Result<String, HttpResponseAttributes>> getItems(InputStream fullResponse, MediaType mediaType,
+                                                                  HttpResponseAttributes attributes) {
     if (isJavaPayload(mediaType)) {
       throw new MuleRuntimeException(createStaticMessage(format("%s is not an accepted media type",
                                                                 APPLICATION_JAVA.toRfcString())));
@@ -258,14 +268,14 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
     LOGGER.debug("Received response at {}: {} and headers {}", location.getRootContainerName(), response,
                  attributes.getHeaders());
     if (!itemsExpression.isPresent()) {
-      return singletonList(toResult(response, mediaType, attributes));
+      return Stream.of(toResult(response, mediaType, attributes));
     }
+
     TypedValue<String> typedValue = toTypedValue(response, mediaType, charset);
-    List<Result<String, HttpResponseAttributes>> splitted = new ArrayList<>();
-    expressionLanguage.split(itemsExpression.get(), buildContext(typedValue, attributes, java.util.Optional.empty()))
-        .forEachRemaining(item -> splitted
-            .add(toResult(item.getValue().toString(), item.getDataType().getMediaType(), attributes)));
-    return splitted;
+    Iterable<TypedValue<?>> splitted =
+        () -> expressionLanguage.split(itemsExpression.get(), buildContext(typedValue, attributes, empty()));
+    return StreamSupport.stream(splitted.spliterator(), false)
+        .map(item -> toResult(item.getValue().toString(), item.getDataType().getMediaType(), attributes));
   }
 
 }
