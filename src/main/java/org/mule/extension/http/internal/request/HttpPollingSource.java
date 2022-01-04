@@ -192,7 +192,7 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
             });
 
             if (!atLeastOneResult.get()) {
-              LOGGER.info("Empty result in HTTP Polling Source at {} of uri {}", location.getRootContainerName(), resolvedUri);
+              LOGGER.debug("Empty result in HTTP Polling Source at {} of uri {}", location.getRootContainerName(), resolvedUri);
             }
           }
 
