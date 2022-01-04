@@ -34,7 +34,7 @@
                 <set-payload value="#[output application/json --- {'items': [{'name': 'Paulina'}, {'name': 'Philip'}], 'wm': 2}]"/>
             </when>
             <otherwise>
-                <set-payload value="#[output application/json --- {'items': [], 'wm': 2}]"/>
+                <set-payload value="#[output application/json --- {'items': [], 'wm': 3}]"/>
             </otherwise>
         </choice>
     </flow>
@@ -63,19 +63,19 @@
             <munit:enable-flow-source value="watermarkInPayloadPollingFlow"/>
         </munit:enable-flow-sources>
         <munit:execution>
-            <munit-tools:dequeue timeout="10" timeoutUnit="SECONDS" queueName="watermark_payload_queue"/>
+            <munit-tools:dequeue timeout="1" timeoutUnit="SECONDS" queueName="watermark_payload_queue"/>
             <set-variable variableName="names" value="#[payload.name]"/>
-            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="watermark_payload_queue"/>
+            <munit-tools:dequeue timeout="1" timeoutUnit="SECONDS" queueName="watermark_payload_queue"/>
             <set-variable variableName="names" value="#[vars.names ++ payload.name]"/>
-            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="watermark_payload_queue"/>
+            <munit-tools:dequeue timeout="1" timeoutUnit="SECONDS" queueName="watermark_payload_queue"/>
             <set-variable variableName="names" value="#[vars.names ++ payload.name]"/>
-            <munit-tools:dequeue timeout="10" timeoutUnit="SECONDS" queueName="watermark_payload_queue"/>
+            <munit-tools:dequeue timeout="1" timeoutUnit="SECONDS" queueName="watermark_payload_queue"/>
             <set-variable variableName="names" value="#[vars.names ++ payload.name]"/>
-            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="watermark_payload_queue"/>
+            <munit-tools:dequeue timeout="1" timeoutUnit="SECONDS" queueName="watermark_payload_queue"/>
             <set-variable variableName="names" value="#[vars.names ++ payload.name]"/>
-            <munit-tools:dequeue timeout="10" timeoutUnit="SECONDS" queueName="watermark_payload_queue"/>
+            <munit-tools:dequeue timeout="1" timeoutUnit="SECONDS" queueName="watermark_payload_queue"/>
             <set-variable variableName="names" value="#[vars.names ++ payload.name]"/>
-            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="watermark_payload_queue"/>
+            <munit-tools:dequeue timeout="1" timeoutUnit="SECONDS" queueName="watermark_payload_queue"/>
             <set-variable variableName="names" value="#[vars.names ++ payload.name]"/>
         </munit:execution>
         <munit:validation>

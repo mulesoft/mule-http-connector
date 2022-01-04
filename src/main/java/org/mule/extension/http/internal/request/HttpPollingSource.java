@@ -45,6 +45,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.api.util.Reference;
+import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -199,9 +200,17 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
     };
   }
 
-  private void sendRequest(PollContext<String, HttpResponseAttributes> pollContext) {
+  private void sendRequest(PollContext<String, HttpResponseAttributes> pollContext) throws InterruptedException {
     Serializable currentWatermark = pollContext.getWatermark().orElse(null);
     requestBuilder.updateRequestBody(body -> resolveRequestBody(body, currentWatermark));
+
+    // We need a latch to prevent this method to finish before all the items are processed. Since we are making
+    // an HTTP request, the callback is going to be executed asynchronously, which will make the poll method
+    // to finish before the watermark is set. The watermark updates are performed as soon as that method finishes,
+    // so without this the callbacks aren't called, and the watermark are not updated, needing two iteration to
+    // perform the actual update. This should be documented (both the explanation and this solution, TODO DOCS-12961)
+    Latch allResultsProcessed = new Latch();
+
     CompletionCallback<InputStream, HttpResponseAttributes> callback =
         new CompletionCallback<InputStream, HttpResponseAttributes>() {
 
@@ -220,12 +229,14 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
             if (!atLeastOneResult.get()) {
               LOGGER.debug("Empty result in HTTP Polling Source at {} of uri {}", location.getRootContainerName(), resolvedUri);
             }
+            allResultsProcessed.release();
           }
 
           @Override
           public void error(Throwable throwable) {
             LOGGER.error("There was an error in HTTP Polling Source at {} of uri '{}'", location.getRootContainerName(),
                          resolvedUri, throwable);
+            allResultsProcessed.release();
           }
         };
 
@@ -240,6 +251,8 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
                    e.getMessage(), e);
     }
 
+    allResultsProcessed.await();
+
   }
 
   @Override
@@ -248,7 +261,11 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
       return;
     }
 
-    sendRequest(pollContext);
+    try {
+      sendRequest(pollContext);
+    } catch (InterruptedException e) {
+      // do nothing
+    }
   }
 
   @Override
