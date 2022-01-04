@@ -84,9 +84,9 @@
             <set-variable variableName="names" value="#[vars.names ++ payload.alias]"/>
         </munit:execution>
         <munit:validation>
-            <munit-tools:assert-that expression="#[vars.firstName]" is="#[MunitTools::containsString('Rodro')]"/>
-            <munit-tools:assert-that expression="#[vars.secondName]" is="#[MunitTools::containsString('Eze')]"/>
-            <munit-tools:assert-that expression="#[vars.thirdName]" is="#[MunitTools::containsString('Steve')]"/>
+            <munit-tools:assert-that expression="#[vars.names]" is="#[MunitTools::containsString('Rodro')]"/>
+            <munit-tools:assert-that expression="#[vars.names]" is="#[MunitTools::containsString('Eze')]"/>
+            <munit-tools:assert-that expression="#[vars.names]" is="#[MunitTools::containsString('Steve')]"/>
         </munit:validation>
     </munit:test>
 
