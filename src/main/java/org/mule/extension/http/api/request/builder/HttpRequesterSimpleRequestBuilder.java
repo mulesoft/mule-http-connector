@@ -11,10 +11,11 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableList;
 import static org.mule.extension.http.internal.request.KeyValuePairUtils.toMultiMap;
+import static org.mule.extension.http.internal.request.LiteralExpressionUtils.resolveLiteralExpression;
 import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
 
 import org.mule.extension.http.internal.request.HttpRequesterConfig;
-import org.mule.extension.http.internal.request.UriUtils;
+import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -25,9 +26,9 @@ import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 /**
  * Component that specifies how to create a proper HTTP simple request, that can be used in a Polling Source
@@ -44,9 +45,6 @@ public class HttpRequesterSimpleRequestBuilder implements HttpRequestBuilderConf
   @Text
   @DisplayName("Body")
   private Literal<String> requestBody;
-
-  // Since the requestBody could be an expression that has to be resolved
-  private String resolvedBody;
 
   /**
    * HTTP headers the message should include.
@@ -75,23 +73,25 @@ public class HttpRequesterSimpleRequestBuilder implements HttpRequestBuilderConf
   @DisplayName("Query Parameters")
   private List<QueryParam> requestQueryParams = emptyList();
 
+  private ExpressionLanguage expressionLanguage;
+  private Serializable watermark;
+
   public String getRequestBody() {
-    if (resolvedBody == null) {
-      resolvedBody = requestBody.getLiteralValue().orElse("");
-    }
-    return resolvedBody;
+    return resolveLiteralExpression(requestBody, expressionLanguage, watermark);
   }
 
-  public void updateRequestBody(Function<String, String> update) {
-    this.resolvedBody = update.apply(requestBody.getLiteralValue().orElse(""));
+  public void updateWatermark(Serializable watermark) {
+    this.watermark = watermark;
+    this.requestHeaders.forEach(header -> header.updateWatermark(watermark));
+  }
+
+  public void setExpressionLanguage(ExpressionLanguage expressionLanguage) {
+    this.expressionLanguage = expressionLanguage;
+    this.requestHeaders.forEach(header -> header.setExpressionLanguage(expressionLanguage));
   }
 
   public List<SimpleRequestHeader> getRequestHeaders() {
     return unmodifiableList(requestHeaders);
-  }
-
-  protected void setRequestHeaders(List<SimpleRequestHeader> headers) {
-    this.requestHeaders = headers != null ? headers : emptyList();
   }
 
   public List<QueryParam> getRequestQueryParams() {
@@ -102,28 +102,11 @@ public class HttpRequesterSimpleRequestBuilder implements HttpRequestBuilderConf
     return unmodifiableMap(requestUriParams);
   }
 
-  protected void setRequestQueryParams(List<QueryParam> queryParams) {
-    this.requestQueryParams = queryParams;
-  }
-
-  protected void setRequestUriParams(Map<String, String> uriParams) {
-    this.requestUriParams = uriParams;
-  }
-
   @Override
   public HttpRequestBuilder toHttpRequestBuilder(HttpRequesterConfig config) {
     return HttpRequest.builder(PRESERVE_HEADER_CASE || config.isPreserveHeadersCase())
         .headers(toMultiMap(getRequestHeaders()))
         .queryParams(toMultiMap(getRequestQueryParams()));
-  }
-
-  public HttpRequesterRequestBuilder toHttpRequesterRequestBuilder() {
-    HttpRequesterRequestBuilder builder = new HttpRequesterRequestBuilder();
-    builder.setBody(TypedValue.of(requestBody));
-    builder.setUriParams(requestUriParams);
-    builder.setQueryParams(toMultiMap(requestQueryParams));
-    builder.setHeaders(toMultiMap(requestHeaders));
-    return builder;
   }
 
   @Override

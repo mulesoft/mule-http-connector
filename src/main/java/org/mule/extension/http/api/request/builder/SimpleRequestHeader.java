@@ -6,10 +6,16 @@
  */
 package org.mule.extension.http.api.request.builder;
 
+import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.runtime.parameter.Literal;
 
+import javax.inject.Inject;
+import java.io.Serializable;
 import java.util.Objects;
+
+import static org.mule.extension.http.internal.request.LiteralExpressionUtils.resolveLiteralExpression;
 
 /**
  * Represents an HTTP Header
@@ -23,7 +29,10 @@ public class SimpleRequestHeader implements KeyValuePair {
   private String key;
 
   @Parameter
-  private String value;
+  private Literal<String> value;
+
+  private ExpressionLanguage expressionLanguage;
+  private Serializable watermark;
 
   @Override
   public String getKey() {
@@ -32,7 +41,15 @@ public class SimpleRequestHeader implements KeyValuePair {
 
   @Override
   public String getValue() {
-    return value;
+    return resolveLiteralExpression(value, expressionLanguage, watermark);
+  }
+
+  public void setExpressionLanguage(ExpressionLanguage expressionLanguage) {
+    this.expressionLanguage = expressionLanguage;
+  }
+
+  public void updateWatermark(Serializable watermark) {
+    this.watermark = watermark;
   }
 
   @Override

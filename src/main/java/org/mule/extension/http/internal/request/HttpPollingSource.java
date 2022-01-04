@@ -89,10 +89,10 @@ import java.util.stream.StreamSupport;
 public class HttpPollingSource extends PollingSource<String, HttpResponseAttributes> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HttpPollingSource.class);
-  private static final String PAYLOAD_PLACEGHOLDER = "payload";
-  private static final String ITEM_PLACEGHOLDER = "item";
-  private static final String ATTRIBUTES_PLACEGHOLDER = "attributes";
-  private static final String WATERMARK_PLACEGHOLDER = "watermark";
+  public static final String PAYLOAD_PLACEGHOLDER = "payload";
+  public static final String ITEM_PLACEGHOLDER = "item";
+  public static final String ATTRIBUTES_PLACEGHOLDER = "attributes";
+  public static final String WATERMARK_PLACEGHOLDER = "watermark";
 
   @Connection
   private ConnectionProvider<HttpExtensionClient> clientProvider;
@@ -170,6 +170,7 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
     client = clientProvider.connect();
     httpRequester = createHttpRequester(false, muleContext);
     resolvedUri = getResolvedUri();
+    requestBuilder.setExpressionLanguage(expressionLanguage);
   }
 
   @Override
@@ -202,7 +203,7 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
 
   private void sendRequest(PollContext<String, HttpResponseAttributes> pollContext) throws InterruptedException {
     Serializable currentWatermark = pollContext.getWatermark().orElse(null);
-    requestBuilder.updateRequestBody(body -> resolveRequestBody(body, currentWatermark));
+    requestBuilder.updateWatermark(currentWatermark);
 
     // We need a latch to prevent this method to finish before all the items are processed. Since we are making
     // an HTTP request, the callback is going to be executed asynchronously, which will make the poll method
@@ -343,19 +344,6 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
     return expressionLanguage
         .evaluate(idExpression, STRING,
                   buildContext(Optional.of(payload), item.getAttributes(), currentWatermark, Optional.of(item.getOutput())));
-  }
-
-  private String resolveRequestBody(String body, Serializable watermark) {
-    if (isExpression(body)) {
-      return expressionLanguage.evaluate(body, buildContext(empty(), empty(), watermark, empty())).getValue().toString();
-    } else {
-      return body;
-    }
-  }
-
-  private boolean isExpression(String exp) {
-    String trimmedExp = exp.trim();
-    return trimmedExp.startsWith("#[") && trimmedExp.endsWith("]");
   }
 
 }
