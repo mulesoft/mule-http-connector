@@ -71,7 +71,7 @@ public class HttpRequesterSimpleRequestBuilder implements HttpRequestBuilderConf
   @Optional
   @NullSafe
   @DisplayName("Query Parameters")
-  private List<QueryParam> requestQueryParams = emptyList();
+  private List<SimpleQueryParam> requestQueryParams = emptyList();
 
   private ExpressionLanguage expressionLanguage;
   private Serializable watermark;
@@ -83,18 +83,20 @@ public class HttpRequesterSimpleRequestBuilder implements HttpRequestBuilderConf
   public void updateWatermark(Serializable watermark) {
     this.watermark = watermark;
     this.requestHeaders.forEach(header -> header.updateWatermark(watermark));
+    this.requestQueryParams.forEach(queryParam -> queryParam.updateWatermark(watermark));
   }
 
   public void setExpressionLanguage(ExpressionLanguage expressionLanguage) {
     this.expressionLanguage = expressionLanguage;
     this.requestHeaders.forEach(header -> header.setExpressionLanguage(expressionLanguage));
+    this.requestQueryParams.forEach(queryParam -> queryParam.setExpressionLanguage(expressionLanguage));
   }
 
   public List<SimpleRequestHeader> getRequestHeaders() {
     return unmodifiableList(requestHeaders);
   }
 
-  public List<QueryParam> getRequestQueryParams() {
+  public List<SimpleQueryParam> getRequestQueryParams() {
     return unmodifiableList(requestQueryParams);
   }
 

@@ -18,21 +18,21 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * Represents an HTTP Header
+ * Represents an HTTP Query Parameter
  *
  * @since 1.7
  */
-@Alias("requestHeader")
-public class SimpleRequestHeader implements KeyValuePair {
+@Alias("requestQueryParam")
+public class SimpleQueryParam implements KeyValuePair {
 
   /**
-   * Represents the Key of this HTTP Header
+   * Represents the Key of this HTTP Query Parameter
    */
   @Parameter
   private String key;
 
   /**
-   * Represents the Value of this HTTP Header, that could be an expression depending on a watermarking value
+   * Represents the Value of this HTTP Query Parameter, that could be an expression depending on a watermarking value
    * that would be then resolved
    */
   @Parameter
@@ -67,14 +67,12 @@ public class SimpleRequestHeader implements KeyValuePair {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    SimpleRequestHeader that = (SimpleRequestHeader) o;
-    return Objects.equals(key, that.key) &&
-        Objects.equals(value, that.value);
+    SimpleQueryParam that = (SimpleQueryParam) o;
+    return Objects.equals(key, that.key) && Objects.equals(value, that.value);
   }
 
   @Override
   public int hashCode() {
     return hash(key, value);
   }
-
 }

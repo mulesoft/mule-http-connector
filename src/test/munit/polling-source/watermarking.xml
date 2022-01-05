@@ -301,6 +301,74 @@
         </munit:validation>
     </munit:test>
 
+    <flow name="watermarkIntoQueryParamsListenerFlow">
+        <http:listener config-ref="watermarkListenerConfig" path="/watermark-into-query"/>
+        <choice>
+            <when expression="#[attributes.queryParams.watermark == '0']">
+                <set-payload value="#[output application/json --- {'items': [{'name': 'Adam'}, {'name': 'Maks'}, {'name': 'Franek'}], 'wm': 1}]"/>
+            </when>
+            <when expression="#[attributes.queryParams.watermark == '1']">
+                <set-payload value="#[output application/json --- {'items': [{'name': 'Antonina'}, {'name': 'Jola'}], 'wm': 2}]"/>
+            </when>
+            <when expression="#[attributes.queryParams.watermark == '2']">
+                <set-payload value="#[output application/json --- {'items': [{'name': 'Paulina'}, {'name': 'Philip'}], 'wm': 3}]"/>
+            </when>
+            <otherwise>
+                <set-payload value="#[output application/json --- {'items': [], 'wm': 4}]"/>
+            </otherwise>
+        </choice>
+    </flow>
+
+    <flow name="watermarkIntoQueryParamsPollingFlow">
+        <http:polling-source config-ref="watermarkRequestConfig" path="watermark-into-query">
+            <scheduling-strategy>
+                <fixed-frequency frequency="1" timeUnit="SECONDS"/>
+            </scheduling-strategy>
+            <http:request-query-params >
+                <http:request-query-param key="watermark" value="#[watermark default 0]" />
+            </http:request-query-params>
+            <http:split-expression><![CDATA[#[output application/json --- payload.items]]]></http:split-expression>
+            <http:watermark-expression><![CDATA[#[payload.wm]]]></http:watermark-expression>
+            <http:id-expression><![CDATA[#[item.name]]]></http:id-expression>
+        </http:polling-source>
+        <munit-tools:queue queueName="watermark_into_query_queue">
+            <munit-tools:value>#[payload]</munit-tools:value>
+        </munit-tools:queue>
+    </flow>
+
+    <munit:test name="watermark-into-query-test-case">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="watermarkIntoQueryParamsListenerFlow"/>
+            <munit:enable-flow-source value="watermarkIntoQueryParamsPollingFlow"/>
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <munit-tools:dequeue timeout="1" timeoutUnit="SECONDS" queueName="watermark_into_query_queue"/>
+            <set-variable variableName="names" value="#[payload.name]"/>
+            <munit-tools:dequeue timeout="1" timeoutUnit="SECONDS" queueName="watermark_into_query_queue"/>
+            <set-variable variableName="names" value="#[vars.names ++ payload.name]"/>
+            <munit-tools:dequeue timeout="1" timeoutUnit="SECONDS" queueName="watermark_into_query_queue"/>
+            <set-variable variableName="names" value="#[vars.names ++ payload.name]"/>
+            <munit-tools:dequeue timeout="1" timeoutUnit="SECONDS" queueName="watermark_into_query_queue"/>
+            <set-variable variableName="names" value="#[vars.names ++ payload.name]"/>
+            <munit-tools:dequeue timeout="1" timeoutUnit="SECONDS" queueName="watermark_into_query_queue"/>
+            <set-variable variableName="names" value="#[vars.names ++ payload.name]"/>
+            <munit-tools:dequeue timeout="1" timeoutUnit="SECONDS" queueName="watermark_into_query_queue"/>
+            <set-variable variableName="names" value="#[vars.names ++ payload.name]"/>
+            <munit-tools:dequeue timeout="1" timeoutUnit="SECONDS" queueName="watermark_into_query_queue"/>
+            <set-variable variableName="names" value="#[vars.names ++ payload.name]"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[vars.names]" is="#[MunitTools::containsString('Adam')]"/>
+            <munit-tools:assert-that expression="#[vars.names]" is="#[MunitTools::containsString('Maks')]"/>
+            <munit-tools:assert-that expression="#[vars.names]" is="#[MunitTools::containsString('Franek')]"/>
+            <munit-tools:assert-that expression="#[vars.names]" is="#[MunitTools::containsString('Antonina')]"/>
+            <munit-tools:assert-that expression="#[vars.names]" is="#[MunitTools::containsString('Jola')]"/>
+            <munit-tools:assert-that expression="#[vars.names]" is="#[MunitTools::containsString('Paulina')]"/>
+            <munit-tools:assert-that expression="#[vars.names]" is="#[MunitTools::containsString('Philip')]"/>
+        </munit:validation>
+    </munit:test>
+
+
     <flow name="identityListenerFlow">
         <http:listener config-ref="watermarkListenerConfig" path="/identity"/>
         <choice>
