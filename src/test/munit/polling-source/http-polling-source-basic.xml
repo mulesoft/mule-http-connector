@@ -22,8 +22,6 @@
 
     <flow name="targetFlow" >
         <http:listener config-ref="targetEndpoint" path="/test" />
-
-        <logger message="#[payload]" level="ERROR"/>
         <choice>
             <when expression="#[isEmpty(payload)]">
                 <set-payload value="test payload"/>
@@ -47,11 +45,12 @@
                 <set-payload value="#[payload ++ ' - ' ++ message.attributes.uriParams['testUriParam']]"/>
             </when>
         </choice>
+        <set-payload value="#[output text/plain --- payload]"/>
     </flow>
 
     <flow name="targetFlowPost" >
         <http:listener config-ref="targetEndpoint" path="/test-post" allowedMethods="POST"/>
-        <set-payload value="test payload"/>
+        <set-payload value="#[output text/plain --- 'test payload']"/>
     </flow>
 
     <flow name="basic-polling">
@@ -125,7 +124,7 @@
 
     <flow name="some-other-stuff">
         <http:listener config-ref="targetEndpoint" path="/test-body"/>
-        <set-payload value="#[payload]"/>
+        <set-payload value="#[output text/plain --- payload]"/>
     </flow>
 
 
