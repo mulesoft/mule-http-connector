@@ -69,9 +69,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 
+import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -148,6 +150,40 @@ public class HttpRequester {
                        httpRequestFactory.create(config, uri, method, streamingMode, sendBodyMode, transformationService,
                                                  requestBuilder, authentication, injectedHeaders),
                        RETRY_ATTEMPTS, injectedHeaders, correlationId);
+  }
+
+  public CompletableFuture<Result<InputStream, HttpResponseAttributes>> doSyncRequest(HttpExtensionClient client,
+                                                                                      HttpRequesterConfig config, String uri,
+                                                                                      String method,
+                                                                                      HttpStreamingType streamingMode,
+                                                                                      HttpSendBodyMode sendBodyMode,
+                                                                                      boolean followRedirects,
+                                                                                      HttpRequestAuthentication authentication,
+                                                                                      Integer responseTimeout,
+                                                                                      ResponseValidator responseValidator,
+                                                                                      TransformationService transformationService,
+                                                                                      HttpRequestBuilderConfigurer requestBuilder,
+                                                                                      boolean checkRetry, MuleContext muleContext,
+                                                                                      Scheduler scheduler,
+                                                                                      Map<String, List<String>> injectedHeaders) {
+    CompletableFuture<Result<InputStream, HttpResponseAttributes>> future = new CompletableFuture<>();
+    CompletionCallback<InputStream, HttpResponseAttributes> callback =
+        new CompletionCallback<InputStream, HttpResponseAttributes>() {
+
+          @Override
+          public void success(Result<InputStream, HttpResponseAttributes> result) {
+            future.complete(result);
+          }
+
+          @Override
+          public void error(Throwable throwable) {
+            future.completeExceptionally(throwable);
+          }
+        };
+    doRequest(client, config, uri, method, streamingMode, sendBodyMode, followRedirects, authentication, responseTimeout,
+              responseValidator, transformationService, requestBuilder, checkRetry, muleContext, scheduler, null, null, callback,
+              injectedHeaders, null);
+    return future;
   }
 
   private void doRequestWithRetry(HttpExtensionClient client, HttpRequesterConfig config, String uri, String method,

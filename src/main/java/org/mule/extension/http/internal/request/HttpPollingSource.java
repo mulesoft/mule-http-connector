@@ -76,6 +76,7 @@ import java.nio.charset.Charset;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -185,10 +186,6 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
     return resolveUri(uriParameters.getScheme(), uriParameters.getHost().trim(), uriParameters.getPort(), resolvedPath);
   }
 
-  protected String getId() {
-    return getClass().getSimpleName();
-  }
-
   private Consumer<PollContext.PollItem<String, HttpResponseAttributes>> getPollingItemConsumer(TypedValue<String> fullResponse,
                                                                                                 Result<TypedValue<?>, HttpResponseAttributes> item,
                                                                                                 Serializable watermark) {
@@ -201,58 +198,40 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
     };
   }
 
+  private void pollResult(PollContext<String, HttpResponseAttributes> pollContext,
+                          Result<InputStream, HttpResponseAttributes> result, Serializable currentWatermark) {
+    HttpResponseAttributes attributes = result.getAttributes().orElse(null);
+    MediaType mediaType = result.getMediaType().orElse(ANY);
+    Charset charset = mediaType.getCharset().orElse(defaultCharset());
+    TypedValue<String> response = toTypedValue(IOUtils.toString(result.getOutput(), charset), mediaType, charset);
+    Reference<Boolean> atLeastOneResult = new Reference<>(false);
+    getItems(response, attributes, currentWatermark).forEach(item -> {
+      atLeastOneResult.set(true);
+      pollContext.accept(getPollingItemConsumer(response, item, currentWatermark));
+    });
+
+    if (!atLeastOneResult.get()) {
+      LOGGER.debug("Empty result in HTTP Polling Source at {} of uri {}", location.getRootContainerName(), resolvedUri);
+    }
+  }
+
   private void sendRequest(PollContext<String, HttpResponseAttributes> pollContext) throws InterruptedException {
     Serializable currentWatermark = pollContext.getWatermark().orElse(null);
     requestBuilder.updateWatermark(currentWatermark);
 
-    // We need a latch to prevent this method to finish before all the items are processed. Since we are making
-    // an HTTP request, the callback is going to be executed asynchronously, which will make the poll method
-    // to finish before the watermark is set. The watermark updates are performed as soon as that method finishes,
-    // so without this the callbacks aren't called, and the watermark are not updated, needing two iteration to
-    // perform the actual update. This should be documented (both the explanation and this solution, TODO DOCS-12961)
-    Latch allResultsProcessed = new Latch();
-
-    CompletionCallback<InputStream, HttpResponseAttributes> callback =
-        new CompletionCallback<InputStream, HttpResponseAttributes>() {
-
-          @Override
-          public void success(Result<InputStream, HttpResponseAttributes> result) {
-            HttpResponseAttributes attributes = result.getAttributes().orElse(null);
-            MediaType mediaType = result.getMediaType().orElse(ANY);
-            Charset charset = mediaType.getCharset().orElse(defaultCharset());
-            TypedValue<String> response = toTypedValue(IOUtils.toString(result.getOutput(), charset), mediaType, charset);
-            Reference<Boolean> atLeastOneResult = new Reference<>(false);
-            getItems(response, attributes, currentWatermark).forEach(item -> {
-              atLeastOneResult.set(true);
-              pollContext.accept(getPollingItemConsumer(response, item, currentWatermark));
-            });
-
-            if (!atLeastOneResult.get()) {
-              LOGGER.debug("Empty result in HTTP Polling Source at {} of uri {}", location.getRootContainerName(), resolvedUri);
-            }
-            allResultsProcessed.release();
-          }
-
-          @Override
-          public void error(Throwable throwable) {
-            LOGGER.error("There was an error in HTTP Polling Source at {} of uri '{}'", location.getRootContainerName(),
-                         resolvedUri, throwable);
-            allResultsProcessed.release();
-          }
-        };
-
     LOGGER.debug("Sending '{}' request to '{}' in flow '{}'.", method, resolvedUri, location.getRootContainerName());
     try {
-      httpRequester.doRequest(client, config, resolvedUri, method, config.getRequestStreamingMode(), config.getSendBodyMode(),
-                              config.getFollowRedirects(), client.getDefaultAuthentication(), config.getResponseTimeout(),
-                              getResponseValidator(), transformationService, requestBuilder, true, muleContext, scheduler, null,
-                              null, callback, injectedHeaders, null);
-    } catch (MuleRuntimeException e) {
-      LOGGER.error("Trigger '{}': Mule runtime exception found while executing poll to {}: '{}'", getId(), resolvedUri,
-                   e.getMessage(), e);
+      Result<InputStream, HttpResponseAttributes> result =
+          httpRequester.doSyncRequest(client, config, resolvedUri, method, config.getRequestStreamingMode(),
+                                      config.getSendBodyMode(), config.getFollowRedirects(), client.getDefaultAuthentication(),
+                                      config.getResponseTimeout(), getResponseValidator(), transformationService, requestBuilder,
+                                      true, muleContext, scheduler, injectedHeaders)
+              .get();
+      pollResult(pollContext, result, currentWatermark);
+    } catch (ExecutionException e) {
+      LOGGER.error("There was an error in HTTP Polling Source at {} of uri '{}'", location.getRootContainerName(), resolvedUri,
+                   e);
     }
-
-    allResultsProcessed.await();
 
   }
 
