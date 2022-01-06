@@ -17,12 +17,26 @@ import org.mule.runtime.extension.api.runtime.parameter.Literal;
 
 import java.io.Serializable;
 
+/**
+ * Utils to be used regarding resolution of {@link Literal}s
+ *
+ * @since 1.7
+ */
 public final class LiteralExpressionUtils {
 
   private LiteralExpressionUtils() {
     // Empty private constructor to avoid instantiation.
   }
 
+  /**
+   * Resolves the real ({@link String}) value of a {@link Literal}.
+   *
+   * @param toResolve the {@link Literal} to be resolved
+   * @param expressionLanguage
+   * @param watermark the value of the watermark, that could be used in an expression within the {@link Literal}
+   * @return If the {@link Literal}'s value is an expression, returns the value of resolving the expression.
+   * If it is not an expression, then it returns the value as is.
+   */
   public static String resolveLiteralExpression(Literal<String> toResolve, ExpressionLanguage expressionLanguage,
                                                 Serializable watermark) {
     String raw = toResolve.getLiteralValue().orElse("");
