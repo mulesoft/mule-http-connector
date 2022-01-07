@@ -61,7 +61,7 @@
             <munit:enable-flow-source value="watermarkInPayloadPollingFlow"/>
         </munit:enable-flow-sources>
         <munit:execution>
-            <munit-tools:dequeue timeout="10" timeoutUnit="SECONDS" queueName="watermark_payload_queue"/>
+            <munit-tools:dequeue timeout="20" timeoutUnit="SECONDS" queueName="watermark_payload_queue"/>
             <set-variable variableName="names" value="#[payload.name]"/>
             <munit-tools:dequeue timeout="1" timeoutUnit="SECONDS" queueName="watermark_payload_queue"/>
             <set-variable variableName="names" value="#[vars.names ++ payload.name]"/>
