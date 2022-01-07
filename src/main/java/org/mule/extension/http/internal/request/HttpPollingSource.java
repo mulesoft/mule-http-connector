@@ -134,25 +134,25 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
   private String method;
 
   /**
-   * HTTP headers the message should include.
-   */
-  @ParameterGroup(name = REQUEST)
-  @Placement(order = 3)
-  private HttpRequesterSimpleRequestBuilder requestBuilder;
-
-  @ParameterGroup(name = "Expressions")
-  @Placement(order = 4)
-  private HttpPollingSourceExpressions expressions;
-
-  /**
    * Validation applied to the connectivity test response.
    */
   @Parameter
   @Optional
   @DisplayName("Response Validator")
-  @Placement(order = 7)
+  @Placement(order = 3)
   @Expression(NOT_SUPPORTED)
   private ResponseValidator responseValidator;
+
+  /**
+   * HTTP headers the message should include.
+   */
+  @ParameterGroup(name = REQUEST)
+  @Placement(order = 4)
+  private HttpRequesterSimpleRequestBuilder requestBuilder;
+
+  @ParameterGroup(name = "Expressions")
+  @Placement(order = 5)
+  private HttpPollingSourceExpressions expressions;
 
   private SuccessStatusCodeValidator defaultStatusCodeValidator = new SuccessStatusCodeValidator("0..399");
 
