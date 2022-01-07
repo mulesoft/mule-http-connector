@@ -49,7 +49,6 @@
             </http:request-headers>
             <http:split-expression><![CDATA[#[output application/json --- payload.items]]]></http:split-expression>
             <http:watermark-expression><![CDATA[#[payload.wm]]]></http:watermark-expression>
-            <!--http:id-expression><![CDATA[#[item.name]]]></http:id-expression-->
         </http:polling-source>
         <munit-tools:queue queueName="watermark_payload_queue">
             <munit-tools:value>#[payload]</munit-tools:value>
@@ -62,7 +61,7 @@
             <munit:enable-flow-source value="watermarkInPayloadPollingFlow"/>
         </munit:enable-flow-sources>
         <munit:execution>
-            <munit-tools:dequeue timeout="1" timeoutUnit="SECONDS" queueName="watermark_payload_queue"/>
+            <munit-tools:dequeue timeout="10" timeoutUnit="SECONDS" queueName="watermark_payload_queue"/>
             <set-variable variableName="names" value="#[payload.name]"/>
             <munit-tools:dequeue timeout="1" timeoutUnit="SECONDS" queueName="watermark_payload_queue"/>
             <set-variable variableName="names" value="#[vars.names ++ payload.name]"/>
@@ -101,7 +100,7 @@
                 <set-payload value="#[output application/json --- {'items': [{'name': 'Paulina', 'wm': 5}, {'name': 'Philip', 'wm': 6}]}]"/>
             </when>
             <otherwise>
-                <set-payload value="#[output application/json --- {'items': [], 'wm': 7}]"/>
+                <set-payload value="#[output application/json --- {'items': []}]"/>
             </otherwise>
         </choice>
     </flow>
@@ -373,16 +372,16 @@
         <http:listener config-ref="watermarkListenerConfig" path="/identity"/>
         <choice>
             <when expression="#[payload.watermark == null]">
-                <set-payload value="#[output application/json --- {'items': [{'name': 'Adam'}, {'name': 'Maks'}, {'name': 'Franek'}], 'wm': 0}]"/>
+                <set-payload value="#[output application/json --- {'items': [{'name': 'Adam', 'wm': 0}, {'name': 'Maks', 'wm': 1}, {'name': 'Franek', 'wm': 2}]}]"/>
             </when>
-            <when expression="#[payload.watermark == '0']">
-                <set-payload value="#[output application/json --- {'items': [{'name': 'Antonina'}, {'name': 'Jola'}, {'name': 'Franek'}], 'wm': 1}]"/>
+            <when expression="#[payload.watermark == '2']">
+                <set-payload value="#[output application/json --- {'items': [{'name': 'Antonina', 'wm': 3}, {'name': 'Antonina', 'wm': 3}, {'name': 'Franek', 'wm': 2}, {'name': 'Jola', 'wm': 4}]}]"/>
             </when>
-            <when expression="#[payload.watermark == '1']">
-                <set-payload value="#[output application/json --- {'items': [{'name': 'Antonina'}, {'name': 'Paulina'}, {'name': 'Franek'}, {'name': 'Philip'}], 'wm': 2}]"/>
+            <when expression="#[payload.watermark == '4']">
+                <set-payload value="#[output application/json --- {'items': [{'name': 'Antonina', 'wm': 3},{'name': 'Paulina', 'wm': 5}, {'name': 'Franek', 'wm': 2}, {'name': 'Philip', 'wm': 6}]}]"/>
             </when>
             <otherwise>
-                <set-payload value="#[output application/json --- {'items': [], 'wm': 3}]"/>
+                <set-payload value="#[output application/json --- {'items': []}]"/>
             </otherwise>
         </choice>
     </flow>
@@ -397,7 +396,7 @@
                 <http:request-header key="Content-Type" value="application/json" />
             </http:request-headers>
             <http:split-expression><![CDATA[#[output application/json --- payload.items]]]></http:split-expression>
-            <http:watermark-expression><![CDATA[#[payload.wm]]]></http:watermark-expression>
+            <http:watermark-expression><![CDATA[#[item.wm]]]></http:watermark-expression>
             <http:id-expression><![CDATA[#[item.name]]]></http:id-expression>
         </http:polling-source>
         <munit-tools:queue queueName="identity_queue">
@@ -405,7 +404,7 @@
         </munit-tools:queue>
     </flow>
 
-    <munit:test name="identity-test-case" ignore="true">
+    <munit:test name="identity-test-case">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="identityListenerFlow"/>
             <munit:enable-flow-source value="identityPollingFlow"/>
@@ -434,6 +433,57 @@
             <munit-tools:assert-that expression="#[vars.names]" is="#[MunitTools::containsString('Jola')]"/>
             <munit-tools:assert-that expression="#[vars.names]" is="#[MunitTools::containsString('Paulina')]"/>
             <munit-tools:assert-that expression="#[vars.names]" is="#[MunitTools::containsString('Philip')]"/>
+        </munit:validation>
+    </munit:test>
+
+
+    <flow name="identityWithoutWatermarkListenerFlow">
+        <http:listener config-ref="watermarkListenerConfig" path="/identity-no-watermark"/>
+        <set-payload value="#[output application/json --- {'items': [{'name': 'Rodro'}, {'name': 'Eze'}, {'name': 'MG'}]}]"/>
+    </flow>
+
+    <flow name="identityWithoutWatermarkPollingFlow">
+        <http:polling-source config-ref="watermarkRequestConfig" path="identity-no-watermark">
+            <scheduling-strategy>
+                <fixed-frequency frequency="1" timeUnit="SECONDS"/>
+            </scheduling-strategy>
+            <http:split-expression><![CDATA[#[output application/json --- payload.items]]]></http:split-expression>
+            <http:id-expression><![CDATA[#[item.name]]]></http:id-expression>
+        </http:polling-source>
+        <munit-tools:queue queueName="identity_nw_queue">
+            <munit-tools:value>#[payload]</munit-tools:value>
+        </munit-tools:queue>
+        <munit-tools:sleep time="10" timeUnit="SECONDS"/>
+    </flow>
+
+    <munit:test name="identity-no-watermark-test-case">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="identityWithoutWatermarkListenerFlow"/>
+            <munit:enable-flow-source value="identityWithoutWatermarkPollingFlow"/>
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <munit-tools:dequeue timeout="1" timeoutUnit="SECONDS" queueName="identity_nw_queue"/>
+            <set-variable variableName="names" value="#[payload.name]"/>
+            <munit-tools:dequeue timeout="1" timeoutUnit="SECONDS" queueName="identity_nw_queue"/>
+            <set-variable variableName="names" value="#[vars.names ++ payload.name]"/>
+            <munit-tools:dequeue timeout="1" timeoutUnit="SECONDS" queueName="identity_nw_queue"/>
+            <set-variable variableName="names" value="#[vars.names ++ payload.name]"/>
+            <set-variable variableName="failed" value="#[false]"/>
+            <try>
+                <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="identity_nw_queue"/>
+                <error-handler>
+                    <on-error-continue>
+                        <!-- no new messages because they are coming with same ids -->
+                        <set-variable variableName="failed" value="#[true]"/>
+                    </on-error-continue>
+                </error-handler>
+            </try>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[vars.names]" is="#[MunitTools::containsString('Rodro')]"/>
+            <munit-tools:assert-that expression="#[vars.names]" is="#[MunitTools::containsString('Eze')]"/>
+            <munit-tools:assert-that expression="#[vars.names]" is="#[MunitTools::containsString('MG')]"/>
+            <munit-tools:assert-that expression="#[vars.failed]" is="#[MunitTools::equalTo(true)]"/>
         </munit:validation>
     </munit:test>
 

@@ -168,7 +168,9 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
   @Override
   protected void doStop() {
     LOGGER.debug("Stopping HTTP Polling Source in {}", location.getRootContainerName());
-    scheduler.stop();
+    if (scheduler != null) {
+      scheduler.stop();
+    }
   }
 
   private String getResolvedUri() {
