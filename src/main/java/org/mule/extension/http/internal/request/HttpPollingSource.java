@@ -8,7 +8,9 @@ package org.mule.extension.http.internal.request;
 
 import static java.nio.charset.Charset.defaultCharset;
 import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST;
-import static org.mule.extension.http.internal.request.HttpPollingSourceUtils.*;
+import static org.mule.extension.http.internal.request.HttpPollingSourceUtils.getItemId;
+import static org.mule.extension.http.internal.request.HttpPollingSourceUtils.getItems;
+import static org.mule.extension.http.internal.request.HttpPollingSourceUtils.getItemWatermark;
 import static org.mule.extension.http.internal.request.HttpRequestUtils.createHttpRequester;
 import static org.mule.extension.http.internal.request.UriUtils.buildPath;
 import static org.mule.extension.http.internal.request.UriUtils.resolveUri;
