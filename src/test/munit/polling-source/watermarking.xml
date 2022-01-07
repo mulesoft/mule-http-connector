@@ -55,20 +55,13 @@
         </munit-tools:queue>
     </flow>
 
-    <munit:test name="watermark-payload-test-case">
+    <munit:test name="watermark-payload-test-case" >
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="watermarkInPayloadListenerFlow"/>
             <munit:enable-flow-source value="watermarkInPayloadPollingFlow"/>
         </munit:enable-flow-sources>
         <munit:execution>
-
-            <!-- To prevent timeouts on versions prior to 4.3 -->
-            <munit-tools:queue queueName="watermark_payload_queue">
-                <munit-tools:value>#['begins']</munit-tools:value>
-            </munit-tools:queue>
-            <munit-tools:dequeue queueName="watermark_payload_queue"/>
-
-            <munit-tools:dequeue timeout="1" timeoutUnit="SECONDS" queueName="watermark_payload_queue"/>
+            <munit-tools:dequeue timeout="10" timeoutUnit="SECONDS" queueName="watermark_payload_queue"/>
             <set-variable variableName="names" value="#[payload.name]"/>
             <munit-tools:dequeue timeout="1" timeoutUnit="SECONDS" queueName="watermark_payload_queue"/>
             <set-variable variableName="names" value="#[vars.names ++ payload.name]"/>
@@ -411,7 +404,7 @@
         </munit-tools:queue>
     </flow>
 
-    <munit:test name="identity-test-case">
+    <munit:test name="identity-test-case" ignore="#[Munit::muleVersionPriorTo('4.2.0')]">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="identityListenerFlow"/>
             <munit:enable-flow-source value="identityPollingFlow"/>
