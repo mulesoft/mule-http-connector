@@ -231,7 +231,7 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
                    e);
     } catch (InterruptedException e) {
       LOGGER.error("There was an error in HTTP Polling Source at {} of uri '{}'", location.getRootContainerName(), resolvedUri,
-              e);
+                   e);
       currentThread().interrupt();
     }
 
