@@ -15,6 +15,7 @@ import static org.mule.extension.http.internal.request.UriUtils.buildPath;
 import static org.mule.extension.http.internal.request.UriUtils.resolveUri;
 import static org.mule.extension.http.internal.request.UriUtils.replaceUriParams;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
@@ -47,6 +48,7 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -54,6 +56,7 @@ import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.source.BackPressure;
@@ -131,18 +134,31 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
   private String method;
 
   /**
+   * Validation applied to the connectivity test response.
+   */
+  @Parameter
+  @Optional
+  @DisplayName("Response Validator")
+  @Placement(order = 3)
+  @Expression(NOT_SUPPORTED)
+  private ResponseValidator responseValidator;
+
+  /**
    * HTTP headers the message should include.
    */
   @ParameterGroup(name = REQUEST)
-  @Placement(order = 3)
+  @Placement(order = 4)
   private HttpRequesterSimpleRequestBuilder requestBuilder;
 
   @ParameterGroup(name = "Expressions")
-  @Placement(order = 4)
+  @Placement(order = 5)
   private HttpPollingSourceExpressions expressions;
 
-  // TODO (HTTPC-181) make this a parameter group
-  private ResponseValidator responseValidator = new SuccessStatusCodeValidator("0..399");
+  private SuccessStatusCodeValidator defaultStatusCodeValidator = new SuccessStatusCodeValidator("0..399");
+
+  private ResponseValidator getResponseValidator() {
+    return responseValidator != null ? responseValidator : defaultStatusCodeValidator;
+  }
 
   @Override
   protected void doStart() throws MuleException {
@@ -207,8 +223,8 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
     try {
       httpRequester.doRequest(client, config, resolvedUri, method, config.getRequestStreamingMode(), config.getSendBodyMode(),
                               config.getFollowRedirects(), client.getDefaultAuthentication(), config.getResponseTimeout(),
-                              responseValidator, transformationService, requestBuilder, true, muleContext, scheduler, null, null,
-                              callback, injectedHeaders, null);
+                              getResponseValidator(), transformationService, requestBuilder, true, muleContext, scheduler, null,
+                              null, callback, injectedHeaders, null);
     } catch (MuleRuntimeException e) {
       LOGGER.error("Trigger '{}': Mule runtime exception found while executing poll to {}: '{}'", getId(), resolvedUri,
                    e.getMessage(), e);
