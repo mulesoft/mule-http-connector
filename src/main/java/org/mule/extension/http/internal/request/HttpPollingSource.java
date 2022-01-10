@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.internal.request;
 
+import static java.lang.Thread.currentThread;
 import static java.nio.charset.Charset.defaultCharset;
 import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST;
 import static org.mule.extension.http.internal.request.HttpPollingSourceUtils.getItemId;
@@ -225,9 +226,13 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
                                       true, muleContext, scheduler, injectedHeaders)
               .get();
       pollResult(pollContext, result, currentWatermark);
-    } catch (ExecutionException | InterruptedException e) {
+    } catch (ExecutionException e) {
       LOGGER.error("There was an error in HTTP Polling Source at {} of uri '{}'", location.getRootContainerName(), resolvedUri,
                    e);
+    } catch (InterruptedException e) {
+      LOGGER.error("There was an error in HTTP Polling Source at {} of uri '{}'", location.getRootContainerName(), resolvedUri,
+              e);
+      currentThread().interrupt();
     }
 
   }
