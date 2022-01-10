@@ -212,7 +212,7 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
     }
   }
 
-  private void sendRequest(PollContext<String, HttpResponseAttributes> pollContext) throws InterruptedException {
+  private void sendRequest(PollContext<String, HttpResponseAttributes> pollContext) {
     Serializable currentWatermark = pollContext.getWatermark().orElse(null);
     requestBuilder.updateWatermark(currentWatermark);
 
@@ -225,7 +225,7 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
                                       true, muleContext, scheduler, injectedHeaders)
               .get();
       pollResult(pollContext, result, currentWatermark);
-    } catch (ExecutionException e) {
+    } catch (ExecutionException | InterruptedException e) {
       LOGGER.error("There was an error in HTTP Polling Source at {} of uri '{}'", location.getRootContainerName(), resolvedUri,
                    e);
     }
@@ -238,11 +238,7 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
       return;
     }
 
-    try {
-      sendRequest(pollContext);
-    } catch (InterruptedException e) {
-      // do nothing
-    }
+    sendRequest(pollContext);
   }
 
   @Override
