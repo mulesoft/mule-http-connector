@@ -41,7 +41,7 @@ public final class HttpPollingSourceExpressions {
   private Literal<String> watermarkExpression;
 
   /**
-   * The expression to retrieve the watermark from the (splitted) response
+   * The expression to retrieve the id from every (splitted) item
    */
   @Parameter
   @org.mule.runtime.extension.api.annotation.param.Optional
