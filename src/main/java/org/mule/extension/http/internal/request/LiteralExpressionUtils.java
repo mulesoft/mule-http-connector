@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.internal.request;
 
-import static org.mule.extension.http.internal.request.HttpPollingSource.WATERMARK_PLACEGHOLDER;
+import static org.mule.extension.http.internal.request.HttpPollingSource.WATERMARK_PLACEHOLDER;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 
@@ -43,7 +43,7 @@ public final class LiteralExpressionUtils {
     if (!isExpression(raw)) {
       return raw;
     }
-    BindingContext context = BindingContext.builder().addBinding(WATERMARK_PLACEGHOLDER, TypedValue.of(watermark)).build();
+    BindingContext context = BindingContext.builder().addBinding(WATERMARK_PLACEHOLDER, TypedValue.of(watermark)).build();
     TypedValue<?> result = expressionLanguage.evaluate(raw, context);
     return result.getValue() != null ? result.getValue().toString() : null;
   }

@@ -8,10 +8,10 @@ package org.mule.extension.http.internal.request;
 
 import static java.lang.String.format;
 import static java.util.Optional.empty;
-import static org.mule.extension.http.internal.request.HttpPollingSource.ATTRIBUTES_PLACEGHOLDER;
-import static org.mule.extension.http.internal.request.HttpPollingSource.ITEM_PLACEGHOLDER;
-import static org.mule.extension.http.internal.request.HttpPollingSource.PAYLOAD_PLACEGHOLDER;
-import static org.mule.extension.http.internal.request.HttpPollingSource.WATERMARK_PLACEGHOLDER;
+import static org.mule.extension.http.internal.request.HttpPollingSource.ATTRIBUTES_PLACEHOLDER;
+import static org.mule.extension.http.internal.request.HttpPollingSource.ITEM_PLACEHOLDER;
+import static org.mule.extension.http.internal.request.HttpPollingSource.PAYLOAD_PLACEHOLDER;
+import static org.mule.extension.http.internal.request.HttpPollingSource.WATERMARK_PLACEHOLDER;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
@@ -42,10 +42,10 @@ public final class HttpPollingSourceUtils {
   private static BindingContext buildContext(Optional<TypedValue<String>> payload, Optional<HttpResponseAttributes> attributes,
                                              Serializable currentWatermark, Optional<TypedValue> item) {
     BindingContext.Builder builder = BindingContext.builder();
-    payload.ifPresent(p -> builder.addBinding(PAYLOAD_PLACEGHOLDER, p));
-    attributes.ifPresent(attr -> builder.addBinding(ATTRIBUTES_PLACEGHOLDER, TypedValue.of(attr)));
-    builder.addBinding(WATERMARK_PLACEGHOLDER, TypedValue.of(currentWatermark));
-    item.ifPresent(it -> builder.addBinding(ITEM_PLACEGHOLDER, it));
+    payload.ifPresent(p -> builder.addBinding(PAYLOAD_PLACEHOLDER, p));
+    attributes.ifPresent(attr -> builder.addBinding(ATTRIBUTES_PLACEHOLDER, TypedValue.of(attr)));
+    builder.addBinding(WATERMARK_PLACEHOLDER, TypedValue.of(currentWatermark));
+    item.ifPresent(it -> builder.addBinding(ITEM_PLACEHOLDER, it));
     return builder.build();
   }
 
@@ -56,7 +56,7 @@ public final class HttpPollingSourceUtils {
   }
 
   private static boolean isJavaPayload(MediaType mediaType) {
-    return mediaType.equals(APPLICATION_JAVA.withCharset(mediaType.getCharset().orElse(null)));
+    return mediaType.matches(APPLICATION_JAVA);
   }
 
   /**

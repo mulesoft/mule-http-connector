@@ -82,10 +82,10 @@ import java.util.function.Consumer;
 public class HttpPollingSource extends PollingSource<String, HttpResponseAttributes> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HttpPollingSource.class);
-  public static final String PAYLOAD_PLACEGHOLDER = "payload";
-  public static final String ITEM_PLACEGHOLDER = "item";
-  public static final String ATTRIBUTES_PLACEGHOLDER = "attributes";
-  public static final String WATERMARK_PLACEGHOLDER = "watermark";
+  public static final String PAYLOAD_PLACEHOLDER = "payload";
+  public static final String ITEM_PLACEHOLDER = "item";
+  public static final String ATTRIBUTES_PLACEHOLDER = "attributes";
+  public static final String WATERMARK_PLACEHOLDER = "watermark";
 
   @Connection
   private ConnectionProvider<HttpExtensionClient> clientProvider;
@@ -184,7 +184,8 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
                                                                                                 Result<TypedValue<?>, HttpResponseAttributes> item,
                                                                                                 Serializable watermark) {
     return pollItem -> {
-      LOGGER.debug("Setting Result for {}: {}", location.getRootContainerName(), item.getOutput());
+      LOGGER.debug("Setting Result for {}: {} with attributes {}", location.getRootContainerName(), item.getOutput(),
+                   item.getAttributes().orElse(null));
       pollItem.setResult(toStringResult(item));
       expressions.getIdExpression()
           .ifPresent(idExp -> pollItem.setId(getItemId(fullResponse, idExp, watermark, item, expressionLanguage)));
@@ -258,7 +259,7 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
   }
 
   private static TypedValue<String> toTypedValue(String value, MediaType mediaType, Charset encoding) {
-    if (mediaType.equals(TEXT.withCharset(mediaType.getCharset().orElse(null)))) {
+    if (mediaType.matches(TEXT)) {
       return TypedValue.of(value);
     } else {
       return new TypedValue<>(value, DataType.builder().mediaType(mediaType).charset(encoding).build());
