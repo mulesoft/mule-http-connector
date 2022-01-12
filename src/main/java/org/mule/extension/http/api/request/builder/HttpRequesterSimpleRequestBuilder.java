@@ -57,7 +57,7 @@ public class HttpRequesterSimpleRequestBuilder {
   @Optional
   @NullSafe
   @DisplayName("URI Parameters")
-  private Map<String, String> requestUriParams = emptyMap();
+  private Map<String, Literal<String>> requestUriParams = emptyMap();
 
   /**
    * Query parameters the request should include.
@@ -80,7 +80,7 @@ public class HttpRequesterSimpleRequestBuilder {
     return unmodifiableList(requestQueryParams);
   }
 
-  public Map<String, String> getRequestUriParams() {
+  public Map<String, Literal<String>> getRequestUriParams() {
     return unmodifiableMap(requestUriParams);
   }
 

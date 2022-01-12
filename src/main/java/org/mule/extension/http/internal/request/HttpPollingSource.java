@@ -18,6 +18,7 @@ import static org.mule.extension.http.internal.request.HttpPollingSourceUtils.is
 import static org.mule.extension.http.internal.request.HttpPollingSourceUtils.resolveBody;
 import static org.mule.extension.http.internal.request.HttpPollingSourceUtils.resolveHeaders;
 import static org.mule.extension.http.internal.request.HttpPollingSourceUtils.resolveQueryParams;
+import static org.mule.extension.http.internal.request.HttpPollingSourceUtils.resolveUriParams;
 import static org.mule.extension.http.internal.request.HttpRequestUtils.createHttpRequester;
 import static org.mule.extension.http.internal.request.UriUtils.buildPath;
 import static org.mule.extension.http.internal.request.UriUtils.resolveUri;
@@ -123,7 +124,6 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
   private ExpressionLanguage expressionLanguage;
 
   private HttpExtensionClient client;
-  private String resolvedUri;
   private Scheduler scheduler;
   private HttpRequester httpRequester;
   private ComponentLocation location;
@@ -191,7 +191,6 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
     scheduler = schedulerService.ioScheduler();
     client = clientProvider.connect();
     httpRequester = createHttpRequester(false, muleContext);
-    resolvedUri = getResolvedUri();
     validateExpressions();
   }
 
@@ -203,9 +202,10 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
     }
   }
 
-  private String getResolvedUri() {
+  private String getResolvedUri(Serializable watermark) {
     UriParameters uriParameters = client.getDefaultUriParameters();
-    String resolvedPath = replaceUriParams(buildPath(config.getBasePath(), path), requestBuilder.getRequestUriParams());
+    String resolvedPath = replaceUriParams(buildPath(config.getBasePath(), path),
+                                           resolveUriParams(requestBuilder.getRequestUriParams(), watermark, expressionLanguage));
     return resolveUri(uriParameters.getScheme(), uriParameters.getHost().trim(), uriParameters.getPort(), resolvedPath);
   }
 
@@ -224,7 +224,7 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
   }
 
   private void pollResult(PollContext<String, HttpResponseAttributes> pollContext,
-                          Result<InputStream, HttpResponseAttributes> result, Serializable currentWatermark) {
+                          Result<InputStream, HttpResponseAttributes> result, Serializable currentWatermark, String resolvedUri) {
     HttpResponseAttributes attributes = result.getAttributes().orElse(null);
     MediaType mediaType = result.getMediaType().orElse(ANY);
     Charset charset = mediaType.getCharset().orElse(defaultCharset());
@@ -268,7 +268,7 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
 
   private void sendRequest(PollContext<String, HttpResponseAttributes> pollContext) {
     Serializable currentWatermark = pollContext.getWatermark().orElse(null);
-
+    String resolvedUri = getResolvedUri(currentWatermark);
     LOGGER.debug("Sending '{}' request to '{}' in flow '{}'.", method, resolvedUri, location.getRootContainerName());
     try {
       Result<InputStream, HttpResponseAttributes> result = httpRequester
@@ -277,7 +277,7 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
                          getResponseValidator(), transformationService, getRequesCreator(currentWatermark), true, muleContext,
                          scheduler, injectedHeaders)
           .get();
-      pollResult(pollContext, result, currentWatermark);
+      pollResult(pollContext, result, currentWatermark, resolvedUri);
     } catch (ExecutionException e) {
       LOGGER.error("There was an error in HTTP Polling Source at {} of uri '{}'", location.getRootContainerName(), resolvedUri,
                    e);

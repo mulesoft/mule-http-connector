@@ -9,6 +9,7 @@ package org.mule.extension.http.internal.request;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static org.mule.extension.http.internal.request.HttpPollingSource.ATTRIBUTES_PLACEHOLDER;
 import static org.mule.extension.http.internal.request.HttpPollingSource.ITEM_PLACEHOLDER;
 import static org.mule.extension.http.internal.request.HttpPollingSource.PAYLOAD_PLACEHOLDER;
@@ -33,9 +34,11 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.parameter.Literal;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -155,20 +158,27 @@ public final class HttpPollingSourceUtils {
     return expressionLanguage.evaluate(bodyExpression, buildContextForRequest(currentWatermark));
   }
 
-  public static MultiMap<String, String> resolveHeaders(List<SimpleRequestHeader> pairs, Serializable currentWatermark,
+  public static MultiMap<String, String> resolveHeaders(List<SimpleRequestHeader> headers, Serializable currentWatermark,
                                                         ExpressionLanguage expressionLanguage) {
-    return toMultiMap(pairs.stream()
-        .map(pair -> new ResolvedKeyValue(pair.getKey(), isExpression(pair.getValue()) ? expressionLanguage
-            .evaluate(pair.getValue(), buildContextForRequest(currentWatermark)).getValue().toString() : pair.getValue()))
+    return toMultiMap(headers.stream()
+        .map(pair -> new ResolvedKeyValue(pair.getKey(),
+                                          resolveIfExpression(pair.getValue(), currentWatermark, expressionLanguage)))
         .collect(toList()));
   }
 
-  public static MultiMap<String, String> resolveQueryParams(List<SimpleQueryParam> pairs, Serializable currentWatermark,
+  public static MultiMap<String, String> resolveQueryParams(List<SimpleQueryParam> queryParams, Serializable currentWatermark,
                                                             ExpressionLanguage expressionLanguage) {
-    return toMultiMap(pairs.stream()
-        .map(pair -> new ResolvedKeyValue(pair.getKey(), isExpression(pair.getValue()) ? expressionLanguage
-            .evaluate(pair.getValue(), buildContextForRequest(currentWatermark)).getValue().toString() : pair.getValue()))
+    return toMultiMap(queryParams.stream()
+        .map(pair -> new ResolvedKeyValue(pair.getKey(),
+                                          resolveIfExpression(pair.getValue(), currentWatermark, expressionLanguage)))
         .collect(toList()));
+  }
+
+  public static Map<String, String> resolveUriParams(Map<String, Literal<String>> uriParams, Serializable currentWatermark,
+                                                     ExpressionLanguage expressionLanguage) {
+    return uriParams.entrySet().stream()
+        .collect(toMap(Map.Entry::getKey, e -> resolveIfExpression(e.getValue().getLiteralValue().orElse(""), currentWatermark,
+                                                                   expressionLanguage)));
   }
 
   public static ValidationResult isValidExpression(String expression, ExpressionLanguage expressionLanguage) {
@@ -176,6 +186,13 @@ public final class HttpPollingSourceUtils {
       return success();
     }
     return expressionLanguage.validate(expression);
+  }
+
+  private static String resolveIfExpression(String exp, Serializable currentWatermark, ExpressionLanguage expressionLanguage) {
+    if (!isExpression(exp)) {
+      return exp;
+    }
+    return expressionLanguage.evaluate(exp, buildContextForRequest(currentWatermark)).getValue().toString();
   }
 
   private static boolean isExpression(String value) {
