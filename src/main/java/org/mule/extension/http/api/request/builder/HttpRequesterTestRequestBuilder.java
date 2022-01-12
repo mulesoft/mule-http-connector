@@ -36,7 +36,7 @@ import java.util.Objects;
  *
  * @since 1.7
  */
-public class HttpRequesterTestRequestBuilder implements HttpRequestBuilderConfigurer {
+public class HttpRequesterTestRequestBuilder {
 
   /**
    * The body of the response message
@@ -112,18 +112,6 @@ public class HttpRequesterTestRequestBuilder implements HttpRequestBuilderConfig
 
   protected void setRequestUriParams(Map<String, String> uriParams) {
     this.requestUriParams = uriParams;
-  }
-
-  @Override
-  public HttpRequestBuilder toHttpRequestBuilder(HttpRequesterConfig config) {
-    return HttpRequest.builder(PRESERVE_HEADER_CASE || config.isPreserveHeadersCase())
-        .headers(toMultiMap(getRequestHeaders()))
-        .queryParams(toMultiMap(getRequestQueryParams()));
-  }
-
-  @Override
-  public TypedValue getBodyAsTypedValue() {
-    return TypedValue.of(getRequestBody());
   }
 
   @Override

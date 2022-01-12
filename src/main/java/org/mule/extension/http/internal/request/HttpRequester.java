@@ -34,8 +34,7 @@ import org.mule.extension.http.api.notification.HttpResponseNotificationData;
 import org.mule.extension.http.api.request.HttpSendBodyMode;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
 import org.mule.extension.http.api.request.authentication.UsernamePasswordAuthentication;
-import org.mule.extension.http.api.request.builder.HttpRequestBuilderConfigurer;
-import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
+import org.mule.extension.http.api.request.builder.CorrelationData;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.streaming.HttpStreamingType;
@@ -136,19 +135,18 @@ public class HttpRequester {
                         HttpStreamingType streamingMode, HttpSendBodyMode sendBodyMode,
                         boolean followRedirects, HttpRequestAuthentication authentication,
                         Integer responseTimeout, ResponseValidator responseValidator,
-                        TransformationService transformationService, HttpRequestBuilderConfigurer requestBuilder,
+                        TransformationService transformationService, RequestCreator requestCreator,
                         boolean checkRetry, MuleContext muleContext, Scheduler scheduler, NotificationEmitter notificationEmitter,
                         StreamingHelper streamingHelper, CompletionCallback<InputStream, HttpResponseAttributes> callback,
-                        Map<String, List<String>> injectedHeaders,
-                        String correlationId) {
+                        Map<String, List<String>> injectedHeaders) {
 
     int resolvedTimeout = resolveResponseTimeout(muleContext, responseTimeout);
     doRequestWithRetry(client, config, uri, method, streamingMode, sendBodyMode, followRedirects, authentication, resolvedTimeout,
-                       responseValidator, transformationService, requestBuilder, checkRetry, muleContext, scheduler,
+                       responseValidator, transformationService, requestCreator, checkRetry, muleContext, scheduler,
                        notificationEmitter, streamingHelper, callback,
                        httpRequestFactory.create(config, uri, method, streamingMode, sendBodyMode, transformationService,
-                                                 requestBuilder, authentication, injectedHeaders),
-                       RETRY_ATTEMPTS, injectedHeaders, correlationId);
+                                                 authentication, injectedHeaders, requestCreator),
+                       RETRY_ATTEMPTS, injectedHeaders);
   }
 
   public CompletableFuture<Result<InputStream, HttpResponseAttributes>> doSyncRequest(HttpExtensionClient client,
@@ -161,7 +159,7 @@ public class HttpRequester {
                                                                                       Integer responseTimeout,
                                                                                       ResponseValidator responseValidator,
                                                                                       TransformationService transformationService,
-                                                                                      HttpRequestBuilderConfigurer requestBuilder,
+                                                                                      RequestCreator requestBuilder,
                                                                                       boolean checkRetry, MuleContext muleContext,
                                                                                       Scheduler scheduler,
                                                                                       Map<String, List<String>> injectedHeaders) {
@@ -181,7 +179,7 @@ public class HttpRequester {
         };
     doRequest(client, config, uri, method, streamingMode, sendBodyMode, followRedirects, authentication, responseTimeout,
               responseValidator, transformationService, requestBuilder, checkRetry, muleContext, scheduler, null, null, callback,
-              injectedHeaders, null);
+              injectedHeaders);
     return future;
   }
 
@@ -189,12 +187,12 @@ public class HttpRequester {
                                   HttpStreamingType streamingMode, HttpSendBodyMode sendBodyMode,
                                   boolean followRedirects, HttpRequestAuthentication authentication,
                                   int responseTimeout, ResponseValidator responseValidator,
-                                  TransformationService transformationService, HttpRequestBuilderConfigurer requestBuilder,
+                                  TransformationService transformationService, RequestCreator requestCreator,
                                   boolean checkRetry, MuleContext muleContext, Scheduler scheduler,
                                   NotificationEmitter notificationEmitter,
                                   StreamingHelper streamingHelper,
                                   CompletionCallback<InputStream, HttpResponseAttributes> callback, HttpRequest httpRequest,
-                                  int retryCount, Map<String, List<String>> injectedHeaders, String correlationId) {
+                                  int retryCount, Map<String, List<String>> injectedHeaders) {
     fireNotification(notificationEmitter, REQUEST_START, () -> HttpRequestNotificationData.from(httpRequest),
                      REQUEST_NOTIFICATION_DATA_TYPE);
 
@@ -216,16 +214,21 @@ public class HttpRequester {
                 scheduler.submit(() -> consumePayload(result));
                 doRequest(client, config, uri, method, streamingMode, sendBodyMode, followRedirects,
                           authentication, responseTimeout, responseValidator, transformationService,
-                          requestBuilder, false, muleContext, scheduler, notificationEmitter,
-                          streamingHelper, callback, injectedHeaders, correlationId);
+                          requestCreator, false, muleContext, scheduler, notificationEmitter,
+                          streamingHelper, callback, injectedHeaders);
               }, () -> {
                 responseValidator.validate((Result) result, httpRequest, streamingHelper);
 
                 Result<Object, HttpResponseAttributes> freshResult = httpResponseToResult
                     .convert(config, muleContext, response, entity, resultInputStreamSupplier, httpRequest.getUri());
 
-                profilingDataProducer
-                    .ifPresent(profilingDataProducer -> profilingDataProducer.triggerProfilingEvent(result, correlationId));
+                profilingDataProducer.ifPresent(
+                                                profilingDataProducer -> profilingDataProducer
+                                                    .triggerProfilingEvent(result,
+                                                                           requestCreator
+                                                                               .getCorrelationData().map(data -> data
+                                                                                   .getCorrelationInfo().getCorrelationId())
+                                                                               .orElse(null)));
 
                 callback.success((Result) freshResult);
               });
@@ -236,11 +239,10 @@ public class HttpRequester {
             checkIfRemotelyClosed(exception, client.getDefaultUriParameters());
 
             if (shouldRetryRemotelyClosed(exception, retryCount, httpRequest)) {
-              doRequestWithRetry(client, config, uri, method, streamingMode, sendBodyMode, followRedirects,
-                                 authentication, responseTimeout, responseValidator, transformationService,
-                                 requestBuilder, checkRetry, muleContext, scheduler, notificationEmitter,
-                                 streamingHelper, callback,
-                                 httpRequest, retryCount - 1, injectedHeaders, correlationId);
+              doRequestWithRetry(client, config, uri, method, streamingMode, sendBodyMode, followRedirects, authentication,
+                                 responseTimeout, responseValidator, transformationService, requestCreator, checkRetry,
+                                 muleContext, scheduler, notificationEmitter, streamingHelper, callback, httpRequest,
+                                 retryCount - 1, injectedHeaders);
               return;
             }
 

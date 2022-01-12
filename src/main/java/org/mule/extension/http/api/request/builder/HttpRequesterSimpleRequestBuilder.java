@@ -10,13 +10,9 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableList;
-import static org.mule.extension.http.internal.request.KeyValuePairUtils.toMultiMap;
-import static org.mule.extension.http.internal.request.LiteralExpressionUtils.resolveLiteralExpression;
 import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
 
 import org.mule.extension.http.internal.request.HttpRequesterConfig;
-import org.mule.runtime.api.el.ExpressionLanguage;
-import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -26,7 +22,6 @@ import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +30,7 @@ import java.util.Map;
  *
  * @since 1.7
  */
-public class HttpRequesterSimpleRequestBuilder implements HttpRequestBuilderConfigurer {
+public class HttpRequesterSimpleRequestBuilder {
 
   /**
    * The body of the response message
@@ -73,23 +68,8 @@ public class HttpRequesterSimpleRequestBuilder implements HttpRequestBuilderConf
   @DisplayName("Query Parameters")
   private List<SimpleQueryParam> requestQueryParams = emptyList();
 
-  private ExpressionLanguage expressionLanguage;
-  private Serializable watermark;
-
   public String getRequestBody() {
-    return resolveLiteralExpression(requestBody, expressionLanguage, watermark);
-  }
-
-  public void updateWatermark(Serializable watermark) {
-    this.watermark = watermark;
-    this.requestHeaders.forEach(header -> header.updateWatermark(watermark));
-    this.requestQueryParams.forEach(queryParam -> queryParam.updateWatermark(watermark));
-  }
-
-  public void setExpressionLanguage(ExpressionLanguage expressionLanguage) {
-    this.expressionLanguage = expressionLanguage;
-    this.requestHeaders.forEach(header -> header.setExpressionLanguage(expressionLanguage));
-    this.requestQueryParams.forEach(queryParam -> queryParam.setExpressionLanguage(expressionLanguage));
+    return requestBody.getLiteralValue().orElse("");
   }
 
   public List<SimpleRequestHeader> getRequestHeaders() {
@@ -104,15 +84,8 @@ public class HttpRequesterSimpleRequestBuilder implements HttpRequestBuilderConf
     return unmodifiableMap(requestUriParams);
   }
 
-  @Override
   public HttpRequestBuilder toHttpRequestBuilder(HttpRequesterConfig config) {
-    return HttpRequest.builder(PRESERVE_HEADER_CASE || config.isPreserveHeadersCase())
-        .headers(toMultiMap(getRequestHeaders()))
-        .queryParams(toMultiMap(getRequestQueryParams()));
+    return HttpRequest.builder(PRESERVE_HEADER_CASE || config.isPreserveHeadersCase());
   }
 
-  @Override
-  public TypedValue getBodyAsTypedValue() {
-    return TypedValue.of(getRequestBody());
-  }
 }

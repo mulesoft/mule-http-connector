@@ -8,24 +8,36 @@ package org.mule.extension.http.internal.request;
 
 import static java.lang.String.format;
 import static java.util.Optional.empty;
+import static java.util.stream.Collectors.toList;
 import static org.mule.extension.http.internal.request.HttpPollingSource.ATTRIBUTES_PLACEHOLDER;
 import static org.mule.extension.http.internal.request.HttpPollingSource.ITEM_PLACEHOLDER;
 import static org.mule.extension.http.internal.request.HttpPollingSource.PAYLOAD_PLACEHOLDER;
 import static org.mule.extension.http.internal.request.HttpPollingSource.WATERMARK_PLACEHOLDER;
+import static org.mule.extension.http.internal.request.KeyValuePairUtils.toMultiMap;
+import static org.mule.runtime.api.el.ValidationResult.success;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
+import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
+import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
+import org.mule.extension.http.api.request.builder.KeyValuePair;
+import org.mule.extension.http.api.request.builder.SimpleQueryParam;
+import org.mule.extension.http.api.request.builder.SimpleRequestHeader;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionLanguage;
+import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -47,6 +59,10 @@ public final class HttpPollingSourceUtils {
     builder.addBinding(WATERMARK_PLACEHOLDER, TypedValue.of(currentWatermark));
     item.ifPresent(it -> builder.addBinding(ITEM_PLACEHOLDER, it));
     return builder.build();
+  }
+
+  private static BindingContext buildContextForRequest(Serializable watermark) {
+    return buildContext(empty(), empty(), watermark, empty());
   }
 
   private static Result<TypedValue<?>, HttpResponseAttributes> toResult(TypedValue<?> item, MediaType mediaType,
@@ -130,4 +146,61 @@ public final class HttpPollingSourceUtils {
                   buildContext(Optional.of(payload), item.getAttributes(), currentWatermark, Optional.of(item.getOutput())));
   }
 
+
+  public static TypedValue<?> resolveBody(String bodyExpression, Serializable currentWatermark,
+                                          ExpressionLanguage expressionLanguage) {
+    if (!isExpression(bodyExpression)) {
+      return TypedValue.of(bodyExpression);
+    }
+    return expressionLanguage.evaluate(bodyExpression, buildContextForRequest(currentWatermark));
+  }
+
+  public static MultiMap<String, String> resolveHeaders(List<SimpleRequestHeader> pairs, Serializable currentWatermark,
+                                                        ExpressionLanguage expressionLanguage) {
+    return toMultiMap(pairs.stream()
+        .map(pair -> new ResolvedKeyValue(pair.getKey(), isExpression(pair.getValue()) ? expressionLanguage
+            .evaluate(pair.getValue(), buildContextForRequest(currentWatermark)).getValue().toString() : pair.getValue()))
+        .collect(toList()));
+  }
+
+  public static MultiMap<String, String> resolveQueryParams(List<SimpleQueryParam> pairs, Serializable currentWatermark,
+                                                            ExpressionLanguage expressionLanguage) {
+    return toMultiMap(pairs.stream()
+        .map(pair -> new ResolvedKeyValue(pair.getKey(), isExpression(pair.getValue()) ? expressionLanguage
+            .evaluate(pair.getValue(), buildContextForRequest(currentWatermark)).getValue().toString() : pair.getValue()))
+        .collect(toList()));
+  }
+
+  public static ValidationResult isValidExpression(String expression, ExpressionLanguage expressionLanguage) {
+    if (!isExpression(expression)) {
+      return success();
+    }
+    return expressionLanguage.validate(expression);
+  }
+
+  private static boolean isExpression(String value) {
+    String trim = value.trim();
+    return trim.startsWith(DEFAULT_EXPRESSION_PREFIX) && trim.endsWith(DEFAULT_EXPRESSION_POSTFIX);
+  }
+
+  private static final class ResolvedKeyValue implements KeyValuePair {
+
+    private String key;
+    private String value;
+
+    public ResolvedKeyValue(String key, String value) {
+      this.key = key;
+      this.value = value;
+    }
+
+    @Override
+    public String getKey() {
+      return key;
+    }
+
+    @Override
+    public String getValue() {
+      return value;
+    }
+  }
 }

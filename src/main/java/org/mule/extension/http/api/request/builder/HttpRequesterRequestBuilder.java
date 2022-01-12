@@ -35,7 +35,7 @@ import java.util.Map;
  *
  * @since 1.0
  */
-public class HttpRequesterRequestBuilder extends HttpMessageBuilder implements HttpRequestBuilderConfigurer {
+public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
 
   /**
    * The body of the response message
@@ -127,20 +127,12 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder implements H
     this.uriParams = uriParams;
   }
 
-  public CorrelationInfo getCorrelationInfo() {
-    return correlationInfo;
-  }
-
   public void setCorrelationInfo(CorrelationInfo correlationInfo) {
     this.correlationInfo = correlationInfo;
   }
 
-  public OutboundCorrelationStrategy getSendCorrelationId() {
-    return sendCorrelationId;
-  }
-
-  public String getCorrelationId() {
-    return correlationId;
+  public CorrelationData getCorrelationData() {
+    return new CorrelationData(correlationInfo, sendCorrelationId, correlationId);
   }
 
   /**
@@ -152,15 +144,10 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder implements H
     return toHttpRequestBuilder(config);
   }
 
-  @Override
   public HttpRequestBuilder toHttpRequestBuilder(HttpRequesterConfig config) {
     return HttpRequest.builder(PRESERVE_HEADER_CASE || config.isPreserveHeadersCase())
         .headers(headers)
         .queryParams(queryParams);
   }
 
-  @Override
-  public TypedValue getBodyAsTypedValue() {
-    return getBody();
-  }
 }
