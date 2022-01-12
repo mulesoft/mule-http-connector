@@ -22,7 +22,7 @@ public class ShareableHttpClient {
   private HttpClient delegate;
   private Integer usageCount = new Integer(0);
 
-  ShareableHttpClient(HttpClient client) {
+  public ShareableHttpClient(HttpClient client) {
     delegate = client;
   }
 
