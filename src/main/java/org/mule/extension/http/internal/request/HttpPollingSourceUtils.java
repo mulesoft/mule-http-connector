@@ -150,6 +150,13 @@ public final class HttpPollingSourceUtils {
   }
 
 
+  /**
+   * @param bodyExpression
+   * @param currentWatermark
+   * @param expressionLanguage
+   * @return the resolution of the expression, that can depend on the watermark's current value. If it's not an
+   * expression, returns the raw body without evaluating it
+   */
   public static TypedValue<?> resolveBody(String bodyExpression, Serializable currentWatermark,
                                           ExpressionLanguage expressionLanguage) {
     if (!isExpression(bodyExpression)) {
@@ -158,6 +165,13 @@ public final class HttpPollingSourceUtils {
     return expressionLanguage.evaluate(bodyExpression, buildContextForRequest(currentWatermark));
   }
 
+  /**
+   * @param headers
+   * @param currentWatermark
+   * @param expressionLanguage
+   * @return the resolution of the expression for each header, that can depend on the watermark's current value.
+   * the headers that are not expressions will be left as are
+   */
   public static MultiMap<String, String> resolveHeaders(List<SimpleRequestHeader> headers, Serializable currentWatermark,
                                                         ExpressionLanguage expressionLanguage) {
     return toMultiMap(headers.stream()
@@ -166,6 +180,13 @@ public final class HttpPollingSourceUtils {
         .collect(toList()));
   }
 
+  /**
+   * @param queryParams
+   * @param currentWatermark
+   * @param expressionLanguage
+   * @return the resolution of the expression for each query parameter, that can depend on the watermark's current value.
+   * the query parameters that are not expressions will be left as are
+   */
   public static MultiMap<String, String> resolveQueryParams(List<SimpleQueryParam> queryParams, Serializable currentWatermark,
                                                             ExpressionLanguage expressionLanguage) {
     return toMultiMap(queryParams.stream()
@@ -174,6 +195,13 @@ public final class HttpPollingSourceUtils {
         .collect(toList()));
   }
 
+  /**
+   * @param uriParams
+   * @param currentWatermark
+   * @param expressionLanguage
+   * @return the resolution of the expression for each uri parameter, that can depend on the watermark's current value.
+   * the uri parameters that are not expressions will be left as are
+   */
   public static Map<String, String> resolveUriParams(Map<String, Literal<String>> uriParams, Serializable currentWatermark,
                                                      ExpressionLanguage expressionLanguage) {
     return uriParams.entrySet().stream()
@@ -181,6 +209,11 @@ public final class HttpPollingSourceUtils {
                                                                    expressionLanguage)));
   }
 
+  /**
+   * @param expression
+   * @param expressionLanguage
+   * @return the {@link ValidationResult} for a given expression. Success, in case it is not actually an expression.
+   */
   public static ValidationResult isValidExpression(String expression, ExpressionLanguage expressionLanguage) {
     if (!isExpression(expression)) {
       return success();
