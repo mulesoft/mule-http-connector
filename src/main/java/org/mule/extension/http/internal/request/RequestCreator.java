@@ -8,15 +8,31 @@ package org.mule.extension.http.internal.request;
 
 import org.mule.extension.http.api.request.builder.CorrelationData;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.http.api.domain.entity.HttpEntity;
 import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
 
 import java.util.Optional;
 
+/**
+ * Creates everything the {@link HttpRequestFactory#create} needs to create and modify the {@link HttpRequestBuilder}
+ *
+ * @since 1.7
+ */
 public interface RequestCreator {
 
+  /**
+   * @param config
+   * @return the {@link HttpRequestBuilder} to configure to create the HTTP Request
+   */
   HttpRequestBuilder createRequestBuilder(HttpRequesterConfig config);
 
+  /**
+   * @return the Body to turn into an {@link HttpEntity}
+   */
   TypedValue<?> getBody();
 
+  /**
+   * @return if any, the {@link CorrelationData} for this HTTP Request
+   */
   Optional<CorrelationData> getCorrelationData();
 }
