@@ -7,7 +7,9 @@
 		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
 		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
-    <munit:config name="watermarking.xml" />
+
+    <!-- 4.1.x gives flaky behaviour -->
+    <munit:config name="watermarking.xml" minMuleVersion="4.2.0"/>
 
     <munit:dynamic-port propertyName="dynamic.port"/>
 
@@ -55,7 +57,7 @@
         </munit-tools:queue>
     </flow>
 
-    <munit:test name="watermark-payload-test-case" ignore="#[Munit::muleVersionPriorTo('4.2.0')]">
+    <munit:test name="watermark-payload-test-case">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="watermarkInPayloadListenerFlow"/>
             <munit:enable-flow-source value="watermarkInPayloadPollingFlow"/>
@@ -472,7 +474,7 @@
         </munit-tools:queue>
     </flow>
 
-    <munit:test name="identity-test-case" ignore="#[Munit::muleVersionPriorTo('4.2.0')]">
+    <munit:test name="identity-test-case">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="identityListenerFlow"/>
             <munit:enable-flow-source value="identityPollingFlow"/>
