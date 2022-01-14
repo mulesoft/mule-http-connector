@@ -42,4 +42,32 @@ public class UriSettings {
   public String getUrl() {
     return url;
   }
+
+  public static class Builder {
+
+    private String path = "/";
+    private String url;
+
+    public Builder withPath(String path) {
+      this.path = path;
+      return this;
+    }
+
+    public Builder withUrl(String url) {
+      this.url = url;
+      return this;
+    }
+
+    public UriSettings build() {
+      UriSettings settings = new UriSettings();
+      settings.path = this.path;
+      settings.url = this.url;
+      return settings;
+    }
+
+    public static Builder newInstance() {
+      return new Builder();
+    }
+
+  }
 }

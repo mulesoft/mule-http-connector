@@ -131,4 +131,75 @@ public final class RequestSettings {
   public boolean isPreserveHeadersCase() {
     return preserveHeadersCase;
   }
+
+  public static class Builder {
+
+    private boolean followRedirects;
+    private HttpSendBodyMode sendBodyMode;
+    private HttpStreamingType requestStreamingMode;
+    private boolean enableCookies;
+    private List<RequestHeader> defaultHeaders;
+    private List<QueryParam> defaultQueryParams;
+    private OutboundCorrelationStrategy sendCorrelationId = AUTO;
+    private boolean preserveHeadersCase = false;
+
+    public Builder withFollowRedirects(boolean followRedirects) {
+      this.followRedirects = followRedirects;
+      return this;
+    }
+
+    public Builder withHttpSendBodyMode(HttpSendBodyMode sendBodyMode) {
+      this.sendBodyMode = sendBodyMode;
+      return this;
+    }
+
+    public Builder withHttpStreamingType(HttpStreamingType requestStreamingMode) {
+      this.requestStreamingMode = requestStreamingMode;
+      return this;
+    }
+
+    public Builder withEnableCookies(boolean enableCookies) {
+      this.enableCookies = enableCookies;
+      return this;
+    }
+
+    public Builder withDefaultHeaders(List<RequestHeader> defaultHeaders) {
+      this.defaultHeaders = defaultHeaders;
+      return this;
+    }
+
+    public Builder withDefaultQueryParams(List<QueryParam> defaultQueryParams) {
+      this.defaultQueryParams = defaultQueryParams;
+      return this;
+    }
+
+    public Builder withOutboundCorrelationStrategy(OutboundCorrelationStrategy sendCorrelationId) {
+      this.sendCorrelationId = sendCorrelationId;
+      return this;
+    }
+
+    public Builder withPreserveHeadersCase(boolean preserveHeadersCase) {
+      this.preserveHeadersCase = preserveHeadersCase;
+      return this;
+    }
+
+    public RequestSettings build() {
+      RequestSettings settings = new RequestSettings();
+      settings.followRedirects = this.followRedirects;
+      settings.sendBodyMode = this.sendBodyMode;
+      settings.requestStreamingMode = this.requestStreamingMode;
+      settings.enableCookies = this.enableCookies;
+      settings.defaultHeaders = this.defaultHeaders;
+      settings.defaultQueryParams = this.defaultQueryParams;
+      settings.sendCorrelationId = this.sendCorrelationId;
+      settings.preserveHeadersCase = this.preserveHeadersCase;
+      return settings;
+    }
+
+
+
+    public static Builder newInstance() {
+      return new Builder();
+    }
+  }
 }
