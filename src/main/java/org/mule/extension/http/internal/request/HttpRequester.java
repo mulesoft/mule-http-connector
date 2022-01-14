@@ -69,6 +69,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 
@@ -149,20 +150,16 @@ public class HttpRequester {
                        RETRY_ATTEMPTS, injectedHeaders);
   }
 
-  public CompletableFuture<Result<InputStream, HttpResponseAttributes>> doSyncRequest(HttpExtensionClient client,
-                                                                                      HttpRequesterConfig config, String uri,
-                                                                                      String method,
-                                                                                      HttpStreamingType streamingMode,
-                                                                                      HttpSendBodyMode sendBodyMode,
-                                                                                      boolean followRedirects,
-                                                                                      HttpRequestAuthentication authentication,
-                                                                                      Integer responseTimeout,
-                                                                                      ResponseValidator responseValidator,
-                                                                                      TransformationService transformationService,
-                                                                                      RequestCreator requestBuilder,
-                                                                                      boolean checkRetry, MuleContext muleContext,
-                                                                                      Scheduler scheduler,
-                                                                                      Map<String, List<String>> injectedHeaders) {
+  public Result<InputStream, HttpResponseAttributes> doSyncRequest(HttpExtensionClient client, HttpRequesterConfig config,
+                                                                   String uri, String method, HttpStreamingType streamingMode,
+                                                                   HttpSendBodyMode sendBodyMode, boolean followRedirects,
+                                                                   HttpRequestAuthentication authentication,
+                                                                   Integer responseTimeout, ResponseValidator responseValidator,
+                                                                   TransformationService transformationService,
+                                                                   RequestCreator requestBuilder, boolean checkRetry,
+                                                                   MuleContext muleContext, Scheduler scheduler,
+                                                                   Map<String, List<String>> injectedHeaders)
+      throws ExecutionException, InterruptedException {
     CompletableFuture<Result<InputStream, HttpResponseAttributes>> future = new CompletableFuture<>();
     CompletionCallback<InputStream, HttpResponseAttributes> callback =
         new CompletionCallback<InputStream, HttpResponseAttributes>() {
@@ -180,7 +177,7 @@ public class HttpRequester {
     doRequest(client, config, uri, method, streamingMode, sendBodyMode, followRedirects, authentication, responseTimeout,
               responseValidator, transformationService, requestBuilder, checkRetry, muleContext, scheduler, null, null, callback,
               injectedHeaders);
-    return future;
+    return future.get();
   }
 
   private void doRequestWithRetry(HttpExtensionClient client, HttpRequesterConfig config, String uri, String method,
@@ -222,13 +219,10 @@ public class HttpRequester {
                 Result<Object, HttpResponseAttributes> freshResult = httpResponseToResult
                     .convert(config, muleContext, response, entity, resultInputStreamSupplier, httpRequest.getUri());
 
-                profilingDataProducer.ifPresent(
-                                                profilingDataProducer -> profilingDataProducer
-                                                    .triggerProfilingEvent(result,
-                                                                           requestCreator
-                                                                               .getCorrelationData().map(data -> data
-                                                                                   .getCorrelationInfo().getCorrelationId())
-                                                                               .orElse(null)));
+                String correlationId =
+                    requestCreator.getCorrelationData().map(data -> data.getCorrelationInfo().getCorrelationId()).orElse(null);
+                profilingDataProducer
+                    .ifPresent(profilingDataProducer -> profilingDataProducer.triggerProfilingEvent(result, correlationId));
 
                 callback.success((Result) freshResult);
               });

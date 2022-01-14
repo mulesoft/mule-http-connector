@@ -215,6 +215,12 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
     return pollItem -> {
       LOGGER.debug("Setting Result for {}: {} with attributes {}", location.getRootContainerName(), item.getOutput(),
                    item.getAttributes().orElse(null));
+
+      // The item is a Result of TypedValue<?> and we need to, finally, transform it to a Result of String.
+      // We couldn't have done this to begin with, because we still needed the item as a TypedValue to
+      // perform expression evaluations (as seen here as well). Also, we have it as a TypedValue<?> instead of
+      // TypedValue<String>, because that's what DW returns when evaluating an expression (the splitting one), and we
+      // have no need to transform it considering that we only use it to then again evaluate expression.
       pollItem.setResult(toStringResult(item));
       expressions.getIdExpression()
           .ifPresent(idExp -> pollItem.setId(getItemId(fullResponse, idExp, watermark, item, expressionLanguage)));
@@ -275,8 +281,7 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
           .doSyncRequest(client, config, resolvedUri, method, config.getRequestStreamingMode(), config.getSendBodyMode(),
                          config.getFollowRedirects(), client.getDefaultAuthentication(), config.getResponseTimeout(),
                          getResponseValidator(), transformationService, getRequesCreator(currentWatermark), true, muleContext,
-                         scheduler, injectedHeaders)
-          .get();
+                         scheduler, injectedHeaders);
       pollResult(pollContext, result, currentWatermark, resolvedUri);
     } catch (ExecutionException e) {
       LOGGER.error("There was an error in HTTP Polling Source at {} of uri '{}'", location.getRootContainerName(), resolvedUri,
