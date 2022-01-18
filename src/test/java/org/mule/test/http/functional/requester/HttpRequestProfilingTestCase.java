@@ -11,33 +11,35 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.mule.extension.http.internal.HttpConnectorConstants.HTTP_ENABLE_PROFILING;
 import static org.mule.extension.http.internal.request.profiling.HttpRequestProfilingEventContext.REASON_PHRASE;
 import static org.mule.extension.http.internal.request.profiling.HttpRequestProfilingEventContext.STATUS_CODE;
-import static org.mule.extension.http.internal.HttpConnectorConstants.HTTP_ENABLE_PROFILING;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.PROFILING;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.ProfilingProducerScope;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.threading.ThreadSnapshotCollector;
+import org.mule.runtime.api.profiling.tracing.TracingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
+import org.mule.runtime.api.profiling.type.context.ExtensionProfilingEventContext;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.eclipse.jetty.server.Request;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mule.runtime.api.profiling.type.context.ExtensionProfilingEventContext;
-import org.mule.tck.junit4.rule.SystemProperty;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 @Feature(HTTP_EXTENSION)
 @Story(PROFILING)
@@ -108,6 +110,11 @@ public class HttpRequestProfilingTestCase extends AbstractHttpRequestTestCase {
     @Override
     public ThreadSnapshotCollector getThreadSnapshotCollector() {
       return () -> null;
+    }
+
+    @Override
+    public TracingService getTracingService() {
+      return null;
     }
   }
 
