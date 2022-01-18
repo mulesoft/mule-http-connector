@@ -6,7 +6,6 @@
  */
 package org.mule.extension.http.internal.request;
 
-import org.mule.extension.http.api.request.builder.CorrelationData;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
 import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;

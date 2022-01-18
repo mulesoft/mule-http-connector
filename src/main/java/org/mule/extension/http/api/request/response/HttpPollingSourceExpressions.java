@@ -7,10 +7,11 @@
 package org.mule.extension.http.api.request.response;
 
 import static java.util.Optional.empty;
+import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 
+import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
-import org.mule.runtime.extension.api.annotation.param.display.Text;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 
 import java.util.Optional;
@@ -27,7 +28,7 @@ public final class HttpPollingSourceExpressions {
    */
   @Parameter
   @org.mule.runtime.extension.api.annotation.param.Optional
-  @Text
+  @Expression(REQUIRED)
   @DisplayName("Split Expression")
   private Literal<String> splitExpression;
 
@@ -36,7 +37,7 @@ public final class HttpPollingSourceExpressions {
    */
   @Parameter
   @org.mule.runtime.extension.api.annotation.param.Optional
-  @Text
+  @Expression(REQUIRED)
   @DisplayName("Watermark Expression")
   private Literal<String> watermarkExpression;
 
@@ -45,7 +46,7 @@ public final class HttpPollingSourceExpressions {
    */
   @Parameter
   @org.mule.runtime.extension.api.annotation.param.Optional
-  @Text
+  @Expression(REQUIRED)
   @DisplayName("Id Expression")
   private Literal<String> idExpression;
 

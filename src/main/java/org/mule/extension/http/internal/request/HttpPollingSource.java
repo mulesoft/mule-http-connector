@@ -32,9 +32,7 @@ import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.FAI
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.WAIT;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.extension.http.api.request.builder.CorrelationData;
 import org.mule.extension.http.api.request.builder.HttpRequesterSimpleRequestBuilder;
-import org.mule.extension.http.api.request.builder.KeyValuePair;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.response.HttpPollingSourceExpressions;
 import org.mule.extension.http.api.request.validator.ResponseValidator;

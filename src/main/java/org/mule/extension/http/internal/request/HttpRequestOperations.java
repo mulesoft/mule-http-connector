@@ -8,7 +8,6 @@ package org.mule.extension.http.internal.request;
 
 import static java.lang.Boolean.getBoolean;
 import static java.lang.Integer.MAX_VALUE;
-import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.extension.http.internal.HttpConnectorConstants.CONNECTOR_OVERRIDES;
 import static org.mule.extension.http.internal.HttpConnectorConstants.HTTP_ENABLE_PROFILING;
@@ -21,7 +20,6 @@ import static org.mule.extension.http.internal.request.HttpRequestUtils.handleCu
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.extension.http.api.request.builder.CorrelationData;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
@@ -164,7 +162,7 @@ public class HttpRequestOperations implements Initialisable, Disposable {
 
       @Override
       public java.util.Optional<CorrelationData> getCorrelationData() {
-        return of(builder.getCorrelationData());
+        return of(new CorrelationData(builder.getCorrelationInfo(), builder.getSendCorrelationId(), builder.getCorrelationId()));
       }
     };
   }

@@ -28,14 +28,13 @@
     </flow>
 
     <flow name="responseOkPollingFlow">
-        <http:polling-source config-ref="responseRequestConfig" path="response-ok">
+        <http:polling-source config-ref="responseRequestConfig" path="response-ok" splitExpression="#[payload]">
             <scheduling-strategy>
                 <fixed-frequency frequency="10" timeUnit="SECONDS"/>
             </scheduling-strategy>
             <http:response-validator>
                 <http:success-status-code-validator values="202" />
             </http:response-validator>
-            <http:split-expression><![CDATA[#[payload]]]></http:split-expression>
         </http:polling-source>
         <munit-tools:queue queueName="response_ok_queue">
             <munit-tools:value>#[payload]</munit-tools:value>
@@ -71,14 +70,13 @@
     </flow>
 
     <flow name="responseErrorPollingFlow">
-        <http:polling-source config-ref="responseRequestConfig" path="response-error">
+        <http:polling-source config-ref="responseRequestConfig" path="response-error" splitExpression="#[payload]">
             <scheduling-strategy>
                 <fixed-frequency frequency="10" timeUnit="SECONDS"/>
             </scheduling-strategy>
             <http:response-validator>
                 <http:success-status-code-validator values="200..299" />
             </http:response-validator>
-            <http:split-expression><![CDATA[#[payload]]]></http:split-expression>
         </http:polling-source>
         <munit-tools:queue queueName="response_fail_queue">
             <munit-tools:value>#[payload]</munit-tools:value>

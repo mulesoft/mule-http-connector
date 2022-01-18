@@ -18,7 +18,6 @@ import org.mockito.stubbing.Answer;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.error.HttpErrorMessageGenerator;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
-import org.mule.extension.http.api.request.builder.CorrelationData;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
@@ -50,8 +49,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
+import static java.util.Optional.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
@@ -143,7 +141,12 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
 
       @Override
       public Optional<CorrelationData> getCorrelationData() {
-        return ofNullable(requestBuilder.getCorrelationData());
+        if (requestBuilder.getCorrelationInfo() != null) {
+          return of(new CorrelationData(requestBuilder.getCorrelationInfo(), requestBuilder.getSendCorrelationId(),
+                                        requestBuilder.getCorrelationId()));
+        } else {
+          return empty();
+        }
       }
     };
   }

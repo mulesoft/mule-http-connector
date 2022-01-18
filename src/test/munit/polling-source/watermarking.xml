@@ -41,7 +41,8 @@
     </flow>
 
     <flow name="watermarkInPayloadPollingFlow">
-        <http:polling-source config-ref="watermarkRequestConfig" path="watermark-payload">
+        <http:polling-source config-ref="watermarkRequestConfig" path="watermark-payload"
+                             splitExpression="#[payload.items]" watermarkExpression="#[payload.wm]">
             <scheduling-strategy>
                 <fixed-frequency frequency="1" timeUnit="SECONDS"/>
             </scheduling-strategy>
@@ -49,8 +50,6 @@
             <http:request-headers >
                 <http:request-header key="Content-Type" value="application/json" />
             </http:request-headers>
-            <http:split-expression><![CDATA[#[output application/json --- payload.items]]]></http:split-expression>
-            <http:watermark-expression><![CDATA[#[payload.wm]]]></http:watermark-expression>
         </http:polling-source>
         <munit-tools:queue queueName="watermark_payload_queue">
             <munit-tools:value>#[payload]</munit-tools:value>
@@ -108,7 +107,8 @@
     </flow>
 
     <flow name="watermarkInItemPollingFlow">
-        <http:polling-source config-ref="watermarkRequestConfig" path="watermark-item">
+        <http:polling-source config-ref="watermarkRequestConfig" path="watermark-item"
+                             splitExpression="#[payload.items]" watermarkExpression="#[item.wm]">
             <scheduling-strategy>
                 <fixed-frequency frequency="1" timeUnit="SECONDS"/>
             </scheduling-strategy>
@@ -116,9 +116,6 @@
             <http:request-headers >
                 <http:request-header key="Content-Type" value="application/json" />
             </http:request-headers>
-            <http:split-expression><![CDATA[#[output application/json --- payload.items]]]></http:split-expression>
-            <http:watermark-expression><![CDATA[#[item.wm]]]></http:watermark-expression>
-            <http:id-expression><![CDATA[#[item.name]]]></http:id-expression>
         </http:polling-source>
         <munit-tools:queue queueName="watermark_item_queue">
             <munit-tools:value>#[payload]</munit-tools:value>
@@ -186,7 +183,8 @@
     </flow>
 
     <flow name="watermarkInHeaderPollingFlow">
-        <http:polling-source config-ref="watermarkRequestConfig" path="watermark-header">
+        <http:polling-source config-ref="watermarkRequestConfig" path="watermark-header"
+                             splitExpression="#[payload.items]" watermarkExpression="#[attributes.headers.water]">
             <scheduling-strategy>
                 <fixed-frequency frequency="1" timeUnit="SECONDS"/>
             </scheduling-strategy>
@@ -194,9 +192,6 @@
             <http:request-headers >
                 <http:request-header key="Content-Type" value="application/json" />
             </http:request-headers>
-            <http:split-expression><![CDATA[#[output application/json --- payload.items]]]></http:split-expression>
-            <http:watermark-expression><![CDATA[#[attributes.headers.water]]]></http:watermark-expression>
-            <http:id-expression><![CDATA[#[item.name]]]></http:id-expression>
         </http:polling-source>
         <munit-tools:queue queueName="watermark_header_queue">
             <munit-tools:value>#[payload]</munit-tools:value>
@@ -254,16 +249,14 @@
     </flow>
 
     <flow name="watermarkIntoHeaderPollingFlow">
-        <http:polling-source config-ref="watermarkRequestConfig" path="watermark-into-header">
+        <http:polling-source config-ref="watermarkRequestConfig" path="watermark-into-header"
+                             splitExpression="#[payload.items]" watermarkExpression="#[payload.wm]">
             <scheduling-strategy>
                 <fixed-frequency frequency="1" timeUnit="SECONDS"/>
             </scheduling-strategy>
             <http:request-headers >
                 <http:request-header key="watermark" value="#[watermark default 0]" />
             </http:request-headers>
-            <http:split-expression><![CDATA[#[output application/json --- payload.items]]]></http:split-expression>
-            <http:watermark-expression><![CDATA[#[payload.wm]]]></http:watermark-expression>
-            <http:id-expression><![CDATA[#[item.name]]]></http:id-expression>
         </http:polling-source>
         <munit-tools:queue queueName="watermark_into_headers_queue">
             <munit-tools:value>#[payload]</munit-tools:value>
@@ -321,16 +314,14 @@
     </flow>
 
     <flow name="watermarkIntoQueryParamsPollingFlow">
-        <http:polling-source config-ref="watermarkRequestConfig" path="watermark-into-query">
+        <http:polling-source config-ref="watermarkRequestConfig" path="watermark-into-query"
+                             splitExpression="#[payload.items]" watermarkExpression="#[payload.wm]">
             <scheduling-strategy>
                 <fixed-frequency frequency="1" timeUnit="SECONDS"/>
             </scheduling-strategy>
             <http:request-query-params >
                 <http:request-query-param key="watermark" value="#[watermark default 0]" />
             </http:request-query-params>
-            <http:split-expression><![CDATA[#[output application/json --- payload.items]]]></http:split-expression>
-            <http:watermark-expression><![CDATA[#[payload.wm]]]></http:watermark-expression>
-            <http:id-expression><![CDATA[#[item.name]]]></http:id-expression>
         </http:polling-source>
         <munit-tools:queue queueName="watermark_into_query_queue">
             <munit-tools:value>#[payload]</munit-tools:value>
@@ -389,16 +380,14 @@
     </flow>
 
     <flow name="watermarkIntoUriParamsPollingFlow">
-        <http:polling-source config-ref="watermarkRequestConfig" path="watermark-into-uri/{subpathWater}">
+        <http:polling-source config-ref="watermarkRequestConfig" path="watermark-into-uri/{subpathWater}"
+                             splitExpression="#[payload.items]" watermarkExpression="#[payload.wm]">
             <scheduling-strategy>
                 <fixed-frequency frequency="1" timeUnit="SECONDS"/>
             </scheduling-strategy>
             <http:request-uri-params >
                 <http:request-uri-param key="subpathWater" value="#[watermark default 0]" />
             </http:request-uri-params>
-            <http:split-expression><![CDATA[#[output application/json --- payload.items]]]></http:split-expression>
-            <http:watermark-expression><![CDATA[#[payload.wm]]]></http:watermark-expression>
-            <http:id-expression><![CDATA[#[item.name]]]></http:id-expression>
         </http:polling-source>
         <munit-tools:queue queueName="watermark_into_uri_queue">
             <munit-tools:value>#[payload]</munit-tools:value>
@@ -457,7 +446,9 @@
     </flow>
 
     <flow name="identityPollingFlow">
-        <http:polling-source config-ref="watermarkRequestConfig" path="identity">
+        <http:polling-source config-ref="watermarkRequestConfig" path="identity"
+                             splitExpression="#[payload.items]"
+                             watermarkExpression="#[item.wm]" idExpression="#[item.name]">
             <scheduling-strategy>
                 <fixed-frequency frequency="1" timeUnit="SECONDS"/>
             </scheduling-strategy>
@@ -465,9 +456,6 @@
             <http:request-headers >
                 <http:request-header key="Content-Type" value="application/json" />
             </http:request-headers>
-            <http:split-expression><![CDATA[#[output application/json --- payload.items]]]></http:split-expression>
-            <http:watermark-expression><![CDATA[#[item.wm]]]></http:watermark-expression>
-            <http:id-expression><![CDATA[#[item.name]]]></http:id-expression>
         </http:polling-source>
         <munit-tools:queue queueName="identity_queue">
             <munit-tools:value>#[payload]</munit-tools:value>
@@ -513,12 +501,11 @@
     </flow>
 
     <flow name="identityWithoutWatermarkPollingFlow">
-        <http:polling-source config-ref="watermarkRequestConfig" path="identity-no-watermark">
+        <http:polling-source config-ref="watermarkRequestConfig" path="identity-no-watermark"
+                             splitExpression="#[payload.items]" idExpression="#[item.name]">
             <scheduling-strategy>
                 <fixed-frequency frequency="1" timeUnit="SECONDS"/>
             </scheduling-strategy>
-            <http:split-expression><![CDATA[#[output application/json --- payload.items]]]></http:split-expression>
-            <http:id-expression><![CDATA[#[item.name]]]></http:id-expression>
         </http:polling-source>
         <munit-tools:queue queueName="identity_nw_queue">
             <munit-tools:value>#[payload]</munit-tools:value>

@@ -34,7 +34,6 @@ import org.mule.extension.http.api.notification.HttpResponseNotificationData;
 import org.mule.extension.http.api.request.HttpSendBodyMode;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
 import org.mule.extension.http.api.request.authentication.UsernamePasswordAuthentication;
-import org.mule.extension.http.api.request.builder.CorrelationData;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.streaming.HttpStreamingType;

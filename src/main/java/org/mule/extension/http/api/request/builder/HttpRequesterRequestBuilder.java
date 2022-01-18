@@ -13,6 +13,7 @@ import static org.mule.runtime.extension.api.runtime.parameter.OutboundCorrelati
 import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
 
 import org.mule.extension.http.api.HttpMessageBuilder;
+import org.mule.extension.http.internal.request.CorrelationData;
 import org.mule.extension.http.internal.request.HttpRequesterConfig;
 import org.mule.extension.http.internal.request.UriUtils;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -129,6 +130,18 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
 
   public void setCorrelationInfo(CorrelationInfo correlationInfo) {
     this.correlationInfo = correlationInfo;
+  }
+
+  public String getCorrelationId() {
+    return correlationId;
+  }
+
+  public CorrelationInfo getCorrelationInfo() {
+    return correlationInfo;
+  }
+
+  public OutboundCorrelationStrategy getSendCorrelationId() {
+    return sendCorrelationId;
   }
 
   public CorrelationData getCorrelationData() {

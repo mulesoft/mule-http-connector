@@ -31,7 +31,6 @@ import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
 
 import org.mule.extension.http.api.request.HttpSendBodyMode;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
-import org.mule.extension.http.api.request.builder.CorrelationData;
 import org.mule.extension.http.api.streaming.HttpStreamingType;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.MediaType;

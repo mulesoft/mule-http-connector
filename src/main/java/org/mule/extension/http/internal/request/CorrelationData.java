@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.http.api.request.builder;
+package org.mule.extension.http.internal.request;
 
 import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
 import org.mule.runtime.extension.api.runtime.parameter.OutboundCorrelationStrategy;
