@@ -26,6 +26,7 @@ import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.request.builder.KeyValuePair;
 import org.mule.extension.http.api.request.builder.SimpleQueryParam;
 import org.mule.extension.http.api.request.builder.SimpleRequestHeader;
+import org.mule.extension.http.api.request.builder.SimpleUriParam;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.el.ValidationResult;
@@ -202,11 +203,10 @@ public final class HttpPollingSourceUtils {
    * @return the resolution of the expression for each uri parameter, that can depend on the watermark's current value.
    * the uri parameters that are not expressions will be left as are
    */
-  public static Map<String, String> resolveUriParams(Map<String, Literal<String>> uriParams, Serializable currentWatermark,
+  public static Map<String, String> resolveUriParams(List<SimpleUriParam> uriParams, Serializable currentWatermark,
                                                      ExpressionLanguage expressionLanguage) {
-    return uriParams.entrySet().stream()
-        .collect(toMap(Map.Entry::getKey, e -> resolveIfExpression(e.getValue().getLiteralValue().orElse(""), currentWatermark,
-                                                                   expressionLanguage)));
+    return uriParams.stream()
+        .collect(toMap(SimpleUriParam::getKey, up -> resolveIfExpression(up.getValue(), currentWatermark, expressionLanguage)));
   }
 
   /**

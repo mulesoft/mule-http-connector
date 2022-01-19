@@ -257,7 +257,7 @@
             <scheduling-strategy>
                 <fixed-frequency frequency="10" timeUnit="SECONDS"/>
             </scheduling-strategy>
-            <http:request-body><![CDATA[Jan Kucharzewski]]></http:request-body>
+            <http:polling-request-body><![CDATA[Jan Kucharzewski]]></http:polling-request-body>
         </http:polling-source>
         <munit-tools:queue queueName="multipart_queue">
             <munit-tools:value>#[payload]</munit-tools:value>

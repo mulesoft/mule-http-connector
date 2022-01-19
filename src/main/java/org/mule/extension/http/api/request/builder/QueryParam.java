@@ -16,7 +16,7 @@ import java.util.Objects;
  * 
  * @since 1.1
  */
-public class QueryParam {
+public class QueryParam implements KeyValuePair {
 
   /**
    * Represents the Key of this HTTP Query Parameter
@@ -30,10 +30,12 @@ public class QueryParam {
   @Parameter
   private String value;
 
+  @Override
   public String getKey() {
     return key;
   }
 
+  @Override
   public String getValue() {
     return value;
   }

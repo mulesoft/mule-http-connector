@@ -143,10 +143,6 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
     return sendCorrelationId;
   }
 
-  public CorrelationData getCorrelationData() {
-    return new CorrelationData(correlationInfo, sendCorrelationId, correlationId);
-  }
-
   /**
    * @deprecated
    * use {@link HttpRequesterRequestBuilder#toHttpRequestBuilder} instead
