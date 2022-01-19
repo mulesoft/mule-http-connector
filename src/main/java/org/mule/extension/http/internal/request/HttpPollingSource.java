@@ -178,7 +178,7 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
   }
 
   private void validateExpressions() {
-    validateExpression(requestBuilder.getRequestBody());
+    validateExpression(requestBuilder.getPollingRequestBody());
     requestBuilder.getRequestHeaders().forEach(header -> validateExpression(header.getValue()));
     requestBuilder.getRequestQueryParams().forEach(queryParam -> validateExpression(queryParam.getValue()));
   }
@@ -259,7 +259,7 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
 
       @Override
       public TypedValue<?> getBody() {
-        return resolveBody(requestBuilder.getRequestBody(), watermark, expressionLanguage);
+        return resolveBody(requestBuilder.getPollingRequestBody(), watermark, expressionLanguage);
       }
 
       @Override

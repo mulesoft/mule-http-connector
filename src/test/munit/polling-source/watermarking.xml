@@ -46,10 +46,10 @@
             <scheduling-strategy>
                 <fixed-frequency frequency="1" timeUnit="SECONDS"/>
             </scheduling-strategy>
-            <http:request-body><![CDATA[#[output application/json --- {'watermark': watermark}]]]></http:request-body>
-            <http:request-headers >
-                <http:request-header key="Content-Type" value="application/json" />
-            </http:request-headers>
+            <http:polling-request-body><![CDATA[#[output application/json --- {'watermark': watermark}]]]></http:polling-request-body>
+            <http:polling-request-headers >
+                <http:polling-request-header key="Content-Type" value="application/json" />
+            </http:polling-request-headers>
         </http:polling-source>
         <munit-tools:queue queueName="watermark_payload_queue">
             <munit-tools:value>#[payload]</munit-tools:value>
@@ -112,10 +112,10 @@
             <scheduling-strategy>
                 <fixed-frequency frequency="1" timeUnit="SECONDS"/>
             </scheduling-strategy>
-            <http:request-body><![CDATA[#[output application/json --- {'watermark': watermark}]]]></http:request-body>
-            <http:request-headers >
-                <http:request-header key="Content-Type" value="application/json" />
-            </http:request-headers>
+            <http:polling-request-body><![CDATA[#[output application/json --- {'watermark': watermark}]]]></http:polling-request-body>
+            <http:polling-request-headers >
+                <http:polling-request-header key="Content-Type" value="application/json" />
+            </http:polling-request-headers>
         </http:polling-source>
         <munit-tools:queue queueName="watermark_item_queue">
             <munit-tools:value>#[payload]</munit-tools:value>
@@ -188,10 +188,10 @@
             <scheduling-strategy>
                 <fixed-frequency frequency="1" timeUnit="SECONDS"/>
             </scheduling-strategy>
-            <http:request-body><![CDATA[#[output application/json --- {'watermark': watermark}]]]></http:request-body>
-            <http:request-headers >
-                <http:request-header key="Content-Type" value="application/json" />
-            </http:request-headers>
+            <http:polling-request-body><![CDATA[#[output application/json --- {'watermark': watermark}]]]></http:polling-request-body>
+            <http:polling-request-headers >
+                <http:polling-request-header key="Content-Type" value="application/json" />
+            </http:polling-request-headers>
         </http:polling-source>
         <munit-tools:queue queueName="watermark_header_queue">
             <munit-tools:value>#[payload]</munit-tools:value>
@@ -254,9 +254,9 @@
             <scheduling-strategy>
                 <fixed-frequency frequency="1" timeUnit="SECONDS"/>
             </scheduling-strategy>
-            <http:request-headers >
-                <http:request-header key="watermark" value="#[watermark default 0]" />
-            </http:request-headers>
+            <http:polling-request-headers >
+                <http:polling-request-header key="watermark" value="#[watermark default 0]" />
+            </http:polling-request-headers>
         </http:polling-source>
         <munit-tools:queue queueName="watermark_into_headers_queue">
             <munit-tools:value>#[payload]</munit-tools:value>
@@ -319,9 +319,9 @@
             <scheduling-strategy>
                 <fixed-frequency frequency="1" timeUnit="SECONDS"/>
             </scheduling-strategy>
-            <http:request-query-params >
-                <http:request-query-param key="watermark" value="#[watermark default 0]" />
-            </http:request-query-params>
+            <http:polling-request-query-params >
+                <http:polling-request-query-param key="watermark" value="#[watermark default 0]" />
+            </http:polling-request-query-params>
         </http:polling-source>
         <munit-tools:queue queueName="watermark_into_query_queue">
             <munit-tools:value>#[payload]</munit-tools:value>
@@ -385,9 +385,9 @@
             <scheduling-strategy>
                 <fixed-frequency frequency="1" timeUnit="SECONDS"/>
             </scheduling-strategy>
-            <http:request-uri-params >
-                <http:request-uri-param key="subpathWater" value="#[watermark default 0]" />
-            </http:request-uri-params>
+            <http:polling-request-uri-params >
+                <http:polling-request-uri-param key="subpathWater" value="#[watermark default 0]" />
+            </http:polling-request-uri-params>
         </http:polling-source>
         <munit-tools:queue queueName="watermark_into_uri_queue">
             <munit-tools:value>#[payload]</munit-tools:value>
@@ -452,10 +452,10 @@
             <scheduling-strategy>
                 <fixed-frequency frequency="1" timeUnit="SECONDS"/>
             </scheduling-strategy>
-            <http:request-body><![CDATA[#[output application/json --- {'watermark': watermark}]]]></http:request-body>
-            <http:request-headers >
-                <http:request-header key="Content-Type" value="application/json" />
-            </http:request-headers>
+            <http:polling-request-body><![CDATA[#[output application/json --- {'watermark': watermark}]]]></http:polling-request-body>
+            <http:polling-request-headers >
+                <http:polling-request-header key="Content-Type" value="application/json" />
+            </http:polling-request-headers>
         </http:polling-source>
         <munit-tools:queue queueName="identity_queue">
             <munit-tools:value>#[payload]</munit-tools:value>

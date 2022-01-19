@@ -98,10 +98,6 @@ public class HttpRequesterTestRequestBuilder implements Initialisable {
     return requestUriParams;
   }
 
-  protected void setRequestQueryParams(List<TestQueryParam> queryParams) {
-    this.requestQueryParams = queryParams;
-  }
-
   @Override
   public int hashCode() {
     return hash(requestBody, requestHeaders, requestQueryParams, requestUriParams);

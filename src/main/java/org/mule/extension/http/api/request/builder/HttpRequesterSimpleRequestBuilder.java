@@ -7,8 +7,6 @@
 package org.mule.extension.http.api.request.builder;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableList;
 import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
 
@@ -23,7 +21,6 @@ import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Component that specifies how to create a proper HTTP simple request, that can be used in a Polling Source
@@ -39,7 +36,7 @@ public class HttpRequesterSimpleRequestBuilder {
   @Optional(defaultValue = "")
   @Text
   @DisplayName("Body")
-  private Literal<String> requestBody;
+  private Literal<String> pollingRequestBody;
 
   /**
    * HTTP headers the message should include.
@@ -48,7 +45,7 @@ public class HttpRequesterSimpleRequestBuilder {
   @Optional
   @NullSafe
   @DisplayName("Headers")
-  protected List<SimpleRequestHeader> requestHeaders = emptyList();
+  protected List<SimpleRequestHeader> pollingRequestHeaders = emptyList();
 
   /**
    * URI parameters that should be used to create the request.
@@ -57,7 +54,7 @@ public class HttpRequesterSimpleRequestBuilder {
   @Optional
   @NullSafe
   @DisplayName("URI Parameters")
-  private Map<String, Literal<String>> requestUriParams = emptyMap();
+  private List<SimpleUriParam> pollingRequestUriParams = emptyList();
 
   /**
    * Query parameters the request should include.
@@ -66,22 +63,22 @@ public class HttpRequesterSimpleRequestBuilder {
   @Optional
   @NullSafe
   @DisplayName("Query Parameters")
-  private List<SimpleQueryParam> requestQueryParams = emptyList();
+  private List<SimpleQueryParam> pollingRequestQueryParams = emptyList();
 
-  public String getRequestBody() {
-    return requestBody.getLiteralValue().orElse("");
+  public String getPollingRequestBody() {
+    return pollingRequestBody.getLiteralValue().orElse("");
   }
 
   public List<SimpleRequestHeader> getRequestHeaders() {
-    return unmodifiableList(requestHeaders);
+    return unmodifiableList(pollingRequestHeaders);
   }
 
   public List<SimpleQueryParam> getRequestQueryParams() {
-    return unmodifiableList(requestQueryParams);
+    return unmodifiableList(pollingRequestQueryParams);
   }
 
-  public Map<String, Literal<String>> getRequestUriParams() {
-    return unmodifiableMap(requestUriParams);
+  public List<SimpleUriParam> getRequestUriParams() {
+    return unmodifiableList(pollingRequestUriParams);
   }
 
   public HttpRequestBuilder toHttpRequestBuilder(HttpRequesterConfig config) {
