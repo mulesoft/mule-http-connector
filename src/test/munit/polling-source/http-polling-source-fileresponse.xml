@@ -59,11 +59,11 @@
     </flow>
 
     <flow name="csvFilePollingFlow">
-        <http:polling-source config-ref="splittingFromFileConfig" path="csv">
+        <http:polling-source config-ref="splittingFromFileConfig" path="csv"
+                             splitExpression="#[output application/json --- payload.parts.file.content]">
             <scheduling-strategy>
                 <fixed-frequency frequency="10" timeUnit="SECONDS"/>
             </scheduling-strategy>
-            <http:split-expression><![CDATA[#[output application/json --- payload.parts.file.content]]]></http:split-expression>
         </http:polling-source>
         <munit-tools:queue queueName="splitfile_queue">
             <munit-tools:value>#[payload]</munit-tools:value>
