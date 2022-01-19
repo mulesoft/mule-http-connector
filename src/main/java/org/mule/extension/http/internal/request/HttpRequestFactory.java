@@ -31,8 +31,6 @@ import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
 
 import org.mule.extension.http.api.request.HttpSendBodyMode;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
-import org.mule.extension.http.api.request.builder.HttpRequestBuilderConfigurer;
-import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.api.streaming.HttpStreamingType;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.MediaType;
@@ -96,7 +94,7 @@ public class HttpRequestFactory {
   /**
    * Creates an {@HttpRequest}.
    *
-   * @param requestBuilderConfigurer The generic {@link HttpRequestBuilderConfigurer} from the request component that should be used to
+   * @param httpRequestCreator The generic {@link RequestCreator} from the request component that should be used to
    *                       create the {@link HttpRequest}.
    * @param authentication The {@link HttpRequestAuthentication} that should be used to create the {@link HttpRequest}.
    * @return an {@HttpRequest} configured based on the parameters.
@@ -104,9 +102,9 @@ public class HttpRequestFactory {
    */
   public HttpRequest create(HttpRequesterConfig config, String uri, String method, HttpStreamingType streamingMode,
                             HttpSendBodyMode sendBodyMode, TransformationService transformationService,
-                            HttpRequestBuilderConfigurer requestBuilderConfigurer, HttpRequestAuthentication authentication,
-                            Map<String, List<String>> injectedHeaders) {
-    HttpRequestBuilder builder = requestBuilderConfigurer.toHttpRequestBuilder(config)
+                            HttpRequestAuthentication authentication, Map<String, List<String>> injectedHeaders,
+                            RequestCreator httpRequestCreator) {
+    HttpRequestBuilder builder = httpRequestCreator.createRequestBuilder(config)
         .uri(uri)
         .method(method);
 
@@ -119,12 +117,9 @@ public class HttpRequestFactory {
       }
     });
 
-    config.getDefaultQueryParams()
-        .forEach(param -> builder.addQueryParam(param.getKey(), param.getValue()));
+    config.getDefaultQueryParams().forEach(param -> builder.addQueryParam(param.getKey(), param.getValue()));
 
-    if (requestBuilderConfigurer instanceof HttpRequesterRequestBuilder) {
-      addCorrelationIdResolution((HttpRequesterRequestBuilder) requestBuilderConfigurer, builder);
-    }
+    httpRequestCreator.getCorrelationData().ifPresent(correlationData -> addCorrelationIdResolution(correlationData, builder));
 
     if (config.isEnableCookies()) {
       addCookiesHeader(config, uri, builder);
@@ -132,7 +127,7 @@ public class HttpRequestFactory {
 
     try {
       builder.entity(createRequestEntity(streamingMode, sendBodyMode, transformationService, builder, method,
-                                         requestBuilderConfigurer.getBodyAsTypedValue()));
+                                         httpRequestCreator.getBody()));
     } catch (Exception e) {
       throw new ModuleException(TRANSFORMATION, e);
     }
@@ -148,9 +143,9 @@ public class HttpRequestFactory {
     return builder.build();
   }
 
-  private void addCorrelationIdResolution(HttpRequesterRequestBuilder requestBuilder, HttpRequestBuilder builder) {
-    requestBuilder.getSendCorrelationId()
-        .getOutboundCorrelationId(requestBuilder.getCorrelationInfo(), requestBuilder.getCorrelationId())
+  private void addCorrelationIdResolution(CorrelationData correlationData, HttpRequestBuilder builder) {
+    correlationData.getSendCorrelationId()
+        .getOutboundCorrelationId(correlationData.getCorrelationInfo(), correlationData.getCorrelationId())
         .ifPresent(correlationId -> {
           String xCorrelationId;
           if (builder.getHeaderValue(X_CORRELATION_ID_HEADER).isPresent()) {

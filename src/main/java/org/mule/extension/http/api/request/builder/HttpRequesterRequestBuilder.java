@@ -13,6 +13,7 @@ import static org.mule.runtime.extension.api.runtime.parameter.OutboundCorrelati
 import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
 
 import org.mule.extension.http.api.HttpMessageBuilder;
+import org.mule.extension.http.internal.request.CorrelationData;
 import org.mule.extension.http.internal.request.HttpRequesterConfig;
 import org.mule.extension.http.internal.request.UriUtils;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -35,7 +36,7 @@ import java.util.Map;
  *
  * @since 1.0
  */
-public class HttpRequesterRequestBuilder extends HttpMessageBuilder implements HttpRequestBuilderConfigurer {
+public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
 
   /**
    * The body of the response message
@@ -127,20 +128,24 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder implements H
     this.uriParams = uriParams;
   }
 
-  public CorrelationInfo getCorrelationInfo() {
-    return correlationInfo;
-  }
-
   public void setCorrelationInfo(CorrelationInfo correlationInfo) {
     this.correlationInfo = correlationInfo;
+  }
+
+  public String getCorrelationId() {
+    return correlationId;
+  }
+
+  public CorrelationInfo getCorrelationInfo() {
+    return correlationInfo;
   }
 
   public OutboundCorrelationStrategy getSendCorrelationId() {
     return sendCorrelationId;
   }
 
-  public String getCorrelationId() {
-    return correlationId;
+  public CorrelationData getCorrelationData() {
+    return new CorrelationData(correlationInfo, sendCorrelationId, correlationId);
   }
 
   /**
@@ -152,15 +157,10 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder implements H
     return toHttpRequestBuilder(config);
   }
 
-  @Override
   public HttpRequestBuilder toHttpRequestBuilder(HttpRequesterConfig config) {
     return HttpRequest.builder(PRESERVE_HEADER_CASE || config.isPreserveHeadersCase())
         .headers(headers)
         .queryParams(queryParams);
   }
 
-  @Override
-  public TypedValue getBodyAsTypedValue() {
-    return getBody();
-  }
 }

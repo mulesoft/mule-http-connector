@@ -98,7 +98,7 @@
                 <fixed-frequency frequency="2" timeUnit="SECONDS"/>
             </scheduling-strategy>
             <http:request-query-params >
-                <http:query-param key="testQueryParam" value="parameter value" />
+                <http:request-query-param key="testQueryParam" value="parameter value" />
             </http:request-query-params>
         </http:polling-source>
         <logger message="#[payload]"/>
@@ -155,7 +155,7 @@
                 <http:request-uri-param key="testPath" value="test" />
             </http:request-uri-params>
             <http:request-query-params >
-                <http:query-param key="testQueryParam" value="parameter value" />
+                <http:request-query-param key="testQueryParam" value="parameter value" />
             </http:request-query-params>
         </http:polling-source>
         <logger message="#[payload]"/>
