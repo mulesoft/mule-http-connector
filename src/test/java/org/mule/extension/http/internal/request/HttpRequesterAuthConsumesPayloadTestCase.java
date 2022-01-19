@@ -22,6 +22,7 @@ import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
@@ -48,6 +49,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Optional.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
@@ -68,6 +70,7 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
   private HttpRequesterConfig config;
   private ResponseValidator responseValidator;
   private HttpRequesterRequestBuilder requestBuilder;
+  private RequestCreator requestCreator;
   private MuleContext muleContext;
   private NotificationEmitter notificationEmitter;
   private CompletionCallback<InputStream, HttpResponseAttributes> callback;
@@ -106,7 +109,7 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     textPayload = "some text payload";
     InputStream payloadInputStream = IOUtils.toInputStream(textPayload);
     when(entity.getContent()).thenReturn(payloadInputStream);
-    when(entity.getLength()).thenReturn(Optional.of((long) textPayload.length()));
+    when(entity.getLength()).thenReturn(of((long) textPayload.length()));
 
     when(streamingHelper.resolveCursorProvider(entity.getContent())).thenReturn(new FakeCursorProvider(payloadInputStream));
 
@@ -120,6 +123,32 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     client = mock(HttpExtensionClient.class);
 
     when(client.send(httpRequest, 0, false, null)).thenReturn(CompletableFuture.completedFuture(response));
+    requestCreator = getRequestCreator();
+  }
+
+  private RequestCreator getRequestCreator() {
+    return new RequestCreator() {
+
+      @Override
+      public HttpRequestBuilder createRequestBuilder(HttpRequesterConfig config) {
+        return requestBuilder.toHttpRequestBuilder(config);
+      }
+
+      @Override
+      public TypedValue<?> getBody() {
+        return requestBuilder.getBody();
+      }
+
+      @Override
+      public Optional<CorrelationData> getCorrelationData() {
+        if (requestBuilder.getCorrelationInfo() != null) {
+          return of(new CorrelationData(requestBuilder.getCorrelationInfo(), requestBuilder.getSendCorrelationId(),
+                                        requestBuilder.getCorrelationId()));
+        } else {
+          return empty();
+        }
+      }
+    };
   }
 
   @Test
@@ -140,14 +169,14 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
         .thenReturn(result1, result2);
 
     Map<String, List<String>> injectedHeaders = new HashMap<>();
-    when(httpRequestFactory.create(config, uri, "dummyMethod", null, null, null, requestBuilder, authentication, injectedHeaders))
+    when(httpRequestFactory.create(config, uri, "dummyMethod", null, null, null, authentication, injectedHeaders, requestCreator))
         .thenReturn(httpRequest);
 
     // When
     boolean checkRetry = true;
     httpRequester.doRequest(client, config, uri, "dummyMethod", null, null, false, authentication, 0, responseValidator, null,
-                            requestBuilder, checkRetry, muleContext, null, notificationEmitter, streamingHelper, callback,
-                            injectedHeaders, "correlationId");
+                            requestCreator, checkRetry, muleContext, null, notificationEmitter, streamingHelper, callback,
+                            injectedHeaders);
 
     // Then
     InOrder order = inOrder(streamingHelper, httpResponseToResult, authentication, callback);
@@ -176,15 +205,15 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
         .thenReturn(result1, result2);
 
     Map<String, List<String>> injectedHeaders = new HashMap<>();
-    when(httpRequestFactory.create(config, uri, "dummyMethod", null, null, null, requestBuilder, authentication, injectedHeaders))
+    when(httpRequestFactory.create(config, uri, "dummyMethod", null, null, null, authentication, injectedHeaders, requestCreator))
         .thenReturn(httpRequest);
 
     boolean checkRetry = true;
 
     // When
     httpRequester.doRequest(client, config, uri, "dummyMethod", null, null, false, authentication, 0, responseValidator, null,
-                            requestBuilder, checkRetry, muleContext, null, notificationEmitter, streamingHelper, callback,
-                            injectedHeaders, "correlationId");
+                            requestCreator, checkRetry, muleContext, null, notificationEmitter, streamingHelper, callback,
+                            injectedHeaders);
 
     // Then
     InOrder order = inOrder(streamingHelper, httpResponseToResult, authentication, callback);
@@ -206,7 +235,7 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     HttpRequester httpRequester = new HttpRequester(httpRequestFactory, httpResponseToResult, httpErrorMessageGenerator);
 
     Map<String, List<String>> injectedHeaders = new HashMap<>();
-    when(httpRequestFactory.create(config, uri, "dummyMethod", null, null, null, requestBuilder, authentication, injectedHeaders))
+    when(httpRequestFactory.create(config, uri, "dummyMethod", null, null, null, authentication, injectedHeaders, requestCreator))
         .thenReturn(httpRequest);
 
     boolean checkRetry = true;
@@ -215,8 +244,8 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
 
     // When
     httpRequester.doRequest(client, config, uri, "dummyMethod", null, null, false, authentication, 0, responseValidator, null,
-                            requestBuilder, checkRetry, muleContext, null, notificationEmitter, streamingHelper, callback,
-                            injectedHeaders, "correlationId");
+                            requestCreator, checkRetry, muleContext, null, notificationEmitter, streamingHelper, callback,
+                            injectedHeaders);
 
     // Then
     ArgumentCaptor<Result> argumentCaptor = ArgumentCaptor.forClass(Result.class);
@@ -241,7 +270,7 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     HttpRequester httpRequester = new HttpRequester(httpRequestFactory, httpResponseToResult, httpErrorMessageGenerator);
 
     Map<String, List<String>> injectedHeaders = new HashMap<>();
-    when(httpRequestFactory.create(config, uri, "dummyMethod", null, null, null, requestBuilder, authentication, injectedHeaders))
+    when(httpRequestFactory.create(config, uri, "dummyMethod", null, null, null, authentication, injectedHeaders, requestCreator))
         .thenReturn(httpRequest);
 
     boolean checkRetry = true;
@@ -250,8 +279,8 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
 
     // When
     httpRequester.doRequest(client, config, uri, "dummyMethod", null, null, false, authentication, 0, responseValidator, null,
-                            requestBuilder, checkRetry, muleContext, null, notificationEmitter, streamingHelper, callback,
-                            injectedHeaders, "correlationId");
+                            requestCreator, checkRetry, muleContext, null, notificationEmitter, streamingHelper, callback,
+                            injectedHeaders);
 
     // Then
     ArgumentCaptor<Result> argumentCaptor = ArgumentCaptor.forClass(Result.class);
@@ -277,15 +306,15 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
         .thenReturn(result1, result2);
 
     Map<String, List<String>> injectedHeaders = new HashMap<>();
-    when(httpRequestFactory.create(config, uri, "dummyMethod", null, null, null, requestBuilder, authentication, injectedHeaders))
+    when(httpRequestFactory.create(config, uri, "dummyMethod", null, null, null, authentication, injectedHeaders, requestCreator))
         .thenReturn(httpRequest);
 
     boolean checkRetry = true;
 
     // When
     httpRequester.doRequest(client, config, uri, "dummyMethod", null, null, false, authentication, 0, responseValidator, null,
-                            requestBuilder, checkRetry, muleContext, null, notificationEmitter, streamingHelper, callback,
-                            injectedHeaders, "correlationId");
+                            requestCreator, checkRetry, muleContext, null, notificationEmitter, streamingHelper, callback,
+                            injectedHeaders);
 
     // Then
     verify(streamingHelper, never()).resolveCursorProvider(entity.getContent());

@@ -27,11 +27,10 @@
     </flow>
 
     <flow name="jsonPollingFlow">
-        <http:polling-source config-ref="splittingConfig" path="json">
+        <http:polling-source config-ref="splittingConfig" path="json" splitExpression="#[payload]">
             <scheduling-strategy>
                 <fixed-frequency frequency="10" timeUnit="SECONDS"/>
             </scheduling-strategy>
-            <http:split-expression><![CDATA[#[payload]]]></http:split-expression>
         </http:polling-source>
         <munit-tools:queue queueName="json_queue">
             <munit-tools:value>#[payload]</munit-tools:value>
@@ -64,11 +63,10 @@
     </flow>
 
     <flow name="textPollingFlow">
-        <http:polling-source config-ref="splittingConfig" path="text">
+        <http:polling-source config-ref="splittingConfig" path="text" splitExpression="#[payload as String splitBy(', ')]">
             <scheduling-strategy>
                 <fixed-frequency frequency="10" timeUnit="SECONDS"/>
             </scheduling-strategy>
-            <http:split-expression><![CDATA[#[payload as String splitBy(', ')]]]></http:split-expression>
         </http:polling-source>
         <munit-tools:queue queueName="text_queue">
             <munit-tools:value>#[payload]</munit-tools:value>
@@ -100,12 +98,10 @@
     </flow>
 
     <flow name="xmlPollingFlow">
-        <http:polling-source config-ref="splittingConfig" path="xml">
+        <http:polling-source config-ref="splittingConfig" path="xml" splitExpression="#[payload.something.*element]">
             <scheduling-strategy>
                 <fixed-frequency frequency="10" timeUnit="SECONDS"/>
             </scheduling-strategy>
-            <http:split-expression>
-                <![CDATA[#[payload.something.*element]]]></http:split-expression>
         </http:polling-source>
         <munit-tools:queue queueName="xml_queue">
             <munit-tools:value>#[payload]</munit-tools:value>
@@ -139,11 +135,10 @@
     </flow>
 
     <flow name="csvPollingFlow">
-        <http:polling-source config-ref="splittingConfig" path="csv">
+        <http:polling-source config-ref="splittingConfig" path="csv" splitExpression="#[output application/json --- payload]">
             <scheduling-strategy>
                 <fixed-frequency frequency="10" timeUnit="SECONDS"/>
             </scheduling-strategy>
-            <http:split-expression><![CDATA[#[output application/json --- payload]]]></http:split-expression>
         </http:polling-source>
         <munit-tools:queue queueName="csv_queue">
             <munit-tools:value>#[payload]</munit-tools:value>
@@ -176,11 +171,10 @@
     </flow>
 
     <flow name="yamlPollingFlow">
-        <http:polling-source config-ref="splittingConfig" path="yaml">
+        <http:polling-source config-ref="splittingConfig" path="yaml" splitExpression="#[payload.people]">
             <scheduling-strategy>
                 <fixed-frequency frequency="10" timeUnit="SECONDS"/>
             </scheduling-strategy>
-            <http:split-expression><![CDATA[#[payload.people]]]></http:split-expression>
         </http:polling-source>
         <munit-tools:queue queueName="yaml_queue">
             <munit-tools:value>#[payload]</munit-tools:value>
@@ -258,12 +252,12 @@
     </flow>
 
     <flow name="multipartPollingFlow">
-        <http:polling-source config-ref="splittingConfig" path="multipart">
+        <http:polling-source config-ref="splittingConfig" path="multipart"
+                             splitExpression="#[output application/json --- [payload.parts.file1.content, payload.parts.file2.content]]">
             <scheduling-strategy>
                 <fixed-frequency frequency="10" timeUnit="SECONDS"/>
             </scheduling-strategy>
             <http:request-body><![CDATA[Jan Kucharzewski]]></http:request-body>
-            <http:split-expression><![CDATA[#[output application/json --- [payload.parts.file1.content, payload.parts.file2.content]]]]></http:split-expression>
         </http:polling-source>
         <munit-tools:queue queueName="multipart_queue">
             <munit-tools:value>#[payload]</munit-tools:value>
@@ -300,11 +294,11 @@
     </flow>
 
     <flow name="headersPollingFlow">
-        <http:polling-source config-ref="splittingConfig" path="headers">
+        <http:polling-source config-ref="splittingConfig" path="headers"
+                             splitExpression="#[output application/json --- [{'name': payload.people[0].name ++ ' ' ++ attributes.headers.h1}, {'name': payload.people[1].name ++ ' ' ++ attributes.headers.h2}]]">
             <scheduling-strategy>
                 <fixed-frequency frequency="10" timeUnit="SECONDS"/>
             </scheduling-strategy>
-            <http:split-expression><![CDATA[#[output application/json --- [{'name': payload.people[0].name ++ ' ' ++ attributes.headers.h1}, {'name': payload.people[1].name ++ ' ' ++ attributes.headers.h2}]]]]></http:split-expression>
         </http:polling-source>
         <munit-tools:queue queueName="headers_queue">
             <munit-tools:value>#[payload]</munit-tools:value>

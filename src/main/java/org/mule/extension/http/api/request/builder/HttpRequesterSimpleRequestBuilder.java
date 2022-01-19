@@ -10,17 +10,15 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableList;
-import static org.mule.extension.http.internal.request.KeyValuePairUtils.toMultiMap;
 import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
 
 import org.mule.extension.http.internal.request.HttpRequesterConfig;
-import org.mule.extension.http.internal.request.UriUtils;
-import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
+import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
 
@@ -32,7 +30,7 @@ import java.util.Map;
  *
  * @since 1.7
  */
-public class HttpRequesterSimpleRequestBuilder implements HttpRequestBuilderConfigurer {
+public class HttpRequesterSimpleRequestBuilder {
 
   /**
    * The body of the response message
@@ -41,7 +39,7 @@ public class HttpRequesterSimpleRequestBuilder implements HttpRequestBuilderConf
   @Optional(defaultValue = "")
   @Text
   @DisplayName("Body")
-  private String requestBody;
+  private Literal<String> requestBody;
 
   /**
    * HTTP headers the message should include.
@@ -59,7 +57,7 @@ public class HttpRequesterSimpleRequestBuilder implements HttpRequestBuilderConf
   @Optional
   @NullSafe
   @DisplayName("URI Parameters")
-  private Map<String, String> requestUriParams = emptyMap();
+  private Map<String, Literal<String>> requestUriParams = emptyMap();
 
   /**
    * Query parameters the request should include.
@@ -68,62 +66,26 @@ public class HttpRequesterSimpleRequestBuilder implements HttpRequestBuilderConf
   @Optional
   @NullSafe
   @DisplayName("Query Parameters")
-  private List<QueryParam> requestQueryParams = emptyList();
+  private List<SimpleQueryParam> requestQueryParams = emptyList();
 
   public String getRequestBody() {
-    return requestBody;
-  }
-
-  protected void setRequestBody(String body) {
-    this.requestBody = body;
+    return requestBody.getLiteralValue().orElse("");
   }
 
   public List<SimpleRequestHeader> getRequestHeaders() {
     return unmodifiableList(requestHeaders);
   }
 
-  protected void setRequestHeaders(List<SimpleRequestHeader> headers) {
-    this.requestHeaders = headers != null ? headers : emptyList();
-  }
-
-  public String replaceUriParamsOf(String path) {
-    return UriUtils.replaceUriParams(path, requestUriParams);
-  }
-
-  public List<QueryParam> getRequestQueryParams() {
+  public List<SimpleQueryParam> getRequestQueryParams() {
     return unmodifiableList(requestQueryParams);
   }
 
-  public Map<String, String> getRequestUriParams() {
+  public Map<String, Literal<String>> getRequestUriParams() {
     return unmodifiableMap(requestUriParams);
   }
 
-  protected void setRequestQueryParams(List<QueryParam> queryParams) {
-    this.requestQueryParams = queryParams;
-  }
-
-  protected void setRequestUriParams(Map<String, String> uriParams) {
-    this.requestUriParams = uriParams;
-  }
-
-  @Override
   public HttpRequestBuilder toHttpRequestBuilder(HttpRequesterConfig config) {
-    return HttpRequest.builder(PRESERVE_HEADER_CASE || config.isPreserveHeadersCase())
-        .headers(toMultiMap(getRequestHeaders()))
-        .queryParams(toMultiMap(getRequestQueryParams()));
+    return HttpRequest.builder(PRESERVE_HEADER_CASE || config.isPreserveHeadersCase());
   }
 
-  public HttpRequesterRequestBuilder toHttpRequesterRequestBuilder() {
-    HttpRequesterRequestBuilder builder = new HttpRequesterRequestBuilder();
-    builder.setBody(TypedValue.of(requestBody));
-    builder.setUriParams(requestUriParams);
-    builder.setQueryParams(toMultiMap(requestQueryParams));
-    builder.setHeaders(toMultiMap(requestHeaders));
-    return builder;
-  }
-
-  @Override
-  public TypedValue getBodyAsTypedValue() {
-    return TypedValue.of(getRequestBody());
-  }
 }
