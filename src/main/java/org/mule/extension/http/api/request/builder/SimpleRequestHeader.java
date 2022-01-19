@@ -19,7 +19,7 @@ import java.util.Objects;
  *
  * @since 1.7
  */
-@Alias("requestHeader")
+@Alias("pollingRequestHeader")
 public class SimpleRequestHeader implements KeyValuePair {
 
   /**

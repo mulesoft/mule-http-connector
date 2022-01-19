@@ -6,29 +6,30 @@
  */
 package org.mule.extension.http.api.request.builder;
 
-import static java.util.Objects.hash;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 
 import java.util.Objects;
 
+import static java.util.Objects.hash;
+
 /**
- * Represents an HTTP Query Parameter
+ * Represents an HTTP URI Parameter
  *
  * @since 1.7
  */
-@Alias("pollingRequestQueryParam")
-public class SimpleQueryParam implements KeyValuePair {
+@Alias("pollingRequestUriParam")
+public class SimpleUriParam implements KeyValuePair {
 
   /**
-   * Represents the Key of this HTTP Query Parameter
+   * Represents the Key of this HTTP URI Parameter
    */
   @Parameter
   private String key;
 
   /**
-   * Represents the Value of this HTTP Query Parameter, that could be an expression depending on a watermarking value
+   * Represents the Value of this HTTP URI Parameter, that could be an expression depending on a watermarking value
    * that would be then resolved
    */
   @Parameter
@@ -52,7 +53,7 @@ public class SimpleQueryParam implements KeyValuePair {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    SimpleQueryParam that = (SimpleQueryParam) o;
+    SimpleUriParam that = (SimpleUriParam) o;
     return Objects.equals(key, that.key) && Objects.equals(value, that.value);
   }
 

@@ -82,9 +82,9 @@
             <scheduling-strategy >
                 <fixed-frequency frequency="2" timeUnit="SECONDS"/>
             </scheduling-strategy>
-            <http:request-headers >
-                <http:request-header key="testHeader" value="Messi" />
-            </http:request-headers>
+            <http:polling-request-headers >
+                <http:polling-request-header key="testHeader" value="Messi" />
+            </http:polling-request-headers>
         </http:polling-source>
         <logger message="#[payload]"/>
         <munit-tools:queue queueName="test_queue_2">
@@ -97,9 +97,9 @@
             <scheduling-strategy >
                 <fixed-frequency frequency="2" timeUnit="SECONDS"/>
             </scheduling-strategy>
-            <http:request-query-params >
-                <http:request-query-param key="testQueryParam" value="parameter value" />
-            </http:request-query-params>
+            <http:polling-request-query-params >
+                <http:polling-request-query-param key="testQueryParam" value="parameter value" />
+            </http:polling-request-query-params>
         </http:polling-source>
         <logger message="#[payload]"/>
         <munit-tools:queue queueName="test_queue_4">
@@ -112,9 +112,9 @@
             <scheduling-strategy >
                 <fixed-frequency frequency="2" timeUnit="SECONDS"/>
             </scheduling-strategy>
-            <http:request-uri-params >
-                <http:request-uri-param key="testPath" value="test" />
-            </http:request-uri-params>
+            <http:polling-request-uri-params >
+                <http:polling-request-uri-param key="testPath" value="test" />
+            </http:polling-request-uri-params>
         </http:polling-source>
         <logger message="#[payload]"/>
         <munit-tools:queue queueName="test_queue_5">
@@ -133,7 +133,7 @@
             <scheduling-strategy >
                 <fixed-frequency frequency="10" timeUnit="HOURS"/>
             </scheduling-strategy>
-            <http:request-body ><![CDATA[Some Body]]></http:request-body>
+            <http:polling-request-body ><![CDATA[Some Body]]></http:polling-request-body>
         </http:polling-source>
         <logger message="#[payload]"/>
         <munit-tools:queue queueName="test_queue_6">
@@ -146,17 +146,17 @@
             <scheduling-strategy >
                 <fixed-frequency frequency="2" timeUnit="SECONDS"/>
             </scheduling-strategy>
-            <http:request-body ><![CDATA[{'someBodyValue': 10}]]></http:request-body>
-            <http:request-headers >
-                <http:request-header key="content" value="application/json" />
-                <http:request-header key="testHeader" value="Messi" />
-            </http:request-headers>
-            <http:request-uri-params >
-                <http:request-uri-param key="testPath" value="test" />
-            </http:request-uri-params>
-            <http:request-query-params >
-                <http:request-query-param key="testQueryParam" value="parameter value" />
-            </http:request-query-params>
+            <http:polling-request-body ><![CDATA[{'someBodyValue': 10}]]></http:polling-request-body>
+            <http:polling-request-headers >
+                <http:polling-request-header key="content" value="application/json" />
+                <http:polling-request-header key="testHeader" value="Messi" />
+            </http:polling-request-headers>
+            <http:polling-request-uri-params >
+                <http:polling-request-uri-param key="testPath" value="test" />
+            </http:polling-request-uri-params>
+            <http:polling-request-query-params >
+                <http:polling-request-query-param key="testQueryParam" value="parameter value" />
+            </http:polling-request-query-params>
         </http:polling-source>
         <logger message="#[payload]"/>
         <munit-tools:queue queueName="test_queue_7">
