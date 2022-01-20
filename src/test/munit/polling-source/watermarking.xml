@@ -334,19 +334,19 @@
             <munit:enable-flow-source value="watermarkIntoQueryParamsPollingFlow"/>
         </munit:enable-flow-sources>
         <munit:execution>
-            <munit-tools:dequeue timeout="1" timeoutUnit="SECONDS" queueName="watermark_into_query_queue"/>
+            <munit-tools:dequeue timeout="2" timeoutUnit="SECONDS" queueName="watermark_into_query_queue"/>
             <set-variable variableName="names" value="#[payload.name]"/>
-            <munit-tools:dequeue timeout="1" timeoutUnit="SECONDS" queueName="watermark_into_query_queue"/>
+            <munit-tools:dequeue timeout="2" timeoutUnit="SECONDS" queueName="watermark_into_query_queue"/>
             <set-variable variableName="names" value="#[vars.names ++ payload.name]"/>
-            <munit-tools:dequeue timeout="1" timeoutUnit="SECONDS" queueName="watermark_into_query_queue"/>
+            <munit-tools:dequeue timeout="2" timeoutUnit="SECONDS" queueName="watermark_into_query_queue"/>
             <set-variable variableName="names" value="#[vars.names ++ payload.name]"/>
-            <munit-tools:dequeue timeout="1" timeoutUnit="SECONDS" queueName="watermark_into_query_queue"/>
+            <munit-tools:dequeue timeout="2" timeoutUnit="SECONDS" queueName="watermark_into_query_queue"/>
             <set-variable variableName="names" value="#[vars.names ++ payload.name]"/>
-            <munit-tools:dequeue timeout="1" timeoutUnit="SECONDS" queueName="watermark_into_query_queue"/>
+            <munit-tools:dequeue timeout="2" timeoutUnit="SECONDS" queueName="watermark_into_query_queue"/>
             <set-variable variableName="names" value="#[vars.names ++ payload.name]"/>
-            <munit-tools:dequeue timeout="1" timeoutUnit="SECONDS" queueName="watermark_into_query_queue"/>
+            <munit-tools:dequeue timeout="2" timeoutUnit="SECONDS" queueName="watermark_into_query_queue"/>
             <set-variable variableName="names" value="#[vars.names ++ payload.name]"/>
-            <munit-tools:dequeue timeout="1" timeoutUnit="SECONDS" queueName="watermark_into_query_queue"/>
+            <munit-tools:dequeue timeout="2" timeoutUnit="SECONDS" queueName="watermark_into_query_queue"/>
             <set-variable variableName="names" value="#[vars.names ++ payload.name]"/>
         </munit:execution>
         <munit:validation>
