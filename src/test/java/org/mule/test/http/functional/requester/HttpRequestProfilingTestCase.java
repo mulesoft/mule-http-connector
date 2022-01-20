@@ -17,7 +17,6 @@ import static org.mule.extension.http.internal.request.profiling.HttpRequestProf
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.PROFILING;
 
-import org.junit.Ignore;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.ProfilingProducerScope;
@@ -39,6 +38,7 @@ import javax.servlet.http.HttpServletResponse;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.eclipse.jetty.server.Request;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
