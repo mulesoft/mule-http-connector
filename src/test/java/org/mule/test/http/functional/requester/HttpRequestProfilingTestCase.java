@@ -17,6 +17,7 @@ import static org.mule.extension.http.internal.request.profiling.HttpRequestProf
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.PROFILING;
 
+import org.junit.Ignore;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.ProfilingProducerScope;
@@ -71,6 +72,7 @@ public class HttpRequestProfilingTestCase extends AbstractHttpRequestTestCase {
   }
 
   @Test
+  @Ignore("HTTPC-197")
   public void whenARequestIsSentTheResponseIsProfiled() throws Exception {
     runFlow("executeRequest").getMessage();
     ExtensionProfilingEventContext profilingEventContext = profilingDataProducer.getLastProfilingEventContext();
