@@ -9,13 +9,7 @@
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <object name="trackPassageMessageProcessor" class="org.mule.test.http.functional.listener.AbstractHttpListenerErrorHandlingTestCase$TrackPassageMessageProcessor"/>
-
-    <configuration>
-        <expression-language>
-            <import class="org.mule.test.http.functional.listener.AbstractHttpListenerErrorHandlingTestCase"/>
-            <alias name="inputStreamPayload" expression="AbstractHttpListenerErrorHandlingTestCase.stream"/>
-        </expression-language>
-    </configuration>
+    <object name="injectStreamProcessor" class="org.mule.test.http.functional.listener.AbstractHttpListenerErrorHandlingTestCase$InjectStreamProcessor"/>
 
     <http:listener-config name="listenerConfig">
         <http:listener-connection host="localhost" port="${port}"/>
@@ -29,7 +23,7 @@
                 </http:headers>
             </http:response>
         </http:listener>
-        <set-payload value="#[mel:inputStreamPayload]"/>
+        <flow-ref name="injectStreamProcessor"/>
         <error-handler>
             <on-error-continue type="EXPRESSION">
                 <flow-ref name="trackPassageMessageProcessor"/>
@@ -58,12 +52,11 @@
     </flow>
 
     <flow name="exceptionBuildingResponse">
-        <http:listener config-ref="listenerConfig" path="/exceptionBuildingResponse" responseStreamingMode="NEVER"/>
-        <set-payload value="#[mel:inputStreamPayload]"/>
+        <http:listener config-ref="listenerConfig" path="/exceptionBuildingResponse" responseStreamingMode="NEVER" />
+        <flow-ref name="injectStreamProcessor"/>
         <error-handler>
             <on-error-propagate type="ANY">
                 <flow-ref name="trackPassageMessageProcessor"/>
-                <set-payload value="#['Exception Handled']"/>
             </on-error-propagate>
         </error-handler>
     </flow>
@@ -78,7 +71,7 @@
         <error-handler>
             <on-error-propagate type="EXPRESSION">
                 <flow-ref name="trackPassageMessageProcessor"/>
-                <set-payload value="#[mel:inputStreamPayload]"/>
+                <flow-ref name="injectStreamProcessor"/>
             </on-error-propagate>
             <on-error-continue type="ANY">
                 <set-payload value="#['Exception Handled']"/>
