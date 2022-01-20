@@ -7,6 +7,7 @@
 package org.mule.test.http.functional.requester;
 
 import static org.hamcrest.Matchers.containsString;
+
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 

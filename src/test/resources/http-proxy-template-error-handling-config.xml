@@ -18,16 +18,15 @@
 
     <flow name="noExceptionStrategyFlow">
         <http:listener config-ref="proxyConfig" path="noExceptionStrategy" responseStreamingMode="AUTO" />
-        <http:request config-ref="requestConfig" method="#[mel:message.attributes.method]" path="#[mel:message.attributes.requestPath]"/>
+        <http:request config-ref="requestConfig" method="#[message.attributes.method]" path="#[message.attributes.requestPath]"/>
     </flow>
 
     <flow name="catchExceptionStrategyFlow">
         <http:listener config-ref="proxyConfig" path="catchExceptionStrategy" responseStreamingMode="AUTO" />
-        <http:request config-ref="requestConfig" method="#[mel:message.attributes.method]]" path="#[mel:message.attributes.requestPath]"/>
+        <http:request config-ref="requestConfig" method="#[message.attributes.method]" path="#[message.attributes.requestPath]"/>
         <error-handler>
             <on-error-continue>
-                <processor ref="catchSensingMessageProcessor"/>
-                <!--TODO(gfernandes) MULE-9738 Use constant from test class when support for accessing test classes is added to the fwk #[mel:org.mule.test.module.http.functional.proxy.HttpProxyTemplateErrorHandlingTestCase.SERVICE_DOWN_MESSAGE] -->
+                <flow-ref name="catchSensingMessageProcessor"/>
                 <set-payload value="Service Down"/>
             </on-error-continue>
         </error-handler>
@@ -35,10 +34,10 @@
 
     <flow name="rollbackExceptionStrategyFlow">
         <http:listener config-ref="proxyConfig" path="rollbackExceptionStrategy" responseStreamingMode="AUTO" />
-        <http:request config-ref="requestConfig" method="#[mel:message.attributes.method]]" path="#[mel:message.attributes.requestPath]"/>
+        <http:request config-ref="requestConfig" method="#[message.attributes.method]" path="#[message.attributes.requestPath]"/>
         <error-handler>
             <on-error-propagate>
-                <processor ref="rollbackSensingMessageProcessor"/>
+                <flow-ref name="rollbackSensingMessageProcessor"/>
             </on-error-propagate>
         </error-handler>
     </flow>

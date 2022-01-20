@@ -6,12 +6,27 @@
  */
 package org.mule.test.http.functional.listener;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.mule.runtime.http.api.HttpConstants.Method.POST;
 import static org.mule.tck.processor.FlowAssert.verify;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.mule.extension.http.api.HttpRequestAttributes;
+import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.http.api.client.HttpClient;
@@ -23,11 +38,7 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
 import java.io.IOException;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import java.security.cert.CertificateEncodingException;
 
 public class HttpListenerValidateCertificateTestCase extends AbstractHttpTestCase {
 
@@ -130,6 +141,24 @@ public class HttpListenerValidateCertificateTestCase extends AbstractHttpTestCas
 
   private String getUrl(int port) {
     return String.format("https://localhost:%d/", port);
+  }
+
+  public static class ValidateClientCertificate extends AbstractComponent implements Processor {
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      HttpRequestAttributes attributes = (HttpRequestAttributes) event.getMessage().getAttributes().getValue();
+      assertThat(attributes.getClientCertificate(), notNullValue());
+      assertThat(attributes.getClientCertificate(), instanceOf(java.security.cert.Certificate.class));
+      try {
+        // Only the client certificate contains CN=OLEKSIYS-W3T this way we validate that we are actually publishing the client
+        // cert
+        assertThat(new String(attributes.getClientCertificate().getEncoded(), UTF_8), containsString("OLEKSIYS-W3T0"));
+      } catch (CertificateEncodingException encodingException) {
+        fail("Encoding exception: " + encodingException);
+      }
+      return event;
+    }
   }
 
 }
