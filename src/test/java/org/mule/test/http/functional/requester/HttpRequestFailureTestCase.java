@@ -8,7 +8,6 @@ package org.mule.test.http.functional.requester;
 
 import static org.hamcrest.Matchers.containsString;
 
-import org.junit.Ignore;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
@@ -16,8 +15,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-@Ignore("HTTPC-177")
-// TODO HTTPC-177: Remove mel expressions from related XML.
 public class HttpRequestFailureTestCase extends AbstractHttpTestCase {
 
   @Rule

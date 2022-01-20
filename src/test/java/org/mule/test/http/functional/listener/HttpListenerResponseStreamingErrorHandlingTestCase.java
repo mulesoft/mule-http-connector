@@ -18,8 +18,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 @Stories({@Story(ERROR_HANDLING), @Story(STREAMING)})
-@Ignore("HTTPC-177")
-// TODO HTTPC-177: Remove mel expressions from related XML.
 public class HttpListenerResponseStreamingErrorHandlingTestCase extends AbstractHttpListenerErrorHandlingTestCase {
 
   final static int TIMEOUT = 3000;

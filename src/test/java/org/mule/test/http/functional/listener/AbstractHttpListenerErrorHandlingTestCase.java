@@ -15,7 +15,11 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.api.event.CoreEvent.builder;
+
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.IOUtils;
@@ -86,6 +90,14 @@ public abstract class AbstractHttpListenerErrorHandlingTestCase extends Abstract
       return event;
     }
 
+  }
+
+  public static class InjectStreamProcessor implements Processor {
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      return builder(event).message(of(stream)).build();
+    }
   }
 
 }

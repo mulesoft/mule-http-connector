@@ -31,8 +31,6 @@ import org.junit.Rule;
 import org.junit.Test;
 
 @Story(PROXY)
-@Ignore("HTTPC-177")
-// TODO HTTPC-177: Remove mel expressions from related XML.
 public class HttpProxyTemplateErrorHandlingTestCase extends AbstractHttpRequestTestCase {
 
   public static final String SERVICE_DOWN_MESSAGE = "Service Down";
