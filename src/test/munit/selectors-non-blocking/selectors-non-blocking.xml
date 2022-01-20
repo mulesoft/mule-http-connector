@@ -30,7 +30,7 @@
         </munit:enable-flow-sources>
         <munit:execution >
             <java:invoke-static doc:name="Spawn as many slow requests as selector threads" class="org.mule.test.SlowRequester" method="spawnSlowRequests(Integer)" >
-                <java:args>#[{arg0: p('dynamic.port')}]</java:args>
+                <java:args><![CDATA[#[{arg0: ${dynamic.port}}]]]></java:args>
             </java:invoke-static>
 
             <http:request method="GET" doc:name="Test Request" path="/test" config-ref="requestConfig"/>
