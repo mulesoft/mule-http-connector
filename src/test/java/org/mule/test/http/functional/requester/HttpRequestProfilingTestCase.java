@@ -38,6 +38,7 @@ import javax.servlet.http.HttpServletResponse;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.eclipse.jetty.server.Request;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -71,6 +72,7 @@ public class HttpRequestProfilingTestCase extends AbstractHttpRequestTestCase {
   }
 
   @Test
+  @Ignore("HTTPC-197")
   public void whenARequestIsSentTheResponseIsProfiled() throws Exception {
     runFlow("executeRequest").getMessage();
     ExtensionProfilingEventContext profilingEventContext = profilingDataProducer.getLastProfilingEventContext();
