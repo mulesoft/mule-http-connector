@@ -8,21 +8,13 @@
 
     <object name="streamProcessor" class="org.mule.test.http.functional.listener.HttpListenerResponseStreamingTestCase$StreamProcessor"/>
 
-    <configuration>
-        <expression-language>
-            <import class="org.mule.test.http.functional.listener.HttpListenerResponseStreamingTestCase"/>
-            <alias name="stringPayload" expression="HttpListenerResponseStreamingTestCase.TEST_BODY"/>
-            <alias name="mapPayload" expression="HttpListenerResponseStreamingTestCase.TEST_BODY_MAP"/>
-        </expression-language>
-    </configuration>
-
     <http:listener-config name="listenerConfig">
         <http:listener-connection host="localhost" port="${port}"/>
     </http:listener-config>
 
     <flow name="stringFlow">
         <http:listener config-ref="listenerConfig" path="/string"/>
-        <set-payload value="#[mel:stringPayload]"/>
+        <set-payload value="${stringPayload}"/>
     </flow>
 
     <flow name="stringWithContentLengthHeaderFlow">
@@ -33,7 +25,7 @@
                 </http:headers>
             </http:response>
         </http:listener>
-        <set-payload value="#[mel:stringPayload]"/>
+        <set-payload value="${stringPayload}"/>
     </flow>
 
     <flow name="stringWithTransferEncodingFlow">
@@ -44,7 +36,7 @@
                 </http:headers>
             </http:response>
         </http:listener>
-        <set-payload value="#[mel:stringPayload]"/>
+        <set-payload value="${stringPayload}"/>
     </flow>
 
     <flow name="stringWithTransferEncodingAndContentLengthFlow">
@@ -55,7 +47,7 @@
                 </http:headers>
             </http:response>
         </http:listener>
-        <set-payload value="#[mel:stringPayload]"/>
+        <set-payload value="${stringPayload}"/>
     </flow>
 
     <flow name="inputStreamFlow">
@@ -98,7 +90,7 @@
 
     <flow name="neverStringFlow">
         <http:listener config-ref="listenerConfig" path="/neverString" responseStreamingMode="NEVER"/>
-        <set-payload value="#[mel:stringPayload]"/>
+        <set-payload value="${stringPayload}"/>
     </flow>
 
     <flow name="neverStringTransferEncodingHeaderFlow">
@@ -109,7 +101,7 @@
                 </http:headers>
             </http:response>
         </http:listener>
-        <set-payload value="#[mel:stringPayload]"/>
+        <set-payload value="${stringPayload}"/>
     </flow>
 
     <flow name="neverInputStreamFlow">
@@ -130,7 +122,7 @@
 
     <flow name="alwaysStringFlow">
         <http:listener config-ref="listenerConfig" path="/alwaysString"  responseStreamingMode="ALWAYS"/>
-        <set-payload value="#[mel:stringPayload]"/>
+        <set-payload value="${stringPayload}"/>
     </flow>
 
     <flow name="alwaysStringContentLengthHeaderFlow">
@@ -141,7 +133,7 @@
                 </http:headers>
             </http:response>
         </http:listener>
-        <set-payload value="#[mel:stringPayload]"/>
+        <set-payload value="${stringPayload}"/>
     </flow>
 
     <flow name="alwaysInputStreamFlow">
@@ -168,7 +160,7 @@
                 </http:headers>
             </http:response>
         </http:listener>
-        <set-payload value="#[mel:mapPayload]"/>
+        <set-payload value="${mapPayload}"/>
     </flow>
 
     <flow name="alwaysMapFlow">
@@ -179,7 +171,7 @@
                 </http:headers>
             </http:response>
         </http:listener>
-        <set-payload value="#[mel:mapPayload]"/>
+        <set-payload value="${mapPayload}"/>
     </flow>
 
     <flow name="neverMapFlow">
@@ -190,7 +182,7 @@
                 </http:headers>
             </http:response>
         </http:listener>
-        <set-payload value="#[mel:mapPayload]"/>
+        <set-payload value="${mapPayload}"/>
     </flow>
 
 </mule>

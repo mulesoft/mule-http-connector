@@ -7,13 +7,7 @@
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <object name="trackPassageMessageProcessor" class="org.mule.test.http.functional.listener.AbstractHttpListenerErrorHandlingTestCase$TrackPassageMessageProcessor"/>
-
-    <configuration>
-        <expression-language>
-            <import class="org.mule.test.http.functional.listener.AbstractHttpListenerErrorHandlingTestCase"/>
-            <alias name="inputStreamPayload" expression="AbstractHttpListenerErrorHandlingTestCase.stream"/>
-        </expression-language>
-    </configuration>
+    <object name="injectStreamProcessor" class="org.mule.test.http.functional.listener.AbstractHttpListenerErrorHandlingTestCase$InjectStreamProcessor"/>
 
     <http:listener-config name="listenerConfig">
         <http:listener-connection host="localhost" port="${port}"/>
@@ -21,7 +15,7 @@
 
     <flow name="exceptionBuildingResponse">
         <http:listener config-ref="listenerConfig" path="/exceptionBuildingResponse" responseStreamingMode="NEVER"/>
-        <set-payload value="#[mel:inputStreamPayload]"/>
+        <flow-ref name="injectStreamProcessor" />
 
         <error-handler>
             <on-error-propagate>
@@ -33,7 +27,7 @@
 
     <flow name="exceptionSendingResponse">
         <http:listener config-ref="listenerConfig" path="/exceptionSendingResponse" responseStreamingMode="ALWAYS"/>
-        <set-payload value="#[mel:inputStreamPayload]"/>
+        <flow-ref name="injectStreamProcessor" />
 
         <error-handler>
             <on-error-continue>
@@ -45,24 +39,24 @@
 
     <flow name="exceptionBuildingResponseFailAgain">
         <http:listener config-ref="listenerConfig" path="/exceptionBuildingResponseFailAgain" responseStreamingMode="NEVER"/>
-        <set-payload value="#[mel:inputStreamPayload]"/>
+        <flow-ref name="injectStreamProcessor" />
 
         <error-handler>
             <on-error-propagate>
                 <flow-ref name="trackPassageMessageProcessor"/>
-                <set-payload value="#[mel:inputStreamPayload]"/>
+                <flow-ref name="injectStreamProcessor" />
             </on-error-propagate>
         </error-handler>
     </flow>
 
     <flow name="exceptionSendingResponseFailAgain">
         <http:listener config-ref="listenerConfig" path="/exceptionSendingResponseFailAgain" responseStreamingMode="ALWAYS"/>
-        <set-payload value="#[mel:inputStreamPayload]"/>
+        <flow-ref name="injectStreamProcessor" />
 
         <error-handler>
             <on-error-continue>
                 <flow-ref name="trackPassageMessageProcessor"/>
-                <set-payload value="#[mel:inputStreamPayload]"/>
+                <flow-ref name="injectStreamProcessor" />
             </on-error-continue>
         </error-handler>
     </flow>

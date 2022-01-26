@@ -25,7 +25,7 @@
     <flow name="simple">
         <http:request config-ref="simpleConfig" path="testPath">
              <http:query-params>
-                #[mel:['testName1' : 'testValue1']]
+                #[{'testName1' : 'testValue1'}]
             </http:query-params>
         </http:request>
     </flow>

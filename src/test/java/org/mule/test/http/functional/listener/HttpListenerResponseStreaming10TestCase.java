@@ -145,19 +145,19 @@ public class HttpListenerResponseStreaming10TestCase extends HttpListenerRespons
   @Test
   public void map() throws Exception {
     final String url = getUrl("map");
-    testResponseIsContentLengthEncoding(url, getHttpVersion(), TEST_BODY_MAP);
+    testResponseIsContentLengthEncoding(url, getHttpVersion(), mapPayload.getValue());
   }
 
   @Test
   public void alwaysMap() throws Exception {
     final String url = getUrl("alwaysMap");
-    testResponseIsNotChunkedEncoding(url, getHttpVersion(), TEST_BODY_MAP);
+    testResponseIsNotChunkedEncoding(url, getHttpVersion(), mapPayload.getValue());
   }
 
   @Test
   public void neverMap() throws Exception {
     final String url = getUrl("neverMap");
-    testResponseIsContentLengthEncoding(url, getHttpVersion(), TEST_BODY_MAP);
+    testResponseIsContentLengthEncoding(url, getHttpVersion(), mapPayload.getValue());
   }
 
 }

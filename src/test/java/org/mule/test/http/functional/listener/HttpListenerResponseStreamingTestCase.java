@@ -6,6 +6,7 @@
  */
 package org.mule.test.http.functional.listener;
 
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.apache.http.client.fluent.Request.Get;
 import static org.apache.http.client.fluent.Request.Post;
 import static org.hamcrest.CoreMatchers.is;
@@ -16,6 +17,14 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
+
+import org.apache.http.Header;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
+import org.apache.http.client.fluent.Response;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
@@ -29,14 +38,6 @@ import org.mule.test.http.functional.AbstractHttpTestCase;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpVersion;
-import org.apache.http.client.fluent.Response;
-import org.junit.Before;
-import org.junit.Rule;
-
 public abstract class HttpListenerResponseStreamingTestCase extends AbstractHttpTestCase {
 
   private static final int DEFAULT_TIMEOUT = 10000;
@@ -44,12 +45,18 @@ public abstract class HttpListenerResponseStreamingTestCase extends AbstractHttp
   private static final int POOLING_FREQUENCY_MILLIS = 1000;
   private static final int POOLING_TIMEOUT_MILLIS = 20000;
 
-  public static final String TEST_BODY = RandomStringUtils.randomAlphabetic(100 * 1024);
-  public static final String TEST_BODY_MAP = "one=1&two=2";
+  @ClassRule
+  public static SystemProperty stringPayload = new SystemProperty("stringPayload", randomAlphabetic(100 * 1024));
+
+  @ClassRule
+  public static SystemProperty mapPayload = new SystemProperty("mapPayload", "one=1&two=2");
+
   private static InputStreamWrapper testStream;
 
   @Rule
-  public SystemProperty stringPayloadLength = new SystemProperty("stringPayloadLength", String.valueOf(TEST_BODY.length()));
+  public SystemProperty stringPayloadLength =
+      new SystemProperty("stringPayloadLength", String.valueOf(stringPayload.getValue().length()));
+
   @Rule
   public DynamicPort listenPort = new DynamicPort("port");
 
@@ -70,15 +77,15 @@ public abstract class HttpListenerResponseStreamingTestCase extends AbstractHttp
   }
 
   protected void testResponseIsContentLengthEncoding(String url, HttpVersion httpVersion) throws IOException {
-    testResponseIsContentLengthEncoding(url, httpVersion, TEST_BODY);
+    testResponseIsContentLengthEncoding(url, httpVersion, stringPayload.getValue());
   }
 
   protected void testResponseIsChunkedEncoding(String url, HttpVersion httpVersion) throws IOException {
-    testResponseIsChunkedEncoding(url, httpVersion, TEST_BODY);
+    testResponseIsChunkedEncoding(url, httpVersion, stringPayload.getValue());
   }
 
   protected void testResponseIsNotChunkedEncoding(String url, HttpVersion httpVersion) throws IOException {
-    testResponseIsNotChunkedEncoding(url, httpVersion, TEST_BODY);
+    testResponseIsNotChunkedEncoding(url, httpVersion, stringPayload.getValue());
   }
 
   protected void testResponseIsContentLengthEncoding(String url, HttpVersion httpVersion, String expectedBody)
@@ -167,7 +174,7 @@ public abstract class HttpListenerResponseStreamingTestCase extends AbstractHttp
 
     @Override
     public CoreEvent process(CoreEvent coreEvent) throws MuleException {
-      testStream = new InputStreamWrapper(TEST_BODY.getBytes());
+      testStream = new InputStreamWrapper(stringPayload.getValue().getBytes());
       return CoreEvent.builder(coreEvent).message(of(testStream)).build();
     }
   }
