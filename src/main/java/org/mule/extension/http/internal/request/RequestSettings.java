@@ -132,6 +132,10 @@ public final class RequestSettings {
     return preserveHeadersCase;
   }
 
+  public static Builder builder() {
+    return new Builder();
+  }
+
   public static class Builder {
 
     private boolean followRedirects;
@@ -196,10 +200,5 @@ public final class RequestSettings {
       return settings;
     }
 
-
-
-    public static Builder newInstance() {
-      return new Builder();
-    }
   }
 }

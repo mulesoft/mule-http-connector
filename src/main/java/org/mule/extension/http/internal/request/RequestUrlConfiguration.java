@@ -22,6 +22,10 @@ public final class RequestUrlConfiguration {
     return basePath;
   }
 
+  public static Builder builder() {
+    return new Builder();
+  }
+
   public static class Builder {
 
     private String basePath;
@@ -35,10 +39,6 @@ public final class RequestUrlConfiguration {
       RequestUrlConfiguration config = new RequestUrlConfiguration();
       config.basePath = this.basePath;
       return config;
-    }
-
-    public static Builder newInstance() {
-      return new Builder();
     }
 
   }

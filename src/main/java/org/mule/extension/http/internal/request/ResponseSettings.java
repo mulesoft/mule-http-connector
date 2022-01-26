@@ -36,6 +36,10 @@ public final class ResponseSettings {
     return responseTimeout;
   }
 
+  public static Builder builder() {
+    return new Builder();
+  }
+
   public static class Builder {
 
     private Integer responseTimeout;
@@ -56,10 +60,6 @@ public final class ResponseSettings {
       settings.responseTimeout = this.responseTimeout;
       settings.responseValidator = this.responseValidator;
       return settings;
-    }
-
-    public static Builder newInstance() {
-      return new Builder();
     }
 
   }

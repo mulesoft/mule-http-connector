@@ -43,6 +43,10 @@ public class UriSettings {
     return url;
   }
 
+  public static Builder builder() {
+    return new Builder();
+  }
+
   public static class Builder {
 
     private String path = "/";
@@ -63,10 +67,6 @@ public class UriSettings {
       settings.path = this.path;
       settings.url = this.url;
       return settings;
-    }
-
-    public static Builder newInstance() {
-      return new Builder();
     }
 
   }

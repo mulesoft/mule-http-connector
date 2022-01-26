@@ -105,6 +105,10 @@ public class HttpRequesterConfig implements Initialisable, HttpRequesterCookieCo
     return muleContext;
   }
 
+  public static Builder builder() {
+    return new Builder();
+  }
+
   public static class Builder {
 
     private RequestUrlConfiguration urlConfiguration;
@@ -113,10 +117,6 @@ public class HttpRequesterConfig implements Initialisable, HttpRequesterCookieCo
     private MuleContext muleContext;
 
     private Builder() {}
-
-    public static Builder newInstance() {
-      return new Builder();
-    }
 
     public Builder withUrlConfiguration(RequestUrlConfiguration urlConfiguration) {
       this.urlConfiguration = urlConfiguration;
