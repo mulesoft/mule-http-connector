@@ -223,10 +223,6 @@ public class HttpRequestOperations implements Initialisable, Disposable {
     }
   }
 
-  public static Builder builder() {
-    return new Builder();
-  }
-
   public static class Builder {
 
     private MuleContext muleContext;
@@ -235,6 +231,10 @@ public class HttpRequestOperations implements Initialisable, Disposable {
     private HashMap<String, List<String>> injectedHeaders;
 
     private Builder() {}
+
+    public static Builder newInstance() {
+      return new Builder();
+    }
 
     public Builder withMuleContext(MuleContext muleContext) {
       this.muleContext = muleContext;
