@@ -21,4 +21,25 @@ public final class RequestUrlConfiguration {
   public String getBasePath() {
     return basePath;
   }
+
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public static class Builder {
+
+    private String basePath;
+
+    public Builder withBasePath(String basePath) {
+      this.basePath = basePath;
+      return this;
+    }
+
+    public RequestUrlConfiguration build() {
+      RequestUrlConfiguration config = new RequestUrlConfiguration();
+      config.basePath = this.basePath;
+      return config;
+    }
+
+  }
 }

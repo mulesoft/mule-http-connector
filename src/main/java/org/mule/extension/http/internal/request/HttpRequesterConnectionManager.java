@@ -103,42 +103,5 @@ public class HttpRequesterConnectionManager implements Disposable {
     clients.remove(configName);
   }
 
-  /**
-   * Wrapper implementation of an {@link HttpClient} that allows being shared by only configuring the client when first required
-   * and only disabling it when last required.
-   */
-  public static class ShareableHttpClient {
 
-    private HttpClient delegate;
-    private Integer usageCount = new Integer(0);
-
-    ShareableHttpClient(HttpClient client) {
-      delegate = client;
-    }
-
-    public synchronized void start() {
-      if (++usageCount == 1) {
-        try {
-          delegate.start();
-        } catch (Exception e) {
-          usageCount--;
-          throw e;
-        }
-      }
-    }
-
-    public synchronized void stop() {
-      // In case this fails we do not want the usageCount to be reincremented
-      // as it will not be further used. If shouldn't be the case that more than
-      // two stops happen.
-      if (--usageCount == 0) {
-        delegate.stop();
-      }
-    }
-
-    public CompletableFuture<HttpResponse> sendAsync(HttpRequest request, int responseTimeout, boolean followRedirects,
-                                                     HttpAuthentication authentication) {
-      return delegate.sendAsync(request, responseTimeout, followRedirects, authentication);
-    }
-  }
 }

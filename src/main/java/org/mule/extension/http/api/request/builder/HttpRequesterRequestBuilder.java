@@ -148,4 +148,67 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
         .headers(headers)
         .queryParams(queryParams);
   }
+
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public static class Builder {
+
+    private TypedValue<Object> body;
+    private MultiMap<String, String> headers = emptyMultiMap();
+    private Map<String, String> uriParams = emptyMap();
+    private MultiMap<String, String> queryParams = emptyMultiMap();
+    private OutboundCorrelationStrategy sendCorrelationId = AUTO;
+    private String correlationId;
+    private CorrelationInfo correlationInfo;
+
+    public Builder withBody(TypedValue<Object> body) {
+      this.body = body;
+      return this;
+    }
+
+    public Builder withHeaders(MultiMap<String, String> headers) {
+      this.headers = headers;
+      return this;
+    }
+
+    public Builder withUriParams(Map<String, String> uriParams) {
+      this.uriParams = uriParams;
+      return this;
+    }
+
+    public Builder withQueryParams(MultiMap<String, String> queryParams) {
+      this.queryParams = queryParams;
+      return this;
+    }
+
+    public Builder withSendCorrelationId(OutboundCorrelationStrategy sendCorrelationId) {
+      this.sendCorrelationId = sendCorrelationId;
+      return this;
+    }
+
+    public Builder withCorrelationId(String correlationId) {
+      this.correlationId = correlationId;
+      return this;
+    }
+
+    public Builder with(CorrelationInfo correlationInfo) {
+      this.correlationInfo = correlationInfo;
+      return this;
+    }
+
+    public HttpRequesterRequestBuilder build() {
+      HttpRequesterRequestBuilder b = new HttpRequesterRequestBuilder();
+      b.body = this.body;
+      b.headers = this.headers;
+      b.uriParams = this.uriParams;
+      b.queryParams = this.queryParams;
+      b.sendCorrelationId = this.sendCorrelationId;
+      b.correlationId = this.correlationId;
+      b.correlationInfo = this.correlationInfo;
+      return b;
+    }
+
+  }
 }

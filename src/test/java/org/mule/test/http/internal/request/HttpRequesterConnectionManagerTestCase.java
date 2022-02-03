@@ -32,7 +32,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
 import org.mule.extension.http.internal.request.HttpRequesterConnectionManager;
-import org.mule.extension.http.internal.request.HttpRequesterConnectionManager.ShareableHttpClient;
+import org.mule.extension.http.internal.request.ShareableHttpClient;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.http.api.client.HttpClient;
 import org.mule.runtime.http.api.client.HttpClientConfiguration;
