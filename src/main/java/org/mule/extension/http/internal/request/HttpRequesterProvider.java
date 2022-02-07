@@ -26,7 +26,6 @@ import org.mule.extension.http.api.request.authentication.HttpRequestAuthenticat
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.proxy.HttpProxyConfig;
 import org.mule.extension.http.api.request.validator.ResponseValidatorTypedException;
-import org.mule.extension.http.internal.request.HttpRequesterConnectionManager.ShareableHttpClient;
 import org.mule.extension.http.internal.request.client.DefaultUriParameters;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
 import org.mule.extension.socket.api.socket.tcp.TcpClientSocketProperties;
