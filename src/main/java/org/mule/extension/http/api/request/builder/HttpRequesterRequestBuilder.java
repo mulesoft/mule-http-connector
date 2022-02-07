@@ -158,11 +158,6 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
         .queryParams(queryParams);
   }
 
-  @Override
-  public TypedValue getBodyAsTypedValue() {
-    return getBody();
-  }
-
   public static Builder builder() {
     return new Builder();
   }
