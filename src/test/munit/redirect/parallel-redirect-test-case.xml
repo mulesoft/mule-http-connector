@@ -13,7 +13,7 @@
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <!--MULE-19908: Ignored until we enabled the fix by default.-->
-    <munit:config name="parallel-redirect-test-case" minMuleVersion="4.3.1" ignore="true"/>
+    <munit:config name="parallel-redirect-test-case" minMuleVersion="4.4.1"/>
 
     <munit:dynamic-port propertyName="dynamic.port.moved"/>
 
@@ -31,8 +31,7 @@
         <http:request-connection host="localhost" port="${dynamic.port.moved}"/>
     </http:request-config>
 
-    <munit:test name="parallel-redirect-test" description="Create multiple request to an endpoint that return 301."
-                ignore="#[Munit::muleVersionEqualTo('4.4.0')]">
+    <munit:test name="parallel-redirect-test" description="Create multiple request to an endpoint that return 301.">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="parallel-moved" />
             <munit:enable-flow-source value="parallel-response" />
