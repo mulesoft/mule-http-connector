@@ -35,4 +35,32 @@ public final class ResponseSettings {
   public Integer getResponseTimeout() {
     return responseTimeout;
   }
+
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public static class Builder {
+
+    private Integer responseTimeout;
+    private ResponseValidator responseValidator;
+
+    public Builder withResponseTimeout(Integer responseTimeout) {
+      this.responseTimeout = responseTimeout;
+      return this;
+    }
+
+    public Builder withResponseValidator(ResponseValidator responseValidator) {
+      this.responseValidator = responseValidator;
+      return this;
+    }
+
+    public ResponseSettings build() {
+      ResponseSettings settings = new ResponseSettings();
+      settings.responseTimeout = this.responseTimeout;
+      settings.responseValidator = this.responseValidator;
+      return settings;
+    }
+
+  }
 }
