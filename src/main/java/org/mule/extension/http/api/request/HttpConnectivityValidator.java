@@ -34,6 +34,7 @@ import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.http.api.HttpConstants;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
@@ -128,6 +129,24 @@ public class HttpConnectivityValidator implements Initialisable {
 
   private void validateResult(HttpRequest request, Result result) {
     getResponseValidator().validate(result, request);
+  }
+
+  //This method is used for composer purposes only
+  public void validate(HttpExtensionClient client, HttpConstants.Protocol protocol, String host, Integer port)
+      throws ExecutionException, InterruptedException, ResponseValidatorTypedException {
+    String pathWithUriParams = replaceUriParams(requestPath, requestBuilder.getRequestUriParams());
+    String uriString = protocol.getScheme() + "://" + host + ":" + port + pathWithUriParams;
+    responseValidator = new SuccessStatusCodeValidator("200..299");
+    HttpRequest request = HttpRequest.builder()
+        .uri(uriString)
+        .method(requestMethod)
+        .headers(toMultiMap(requestBuilder.getRequestHeaders()))
+        .queryParams(toMultiMap(requestBuilder.getRequestQueryParams()))
+        .entity(requestBuilder.buildEntity())
+        .build();
+
+    Result<Object, HttpResponseAttributes> result = sendRequest(client, request);
+    validateResult(request, result);
   }
 
   private Result<Object, HttpResponseAttributes> sendRequest(HttpExtensionClient client, HttpRequest request)
