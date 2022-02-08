@@ -126,11 +126,11 @@ public class HttpConnectivityValidator implements Initialisable {
     validateResult(request, result);
   }
 
-  private void validateResult(HttpRequest request, Result result) {
+  protected void validateResult(HttpRequest request, Result result) {
     getResponseValidator().validate(result, request);
   }
 
-  private Result<Object, HttpResponseAttributes> sendRequest(HttpExtensionClient client, HttpRequest request)
+  protected Result<Object, HttpResponseAttributes> sendRequest(HttpExtensionClient client, HttpRequest request)
       throws InterruptedException, ExecutionException {
     int responseTimeoutInt = (int) responseTimeoutUnit.toMillis(responseTimeout.longValue());
     HttpResponse response =
@@ -159,8 +159,20 @@ public class HttpConnectivityValidator implements Initialisable {
         + pathWithUriParams;
   }
 
-  private ResponseValidator getResponseValidator() {
+  protected ResponseValidator getResponseValidator() {
     return responseValidator == null ? defaultStatusCodeValidator : responseValidator;
+  }
+
+  protected String getRequestPath() {
+    return this.requestPath;
+  }
+
+  protected String getRequestMethod() {
+    return this.requestMethod;
+  }
+
+  protected HttpRequesterTestRequestBuilder getRequestBuilder() {
+    return this.requestBuilder;
   }
 
   @Override
