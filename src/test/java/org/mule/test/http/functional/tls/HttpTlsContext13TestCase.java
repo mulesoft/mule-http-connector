@@ -56,6 +56,7 @@ public class HttpTlsContext13TestCase extends AbstractHttpTlsContextTestCase {
         && (!javaVersion[0].equals("1.8.0") || parseInt(javaVersion[1]) > 261));
   }
 
+  // In case of certificate expiration regenerate using tls13/certificate-creation-examples.sh
   @Test
   public void testBothProtocolsOneCipher() throws Exception {
     assertThat(flowRunner(client).keepStreamsOpen().run().getMessage(), hasPayload(equalTo(SUCCESS_RESPONSE)));
