@@ -24,9 +24,9 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-public class HttpTlsContext13TestCase extends AbstractHttpTlsContextTestCase {
+public class HttpTlsContextClient13ToServer13TestCase extends AbstractHttpTlsContextTestCase {
 
-  private static final String client = "tls-1.3-client";
+  private static final String client13 = "tls-1.3-client";
   private static final String SUCCESS_RESPONSE = "success";
 
   @ClassRule
@@ -46,7 +46,7 @@ public class HttpTlsContext13TestCase extends AbstractHttpTlsContextTestCase {
 
   @Override
   protected String getConfigFile() {
-    return "http-tls-1.3-test.xml";
+    return "http-client-tls-1.3-server-1.3-test.xml";
   }
 
   @BeforeClass
@@ -58,7 +58,7 @@ public class HttpTlsContext13TestCase extends AbstractHttpTlsContextTestCase {
 
   // In case of certificate expiration regenerate using tls13/certificate-creation-examples.sh
   @Test
-  public void testBothProtocolsOneCipher() throws Exception {
-    assertThat(flowRunner(client).keepStreamsOpen().run().getMessage(), hasPayload(equalTo(SUCCESS_RESPONSE)));
+  public void testClient13ToServer13() throws Exception {
+    assertThat(flowRunner(client13).keepStreamsOpen().run().getMessage(), hasPayload(equalTo(SUCCESS_RESPONSE)));
   }
 }
