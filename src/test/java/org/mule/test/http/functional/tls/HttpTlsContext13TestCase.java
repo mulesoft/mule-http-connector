@@ -9,20 +9,19 @@ package org.mule.test.http.functional.tls;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 
 import static java.lang.Integer.parseInt;
+import static java.lang.System.getProperty;
 
+import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assume.assumeTrue;
 
-import org.mule.functional.api.exception.ExpectedError;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.apache.commons.lang3.JavaVersion;
-import org.apache.commons.lang3.SystemUtils;
-import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 
 public class HttpTlsContext13TestCase extends AbstractHttpTlsContextTestCase {
@@ -45,9 +44,6 @@ public class HttpTlsContext13TestCase extends AbstractHttpTlsContextTestCase {
   @ClassRule
   public static SystemProperty verboseExceptions = new SystemProperty("mule.verbose.exceptions", "true");
 
-  @Rule
-  public ExpectedError expectedError = ExpectedError.none();
-
   @Override
   protected String getConfigFile() {
     return "http-tls-1.3-test.xml";
@@ -55,8 +51,8 @@ public class HttpTlsContext13TestCase extends AbstractHttpTlsContextTestCase {
 
   @BeforeClass
   public static void assumeJdkIsCompatible() {
-    String[] javaVersion = System.getProperty("java.version").split("_");
-    Assume.assumeTrue(SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_1_8)
+    String[] javaVersion = getProperty("java.version").split("_");
+    assumeTrue(isJavaVersionAtLeast(JavaVersion.JAVA_1_8)
         && (!javaVersion[0].equals("1.8.0") || parseInt(javaVersion[1]) > 261));
   }
 
