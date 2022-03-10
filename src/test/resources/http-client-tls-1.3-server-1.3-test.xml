@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
+    <http:listener-config
+            name="HTTP_Listener_config_unsecure" doc:name="HTTP Listener config">
+        <http:listener-connection host="0.0.0.0"
+                                  port="${internal.port.1}"/>
+    </http:listener-config>
+    <http:listener-config
+            name="HTTP_Listener_config_secured" doc:name="HTTP Listener config"
+    >
+        <http:listener-connection protocol="HTTPS"
+                                  host="0.0.0.0" port="${internal.port.2}">
+            <tls:context enabledProtocols="TLSv1.3"
+                         enabledCipherSuites="TLS_AES_128_GCM_SHA256">
+                <tls:trust-store path="tls13/myTruststore.jks"
+                                 password="123456"/>
+                <tls:key-store type="pkcs12" path="tls13/cert-localhost.p12"
+                               keyPassword="123456" password="123456"/>
+            </tls:context>
+        </http:listener-connection>
+    </http:listener-config>
+    <http:request-config
+            name="HTTP_Request_configuration1"
+            doc:name="HTTP Request configuration"
+    >
+        <http:request-connection protocol="HTTPS"
+                                 host="localhost" port="${internal.port.2}">
+            <tls:context enabledProtocols="TLSv1.3"
+                         enabledCipherSuites="TLS_AES_128_GCM_SHA256">
+                <tls:trust-store path="tls13/myTruststore.jks"
+                                 password="123456"/>
+                <tls:key-store type="pkcs12" path="tls13/cert-localhost.p12"
+                               keyPassword="123456" password="123456"/>
+            </tls:context>
+        </http:request-connection>
+    </http:request-config>
+    <flow name="tls-1.3-server">
+        <http:listener doc:name="Listener" config-ref="HTTP_Listener_config_secured" path="/server"/>
+        <logger level="INFO" doc:name="Logger"/>
+        <set-payload value='#[%dw 2.0&#10;output text/plain&#10;---&#10;"success"]' doc:name="Set Payload"/>
+    </flow>
+    <flow name="tls-1.3-client">
+        <http:listener doc:name="Listener" config-ref="HTTP_Listener_config_unsecure" path="/client"/>
+        <http:request method="GET" doc:name="Local" config-ref="HTTP_Request_configuration1"
+                      url="https://localhost:${internal.port.2}/server"/>
+        <logger level="INFO" doc:name="Logger" message="#[payload]"/>
+    </flow>
+</mule>
