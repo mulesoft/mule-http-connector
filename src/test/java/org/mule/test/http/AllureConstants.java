@@ -25,6 +25,7 @@ public interface AllureConstants {
       String REQUEST_URL = "Request URL";
       String REQUEST_CONFIG = "Request Configuration";
       String RESPONSE_BUILDER = "Response Builder";
+      String RESPONSE_VALIDATION = "Response Validation";
       String STREAMING = "Streaming";
       String TCP_BUILDER = "TCP Builders";
       String URL_ENCODED = "URL Encoded";
@@ -39,6 +40,7 @@ public interface AllureConstants {
       String RETRY_POLICY = "Retry Policy";
       String REJECT_INVALID_TRANSFER_ENCODING = "Reject Invalid Transfer Encoding";
       String PROFILING = "Profiling";
+      String POLLING_SOURCE = "Polling Source";
     }
 
   }

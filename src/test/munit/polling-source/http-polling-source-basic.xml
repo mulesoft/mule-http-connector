@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+
+    <munit:config name="http-polling-source-basic.xml" />
+
+    <munit:dynamic-port propertyName="dynamic.port"/>
+
+    <http:listener-config name="targetEndpoint">
+        <http:listener-connection host="0.0.0.0" port="${dynamic.port}"/>
+    </http:listener-config>
+
+    <http:request-config name="requestConfigBasic" sendBodyMode="ALWAYS">
+        <http:request-connection host="localhost" port="${dynamic.port}" />
+    </http:request-config>
+
+    <flow name="targetFlow" >
+        <http:listener config-ref="targetEndpoint" path="/test" />
+        <choice>
+            <when expression="#[isEmpty(payload)]">
+                <set-payload value="test payload"/>
+            </when>
+        </choice>
+
+        <choice>
+            <when expression="#[message.attributes.headers['testHeader'] != null]">
+                <set-payload value="#[payload ++ ' - Received header: ' ++ message.attributes.headers['testHeader']]"/>
+            </when>
+        </choice>
+
+        <choice>
+            <when expression="#[message.attributes.queryParams['testQueryParam'] != null]">
+                <set-payload value="#[payload ++ ' - ' ++ message.attributes.queryParams['testQueryParam']]"/>
+            </when>
+        </choice>
+
+        <choice>
+            <when expression="#[message.attributes.uriParams['testUriParam'] != null]">
+                <set-payload value="#[payload ++ ' - ' ++ message.attributes.uriParams['testUriParam']]"/>
+            </when>
+        </choice>
+        <set-payload value="#[output text/plain --- payload]"/>
+    </flow>
+
+    <flow name="targetFlowPost" >
+        <http:listener config-ref="targetEndpoint" path="/test-post" allowedMethods="POST"/>
+        <set-payload value="#[output text/plain --- 'test payload']"/>
+    </flow>
+
+    <flow name="basic-polling">
+        <http:polling-source config-ref="requestConfigBasic" path="test">
+            <scheduling-strategy >
+                <fixed-frequency frequency="2" timeUnit="SECONDS"/>
+            </scheduling-strategy>
+        </http:polling-source>
+        <logger message="#[payload]"/>
+        <munit-tools:queue queueName="test_queue_1">
+            <munit-tools:value>#[payload]</munit-tools:value>
+        </munit-tools:queue>
+    </flow>
+
+    <flow name="basic-polling-post">
+        <http:polling-source config-ref="requestConfigBasic" path="test-post" method="POST">
+            <scheduling-strategy >
+                <fixed-frequency frequency="2" timeUnit="SECONDS"/>
+            </scheduling-strategy>
+        </http:polling-source>
+        <logger message="#[payload]"/>
+        <munit-tools:queue queueName="test_queue_3">
+            <munit-tools:value>#[payload]</munit-tools:value>
+        </munit-tools:queue>
+    </flow>
+
+    <flow name="basic-polling-with-header">
+        <http:polling-source config-ref="requestConfigBasic" path="test">
+            <scheduling-strategy >
+                <fixed-frequency frequency="2" timeUnit="SECONDS"/>
+            </scheduling-strategy>
+            <http:polling-request-headers >
+                <http:polling-request-header key="testHeader" value="Messi" />
+            </http:polling-request-headers>
+        </http:polling-source>
+        <logger message="#[payload]"/>
+        <munit-tools:queue queueName="test_queue_2">
+            <munit-tools:value>#[payload]</munit-tools:value>
+        </munit-tools:queue>
+    </flow>
+
+    <flow name="basic-polling-with-query-params">
+        <http:polling-source config-ref="requestConfigBasic" path="test">
+            <scheduling-strategy >
+                <fixed-frequency frequency="2" timeUnit="SECONDS"/>
+            </scheduling-strategy>
+            <http:polling-request-query-params >
+                <http:polling-request-query-param key="testQueryParam" value="parameter value" />
+            </http:polling-request-query-params>
+        </http:polling-source>
+        <logger message="#[payload]"/>
+        <munit-tools:queue queueName="test_queue_4">
+            <munit-tools:value>#[payload]</munit-tools:value>
+        </munit-tools:queue>
+    </flow>
+
+    <flow name="basic-polling-with-uri-params">
+        <http:polling-source config-ref="requestConfigBasic" path="/{testPath}">
+            <scheduling-strategy >
+                <fixed-frequency frequency="2" timeUnit="SECONDS"/>
+            </scheduling-strategy>
+            <http:polling-request-uri-params >
+                <http:polling-request-uri-param key="testPath" value="test" />
+            </http:polling-request-uri-params>
+        </http:polling-source>
+        <logger message="#[payload]"/>
+        <munit-tools:queue queueName="test_queue_5">
+            <munit-tools:value>#[payload]</munit-tools:value>
+        </munit-tools:queue>
+    </flow>
+
+    <flow name="some-other-stuff">
+        <http:listener config-ref="targetEndpoint" path="/test-body"/>
+        <set-payload value="#[output text/plain --- payload]"/>
+    </flow>
+
+
+    <flow name="basic-polling-body">
+        <http:polling-source config-ref="requestConfigBasic" path="/test-body">
+            <scheduling-strategy >
+                <fixed-frequency frequency="10" timeUnit="HOURS"/>
+            </scheduling-strategy>
+            <http:polling-request-body ><![CDATA[Some Body]]></http:polling-request-body>
+        </http:polling-source>
+        <logger message="#[payload]"/>
+        <munit-tools:queue queueName="test_queue_6">
+            <munit-tools:value>#[payload]</munit-tools:value>
+        </munit-tools:queue>
+    </flow>
+
+    <flow name="basic-polling-full-params">
+        <http:polling-source config-ref="requestConfigBasic" path="/{testPath}">
+            <scheduling-strategy >
+                <fixed-frequency frequency="2" timeUnit="SECONDS"/>
+            </scheduling-strategy>
+            <http:polling-request-body ><![CDATA[{'someBodyValue': 10}]]></http:polling-request-body>
+            <http:polling-request-headers >
+                <http:polling-request-header key="content" value="application/json" />
+                <http:polling-request-header key="testHeader" value="Messi" />
+            </http:polling-request-headers>
+            <http:polling-request-uri-params >
+                <http:polling-request-uri-param key="testPath" value="test" />
+            </http:polling-request-uri-params>
+            <http:polling-request-query-params >
+                <http:polling-request-query-param key="testQueryParam" value="parameter value" />
+            </http:polling-request-query-params>
+        </http:polling-source>
+        <logger message="#[payload]"/>
+        <munit-tools:queue queueName="test_queue_7">
+            <munit-tools:value>#[payload]</munit-tools:value>
+        </munit-tools:queue>
+    </flow>
+
+    <munit:test name="basic-polling-test-case">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="targetFlow" />
+            <munit:enable-flow-source value="basic-polling" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <munit-tools:dequeue timeout="5" timeoutUnit="SECONDS" queueName="test_queue_1"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[payload]" is="#[MunitTools::equalTo('test payload')]"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="polling-done-several-times-test-case">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="targetFlow" />
+            <munit:enable-flow-source value="basic-polling" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <munit-tools:sleep time="9" timeUnit="SECONDS"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[MunitTools::queueSize('test_queue_1')]" is="#[MunitTools::greaterThanOrEqualTo(4)]" />
+            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="test_queue_1"/>
+            <munit-tools:assert-that expression="#[payload]" is="#[MunitTools::equalTo('test payload')]"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="polling-with-header-test-case">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="targetFlow" />
+            <munit:enable-flow-source value="basic-polling-with-header" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <munit-tools:dequeue timeout="10" timeoutUnit="SECONDS" queueName="test_queue_2"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[payload]" is="#[MunitTools::equalTo('test payload - Received header: Messi')]"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="polling-post-test-case">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="targetFlowPost" />
+            <munit:enable-flow-source value="basic-polling-post" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="test_queue_3"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[payload]" is="#[MunitTools::equalTo('test payload')]"/>
+        </munit:validation>
+    </munit:test>
+
+
+    <munit:test name="polling-query-params-test-case">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="targetFlow" />
+            <munit:enable-flow-source value="basic-polling-with-query-params" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="test_queue_4"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[payload]" is="#[MunitTools::equalTo('test payload - parameter value')]"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="polling-uri-params-test-case">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="targetFlow" />
+            <munit:enable-flow-source value="basic-polling-with-uri-params" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="test_queue_5"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[payload]" is="#[MunitTools::equalTo('test payload')]"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="polling-body-test-case">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="some-other-stuff" />
+            <munit:enable-flow-source value="basic-polling-body" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="test_queue_6"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[payload]" is="#[MunitTools::equalTo('Some Body')]"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="polling-full-basic-test-case">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="targetFlow" />
+            <munit:enable-flow-source value="basic-polling-full-params" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="test_queue_7"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[payload]" is="#[MunitTools::equalTo('{\'someBodyValue\': 10} - Received header: Messi - parameter value')]"/>
+        </munit:validation>
+    </munit:test>
+
+</mule>

@@ -127,23 +127,32 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
     this.uriParams = uriParams;
   }
 
-  public CorrelationInfo getCorrelationInfo() {
-    return correlationInfo;
-  }
-
   public void setCorrelationInfo(CorrelationInfo correlationInfo) {
     this.correlationInfo = correlationInfo;
-  }
-
-  public OutboundCorrelationStrategy getSendCorrelationId() {
-    return sendCorrelationId;
   }
 
   public String getCorrelationId() {
     return correlationId;
   }
 
+  public CorrelationInfo getCorrelationInfo() {
+    return correlationInfo;
+  }
+
+  public OutboundCorrelationStrategy getSendCorrelationId() {
+    return sendCorrelationId;
+  }
+
+  /**
+   * @deprecated
+   * use {@link HttpRequesterRequestBuilder#toHttpRequestBuilder} instead
+   */
+  @Deprecated
   public HttpRequestBuilder configure(HttpRequesterConfig config) {
+    return toHttpRequestBuilder(config);
+  }
+
+  public HttpRequestBuilder toHttpRequestBuilder(HttpRequesterConfig config) {
     return HttpRequest.builder(PRESERVE_HEADER_CASE || config.isPreserveHeadersCase())
         .headers(headers)
         .queryParams(queryParams);

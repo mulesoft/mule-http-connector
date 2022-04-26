@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+    <munit:config name="https-polling-source.xml" />
+
+    <munit:dynamic-port propertyName="dynamic.port"/>
+
+
+    <tls:context name="globalTlsContext" >
+        <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit"/>
+        <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+    </tls:context>
+
+
+    <http:listener-config name="targetEndpointHTTPS">
+        <http:listener-connection host="0.0.0.0" port="${dynamic.port}" protocol="HTTPS" tlsContext="globalTlsContext"/>
+    </http:listener-config>
+
+    <http:request-config name="requestConfigHTTPS" sendBodyMode="ALWAYS">
+        <http:request-connection host="localhost" port="${dynamic.port}" protocol="HTTPS" tlsContext="globalTlsContext"/>
+    </http:request-config>
+
+    <flow name="targetHTTPSFlow" >
+        <http:listener config-ref="targetEndpointHTTPS" path="/test" />
+        <set-payload value="#[output text/plain --- 'Message received']"/>
+    </flow>
+
+    <flow name="https-polling">
+        <http:polling-source config-ref="requestConfigHTTPS" path="test">
+            <scheduling-strategy >
+                <fixed-frequency frequency="2" timeUnit="SECONDS"/>
+            </scheduling-strategy>
+        </http:polling-source>
+        <logger message="#[payload]" level="ERROR"/>
+        <munit-tools:queue queueName="test_queue_https">
+            <munit-tools:value>#[payload]</munit-tools:value>
+        </munit-tools:queue>
+    </flow>
+
+    <munit:test name="polling-https-test-case">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="targetHTTPSFlow" />
+            <munit:enable-flow-source value="https-polling" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="test_queue_https"/>
+        </munit:execution>
+        <munit:validation>
+            <logger message="#[payload]" level="ERROR"/>
+            <munit-tools:assert-that expression="#[payload]" is="#[MunitTools::equalTo('Message received')]"/>
+        </munit:validation>
+    </munit:test>
+
+
+</mule>

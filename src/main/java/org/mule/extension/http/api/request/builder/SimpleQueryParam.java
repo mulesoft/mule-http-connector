@@ -7,16 +7,19 @@
 package org.mule.extension.http.api.request.builder;
 
 import static java.util.Objects.hash;
+import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.runtime.parameter.Literal;
 
 import java.util.Objects;
 
 /**
  * Represents an HTTP Query Parameter
- * 
- * @since 1.1
+ *
+ * @since 1.7
  */
-public class QueryParam implements KeyValuePair {
+@Alias("pollingRequestQueryParam")
+public class SimpleQueryParam implements KeyValuePair {
 
   /**
    * Represents the Key of this HTTP Query Parameter
@@ -25,10 +28,11 @@ public class QueryParam implements KeyValuePair {
   private String key;
 
   /**
-   * Represents the Value of this HTTP Query Parameter
+   * Represents the Value of this HTTP Query Parameter, that could be an expression depending on a watermarking value
+   * that would be then resolved
    */
   @Parameter
-  private String value;
+  private Literal<String> value;
 
   @Override
   public String getKey() {
@@ -37,17 +41,19 @@ public class QueryParam implements KeyValuePair {
 
   @Override
   public String getValue() {
-    return value;
+    return value.getLiteralValue().orElse("");
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (obj instanceof QueryParam) {
-      QueryParam other = (QueryParam) obj;
-      return Objects.equals(key, other.key) && Objects.equals(value, other.value);
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
     }
-
-    return false;
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    SimpleQueryParam that = (SimpleQueryParam) o;
+    return Objects.equals(key, that.key) && Objects.equals(value, that.value);
   }
 
   @Override

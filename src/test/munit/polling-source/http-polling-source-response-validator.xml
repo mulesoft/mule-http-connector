@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+
+    <munit:config name="http-polling-source-response-validator.xml"/>
+
+    <munit:dynamic-port propertyName="dynamic.port"/>
+
+    <http:listener-config name="responseListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="${dynamic.port}"/>
+    </http:listener-config>
+
+    <http:request-config name="responseRequestConfig">
+        <http:request-connection host="localhost" port="${dynamic.port}"/>
+    </http:request-config>
+
+    <flow name="responseOkListenerFlow">
+        <http:listener config-ref="responseListenerConfig" path="/response-ok">
+            <http:response statusCode="202"/>
+        </http:listener>
+        <set-payload value="#[output application/json --- [{'name': 'ex1'}, {'name': 'ex2'}, {'name': 'ex3'}]]"/>
+    </flow>
+
+    <flow name="responseOkPollingFlow">
+        <http:polling-source config-ref="responseRequestConfig" path="response-ok" splitExpression="#[payload]">
+            <scheduling-strategy>
+                <fixed-frequency frequency="10" timeUnit="SECONDS"/>
+            </scheduling-strategy>
+            <http:response-validator>
+                <http:success-status-code-validator values="202" />
+            </http:response-validator>
+        </http:polling-source>
+        <munit-tools:queue queueName="response_ok_queue">
+            <munit-tools:value>#[payload]</munit-tools:value>
+        </munit-tools:queue>
+    </flow>
+
+    <munit:test name="response-ok-test-case">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="responseOkListenerFlow"/>
+            <munit:enable-flow-source value="responseOkPollingFlow"/>
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="response_ok_queue"/>
+            <set-variable variableName="names" value="#[payload.name]"/>
+            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="response_ok_queue"/>
+            <set-variable variableName="names" value="#[vars.names ++ payload.name]"/>
+            <munit-tools:dequeue timeout="3" timeoutUnit="SECONDS" queueName="response_ok_queue"/>
+            <set-variable variableName="names" value="#[vars.names ++ payload.name]"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[vars.names]" is="#[MunitTools::containsString('ex1')]"/>
+            <munit-tools:assert-that expression="#[vars.names]" is="#[MunitTools::containsString('ex2')]"/>
+            <munit-tools:assert-that expression="#[vars.names]" is="#[MunitTools::containsString('ex3')]"/>
+        </munit:validation>
+    </munit:test>
+
+
+    <flow name="responseErrorListenerFlow">
+        <http:listener config-ref="responseListenerConfig" path="/response-error">
+            <http:response statusCode="301"/>
+        </http:listener>
+        <set-payload value="#[output application/json --- [{'name': 'ex1'}, {'name': 'ex2'}, {'name': 'ex3'}]]"/>
+    </flow>
+
+    <flow name="responseErrorPollingFlow">
+        <http:polling-source config-ref="responseRequestConfig" path="response-error" splitExpression="#[payload]">
+            <scheduling-strategy>
+                <fixed-frequency frequency="10" timeUnit="SECONDS"/>
+            </scheduling-strategy>
+            <http:response-validator>
+                <http:success-status-code-validator values="200..299" />
+            </http:response-validator>
+        </http:polling-source>
+        <munit-tools:queue queueName="response_fail_queue">
+            <munit-tools:value>#[payload]</munit-tools:value>
+        </munit-tools:queue>
+    </flow>
+
+    <munit:test name="response-error-test-case">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="responseErrorListenerFlow"/>
+            <munit:enable-flow-source value="responseErrorPollingFlow"/>
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <set-variable variableName="failed" value="#[false]"/>
+            <try>
+                <munit-tools:dequeue timeout="5" timeoutUnit="SECONDS" queueName="response_fail_queue"/>
+                <error-handler>
+                    <on-error-continue>
+                        <set-variable variableName="failed" value="#[true]"/>
+                    </on-error-continue>
+                </error-handler>
+            </try>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[vars.failed]" is="#[MunitTools::equalTo(true)]"/>
+        </munit:validation>
+    </munit:test>
+
+</mule>

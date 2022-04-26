@@ -56,9 +56,9 @@ public class HttpResponseToResult {
 
   private static final ConcurrentMap<String, MediaType> parsedMediaTypes = new ConcurrentHashMap<>();
 
-  Result<Object, HttpResponseAttributes> convert(HttpRequesterCookieConfig config, MuleContext muleContext,
-                                                 HttpResponse response, HttpEntity entity,
-                                                 Supplier<Object> payloadSupplier, URI uri) {
+  public Result<Object, HttpResponseAttributes> convert(HttpRequesterCookieConfig config, MuleContext muleContext,
+                                                        HttpResponse response, HttpEntity entity,
+                                                        Supplier<Object> payloadSupplier, URI uri) {
 
     if (config.isEnableCookies()) {
       processCookies(config, response, uri);
