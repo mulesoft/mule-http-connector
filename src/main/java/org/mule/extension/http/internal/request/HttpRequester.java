@@ -212,7 +212,12 @@ public class HttpRequester {
                           requestCreator, false, muleContext, scheduler, notificationEmitter,
                           streamingHelper, callback, injectedHeaders);
               }, () -> {
-                responseValidator.validate((Result) result, httpRequest, streamingHelper);
+                if (streamingHelper != null) {
+                  responseValidator.validate((Result) result, httpRequest, streamingHelper);
+                } else {
+                  // we don't have streamingHelper in sources
+                  responseValidator.validate((Result) result, httpRequest);
+                }
 
                 Result<Object, HttpResponseAttributes> freshResult = httpResponseToResult
                     .convert(config, muleContext, response, entity, resultInputStreamSupplier, httpRequest.getUri());
