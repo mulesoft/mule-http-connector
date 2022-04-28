@@ -101,7 +101,7 @@ public class HttpConnectivityValidator implements Initialisable {
    */
   @ParameterGroup(name = "Request Builder", showInDsl = false)
   @Placement(order = 6)
-  private HttpRequesterTestRequestBuilder requestBuilder;
+  private HttpRequesterTestRequestBuilder requestBuilder = new HttpRequesterTestRequestBuilder();
 
   /**
    * Validation applied to the connectivity test response.
