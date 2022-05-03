@@ -6,16 +6,20 @@
  */
 package org.mule.extension.http.api.request;
 
+import static java.util.Collections.emptyList;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.extension.http.internal.request.KeyValuePairUtils.toMultiMap;
 import static org.mule.extension.http.internal.request.UriUtils.replaceUriParams;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
 import org.mule.extension.http.api.request.builder.HttpRequesterTestRequestBuilder;
+import org.mule.extension.http.api.request.builder.TestQueryParam;
+import org.mule.extension.http.api.request.builder.TestRequestHeader;
+import org.mule.extension.http.api.request.builder.UriParam;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.request.validator.ResponseValidatorTypedException;
 import org.mule.extension.http.api.request.validator.SuccessStatusCodeValidator;
@@ -27,20 +31,23 @@ import org.mule.extension.http.internal.request.client.HttpExtensionClient;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.extension.api.annotation.Expression;
+import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
-import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.extension.api.annotation.param.display.Text;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
-import org.slf4j.Logger;
 
 import javax.inject.Inject;
 import java.net.CookieManager;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -50,8 +57,6 @@ import java.util.concurrent.TimeUnit;
  * @since 1.7
  */
 public class HttpConnectivityValidator implements Initialisable {
-
-  private static final Logger LOGGER = getLogger(HttpConnectivityValidator.class);
 
   /**
    * Path used in the connectivity test request URI.
@@ -97,11 +102,48 @@ public class HttpConnectivityValidator implements Initialisable {
   private TimeUnit responseTimeoutUnit = MILLISECONDS;
 
   /**
-   * Request builder to be used to connectivity test.
+   * The body in the connectivity test request. It can be an expression, but it won't have any binding.
    */
-  @ParameterGroup(name = "Request Builder", showInDsl = false)
+  @Parameter
+  @Optional
   @Placement(order = 6)
-  private HttpRequesterTestRequestBuilder requestBuilder = new HttpRequesterTestRequestBuilder();
+  @Text
+  @Expression(value = SUPPORTED)
+  @DisplayName("Body")
+  private Literal<String> requestBody;
+
+  /**
+   * HTTP headers the connectivity test request should include. It allows multiple headers with the same key.
+   */
+  @Parameter
+  @Optional
+  @Placement(order = 7)
+  @NullSafe
+  @Expression(value = NOT_SUPPORTED)
+  @DisplayName("Headers")
+  private List<TestRequestHeader> requestHeaders = emptyList();
+
+  /**
+   * Query parameters the connectivity test request should include. It allows multiple query params with the same key.
+   */
+  @Parameter
+  @Optional
+  @Placement(order = 8)
+  @NullSafe
+  @Expression(value = NOT_SUPPORTED)
+  @DisplayName("Query Parameters")
+  private List<TestQueryParam> requestQueryParams = emptyList();
+
+  /**
+   * URI parameters the connectivity test request should include.
+   */
+  @Parameter
+  @Optional
+  @Placement(order = 9)
+  @NullSafe
+  @Expression(value = NOT_SUPPORTED)
+  @DisplayName("URI Parameters")
+  private List<UriParam> requestUriParams = emptyList();
 
   /**
    * Validation applied to the connectivity test response.
@@ -109,9 +151,18 @@ public class HttpConnectivityValidator implements Initialisable {
   @Parameter
   @Optional
   @DisplayName("Response Validator")
-  @Placement(order = 7)
+  @Placement(order = 10)
   @Expression(NOT_SUPPORTED)
   private ResponseValidator responseValidator;
+
+  @Inject
+  private ExpressionManager expressionManager;
+
+  /**
+   * Request builder to be used to connectivity test.
+   */
+  private HttpRequesterTestRequestBuilder requestBuilder =
+      new HttpRequesterTestRequestBuilder(requestBody, requestHeaders, requestQueryParams, requestUriParams, expressionManager);
 
   private SuccessStatusCodeValidator defaultStatusCodeValidator = new SuccessStatusCodeValidator("0..399");
 
@@ -180,9 +231,8 @@ public class HttpConnectivityValidator implements Initialisable {
     if (responseValidator != null) {
       initialiseIfNeeded(responseValidator, true, muleContext);
     }
-    if (requestBuilder != null) {
-      initialiseIfNeeded(requestBuilder, true, muleContext);
-    }
+    requestBuilder =
+        new HttpRequesterTestRequestBuilder(requestBody, requestHeaders, requestQueryParams, requestUriParams, expressionManager);
   }
 
   private static class VoidHttpRequesterCookieConfig implements HttpRequesterCookieConfig {
