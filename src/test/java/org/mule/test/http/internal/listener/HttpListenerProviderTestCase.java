@@ -6,9 +6,9 @@
  */
 package org.mule.test.http.internal.listener;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.ERROR_HANDLING;
+
 import static org.mockito.Mockito.doThrow;
 
 import org.mule.extension.http.internal.listener.HttpListenerProvider;
@@ -19,20 +19,33 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import java.lang.reflect.Field;
 import java.net.BindException;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
-@RunWith(MockitoJUnitRunner.class)
+@Feature(HTTP_EXTENSION)
+@Story(ERROR_HANDLING)
+@Issue("W-11090837")
 public class HttpListenerProviderTestCase extends AbstractMuleTestCase {
 
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
+
   @Mock
-  HttpServer server;
+  private HttpServer server;
 
   @InjectMocks
-  HttpListenerProvider httpListenerProvider = new HttpListenerProvider();
+  private HttpListenerProvider httpListenerProvider = new HttpListenerProvider();
+
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
   @Test
   public void testWhenExceptionIsThrownItShouldBeWrappedAsMuleException() throws Exception {
@@ -51,11 +64,9 @@ public class HttpListenerProviderTestCase extends AbstractMuleTestCase {
 
     doThrow(new BindException("Address already in use")).when(server).start();
 
-    try {
-      httpListenerProvider.start();
-      fail("Was expecting start to fail");
-    } catch (DefaultMuleException e) {
-      assertThat(e.getMessage(), is("Could not start HTTP server for 'testConfig' on port 8081: Address already in use"));
-    }
+    expectedException.expect(DefaultMuleException.class);
+    expectedException.expectMessage("Could not start HTTP server for 'testConfig' on port 8081: Address already in use");
+
+    httpListenerProvider.start();
   }
 }
