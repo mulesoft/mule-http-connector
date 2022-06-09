@@ -30,12 +30,7 @@ import org.mule.extension.socket.api.socket.tcp.TcpServerSocketProperties;
 import org.mule.modules.cors.api.configuration.origin.EveryOrigin;
 import org.mule.modules.cors.api.configuration.origin.Origin;
 import org.mule.modules.cors.api.configuration.origin.SingleOrigin;
-import org.mule.runtime.extension.api.annotation.Configurations;
-import org.mule.runtime.extension.api.annotation.Export;
-import org.mule.runtime.extension.api.annotation.Extension;
-import org.mule.runtime.extension.api.annotation.Import;
-import org.mule.runtime.extension.api.annotation.Operations;
-import org.mule.runtime.extension.api.annotation.SubTypeMapping;
+import org.mule.runtime.extension.api.annotation.*;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 import org.mule.runtime.extension.api.annotation.notification.NotificationActions;
@@ -65,7 +60,12 @@ import org.mule.runtime.extension.api.annotation.notification.NotificationAction
 // TODO move back to package org.mule.extension.http.internal as part of MULE-10651. Now we are using this package
 // because it doesn't work in the former package since the classloader mechanism will try to load the class from another bundle.
 @Export(classes = {HttpPolicyRequestAttributes.class, HttpProxyConfig.class, HttpNotificationData.class})
+@PrivilegedExport(packages = {
+    "org.mule.extension.http.api.request.client",
+    "org.mule.extension.http.internal.request",
+    "org.mule.extension.http.api.request.builder",
+    "org.mule.extension.http.internal.request.client"},
+    artifacts = {"com.mulesoft.composer.connectors:mule4-rest-consumer-composer-connector"})
 public class HttpConnector {
 
 }
-
