@@ -32,8 +32,10 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.http.HttpResponse;
@@ -155,20 +157,36 @@ public class HttpListenerConfigFunctionalTestCase extends AbstractHttpTestCase {
 
   private String getNonLocalhostIp() {
     try {
+      List<InetAddress> candidates = new ArrayList<>();
       Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
       for (NetworkInterface networkInterface : Collections.list(nets)) {
         final Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
         while (inetAddresses.hasMoreElements()) {
           InetAddress inetAddress = inetAddresses.nextElement();
           if (!inetAddress.isLoopbackAddress() && IPADDRESS_PATTERN.matcher(inetAddress.getHostAddress()).find()) {
-            return inetAddress.getHostAddress();
+            candidates.add(inetAddress);
           }
         }
       }
-      throw new RuntimeException("Could not find network interface different from localhost");
+      if (candidates.isEmpty()) {
+        throw new RuntimeException("Could not find network interface different from localhost");
+      } else {
+        return preferSiteLocal(candidates);
+      }
     } catch (SocketException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private static String preferSiteLocal(List<? extends InetAddress> candidates) {
+    for (InetAddress address : candidates) {
+      if (address.isSiteLocalAddress()) {
+        // If there is some site local, return that.
+        return address.getHostAddress();
+      }
+    }
+    // Otherwise, fallback to the first.
+    return candidates.get(0).getHostAddress();
   }
 
 }
