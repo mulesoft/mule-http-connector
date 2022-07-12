@@ -68,8 +68,6 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
 
   BAD_GATEWAY,
 
-  MULTI_STATUS,
-
   GATEWAY_TIMEOUT,
 
   MULTIPLE_CHOICES,
