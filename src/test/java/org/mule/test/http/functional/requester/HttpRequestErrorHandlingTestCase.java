@@ -13,7 +13,26 @@ import static org.junit.Assert.assertThat;
 import static org.mule.extension.http.internal.listener.HttpListener.HTTP_NAMESPACE;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.runtime.extension.api.error.MuleErrors.ANY;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.*;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.FORBIDDEN;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.NOT_FOUND;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.METHOD_NOT_ALLOWED;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.NOT_ACCEPTABLE;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.UNSUPPORTED_MEDIA_TYPE;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.TOO_MANY_REQUESTS;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.EXPECTATION_FAILED;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.GATEWAY_TIMEOUT;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_GATEWAY;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.MOVED_PERMANENTLY;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.MOVED_TEMPORARILY;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.MULTIPLE_CHOICES;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.SEE_OTHER;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.NOT_MODIFIED;
+
+
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.ERRORS;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.ERROR_HANDLING;
 
@@ -195,12 +214,12 @@ public class HttpRequestErrorHandlingTestCase extends AbstractHttpRequestTestCas
     return getErrorMessage(customMessage, httpPort);
   }
 
-  void verifyErrorWhenReceiving(HttpStatus status, String expectedMessage) throws Exception {
+  private void verifyErrorWhenReceiving(HttpStatus status, String expectedMessage) throws Exception {
     verifyErrorWhenReceiving(status, format("%s %s", status.getStatusCode(), status.getReasonPhrase()), status.name(),
                              getErrorMessage(expectedMessage));
   }
 
-  void verifyErrorWhenReceiving(HttpStatus status, Object expectedResult, String expectedError, String expectedMessage)
+  private void verifyErrorWhenReceiving(HttpStatus status, Object expectedResult, String expectedError, String expectedMessage)
       throws Exception {
     serverStatus = status.getStatusCode();
     // Hit flow with error handler
