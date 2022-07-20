@@ -32,7 +32,6 @@ import static org.mule.runtime.http.api.HttpConstants.HttpStatus.MULTIPLE_CHOICE
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.SEE_OTHER;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.NOT_MODIFIED;
 
-
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.ERRORS;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.ERROR_HANDLING;
 
