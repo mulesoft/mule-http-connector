@@ -13,19 +13,25 @@ import static org.junit.Assert.assertThat;
 import static org.mule.extension.http.internal.listener.HttpListener.HTTP_NAMESPACE;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.runtime.extension.api.error.MuleErrors.ANY;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_GATEWAY;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.EXPECTATION_FAILED;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.FORBIDDEN;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.GATEWAY_TIMEOUT;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.NOT_FOUND;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.METHOD_NOT_ALLOWED;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.NOT_ACCEPTABLE;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.NOT_FOUND;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.TOO_MANY_REQUESTS;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.UNSUPPORTED_MEDIA_TYPE;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.TOO_MANY_REQUESTS;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.EXPECTATION_FAILED;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.GATEWAY_TIMEOUT;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_GATEWAY;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.MOVED_PERMANENTLY;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.MOVED_TEMPORARILY;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.MULTIPLE_CHOICES;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.SEE_OTHER;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.NOT_MODIFIED;
+
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.ERRORS;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.ERROR_HANDLING;
 
@@ -39,11 +45,14 @@ import org.apache.commons.lang3.SystemUtils;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.error.HttpError;
 import org.mule.functional.api.exception.ExpectedError;
 import org.mule.functional.api.flow.FlowRunner;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.streaming.bytes.ManagedCursorStreamProvider;
 import org.mule.runtime.http.api.HttpConstants.HttpStatus;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -170,6 +179,32 @@ public class HttpRequestErrorHandlingTestCase extends AbstractHttpRequestTestCas
                hasPayload(equalTo(DEFAULT_RESPONSE)));
   }
 
+  @Test
+  public void movedPermanently() throws Exception {
+    verifyErrorWhenRedirect(MOVED_PERMANENTLY, "301 Moved Permanently");
+  }
+
+  @Test
+  public void movedTemporarily() throws Exception {
+    verifyErrorWhenRedirect(MOVED_TEMPORARILY, "302 Found", MOVED_TEMPORARILY.name(),
+                            getErrorMessage("302 Moved Temporarily"));
+  }
+
+  @Test
+  public void multipleChoices() throws Exception {
+    verifyErrorWhenRedirect(MULTIPLE_CHOICES, "300 Multiple Choices");
+  }
+
+  @Test
+  public void seeOther() throws Exception {
+    verifyErrorWhenRedirect(SEE_OTHER, "303 See Other");
+  }
+
+  @Test
+  public void notModified() throws Exception {
+    verifyErrorWhenRedirect(NOT_MODIFIED, "304 Not Modified");
+  }
+
   private String getErrorMessage(String customMessage, DynamicPort port) {
     return format("HTTP GET on resource 'http://localhost:%s/testPath' failed%s.", port.getValue(), customMessage);
   }
@@ -178,12 +213,12 @@ public class HttpRequestErrorHandlingTestCase extends AbstractHttpRequestTestCas
     return getErrorMessage(customMessage, httpPort);
   }
 
-  void verifyErrorWhenReceiving(HttpStatus status, String expectedMessage) throws Exception {
+  private void verifyErrorWhenReceiving(HttpStatus status, String expectedMessage) throws Exception {
     verifyErrorWhenReceiving(status, format("%s %s", status.getStatusCode(), status.getReasonPhrase()), status.name(),
                              getErrorMessage(expectedMessage));
   }
 
-  void verifyErrorWhenReceiving(HttpStatus status, Object expectedResult, String expectedError, String expectedMessage)
+  private void verifyErrorWhenReceiving(HttpStatus status, Object expectedResult, String expectedError, String expectedMessage)
       throws Exception {
     serverStatus = status.getStatusCode();
     // Hit flow with error handler
@@ -195,6 +230,20 @@ public class HttpRequestErrorHandlingTestCase extends AbstractHttpRequestTestCas
     }
     this.expectedError.expectMessage(is(expectedMessage));
     getFlowRunner("unhandled", httpPort.getNumber()).run();
+  }
+
+  void verifyErrorWhenRedirect(HttpStatus status, String expectedMessage) throws Exception {
+    verifyErrorWhenRedirect(status, format("%s %s", status.getStatusCode(), status.getReasonPhrase()), status.name(),
+                            getErrorMessage(expectedMessage));
+  }
+
+  void verifyErrorWhenRedirect(HttpStatus status, Object expectedResult, String expectedError, String expectedMessage)
+      throws Exception {
+    serverStatus = status.getStatusCode();
+    // Hit flow with error handler
+    CoreEvent result = getFlowRunner("redirect", httpPort.getNumber()).run();
+    HttpResponseAttributes attributes = (HttpResponseAttributes) result.getMessage().getAttributes().getValue();
+    assertThat(attributes.getStatusCode() + " " + attributes.getReasonPhrase(), is(expectedResult));
   }
 
   private FlowRunner getFlowRunner(String flowName, int port) {

@@ -68,7 +68,17 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
 
   BAD_GATEWAY,
 
-  GATEWAY_TIMEOUT;
+  GATEWAY_TIMEOUT,
+
+  MULTIPLE_CHOICES,
+
+  MOVED_PERMANENTLY,
+
+  MOVED_TEMPORARILY,
+
+  SEE_OTHER,
+
+  NOT_MODIFIED;
 
   private static Set<ErrorTypeDefinition> httpRequestOperationErrors;
 
@@ -92,6 +102,11 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
     errors.add(SERVICE_UNAVAILABLE);
     errors.add(BAD_GATEWAY);
     errors.add(GATEWAY_TIMEOUT);
+    errors.add(MULTIPLE_CHOICES);
+    errors.add(MOVED_PERMANENTLY);
+    errors.add(MOVED_TEMPORARILY);
+    errors.add(SEE_OTHER);
+    errors.add(NOT_MODIFIED);
 
     httpRequestOperationErrors = unmodifiableSet(errors);
   }

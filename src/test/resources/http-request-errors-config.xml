@@ -81,4 +81,16 @@
         </error-handler>
     </flow>
 
+    <flow name="redirect" >
+        <http:request config-ref="simpleConfig" path="testPath" responseTimeout="1000" followRedirects="false">
+            <http:headers>#[{'Content-Type': 'application/xml'}]</http:headers>
+        </http:request>
+        <error-handler>
+            <on-error-continue>
+                <logger level="WARN" message="#[error.errorMessage.payload]"/>
+                <set-payload value="#[error.errorMessage.payload]"/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+
 </mule>
