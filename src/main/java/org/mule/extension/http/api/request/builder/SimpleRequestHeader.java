@@ -17,7 +17,7 @@ import java.util.Objects;
 /**
  * Represents an HTTP Header
  *
- * @since 1.7
+ * @since 1.8
  */
 @Alias("pollingRequestHeader")
 public class SimpleRequestHeader implements KeyValuePair {

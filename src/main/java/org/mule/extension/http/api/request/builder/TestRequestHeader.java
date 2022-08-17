@@ -17,7 +17,7 @@ import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 /**
  * Represents an HTTP Header
  *
- * @since 1.7
+ * @since 1.8
  */
 @Alias("requestHeader")
 public class TestRequestHeader implements KeyValuePair {

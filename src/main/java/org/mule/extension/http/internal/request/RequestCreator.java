@@ -15,7 +15,7 @@ import java.util.Optional;
 /**
  * Creates everything the {@link HttpRequestFactory#create} needs to create and modify the {@link HttpRequestBuilder}
  *
- * @since 1.7
+ * @since 1.8
  */
 public interface RequestCreator {
 

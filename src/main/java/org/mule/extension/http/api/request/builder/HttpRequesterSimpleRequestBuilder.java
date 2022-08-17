@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * Component that specifies how to create a proper HTTP simple request, that can be used in a Polling Source
  *
- * @since 1.7
+ * @since 1.8
  */
 public class HttpRequesterSimpleRequestBuilder {
 

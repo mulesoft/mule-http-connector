@@ -47,7 +47,7 @@ import java.util.stream.StreamSupport;
 
 /**
  * Utils to be used for resolution of expressions of the {@link HttpPollingSource}
- * @since 1.7
+ * @since 1.8
  */
 public final class HttpPollingSourceUtils {
 

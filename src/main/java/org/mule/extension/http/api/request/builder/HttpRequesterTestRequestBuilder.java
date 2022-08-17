@@ -24,7 +24,7 @@ import java.util.Objects;
 /**
  * Component that specifies how to create a proper HTTP simple request, that can be used in a connectivity testing.
  *
- * @since 1.7
+ * @since 1.8
  */
 public class HttpRequesterTestRequestBuilder {
 

@@ -19,7 +19,7 @@ import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 /**
  * Represents an HTTP Query Parameter
  *
- * @since 1.7
+ * @since 1.8
  */
 @Alias("queryParam")
 public class TestQueryParam implements KeyValuePair {

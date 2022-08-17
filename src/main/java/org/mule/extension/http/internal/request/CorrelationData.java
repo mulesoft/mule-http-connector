@@ -12,7 +12,7 @@ import org.mule.runtime.extension.api.runtime.parameter.OutboundCorrelationStrat
 /**
  * Models all the data needed to build an HTTP Request with Correlation ID
  *
- * @since 1.7
+ * @since 1.8
  */
 public final class CorrelationData {
 

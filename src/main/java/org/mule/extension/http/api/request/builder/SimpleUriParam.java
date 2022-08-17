@@ -17,7 +17,7 @@ import static java.util.Objects.hash;
 /**
  * Represents an HTTP URI Parameter
  *
- * @since 1.7
+ * @since 1.8
  */
 @Alias("pollingRequestUriParam")
 public class SimpleUriParam implements KeyValuePair {

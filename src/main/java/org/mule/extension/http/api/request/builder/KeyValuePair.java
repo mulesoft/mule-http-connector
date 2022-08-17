@@ -10,7 +10,7 @@ package org.mule.extension.http.api.request.builder;
  * A single two-strings pair used for key-values used in contexts where using expressions for building maps doesn't
  * make sense, as within the connection providers.
  *
- * @since 1.7
+ * @since 1.8
  */
 public interface KeyValuePair {
 

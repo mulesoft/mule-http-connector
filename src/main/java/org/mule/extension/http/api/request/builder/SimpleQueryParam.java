@@ -16,7 +16,7 @@ import java.util.Objects;
 /**
  * Represents an HTTP Query Parameter
  *
- * @since 1.7
+ * @since 1.8
  */
 @Alias("pollingRequestQueryParam")
 public class SimpleQueryParam implements KeyValuePair {

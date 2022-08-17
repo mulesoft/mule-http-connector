@@ -32,7 +32,7 @@ import java.util.Optional;
 /**
  * Response validator that uses an expression.
  *
- * @since 1.7
+ * @since 1.8
  */
 @TypeDsl(allowTopLevelDefinition = true)
 public class ExpressionResponseValidator implements ResponseValidator {
