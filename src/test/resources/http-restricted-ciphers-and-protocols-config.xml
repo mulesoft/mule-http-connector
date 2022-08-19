@@ -41,7 +41,7 @@
     <!--Forces TLSv1.1-->
     <http:listener-config name="listenerConfig1">
         <http:listener-connection protocol="${protocol}" host="localhost" port="${port1}">
-            <tls:context enabledProtocols="TLSv1.1">
+            <tls:context enabledProtocols="TLSv1.2">
                 <tls:key-store path="tls/serverKeystore" keyPassword="mulepassword" password="mulepassword"/>
             </tls:context>
         </http:listener-connection>
