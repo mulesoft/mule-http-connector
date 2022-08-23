@@ -6,12 +6,14 @@
  */
 package org.mule.test.http.functional.tls;
 
+import static org.mule.test.http.functional.matcher.HttpResponseContentStringMatcher.body;
+
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mule.test.http.functional.matcher.HttpResponseContentStringMatcher.body;
+
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.matcher.HttpResponseStatusCodeMatcher;

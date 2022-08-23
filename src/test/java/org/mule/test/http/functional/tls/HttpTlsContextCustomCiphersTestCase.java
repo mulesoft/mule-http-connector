@@ -6,10 +6,12 @@
  */
 package org.mule.test.http.functional.tls;
 
+import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
+
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
+
 import org.mule.functional.api.exception.ExpectedError;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;

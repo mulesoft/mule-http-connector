@@ -6,8 +6,13 @@
  */
 package org.mule.test.http.functional.tls;
 
-import static org.apache.commons.io.FileUtils.getFile;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.HTTPS;
+
+import static java.security.Security.getProperty;
+import static java.security.Security.setProperty;
+
+import static org.apache.commons.io.FileUtils.getFile;
+
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
@@ -15,14 +20,14 @@ import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
-import javax.net.ssl.SSLContext;
-
 import io.qameta.allure.Story;
+import javax.net.ssl.SSLContext;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
+import org.junit.BeforeClass;
 
 @Story(HTTPS)
 public abstract class AbstractHttpTlsContextTestCase extends AbstractHttpTestCase {
@@ -31,7 +36,14 @@ public abstract class AbstractHttpTlsContextTestCase extends AbstractHttpTestCas
   private static final String trustStorePath = "tls/ssltest-cacerts.jks";
   private static final String storePassword = "changeit";
   private static final String keyPassword = "changeit";
-  private static final String protocol = "TLSv1.2";
+  private static final String TLS12 = "TLSv1.2";
+  private static final String TLS11 = "TLSv1.1";
+  private static final String DISABLED_ALGORITHMS_PROPERTY = "jdk.tls.disabledAlgorithms";
+
+  @BeforeClass
+  public static void enabledProtocol() {
+    setProperty(DISABLED_ALGORITHMS_PROPERTY, getProperty(DISABLED_ALGORITHMS_PROPERTY).replace(TLS11 + ", ", ""));
+  }
 
   protected static HttpResponse executeGetRequest(String url) throws IOException, GeneralSecurityException {
     HttpClient client = getSecureClient();
@@ -55,7 +67,7 @@ public abstract class AbstractHttpTlsContextTestCase extends AbstractHttpTestCas
     char[] keyPass = keyPassword.toCharArray();
     customSslContext =
         SSLContexts.custom()
-            .useProtocol(protocol)
+            .useProtocol(TLS12)
             .loadKeyMaterial(keyStore, storePass, keyPass)
             .loadTrustMaterial(trustStore, storePass)
             .build();

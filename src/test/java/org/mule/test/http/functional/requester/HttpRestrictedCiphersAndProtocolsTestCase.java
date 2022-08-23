@@ -6,13 +6,16 @@
  */
 package org.mule.test.http.functional.requester;
 
+import static org.mule.runtime.http.api.HttpConstants.Method.POST;
+import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.HTTPS;
+
 import static java.lang.String.format;
+
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.http.api.HttpConstants.Method.POST;
-import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.HTTPS;
+
 import org.mule.extension.http.api.error.HttpRequestFailedException;
 import org.mule.functional.api.exception.ExpectedError;
 import org.mule.runtime.api.tls.TlsContextFactory;
@@ -27,7 +30,7 @@ import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.test.http.functional.AbstractHttpTestCase;
+import org.mule.test.http.functional.tls.AbstractHttpTlsContextTestCase;
 
 import io.qameta.allure.Story;
 import io.qameta.allure.junit4.DisplayName;
@@ -38,7 +41,7 @@ import org.junit.Test;
 
 @Story(HTTPS)
 @DisplayName("HTTPS Restricted Ciphers and Protocols")
-public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestCase {
+public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTlsContextTestCase {
 
   @Rule
   public DynamicPort port1 = new DynamicPort("port1");
