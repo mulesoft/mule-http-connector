@@ -15,7 +15,7 @@ import java.util.Objects;
 /**
  * Represents an HTTP URI Parameter
  * 
- * @since 1.7
+ * @since 1.8
  */
 public class UriParam implements KeyValuePair {
 

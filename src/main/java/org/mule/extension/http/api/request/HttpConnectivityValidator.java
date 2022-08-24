@@ -54,7 +54,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Requester connectivity validator. It validates the connections created by the {@link HttpRequesterProvider}.
  *
- * @since 1.7
+ * @since 1.8
  */
 public class HttpConnectivityValidator implements Initialisable {
 
