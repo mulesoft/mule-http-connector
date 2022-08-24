@@ -52,7 +52,7 @@
     </http:request-config>
     <http:request-config name="clientGlobalConfigDefaultFails">
         <http:request-connection host="localhost" port="${https.internal.default}" protocol="HTTPS">
-            <tls:context enabledProtocols="TLSv1.1">
+            <tls:context enabledProtocols="TLSv1.2">
                 <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit"/>
                 <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
             </tls:context>
@@ -68,7 +68,7 @@
     </http:request-config>
     <http:request-config name="clientGlobalConfigTLSv1">
         <http:request-connection host="localhost" port="${https.internal.alltls}" protocol="HTTPS">
-            <tls:context enabledProtocols="TLSv1.1">
+            <tls:context enabledProtocols="TLSv1.2">
                 <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit"/>
                 <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
             </tls:context>

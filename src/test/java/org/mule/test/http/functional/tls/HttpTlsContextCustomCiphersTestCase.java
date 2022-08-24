@@ -6,10 +6,12 @@
  */
 package org.mule.test.http.functional.tls;
 
+import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
+
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
+
 import org.mule.functional.api.exception.ExpectedError;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -27,7 +29,7 @@ public class HttpTlsContextCustomCiphersTestCase extends AbstractHttpTlsContextT
   @ClassRule
   public static DynamicPort httpsInternalPort3 = new DynamicPort("internal.port.3");
 
-  private static final String invalidCipher = "TLS_RSA_WITH_AES_256_CBC_SHA";
+  private static final String validCipher = "TLS_RSA_WITH_AES_256_CBC_SHA";
   private static final String bothProtocolsOneCipher = "bothProtocolsOneCipher";
   private static final String validProtocolValidCipher = "validProtocolValidCipher";
   private static final String validProtocolInvalidCipher = "validProtocolInvalidCipher";
@@ -35,7 +37,7 @@ public class HttpTlsContextCustomCiphersTestCase extends AbstractHttpTlsContextT
   private static final String ERROR_RESPONSE = "Remotely closed";
 
   @ClassRule
-  public static SystemProperty cipherSuites = new SystemProperty("cipherSuites", invalidCipher);
+  public static SystemProperty cipherSuites = new SystemProperty("cipherSuites", validCipher);
   @ClassRule
   public static SystemProperty verboseExceptions = new SystemProperty("mule.verbose.exceptions", "true");
 
