@@ -6,21 +6,18 @@
  */
 package org.mule.test.http.functional.tls;
 
-import static org.mule.test.http.functional.matcher.HttpResponseContentStringMatcher.body;
-
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-
+import static org.mule.test.http.functional.matcher.HttpResponseContentStringMatcher.body;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.matcher.HttpResponseStatusCodeMatcher;
 
 import org.apache.http.HttpResponse;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class HttpTlsContextCustomProtocolsTestCase extends AbstractHttpTlsContextTestCase {
@@ -63,7 +60,6 @@ public class HttpTlsContextCustomProtocolsTestCase extends AbstractHttpTlsContex
   }
 
   @Test
-  @Ignore("W-11622684: After disabling TLS 1.1 with the JDK8 update, this test is obsolete.")
   public void testGlobalTlsContextDefaultProtocolsFails() throws Exception {
     HttpResponse response = executeGetRequest(defaultProtocolsFailsUrl);
 

@@ -30,13 +30,13 @@
     <!-- Valid Protocol with invalid cipher -->
     <http:request-config name="requestConfig3">
         <http:request-connection protocol="HTTPS" host="localhost" port="${internal.port.3}">
-            <tls:context enabledProtocols="TLSv1.2" enabledCipherSuites="TLS_RSA_WITH_AES_128_CBC_SHA">
+            <tls:context enabledProtocols="TLSv1.1" enabledCipherSuites="TLS_RSA_WITH_AES_128_CBC_SHA">
                 <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit"/>
             </tls:context>
         </http:request-connection>
     </http:request-config>
 
-    <!--Uses JVM defaults-->
+    <!--Forces TLSv1.1 and TLSv1.2-->
     <http:listener-config name="listenerConfig1">
         <http:listener-connection protocol="HTTPS" host="localhost" port="${internal.port.1}">
             <tls:context enabledCipherSuites="default">

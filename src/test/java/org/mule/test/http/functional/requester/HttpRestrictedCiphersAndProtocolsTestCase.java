@@ -6,16 +6,13 @@
  */
 package org.mule.test.http.functional.requester;
 
-import static org.mule.runtime.http.api.HttpConstants.Method.POST;
-import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.HTTPS;
-
 import static java.lang.String.format;
-
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-
+import static org.mule.runtime.http.api.HttpConstants.Method.POST;
+import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.HTTPS;
 import org.mule.extension.http.api.error.HttpRequestFailedException;
 import org.mule.functional.api.exception.ExpectedError;
 import org.mule.runtime.api.tls.TlsContextFactory;
@@ -36,7 +33,6 @@ import io.qameta.allure.Story;
 import io.qameta.allure.junit4.DisplayName;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -122,7 +118,6 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
   }
 
   @Test
-  @Ignore("W-11622684: After disabling TLS 1.1 with the JDK8 update, this test is obsolete.")
   public void failsWithProtocolMismatch() throws Exception {
     expectedError.expectCause(instanceOf(HttpRequestFailedException.class));
     expectedError.expectMessage(containsString("Remotely closed"));
