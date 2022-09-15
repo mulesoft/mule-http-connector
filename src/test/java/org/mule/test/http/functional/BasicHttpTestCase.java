@@ -30,6 +30,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.junit.Rule;
 import org.junit.Test;
 
+import javax.inject.Inject;
+
 public class BasicHttpTestCase extends AbstractHttpRequestTestCase {
 
   @Rule
