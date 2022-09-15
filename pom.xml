@@ -110,6 +110,11 @@
                             -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${session.executionRootDirectory}/target/jacoco.exec
                         </argLine>
                     </argLines>
+                    <!-- For testing tracing capabilities-->
+                    <systemPropertyVariables>
+                        <mule.openetelemetry.export.enabled>true</mule.openetelemetry.export.enabled>
+                        <mule.enable.profiling.service>true</mule.enable.profiling.service>
+                    </systemPropertyVariables>
                     <runtimeConfiguration>
                         <discoverRuntimes>
                             <product>ALL</product>
