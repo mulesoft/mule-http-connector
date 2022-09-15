@@ -11,6 +11,7 @@ import static java.lang.Thread.currentThread;
 import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Optional.empty;
 import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST;
+import static org.mule.extension.http.internal.request.EmptyDistributedTraceContextManager.getDistributedTraceContextManager;
 import static org.mule.extension.http.internal.request.HttpPollingSourceUtils.getItemId;
 import static org.mule.extension.http.internal.request.HttpPollingSourceUtils.getItems;
 import static org.mule.extension.http.internal.request.HttpPollingSourceUtils.getItemWatermark;
@@ -279,7 +280,7 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
           .doSyncRequest(client, config, resolvedUri, method, config.getRequestStreamingMode(), config.getSendBodyMode(),
                          config.getFollowRedirects(), client.getDefaultAuthentication(), config.getResponseTimeout(),
                          getResponseValidator(), transformationService, getRequesCreator(currentWatermark), true, muleContext,
-                         scheduler, injectedHeaders);
+                         scheduler, injectedHeaders, getDistributedTraceContextManager());
       pollResult(pollContext, result, currentWatermark, resolvedUri);
     } catch (ExecutionException e) {
       LOGGER.error("There was an error in HTTP Polling Source at {} of uri '{}'", location.getRootContainerName(), resolvedUri,

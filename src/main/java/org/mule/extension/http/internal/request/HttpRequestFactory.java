@@ -46,6 +46,7 @@ import org.mule.runtime.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.runtime.http.api.domain.entity.multipart.HttpPart;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
+import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -103,7 +104,8 @@ public class HttpRequestFactory {
   public HttpRequest create(HttpRequesterConfig config, String uri, String method, HttpStreamingType streamingMode,
                             HttpSendBodyMode sendBodyMode, TransformationService transformationService,
                             HttpRequestAuthentication authentication, Map<String, List<String>> injectedHeaders,
-                            RequestCreator httpRequestCreator) {
+                            RequestCreator httpRequestCreator,
+                            DistributedTraceContextManager distributedTraceContextManager) {
     HttpRequestBuilder builder = httpRequestCreator.createRequestBuilder(config)
         .uri(uri)
         .method(method);
@@ -124,6 +126,8 @@ public class HttpRequestFactory {
     if (config.isEnableCookies()) {
       addCookiesHeader(config, uri, builder);
     }
+
+    distributedTraceContextManager.getRemoteTraceContextMap().forEach(builder::addHeader);
 
     try {
       builder.entity(createRequestEntity(streamingMode, sendBodyMode, transformationService, builder, method,

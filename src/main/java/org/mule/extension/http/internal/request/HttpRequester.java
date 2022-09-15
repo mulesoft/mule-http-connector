@@ -55,6 +55,7 @@ import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
+import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -136,15 +137,18 @@ public class HttpRequester {
                         TransformationService transformationService, RequestCreator requestCreator,
                         boolean checkRetry, MuleContext muleContext, Scheduler scheduler, NotificationEmitter notificationEmitter,
                         StreamingHelper streamingHelper, CompletionCallback<InputStream, HttpResponseAttributes> callback,
-                        Map<String, List<String>> injectedHeaders) {
+                        Map<String, List<String>> injectedHeaders,
+                        DistributedTraceContextManager distributedTraceContextManager) {
 
     int resolvedTimeout = resolveResponseTimeout(muleContext, responseTimeout);
+    HttpRequest httpRequester = httpRequestFactory.create(config, uri, method, streamingMode, sendBodyMode, transformationService,
+                                                          authentication, injectedHeaders, requestCreator,
+                                                          distributedTraceContextManager);
+
     doRequestWithRetry(client, config, uri, method, streamingMode, sendBodyMode, followRedirects, authentication, resolvedTimeout,
                        responseValidator, transformationService, requestCreator, checkRetry, muleContext, scheduler,
-                       notificationEmitter, streamingHelper, callback,
-                       httpRequestFactory.create(config, uri, method, streamingMode, sendBodyMode, transformationService,
-                                                 authentication, injectedHeaders, requestCreator),
-                       RETRY_ATTEMPTS, injectedHeaders);
+                       notificationEmitter, streamingHelper, callback, httpRequester,
+                       RETRY_ATTEMPTS, injectedHeaders, distributedTraceContextManager);
   }
 
   public Result<InputStream, HttpResponseAttributes> doSyncRequest(HttpExtensionClient client, HttpRequesterConfig config,
@@ -155,7 +159,8 @@ public class HttpRequester {
                                                                    TransformationService transformationService,
                                                                    RequestCreator requestBuilder, boolean checkRetry,
                                                                    MuleContext muleContext, Scheduler scheduler,
-                                                                   Map<String, List<String>> injectedHeaders)
+                                                                   Map<String, List<String>> injectedHeaders,
+                                                                   DistributedTraceContextManager distributedTraceContextManager)
       throws ExecutionException, InterruptedException {
     CompletableFuture<Result<InputStream, HttpResponseAttributes>> future = new CompletableFuture<>();
     CompletionCallback<InputStream, HttpResponseAttributes> callback =
@@ -173,7 +178,7 @@ public class HttpRequester {
         };
     doRequest(client, config, uri, method, streamingMode, sendBodyMode, followRedirects, authentication, responseTimeout,
               responseValidator, transformationService, requestBuilder, checkRetry, muleContext, scheduler, null, null, callback,
-              injectedHeaders);
+              injectedHeaders, distributedTraceContextManager);
     return future.get();
   }
 
@@ -186,7 +191,8 @@ public class HttpRequester {
                                   NotificationEmitter notificationEmitter,
                                   StreamingHelper streamingHelper,
                                   CompletionCallback<InputStream, HttpResponseAttributes> callback, HttpRequest httpRequest,
-                                  int retryCount, Map<String, List<String>> injectedHeaders) {
+                                  int retryCount, Map<String, List<String>> injectedHeaders,
+                                  DistributedTraceContextManager distributedTraceContextManager) {
     fireNotification(notificationEmitter, REQUEST_START, () -> HttpRequestNotificationData.from(httpRequest),
                      REQUEST_NOTIFICATION_DATA_TYPE);
 
@@ -210,7 +216,7 @@ public class HttpRequester {
                 doRequest(client, config, uri, method, streamingMode, sendBodyMode, followRedirects,
                           authentication, responseTimeout, responseValidator, transformationService,
                           requestCreator, false, muleContext, scheduler, notificationEmitter,
-                          streamingHelper, callback, injectedHeaders);
+                          streamingHelper, callback, injectedHeaders, distributedTraceContextManager);
               }, () -> {
                 if (streamingHelper != null) {
                   responseValidator.validate((Result) result, httpRequest, streamingHelper);
@@ -239,7 +245,7 @@ public class HttpRequester {
               doRequestWithRetry(client, config, uri, method, streamingMode, sendBodyMode, followRedirects, authentication,
                                  responseTimeout, responseValidator, transformationService, requestCreator, checkRetry,
                                  muleContext, scheduler, notificationEmitter, streamingHelper, callback, httpRequest,
-                                 retryCount - 1, injectedHeaders);
+                                 retryCount - 1, injectedHeaders, distributedTraceContextManager);
               return;
             }
 
