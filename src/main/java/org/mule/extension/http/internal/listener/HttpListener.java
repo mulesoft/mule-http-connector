@@ -107,6 +107,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.mule.sdk.compatibility.api.utils.ForwardCompatibilityHelper;
 import org.slf4j.Logger;
 
 /**
@@ -149,6 +150,9 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
 
   @Inject
   private NotificationListenerRegistry notificationListenerRegistry;
+
+  @Inject
+  private java.util.Optional<ForwardCompatibilityHelper> forwardCompatibilityHelper;
 
   private MuleContextStopWatcher muleContextStopWatcher;
 
@@ -406,6 +410,8 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
               .setInterception(interceptor.request(getMethod(result), headers)));
 
           SourceCallbackContext context = sourceCallback.createContext();
+          forwardCompatibilityHelper
+              .ifPresent(fch -> fch.getDistributedTraceContextManager(context).setRemoteTraceContextMap(headers));
           context.addVariable(RESPONSE_CONTEXT, responseContext);
 
           resolveCorrelationId(headers, context);

@@ -62,6 +62,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.extension.http.internal.request.EmptyDistributedTraceContextManager.getDistributedTraceContextManager;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 
 public class HttpRequesterAuthConsumesPayloadTestCase {
@@ -170,14 +171,15 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
         .thenReturn(result1, result2);
 
     Map<String, List<String>> injectedHeaders = new HashMap<>();
-    when(httpRequestFactory.create(config, uri, "dummyMethod", null, null, null, authentication, injectedHeaders, requestCreator))
-        .thenReturn(httpRequest);
+    when(httpRequestFactory.create(config, uri, "dummyMethod", null, null, null, authentication, injectedHeaders, requestCreator,
+                                   getDistributedTraceContextManager()))
+                                       .thenReturn(httpRequest);
 
     // When
     boolean checkRetry = true;
     httpRequester.doRequest(client, config, uri, "dummyMethod", null, null, false, authentication, 0, responseValidator, null,
                             requestCreator, checkRetry, muleContext, null, notificationEmitter, streamingHelper, callback,
-                            injectedHeaders);
+                            injectedHeaders, getDistributedTraceContextManager());
 
     // Then
     InOrder order = inOrder(streamingHelper, httpResponseToResult, authentication, callback);
@@ -206,15 +208,16 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
         .thenReturn(result1, result2);
 
     Map<String, List<String>> injectedHeaders = new HashMap<>();
-    when(httpRequestFactory.create(config, uri, "dummyMethod", null, null, null, authentication, injectedHeaders, requestCreator))
-        .thenReturn(httpRequest);
+    when(httpRequestFactory.create(config, uri, "dummyMethod", null, null, null, authentication, injectedHeaders, requestCreator,
+                                   getDistributedTraceContextManager()))
+                                       .thenReturn(httpRequest);
 
     boolean checkRetry = true;
 
     // When
     httpRequester.doRequest(client, config, uri, "dummyMethod", null, null, false, authentication, 0, responseValidator, null,
                             requestCreator, checkRetry, muleContext, null, notificationEmitter, streamingHelper, callback,
-                            injectedHeaders);
+                            injectedHeaders, getDistributedTraceContextManager());
 
     // Then
     InOrder order = inOrder(streamingHelper, httpResponseToResult, authentication, callback);
@@ -236,8 +239,9 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     HttpRequester httpRequester = new HttpRequester(httpRequestFactory, httpResponseToResult, httpErrorMessageGenerator);
 
     Map<String, List<String>> injectedHeaders = new HashMap<>();
-    when(httpRequestFactory.create(config, uri, "dummyMethod", null, null, null, authentication, injectedHeaders, requestCreator))
-        .thenReturn(httpRequest);
+    when(httpRequestFactory.create(config, uri, "dummyMethod", null, null, null, authentication, injectedHeaders, requestCreator,
+                                   getDistributedTraceContextManager()))
+                                       .thenReturn(httpRequest);
 
     boolean checkRetry = true;
 
@@ -246,7 +250,7 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     // When
     httpRequester.doRequest(client, config, uri, "dummyMethod", null, null, false, authentication, 0, responseValidator, null,
                             requestCreator, checkRetry, muleContext, null, notificationEmitter, streamingHelper, callback,
-                            injectedHeaders);
+                            injectedHeaders, getDistributedTraceContextManager());
 
     // Then
     ArgumentCaptor<Result> argumentCaptor = ArgumentCaptor.forClass(Result.class);
@@ -271,8 +275,9 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     HttpRequester httpRequester = new HttpRequester(httpRequestFactory, httpResponseToResult, httpErrorMessageGenerator);
 
     Map<String, List<String>> injectedHeaders = new HashMap<>();
-    when(httpRequestFactory.create(config, uri, "dummyMethod", null, null, null, authentication, injectedHeaders, requestCreator))
-        .thenReturn(httpRequest);
+    when(httpRequestFactory.create(config, uri, "dummyMethod", null, null, null, authentication, injectedHeaders, requestCreator,
+                                   getDistributedTraceContextManager()))
+                                       .thenReturn(httpRequest);
 
     boolean checkRetry = true;
 
@@ -281,7 +286,7 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     // When
     httpRequester.doRequest(client, config, uri, "dummyMethod", null, null, false, authentication, 0, responseValidator, null,
                             requestCreator, checkRetry, muleContext, null, notificationEmitter, streamingHelper, callback,
-                            injectedHeaders);
+                            injectedHeaders, getDistributedTraceContextManager());
 
     // Then
     ArgumentCaptor<Result> argumentCaptor = ArgumentCaptor.forClass(Result.class);
@@ -307,15 +312,16 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
         .thenReturn(result1, result2);
 
     Map<String, List<String>> injectedHeaders = new HashMap<>();
-    when(httpRequestFactory.create(config, uri, "dummyMethod", null, null, null, authentication, injectedHeaders, requestCreator))
-        .thenReturn(httpRequest);
+    when(httpRequestFactory.create(config, uri, "dummyMethod", null, null, null, authentication, injectedHeaders, requestCreator,
+                                   getDistributedTraceContextManager()))
+                                       .thenReturn(httpRequest);
 
     boolean checkRetry = true;
 
     // When
     httpRequester.doRequest(client, config, uri, "dummyMethod", null, null, false, authentication, 0, responseValidator, null,
                             requestCreator, checkRetry, muleContext, null, notificationEmitter, streamingHelper, callback,
-                            injectedHeaders);
+                            injectedHeaders, getDistributedTraceContextManager());
 
     // Then
     verify(streamingHelper, never()).resolveCursorProvider(entity.getContent());

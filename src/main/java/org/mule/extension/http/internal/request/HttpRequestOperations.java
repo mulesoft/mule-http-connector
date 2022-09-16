@@ -17,7 +17,8 @@ import static org.mule.extension.http.internal.request.UriUtils.buildPath;
 import static org.mule.extension.http.internal.request.UriUtils.resolveUri;
 import static org.mule.extension.http.internal.request.HttpRequestUtils.createHttpRequester;
 import static org.mule.extension.http.internal.request.HttpRequestUtils.handleCursor;
-import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
+import static org.mule.extension.http.internal.request.EmptyDistributedTraceContextManager.getDistributedTraceContextManager;
+import static org.mule.sdk.api.annotation.param.MediaType.ANY;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
@@ -53,6 +54,7 @@ import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
+import org.mule.sdk.compatibility.api.utils.ForwardCompatibilityHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,6 +81,9 @@ public class HttpRequestOperations implements Initialisable, Disposable {
   @Inject
   @Named("http.request.fixedHeadersRegistry")
   private HashMap<String, List<String>> injectedHeaders;
+
+  @Inject
+  private java.util.Optional<ForwardCompatibilityHelper> forwardCompatibilityHelper;
 
   private Scheduler scheduler;
 
@@ -141,7 +146,9 @@ public class HttpRequestOperations implements Initialisable, Disposable {
                               overrides.getSendBodyMode(), overrides.getFollowRedirects(), client.getDefaultAuthentication(),
                               overrides.getResponseTimeout(), responseValidator, transformationService,
                               getRequestCreator(resolvedBuilder), true, muleContext, scheduler, notificationEmitter,
-                              streamingHelper, callback, injectedHeaders);
+                              streamingHelper, callback, injectedHeaders, forwardCompatibilityHelper
+                                  .map(fcHelper -> fcHelper.getDistributedTraceContextManager(correlationInfo))
+                                  .orElse(getDistributedTraceContextManager()));
     } catch (Throwable t) {
       callback.error(t instanceof Exception ? (Exception) t : new DefaultMuleException(t));
     }

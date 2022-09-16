@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+  ~ The software in this package is published under the terms of the CPAL v1.0
+  ~ license, a copy of which has been included with this distribution in the
+  ~ LICENSE.txt file.
+  -->
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+      xsi:schemaLocation="
+      	http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+
+    <munit:config name="test-tracing-test-case" minMuleVersion="4.5.0-SNAPSHOT"/>
+
+    <munit:dynamic-port propertyName="http.port"/>
+
+    <http:listener-config name="listenerConfig" >
+        <http:listener-connection host="0.0.0.0" port="${http.port}" />
+    </http:listener-config>
+
+    <http:request-config name="requestConfig">
+        <http:request-connection host="localhost" port="${http.port}" />
+    </http:request-config>
+
+    <munit:test name="tracing">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="ListenerFlow" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <http:request method="GET" path='/' config-ref="requestConfig"  />
+        </munit:execution>
+    </munit:test>
+
+    <flow name="ListenerFlow" >
+        <http:listener path="*" config-ref="listenerConfig" />
+        <munit-tools:assert-that expression="#[attributes.headers]" is="#[MunitTools::hasKey('traceparent')]" message="Trace context propagation" />
+    </flow>
+</mule>
