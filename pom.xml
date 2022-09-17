@@ -26,7 +26,7 @@
         <grizzlyAhcVersion>1.14-MULE-019</grizzlyAhcVersion>
         <javaxActivationVersion>1.2.0</javaxActivationVersion>
         <javaxMailVersion>1.4.3</javaxMailVersion>
-        <jettyVersion>9.0.7.v20131107</jettyVersion>
+        <jettyVersion>11.0.12</jettyVersion>
 
         <commonsTextVersion>1.9</commonsTextVersion>
         <formatterConfigPath>formatter.xml</formatterConfigPath>
