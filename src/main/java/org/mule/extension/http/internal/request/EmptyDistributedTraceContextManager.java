@@ -39,4 +39,22 @@ public class EmptyDistributedTraceContextManager implements DistributedTraceCont
   public Map<String, String> getRemoteTraceContextMap() {
     return emptyMap();
   }
+
+  @Override
+  public void setCurrentSpanName(String name) {
+    // TODO: W-10876465 A.8.2 Respect semantic conventions of span generation in HTTP
+    // Nothing to do.
+  }
+
+  @Override
+  public void addCurrentSpanAttribute(String key, String value) {
+    // TODO: W-10876465 A.8.2 Respect semantic conventions of span generation in HTTP
+    // Nothing to do.
+  }
+
+  @Override
+  public void addCurrentSpanAttributes(Map<String, String> attributes) {
+    // TODO: W-10876465 A.8.2 Respect semantic conventions of span generation in HTTP
+    // Nothing to do.
+  }
 }
