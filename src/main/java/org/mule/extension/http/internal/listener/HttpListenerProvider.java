@@ -32,6 +32,7 @@ import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -176,6 +177,9 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
   private HttpService httpService;
 
   @Inject
+  protected MuleContext muleContext;
+
+  @Inject
   private SchedulerService schedulerService;
 
   @Inject
@@ -207,7 +211,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
     }
 
     if (tlsContext != null) {
-      initialiseIfNeeded(tlsContext);
+      initialiseIfNeeded(tlsContext, muleContext);
     }
 
     verifyConnectionsParameters();
