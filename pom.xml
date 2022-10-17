@@ -20,6 +20,8 @@
     <name>HTTP Connector</name>
     <description>A Mule extension that provides HTTP server and client functionality</description>
 
+	<!-- hello! -->
+
     <properties>
         <fluentHcVersion>4.5.13</fluentHcVersion>
         <grizzlyVersion>2.3.36-MULE-024</grizzlyVersion>
