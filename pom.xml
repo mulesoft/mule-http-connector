@@ -28,7 +28,7 @@
         <javaxMailVersion>1.4.3</javaxMailVersion>
         <jettyVersion>9.0.7.v20131107</jettyVersion>
 
-        <commonsTextVersion>1.9</commonsTextVersion>
+        <commonsTextVersion>1.10.0</commonsTextVersion>
         <formatterConfigPath>formatter.xml</formatterConfigPath>
 
         <muleSocketsConnectorVersion>1.2.2</muleSocketsConnectorVersion>
