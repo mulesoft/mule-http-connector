@@ -28,7 +28,6 @@
         <javaxMailVersion>1.4.3</javaxMailVersion>
         <jettyVersion>9.0.7.v20131107</jettyVersion>
 
-        <commonsTextVersion>1.9</commonsTextVersion>
         <formatterConfigPath>formatter.xml</formatterConfigPath>
 
         <muleSocketsConnectorVersion>1.2.2</muleSocketsConnectorVersion>
@@ -192,11 +191,6 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-cors-kernel</artifactId>
             <version>${muleCorsKernelVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-text</artifactId>
-            <version>${commonsTextVersion}</version>             
         </dependency>
 
         <!-- Tests -->
