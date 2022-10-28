@@ -50,7 +50,7 @@
 
         <scriptingModuleVersion>1.1.7</scriptingModuleVersion>
 
-        <springVersion>5.3.18</springVersion>
+        <springVersion>5.3.23</springVersion>
     </properties>
 
     <build>
