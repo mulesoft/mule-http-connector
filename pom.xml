@@ -145,7 +145,7 @@
                     <dependency>
                         <groupId>org.mule.module</groupId>
                         <artifactId>mule-java-module</artifactId>
-                        <version>1.2.6</version>
+                        <version>1.2.10</version>
                         <classifier>mule-plugin</classifier>
                     </dependency>
                 </dependencies>
