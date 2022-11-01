@@ -28,7 +28,7 @@
         <javaxMailVersion>1.4.3</javaxMailVersion>
         <jettyVersion>9.0.7.v20131107</jettyVersion>
 
-        <commonsTextVersion>1.9</commonsTextVersion>
+        <commonsLang3Version>3.12.0</commonsLang3Version>
         <formatterConfigPath>formatter.xml</formatterConfigPath>
 
         <muleSocketsConnectorVersion>1.2.2</muleSocketsConnectorVersion>
@@ -195,8 +195,8 @@
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
-            <artifactId>commons-text</artifactId>
-            <version>${commonsTextVersion}</version>             
+            <artifactId>commons-lang3</artifactId>
+            <version>${commonsLang3Version}</version>
         </dependency>
 
         <!-- Tests -->
