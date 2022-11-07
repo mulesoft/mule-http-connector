@@ -36,15 +36,18 @@ public class HttpListenerCurrentSpanCustomizer extends HttpCurrentSpanCustomizer
   public static final String HTTP_USER_AGENT = "http.user_agent";
   private final HttpRequestAttributes attributes;
   private final String host;
+  private final int port;
 
-  public HttpListenerCurrentSpanCustomizer(HttpRequestAttributes attributes, String host) {
+  private HttpListenerCurrentSpanCustomizer(HttpRequestAttributes attributes, String host, int port) {
     this.attributes = attributes;
     this.host = host;
+    this.port = port;
   }
 
   public static HttpCurrentSpanCustomizer getHttpListenerCurrentSpanCustomizer(HttpRequestAttributes attributes,
-                                                                               String host) {
-    return new HttpListenerCurrentSpanCustomizer(attributes, host);
+                                                                               String host,
+                                                                               int port) {
+    return new HttpListenerCurrentSpanCustomizer(attributes, host, port);
   }
 
   @Override
@@ -91,7 +94,7 @@ public class HttpListenerCurrentSpanCustomizer extends HttpCurrentSpanCustomizer
 
   @Override
   public URI getURI() throws URISyntaxException {
-    return new URI(attributes.getScheme() + ":/" + attributes.getLocalAddress() + attributes.getListenerPath());
+    return new URI(attributes.getScheme(), null, host, port, attributes.getListenerPath(), null, null);
   }
 
   @Override

@@ -46,10 +46,7 @@ import org.mule.extension.http.api.listener.server.HttpListenerConfig;
 import org.mule.extension.http.api.streaming.HttpStreamingType;
 import org.mule.extension.http.internal.HttpMetadataResolver;
 import org.mule.extension.http.internal.listener.intercepting.InterceptingException;
-import org.mule.extension.http.internal.listener.profiling.tracing.HttpListenerCurrentSpanCustomizer;
 import org.mule.extension.http.internal.listener.server.ModuleRequestHandler;
-import org.mule.extension.http.internal.request.EmptyDistributedTraceContextManager;
-import org.mule.extension.http.internal.request.profiling.tracing.HttpSpanUtils;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -443,8 +440,9 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
             DistributedTraceContextManager distributedTraceContextManager =
                 forwardCompatibilityHelper.get().getDistributedTraceContextManager(context);
             distributedTraceContextManager.setRemoteTraceContextMap(headers);
-            getHttpListenerCurrentSpanCustomizer(result.getAttributes().get(), server.getServerAddress().getIp())
-                .customizeSpan(distributedTraceContextManager);
+            getHttpListenerCurrentSpanCustomizer(result.getAttributes().get(), server.getServerAddress().getIp(),
+                                                 server.getServerAddress().getPort())
+                                                     .customizeSpan(distributedTraceContextManager);
           }
 
           sourceCallback.handle(result, context);

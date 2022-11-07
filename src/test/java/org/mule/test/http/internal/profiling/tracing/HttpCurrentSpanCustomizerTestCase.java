@@ -27,7 +27,11 @@ import static org.eclipse.jetty.http.HttpMethod.GET;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.TRACING;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.internal.request.profiling.tracing.HttpCurrentSpanCustomizer;
 import org.mule.runtime.api.util.MultiMap;
@@ -40,6 +44,8 @@ import org.junit.Test;
 import java.net.URI;
 
 @Feature(HTTP_EXTENSION)
+@Story(TRACING)
+@Issue("W-11818702")
 public class HttpCurrentSpanCustomizerTestCase {
 
   public static final String TEST_HOST = "test.host";
@@ -51,8 +57,10 @@ public class HttpCurrentSpanCustomizerTestCase {
   public static final String EXPECTED_PROTOCOL_VERSION = "1.1";
   public static final String EXPECTED_PORT = "8080";
   public static final String EXPECTED_PEER_NAME = "www.expectedhost.com";
+  public static final int TEST_PORT = 8080;
 
   @Test
+  @Description("The listener span customizer informs the distributed trace context manager the correct attributes/name")
   public void listenerSpan() {
     HttpRequestAttributes attributes = mock(HttpRequestAttributes.class);
     when(attributes.getMethod()).thenReturn(GET.asString());
@@ -64,7 +72,7 @@ public class HttpCurrentSpanCustomizerTestCase {
     when(headers.get(USER_AGENT)).thenReturn(EXPECTED_USER_AGENT);
     when(attributes.getLocalAddress()).thenReturn(LOCAL_ADDRESS);
 
-    HttpCurrentSpanCustomizer currentSpanCustomizer = getHttpListenerCurrentSpanCustomizer(attributes, TEST_HOST);
+    HttpCurrentSpanCustomizer currentSpanCustomizer = getHttpListenerCurrentSpanCustomizer(attributes, TEST_HOST, TEST_PORT);
     DistributedTraceContextManager distributedTraceContextManager = mock(DistributedTraceContextManager.class);
     currentSpanCustomizer.customizeSpan(distributedTraceContextManager);
 
@@ -79,6 +87,7 @@ public class HttpCurrentSpanCustomizerTestCase {
   }
 
   @Test
+  @Description("The request span customizer informs the distributed trace context manager the correct attributes/name")
   public void requestSpan() throws Exception {
     HttpRequest httpRequest = mock(HttpRequest.class);
     DistributedTraceContextManager distributedTraceContextManager = mock(DistributedTraceContextManager.class);

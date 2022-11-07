@@ -9,8 +9,6 @@ package org.mule.extension.http.internal.request.profiling.tracing;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-import static java.lang.String.valueOf;
-
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 
 import java.net.URI;
@@ -36,7 +34,6 @@ public abstract class HttpCurrentSpanCustomizer {
    *
    * @param distributedTraceContextManager the {@link DistributedTraceContextManager} used for adding attributes and setting the name.
    */
-
   public void customizeSpan(DistributedTraceContextManager distributedTraceContextManager) {
     try {
       distributedTraceContextManager.setCurrentSpanName(getSpanName());
