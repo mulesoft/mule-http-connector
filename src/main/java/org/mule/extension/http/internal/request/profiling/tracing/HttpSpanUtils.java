@@ -5,11 +5,6 @@
  * LICENSE.txt file.
  */
 
-/**
- * Utils for creating http spans both in listeners and requests.
- *
- * @since 1.8.0
- */
 package org.mule.extension.http.internal.request.profiling.tracing;
 
 import static java.lang.String.valueOf;
@@ -26,6 +21,8 @@ import org.slf4j.Logger;
 public class HttpSpanUtils {
 
   public static final String HTTP_STATUS_CODE = "http.status_code";
+
+  private HttpSpanUtils() {}
 
   /**
    * Adds the status code attribute.
