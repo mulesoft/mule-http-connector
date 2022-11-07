@@ -23,7 +23,6 @@ import org.slf4j.Logger;
  */
 public abstract class HttpCurrentSpanCustomizer {
 
-
   private static final Logger LOGGER = getLogger(HttpCurrentSpanCustomizer.class);
 
   public static final String HTTP_METHOD = "http.method";
