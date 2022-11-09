@@ -34,6 +34,8 @@ public class HttpListenerCurrentSpanCustomizer extends HttpCurrentSpanCustomizer
   public static final String NET_HOST_NAME = "net.host.name";
   public static final String NET_HOST_PORT = "net.host.port";
   public static final String HTTP_USER_AGENT = "http.user_agent";
+  public static final String HTTP_SCHEME = "http.scheme";
+
   private final HttpRequestAttributes attributes;
   private final String host;
   private final int port;
@@ -58,6 +60,7 @@ public class HttpListenerCurrentSpanCustomizer extends HttpCurrentSpanCustomizer
       distributedTraceContextManager.addCurrentSpanAttribute(HTTP_TARGET, attributes.getListenerPath());
       distributedTraceContextManager.addCurrentSpanAttribute(NET_HOST_NAME, host);
       distributedTraceContextManager.addCurrentSpanAttribute(NET_HOST_PORT, valueOf(getURI().getPort()));
+      distributedTraceContextManager.addCurrentSpanAttribute(HTTP_SCHEME, attributes.getScheme());
       String userAgent = attributes.getHeaders().get(USER_AGENT);
 
       if (userAgent != null) {

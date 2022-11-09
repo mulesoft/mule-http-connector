@@ -9,6 +9,7 @@ package org.mule.test.http.internal.profiling.tracing;
 
 
 import static org.mule.extension.http.api.HttpHeaders.Names.USER_AGENT;
+import static org.mule.extension.http.internal.listener.profiling.tracing.HttpListenerCurrentSpanCustomizer.HTTP_SCHEME;
 import static org.mule.extension.http.internal.listener.profiling.tracing.HttpListenerCurrentSpanCustomizer.HTTP_TARGET;
 import static org.mule.extension.http.internal.listener.profiling.tracing.HttpListenerCurrentSpanCustomizer.HTTP_USER_AGENT;
 import static org.mule.extension.http.internal.listener.profiling.tracing.HttpListenerCurrentSpanCustomizer.NET_HOST_NAME;
@@ -58,6 +59,7 @@ public class HttpCurrentSpanCustomizerTestCase {
   public static final String EXPECTED_PORT = "8080";
   public static final String EXPECTED_PEER_NAME = "www.expectedhost.com";
   public static final int TEST_PORT = 8080;
+  public static final String EXPECTED_SCHEME = HTTPS;
 
   @Test
   @Description("The listener span customizer informs the distributed trace context manager the correct attributes/name")
@@ -84,6 +86,7 @@ public class HttpCurrentSpanCustomizerTestCase {
     verify(distributedTraceContextManager).addCurrentSpanAttribute(NET_HOST_NAME, TEST_HOST);
     verify(distributedTraceContextManager).addCurrentSpanAttribute(NET_HOST_PORT, EXPECTED_PORT);
     verify(distributedTraceContextManager).addCurrentSpanAttribute(HTTP_USER_AGENT, EXPECTED_USER_AGENT);
+    verify(distributedTraceContextManager).addCurrentSpanAttribute(HTTP_SCHEME, EXPECTED_SCHEME);
   }
 
   @Test
