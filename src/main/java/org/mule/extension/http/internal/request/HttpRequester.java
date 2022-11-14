@@ -22,6 +22,8 @@ import static org.mule.extension.http.internal.HttpConnectorConstants.IDEMPOTENT
 import static org.mule.extension.http.internal.HttpConnectorConstants.REMOTELY_CLOSED;
 import static org.mule.extension.http.internal.HttpConnectorConstants.RETRY_ATTEMPTS_PROPERTY;
 import static org.mule.extension.http.internal.HttpConnectorConstants.RETRY_ON_ALL_METHODS_PROPERTY;
+import static org.mule.extension.http.internal.request.profiling.tracing.HttpRequestCurrentSpanCustomizer.getHttpRequesterCurrentSpanCustomizer;
+import static org.mule.extension.http.internal.request.profiling.tracing.HttpSpanUtils.addStatusCodeAttribute;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
 
@@ -145,6 +147,8 @@ public class HttpRequester {
                                                           authentication, injectedHeaders, requestCreator,
                                                           distributedTraceContextManager);
 
+    getHttpRequesterCurrentSpanCustomizer(httpRequester).customizeSpan(distributedTraceContextManager);
+
     doRequestWithRetry(client, config, uri, method, streamingMode, sendBodyMode, followRedirects, authentication, resolvedTimeout,
                        responseValidator, transformationService, requestCreator, checkRetry, muleContext, scheduler,
                        notificationEmitter, streamingHelper, callback, httpRequester,
@@ -233,6 +237,10 @@ public class HttpRequester {
                 profilingDataProducer
                     .ifPresent(profilingDataProducer -> profilingDataProducer.triggerProfilingEvent(result, correlationId));
 
+                if (distributedTraceContextManager != null) {
+                  result.getAttributes().ifPresent(attributes -> addStatusCodeAttribute(distributedTraceContextManager,
+                                                                                        attributes.getStatusCode(), logger));
+                }
                 callback.success((Result) freshResult);
               });
             } catch (Exception e) {

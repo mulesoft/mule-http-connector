@@ -17,6 +17,9 @@ import static org.mule.extension.http.api.error.HttpError.BASIC_AUTHENTICATION;
 import static org.mule.extension.http.api.error.HttpError.NOT_FOUND;
 import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE;
 import static org.mule.extension.http.internal.listener.HttpRequestToResult.transform;
+import static org.mule.extension.http.internal.listener.profiling.tracing.HttpListenerCurrentSpanCustomizer.getHttpListenerCurrentSpanCustomizer;
+import static org.mule.extension.http.internal.request.EmptyDistributedTraceContextManager.getDistributedTraceContextManager;
+import static org.mule.extension.http.internal.request.profiling.tracing.HttpSpanUtils.addStatusCodeAttribute;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
@@ -39,7 +42,6 @@ import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.listener.builder.HttpListenerErrorResponseBuilder;
 import org.mule.extension.http.api.listener.builder.HttpListenerSuccessResponseBuilder;
 import org.mule.extension.http.api.listener.headers.HttpHeadersException;
-import org.mule.extension.http.api.listener.headers.HttpHeadersValidator;
 import org.mule.extension.http.api.listener.server.HttpListenerConfig;
 import org.mule.extension.http.api.streaming.HttpStreamingType;
 import org.mule.extension.http.internal.HttpMetadataResolver;
@@ -107,6 +109,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 import org.mule.sdk.compatibility.api.utils.ForwardCompatibilityHelper;
 import org.slf4j.Logger;
 
@@ -202,8 +205,10 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
     HttpResponseContext context = callbackContext.<HttpResponseContext>getVariable(RESPONSE_CONTEXT)
         .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(RESPONSE_CONTEXT_NOT_FOUND)));
 
-    responseSender.sendResponse(context, response, completionCallback);
+    responseSender.sendResponse(context, response, completionCallback, resolveDistributedTraceContextManager(callbackContext));
   }
+
+
 
   // TODO: MULE-10900 figure out a way to have a shared group between callbacks and possibly regular params
   @OnError
@@ -213,10 +218,16 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
                       Error error,
                       SourceCompletionCallback completionCallback) {
     try {
-      sendErrorResponse(errorResponse, callbackContext, error, completionCallback);
+      sendErrorResponse(errorResponse, callbackContext, error, completionCallback,
+                        resolveDistributedTraceContextManager(callbackContext));
     } catch (Throwable t) {
       completionCallback.error(t);
     }
+  }
+
+  private DistributedTraceContextManager resolveDistributedTraceContextManager(SourceCallbackContext sourceCallbackContext) {
+    return forwardCompatibilityHelper.map(fch -> fch.getDistributedTraceContextManager(sourceCallbackContext))
+        .orElse(getDistributedTraceContextManager());
   }
 
   @OnBackPressure
@@ -248,6 +259,15 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
                                  SourceCallbackContext callbackContext,
                                  Error error,
                                  SourceCompletionCallback completionCallback) {
+    sendErrorResponse(errorResponse, callbackContext, error, completionCallback, getDistributedTraceContextManager());
+
+  }
+
+  private void sendErrorResponse(HttpListenerErrorResponseBuilder errorResponse,
+                                 SourceCallbackContext callbackContext,
+                                 Error error,
+                                 SourceCompletionCallback completionCallback,
+                                 DistributedTraceContextManager distributedTraceContextManager) {
 
     final HttpResponseBuilder failureResponseBuilder = createFailureResponseBuilder(error);
 
@@ -266,6 +286,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
       response = buildErrorResponse();
     }
 
+    addStatusCodeAttribute(distributedTraceContextManager, response.getStatusCode(), LOGGER);
     final HttpResponseReadyCallback responseCallback = context.getResponseCallback();
     callbackContext.addVariable(RESPONSE_SEND_ATTEMPT, true);
     responseCallback.responseReady(response, new ResponseFailureStatusCallback(responseCallback, completionCallback));
@@ -410,11 +431,19 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
               .setInterception(interceptor.request(getMethod(result), headers)));
 
           SourceCallbackContext context = sourceCallback.createContext();
-          forwardCompatibilityHelper
-              .ifPresent(fch -> fch.getDistributedTraceContextManager(context).setRemoteTraceContextMap(headers));
+
           context.addVariable(RESPONSE_CONTEXT, responseContext);
 
           resolveCorrelationId(headers, context);
+
+          if (forwardCompatibilityHelper.isPresent()) {
+            DistributedTraceContextManager distributedTraceContextManager =
+                forwardCompatibilityHelper.get().getDistributedTraceContextManager(context);
+            distributedTraceContextManager.setRemoteTraceContextMap(headers);
+            getHttpListenerCurrentSpanCustomizer(result.getAttributes().get(), server.getServerAddress().getIp(),
+                                                 server.getServerAddress().getPort())
+                                                     .customizeSpan(distributedTraceContextManager);
+          }
 
           sourceCallback.handle(result, context);
         } catch (HttpHeadersException httpHeadersError) {
