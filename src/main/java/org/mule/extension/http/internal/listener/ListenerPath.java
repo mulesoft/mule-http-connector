@@ -10,8 +10,8 @@ import org.mule.runtime.core.api.util.StringUtils;
 
 public class ListenerPath {
 
-  private String basePath;
-  private String resolvedPath;
+  private final String basePath;
+  private final String resolvedPath;
 
   public ListenerPath(String basePath, String listenerPath) {
     this.basePath = basePath;
@@ -23,7 +23,10 @@ public class ListenerPath {
   }
 
   public String getRelativePath(String requestPath) {
-    return basePath == null ? requestPath : requestPath.replace(basePath, StringUtils.EMPTY);
+    if (isEmptyBasePath()) {
+      return requestPath;
+    }
+    return requestPath.replaceFirst(pathWithoutEndSlash(basePath), StringUtils.EMPTY);
   }
 
   private String pathWithoutEndSlash(String path) {
@@ -32,5 +35,9 @@ public class ListenerPath {
     } else {
       return path;
     }
+  }
+
+  private boolean isEmptyBasePath() {
+    return basePath == null || basePath.isEmpty() || basePath.equals("/");
   }
 }
