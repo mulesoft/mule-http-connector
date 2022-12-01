@@ -17,36 +17,43 @@ public class ListenerPathTestCase extends AbstractMuleTestCase {
 
   @Test
   public void relativePathGivenNullBasePath() {
-    ListenerPath listenerPath = new ListenerPath(null, "ignored");
+    ListenerPath listenerPath = new ListenerPath(null, "/ignored");
     String relativePath = listenerPath.getRelativePath("/relative/path");
     assertThat(relativePath, is("/relative/path"));
   }
 
   @Test
   public void relativePathGivenEmptyBasePath() {
-    ListenerPath listenerPath = new ListenerPath("", "ignored");
+    ListenerPath listenerPath = new ListenerPath("", "/ignored");
     String relativePath = listenerPath.getRelativePath("/relative/path");
     assertThat(relativePath, is("/relative/path"));
   }
 
   @Test
   public void relativePathGivenSlashBasePath() {
-    ListenerPath listenerPath = new ListenerPath("/", "ignored");
+    ListenerPath listenerPath = new ListenerPath("/", "/ignored");
     String relativePath = listenerPath.getRelativePath("/relative/path");
     assertThat(relativePath, is("/relative/path"));
   }
 
   @Test
   public void relativePathGivenSomeBasePath() {
-    ListenerPath listenerPath = new ListenerPath("/some", "ignored");
+    ListenerPath listenerPath = new ListenerPath("/some", "/ignored");
     String relativePath = listenerPath.getRelativePath("/some/relative/path");
     assertThat(relativePath, is("/relative/path"));
   }
 
   @Test
   public void relativePathGivenABasePathRepeatedInTheRelativePath() {
-    ListenerPath listenerPath = new ListenerPath("/path", "ignored");
+    ListenerPath listenerPath = new ListenerPath("/path", "/ignored");
     String relativePath = listenerPath.getRelativePath("/path/relative/path");
     assertThat(relativePath, is("/relative/path"));
+  }
+
+  @Test
+  public void basePathInTheMiddle() {
+    ListenerPath listenerPath = new ListenerPath("/middle", "/ignored");
+    String relativePath = listenerPath.getRelativePath("/path/middle/path");
+    assertThat(relativePath, is("/path/middle/path"));
   }
 }

@@ -6,9 +6,15 @@
  */
 package org.mule.extension.http.internal.listener;
 
-import org.mule.runtime.core.api.util.StringUtils;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
+import static org.slf4j.LoggerFactory.getLogger;
+
+import org.slf4j.Logger;
 
 public class ListenerPath {
+
+  private static final Logger LOGGER = getLogger(ListenerPath.class);
 
   private final String basePath;
   private final String resolvedPath;
@@ -23,10 +29,19 @@ public class ListenerPath {
   }
 
   public String getRelativePath(String requestPath) {
+    checkArgument(requestPath.startsWith("/"), "requestPath must start with '/'");
+
     if (isEmptyBasePath()) {
       return requestPath;
     }
-    return requestPath.replaceFirst(pathWithoutEndSlash(basePath), StringUtils.EMPTY);
+
+    String basePathWithoutEndSlash = pathWithoutEndSlash(basePath);
+    if (!requestPath.startsWith(basePathWithoutEndSlash)) {
+      LOGGER.warn("Request path '{}' doesn't start with base path '{}'", requestPath, basePath);
+      return requestPath;
+    }
+
+    return requestPath.substring(basePathWithoutEndSlash.length());
   }
 
   private String pathWithoutEndSlash(String path) {
