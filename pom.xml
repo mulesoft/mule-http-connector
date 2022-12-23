@@ -12,6 +12,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    
     <groupId>org.mule.connectors</groupId>
     <artifactId>mule-http-connector</artifactId>
     <packaging>mule-extension</packaging>
