@@ -50,6 +50,7 @@
         <mavenResources.version>3.0.2</mavenResources.version>
 
         <scriptingModuleVersion>1.1.7</scriptingModuleVersion>
+        <muleObjectStoreConnectorTestVersion>1.2.1</muleObjectStoreConnectorTestVersion>
 
         <springVersion>5.3.18</springVersion>
     </properties>
@@ -373,6 +374,13 @@
             <artifactId>mule-scripting-module</artifactId>
             <classifier>mule-plugin</classifier>
             <version>${scriptingModuleVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.connectors</groupId>
+            <artifactId>mule-objectstore-connector</artifactId>
+            <version>${muleObjectStoreConnectorTestVersion}</version>
+            <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
 
