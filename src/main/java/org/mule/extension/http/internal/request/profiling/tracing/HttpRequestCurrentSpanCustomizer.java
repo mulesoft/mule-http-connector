@@ -32,6 +32,7 @@ public class HttpRequestCurrentSpanCustomizer extends HttpCurrentSpanCustomizer 
   public static final String HTTP_URL = "http.url";
   public static final String NET_PEER_PORT = "net.peer.port";
   public static final String NET_PEER_NAME = "net.peer.name";
+  private static final String SPAN_KIND_NAME = "Client";
 
   public static final String PROTOCOL_VERSION_0_9 = "0.9";
   public static final String PROTOCOL_VERSION_1_0 = "1.0";
@@ -81,6 +82,11 @@ public class HttpRequestCurrentSpanCustomizer extends HttpCurrentSpanCustomizer 
   @Override
   public URI getURI() {
     return httpRequest.getUri();
+  }
+
+  @Override
+  protected String getSpanKind() {
+    return SPAN_KIND_NAME;
   }
 
   private static String getHttpProtocolVersionFrom(HttpProtocol protocol) {

@@ -35,6 +35,7 @@ public class HttpListenerCurrentSpanCustomizer extends HttpCurrentSpanCustomizer
   public static final String NET_HOST_PORT = "net.host.port";
   public static final String HTTP_USER_AGENT = "http.user_agent";
   public static final String HTTP_SCHEME = "http.scheme";
+  private static final String SPAN_KIND_NAME = "Server";
 
   private final HttpRequestAttributes attributes;
   private final String host;
@@ -98,6 +99,11 @@ public class HttpListenerCurrentSpanCustomizer extends HttpCurrentSpanCustomizer
   @Override
   public URI getURI() throws URISyntaxException {
     return new URI(attributes.getScheme(), null, host, port, attributes.getListenerPath(), null, null);
+  }
+
+  @Override
+  protected String getSpanKind() {
+    return SPAN_KIND_NAME;
   }
 
   @Override
