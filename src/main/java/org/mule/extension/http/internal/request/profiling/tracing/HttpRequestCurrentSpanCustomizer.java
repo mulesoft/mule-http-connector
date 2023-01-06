@@ -32,7 +32,7 @@ public class HttpRequestCurrentSpanCustomizer extends HttpCurrentSpanCustomizer 
   public static final String HTTP_URL = "http.url";
   public static final String NET_PEER_PORT = "net.peer.port";
   public static final String NET_PEER_NAME = "net.peer.name";
-  private static final String SPAN_KIND_NAME = "Client";
+  private static final String SPAN_KIND_NAME = "CLIENT";
 
   public static final String PROTOCOL_VERSION_0_9 = "0.9";
   public static final String PROTOCOL_VERSION_1_0 = "1.0";

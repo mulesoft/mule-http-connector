@@ -35,7 +35,7 @@ public class HttpListenerCurrentSpanCustomizer extends HttpCurrentSpanCustomizer
   public static final String NET_HOST_PORT = "net.host.port";
   public static final String HTTP_USER_AGENT = "http.user_agent";
   public static final String HTTP_SCHEME = "http.scheme";
-  private static final String SPAN_KIND_NAME = "Server";
+  private static final String SPAN_KIND_NAME = "SERVER";
 
   private final HttpRequestAttributes attributes;
   private final String host;
