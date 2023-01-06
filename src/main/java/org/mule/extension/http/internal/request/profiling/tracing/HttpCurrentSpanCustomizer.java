@@ -40,7 +40,7 @@ public abstract class HttpCurrentSpanCustomizer {
 
       distributedTraceContextManager.addCurrentSpanAttribute(HTTP_METHOD, getMethod());
       distributedTraceContextManager.addCurrentSpanAttribute(SPAN_KIND, getSpanKind());
-      
+
       String flavor = getFlavor();
       if (flavor != null) {
         distributedTraceContextManager.addCurrentSpanAttribute(HTTP_FLAVOR, flavor);
