@@ -91,6 +91,7 @@ public class HttpRequester {
 
   private static final DataType REQUEST_NOTIFICATION_DATA_TYPE = DataType.fromType(HttpRequestNotificationData.class);
   private static final DataType RESPONSE_NOTIFICATION_DATA_TYPE = DataType.fromType(HttpResponseNotificationData.class);
+  public static final String SPAN_STATUS = "status.override";
 
   private final HttpRequestFactory httpRequestFactory;
   private final HttpResponseToResult httpResponseToResult;
@@ -238,8 +239,15 @@ public class HttpRequester {
                     .ifPresent(profilingDataProducer -> profilingDataProducer.triggerProfilingEvent(result, correlationId));
 
                 if (distributedTraceContextManager != null) {
-                  result.getAttributes().ifPresent(attributes -> addStatusCodeAttribute(distributedTraceContextManager,
-                                                                                        attributes.getStatusCode(), logger));
+                  result.getAttributes().ifPresent(attributes -> {
+                    addStatusCodeAttribute(distributedTraceContextManager,
+                        attributes.getStatusCode(), logger);
+                    if(attributes.getStatusCode() >= 400){
+                      distributedTraceContextManager.addCurrentSpanAttribute(SPAN_STATUS, "ERROR");
+                    } else {
+                      distributedTraceContextManager.addCurrentSpanAttribute(SPAN_STATUS, "UNSET");
+                    }
+                  });
                 }
                 callback.success((Result) freshResult);
               });

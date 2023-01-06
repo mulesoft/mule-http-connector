@@ -44,6 +44,7 @@ public class HttpListenerResponseSender {
     HttpResponse httpResponse = buildResponse(response, context.getInterception(), context.isSupportStreaming());
     final HttpResponseReadyCallback responseCallback = context.getResponseCallback();
     addStatusCodeAttribute(distributedTraceContextManager, httpResponse.getStatusCode(), LOGGER);
+    // Agrego aca UNSET
     responseCallback.responseReady(httpResponse, getResponseFailureCallback(responseCallback, completionCallback));
   }
 
