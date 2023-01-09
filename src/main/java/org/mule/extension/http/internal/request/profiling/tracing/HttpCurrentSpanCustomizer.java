@@ -27,6 +27,7 @@ public abstract class HttpCurrentSpanCustomizer {
 
   public static final String HTTP_METHOD = "http.method";
   public static final String HTTP_FLAVOR = "http.flavor";
+  public static final String SPAN_KIND = "span.kind.override";
 
   /**
    * Customize the current span using the {@link DistributedTraceContextManager}
@@ -38,6 +39,7 @@ public abstract class HttpCurrentSpanCustomizer {
       distributedTraceContextManager.setCurrentSpanName(getSpanName());
 
       distributedTraceContextManager.addCurrentSpanAttribute(HTTP_METHOD, getMethod());
+      distributedTraceContextManager.addCurrentSpanAttribute(SPAN_KIND, getSpanKind());
 
       String flavor = getFlavor();
       if (flavor != null) {
@@ -71,4 +73,9 @@ public abstract class HttpCurrentSpanCustomizer {
    * @return the {@link URI}
    */
   public abstract URI getURI() throws URISyntaxException;
+
+  /**
+   * @return the span kind
+   */
+  protected abstract String getSpanKind();
 }
