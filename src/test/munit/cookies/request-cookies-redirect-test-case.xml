@@ -18,11 +18,11 @@
 
     <os:object-store name="lastCookieOS" persistent="false" />
 
-    <http:listener-config name="requestCookiesListenerConfig">
+    <http:listener-config name="requestCookiesRedirectListenerConfig">
         <http:listener-connection host="0.0.0.0" port="${dynamic.port}" usePersistentConnections="false"/>
     </http:listener-config>
 
-    <http:request-config name="requestCookiesRequesterConfig" enableCookies="true">
+    <http:request-config name="requestCookiesRedirectRequesterConfig" enableCookies="true">
         <http:request-connection host="localhost" port="${dynamic.port}"/>
     </http:request-config>
 
@@ -37,7 +37,7 @@
                 <os:value>#[0]</os:value>
             </os:store>
 
-            <http:request method="GET" config-ref="requestCookiesRequesterConfig" path="/incrementalCookie" />
+            <http:request method="GET" config-ref="requestCookiesRedirectRequesterConfig" path="/incrementalCookie" />
 
             <set-variable value="#[payload as String]" variableName="myCookieHeader"/>
         </munit:execution>
@@ -58,7 +58,7 @@
                 <os:value>#[0]</os:value>
             </os:store>
 
-            <http:request method="GET" config-ref="requestCookiesRequesterConfig" path="/incrementalCookie" >
+            <http:request method="GET" config-ref="requestCookiesRedirectRequesterConfig" path="/incrementalCookie" >
                 <http:headers>
                     #[{'Cookie' : 'TheCookieName=InitialValue'}]
                 </http:headers>
@@ -73,14 +73,14 @@
     </munit:test>
 
     <flow name="getMyCookieHeaderAsPayloadFlow">
-        <http:listener config-ref="requestCookiesListenerConfig" path="/getMyCookieHeaderAsPayload" />
+        <http:listener config-ref="requestCookiesRedirectListenerConfig" path="/getMyCookieHeaderAsPayload" />
         <logger message="#[attributes.headers]" level="ERROR" />
         <set-payload value="#[attributes.headers.'Cookie']" />
         <logger message="#[payload]" level="ERROR" />
     </flow>
 
     <flow name="incrementalCookieSetterFlow">
-        <http:listener config-ref="requestCookiesListenerConfig" path="/incrementalCookie" >
+        <http:listener config-ref="requestCookiesRedirectListenerConfig" path="/incrementalCookie" >
             <http:response statusCode="#[301]" >
                 <http:headers>
                     #[{'Set-Cookie' : vars.nextCookieStr, 'Location' : vars.redirectLocation}]
