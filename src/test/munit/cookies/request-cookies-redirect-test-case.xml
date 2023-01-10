@@ -29,7 +29,7 @@
     <munit:test name="cookiesWithMultipleRedirect" description="ad">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="incrementalCookieSetterFlow" />
-            <munit:enable-flow-source value="getMyCookieHeaderAsPayloadFlow" />
+            <munit:enable-flow-source value="getCookieHeaderAsPayloadFlow" />
         </munit:enable-flow-sources>
 
         <munit:execution>
@@ -50,7 +50,7 @@
     <munit:test name="cookiesWithMultipleRedirectAndInitialValueSetManually" description="ad">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="incrementalCookieSetterFlow" />
-            <munit:enable-flow-source value="getMyCookieHeaderAsPayloadFlow" />
+            <munit:enable-flow-source value="getCookieHeaderAsPayloadFlow" />
         </munit:enable-flow-sources>
 
         <munit:execution>
@@ -72,7 +72,7 @@
         </munit:validation>
     </munit:test>
 
-    <flow name="getMyCookieHeaderAsPayloadFlow">
+    <flow name="getCookieHeaderAsPayloadFlow">
         <http:listener config-ref="requestCookiesRedirectListenerConfig" path="/getMyCookieHeaderAsPayload" />
         <logger message="#[attributes.headers]" level="ERROR" />
         <set-payload value="#[attributes.headers.'Cookie']" />
