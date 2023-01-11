@@ -51,6 +51,7 @@
 
         <scriptingModuleVersion>1.1.7</scriptingModuleVersion>
 
+        <runtimeVersionForMunit>4.6.0-SNAPSHOT</runtimeVersionForMunit>
         <springVersion>5.3.18</springVersion>
     </properties>
 
@@ -121,6 +122,7 @@
                             <includeSnapshots>true</includeSnapshots>
                         </discoverRuntimes>
                     </runtimeConfiguration>
+                    <runtimeVersion>${runtimeVersionForMunit}</runtimeVersion>
                 </configuration>
                 <dependencies>
                     <dependency>
