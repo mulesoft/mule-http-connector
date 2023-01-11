@@ -16,7 +16,7 @@
 
     <munit:dynamic-port propertyName="dynamic.port"/>
 
-    <http:listener-config name="listenerConfig" doc:name="HTTP Listener config" >
+    <http:listener-config name="listenerConfigSelectorsNonBlocking" doc:name="HTTP Listener config" >
         <http:listener-connection host="0.0.0.0" port="${dynamic.port}" />
     </http:listener-config>
 
@@ -44,7 +44,7 @@
     </munit:test>
     
     <flow name="TestFlow" >
-        <http:listener doc:name="Test" path="/test" config-ref="listenerConfig" />
+        <http:listener doc:name="Test" path="/test" config-ref="listenerConfigSelectorsNonBlocking" />
         <logger />
         <set-payload value='#["Test payload"]' />
     </flow>
