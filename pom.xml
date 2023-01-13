@@ -52,10 +52,6 @@
         <scriptingModuleVersion>1.1.7</scriptingModuleVersion>
 
         <springVersion>5.3.18</springVersion>
-
-        <!-- Run MUnit tests with the latest snapshot by default. To run against another version, run verify phase
-             with -Druntime.version=OTHER_MULE_VERSION -->
-        <runtime.version>4.6.0-SNAPSHOT</runtime.version>
     </properties>
 
     <build>
@@ -120,12 +116,19 @@
                         <mule.enable.profiling.service>true</mule.enable.profiling.service>
                     </systemPropertyVariables>
                     <runtimeConfiguration>
+                        <!-- Compatibility with the minMuleVersion -->
+                        <additionalRuntimes>
+                            <additionalRuntime>MULE_EE:4.1.1</additionalRuntime>
+                        </additionalRuntimes>
+
+                        <!-- Versions with support and snapshots -->
                         <discoverRuntimes>
-                            <product>ALL</product>
+                            <product>EE</product>
+                            <minMuleVersion>4.3.0</minMuleVersion>
                             <includeSnapshots>true</includeSnapshots>
+                            <latestPatches>true</latestPatches>
                         </discoverRuntimes>
                     </runtimeConfiguration>
-                    <runtimeVersion>${runtime.version}</runtimeVersion>
                 </configuration>
                 <dependencies>
                     <dependency>
