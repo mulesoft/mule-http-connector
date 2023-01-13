@@ -115,6 +115,8 @@
                         <mule.openetelemetry.export.enabled>true</mule.openetelemetry.export.enabled>
                         <mule.enable.profiling.service>true</mule.enable.profiling.service>
                     </systemPropertyVariables>
+
+                    <!-- Configuration for local builds, in Jenkins we configure this via command line arguments -->
                     <runtimeConfiguration>
                         <!-- Compatibility with the minMuleVersion -->
                         <additionalRuntimes>
@@ -124,7 +126,7 @@
                         <!-- Versions with support and snapshots -->
                         <discoverRuntimes>
                             <product>EE</product>
-                            <minMuleVersion>4.3.0</minMuleVersion>
+                            <minMuleVersion>4.4.0</minMuleVersion>
                             <includeSnapshots>true</includeSnapshots>
                             <latestPatches>true</latestPatches>
                         </discoverRuntimes>
