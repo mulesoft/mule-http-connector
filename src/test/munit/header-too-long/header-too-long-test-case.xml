@@ -26,7 +26,7 @@
 
     <munit:test name="header-too-long-test" description="Test" ignore="#[Munit::muleVersionEqualTo('4.3.0')]">
         <munit:enable-flow-sources>
-            <munit:enable-flow-source value="ListenerFlow" />
+            <munit:enable-flow-source value="HeaderTooLongListenerFlow" />
         </munit:enable-flow-sources>
         <munit:execution >
             <try>
@@ -49,7 +49,7 @@ import * from dw::core::Strings
             <munit-tools:assert-that is="#[MunitTools::containsString('failed with status code 413')]" expression="#[vars.errorMessage]"/>
         </munit:validation>
     </munit:test>
-    <flow name="ListenerFlow" >
+    <flow name="HeaderTooLongListenerFlow" >
         <http:listener config-ref="HttpListenerConfig" path="*" responseStreamingMode="NEVER">
             <non-repeatable-stream />
         </http:listener>

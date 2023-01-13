@@ -26,7 +26,7 @@
 
     <munit:test name="url-too-long-test" description="Test" ignore="#[Munit::muleVersionEqualTo('4.3.0')]">
         <munit:enable-flow-sources>
-            <munit:enable-flow-source value="ListenerFlow" />
+            <munit:enable-flow-source value="UrlTooLongListenerFlow" />
         </munit:enable-flow-sources>
         <munit:execution >
             <try>
