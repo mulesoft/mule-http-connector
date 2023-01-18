@@ -53,8 +53,6 @@
         <muleObjectStoreConnectorTestVersion>1.2.1</muleObjectStoreConnectorTestVersion>
 
         <springVersion>5.3.18</springVersion>
-
-        <runtimeVersionForMunit>4.6.0-SNAPSHOT</runtimeVersionForMunit>
     </properties>
 
     <build>
@@ -134,7 +132,6 @@
                             <latestPatches>true</latestPatches>
                         </discoverRuntimes>
                     </runtimeConfiguration>
-                    <runtimeVersion>${runtimeVersionForMunit}</runtimeVersion>
                 </configuration>
                 <dependencies>
                     <dependency>
