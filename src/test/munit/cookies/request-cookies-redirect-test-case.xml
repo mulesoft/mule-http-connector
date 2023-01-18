@@ -12,7 +12,7 @@
 		       http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <munit:config name="request-cookies-redirect-test-case"/>
+    <munit:config name="request-cookies-redirect-test-case" minMuleVersion="4.4.1"/>
 
     <munit:dynamic-port propertyName="dynamic.port"/>
 
@@ -26,7 +26,7 @@
         <http:request-connection host="localhost" port="${dynamic.port}"/>
     </http:request-config>
 
-    <munit:test name="cookiesWithMultipleRedirect" description="ad">
+    <munit:test name="cookiesWithMultipleRedirect" description="Cookies are replaced during the redirect mechanism">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="incrementalCookieSetterFlow" />
             <munit:enable-flow-source value="getCookieHeaderAsPayloadFlow" />
@@ -47,7 +47,7 @@
         </munit:validation>
     </munit:test>
 
-    <munit:test name="cookiesWithMultipleRedirectAndInitialValueSetManually" description="ad">
+    <munit:test name="cookiesWithMultipleRedirectAndInitialValueSetManually" description="Cookies are replaced during the redirect mechanism, even if we set an initial value">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="incrementalCookieSetterFlow" />
             <munit:enable-flow-source value="getCookieHeaderAsPayloadFlow" />
@@ -74,9 +74,7 @@
 
     <flow name="getCookieHeaderAsPayloadFlow">
         <http:listener config-ref="requestCookiesRedirectListenerConfig" path="/getMyCookieHeaderAsPayload" />
-        <logger message="#[attributes.headers]" level="ERROR" />
         <set-payload value="#[attributes.headers.'Cookie']" />
-        <logger message="#[payload]" level="ERROR" />
     </flow>
 
     <flow name="incrementalCookieSetterFlow">

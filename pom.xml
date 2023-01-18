@@ -127,7 +127,6 @@
                         <!-- Versions with support and snapshots -->
                         <discoverRuntimes>
                             <product>EE</product>
-                            <minMuleVersion>4.4.0</minMuleVersion>
                             <includeSnapshots>true</includeSnapshots>
                             <latestPatches>true</latestPatches>
                         </discoverRuntimes>

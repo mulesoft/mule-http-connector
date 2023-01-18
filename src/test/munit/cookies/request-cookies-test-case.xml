@@ -10,7 +10,7 @@
 		       http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <munit:config name="request-cookies-test-case"/>
+    <munit:config name="request-cookies-test-case" minMuleVersion="4.4.1"/>
 
     <munit:dynamic-port propertyName="dynamic.port"/>
 
