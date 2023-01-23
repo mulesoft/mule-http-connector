@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:os="http://www.mulesoft.org/schema/mule/os"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		       http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+		       http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <munit:config name="request-cookies-redirect-test-case" minMuleVersion="4.4.1"/>
+
+    <munit:dynamic-port propertyName="dynamic.port"/>
+
+    <os:object-store name="lastCookieOS" persistent="false" />
+
+    <http:listener-config name="requestCookiesRedirectListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="${dynamic.port}" usePersistentConnections="false"/>
+    </http:listener-config>
+
+    <http:request-config name="requestCookiesRedirectRequesterConfig" enableCookies="true">
+        <http:request-connection host="localhost" port="${dynamic.port}"/>
+    </http:request-config>
+
+    <munit:test name="cookiesWithMultipleRedirect" description="Cookies are replaced during the redirect mechanism">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="incrementalCookieSetterFlow" />
+            <munit:enable-flow-source value="getCookieHeaderAsPayloadFlow" />
+        </munit:enable-flow-sources>
+
+        <munit:execution>
+            <os:store objectStore="lastCookieOS" key="lastCookie">
+                <os:value>#[0]</os:value>
+            </os:store>
+
+            <http:request method="GET" config-ref="requestCookiesRedirectRequesterConfig" path="/incrementalCookie" />
+
+            <set-variable value="#[payload as String]" variableName="myCookieHeader"/>
+        </munit:execution>
+
+        <munit:validation>
+            <munit-tools:assert-equals actual="#[vars.myCookieHeader]" expected='#["TheCookieName=3"]'/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="cookiesWithMultipleRedirectAndInitialValueSetManually" description="Cookies are replaced during the redirect mechanism, even if we set an initial value">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="incrementalCookieSetterFlow" />
+            <munit:enable-flow-source value="getCookieHeaderAsPayloadFlow" />
+        </munit:enable-flow-sources>
+
+        <munit:execution>
+            <os:store objectStore="lastCookieOS" key="lastCookie">
+                <os:value>#[0]</os:value>
+            </os:store>
+
+            <http:request method="GET" config-ref="requestCookiesRedirectRequesterConfig" path="/incrementalCookie" >
+                <http:headers>
+                    #[{'Cookie' : 'TheCookieName=InitialValue'}]
+                </http:headers>
+            </http:request>
+
+            <set-variable value="#[payload as String]" variableName="myCookieHeader"/>
+        </munit:execution>
+
+        <munit:validation>
+            <munit-tools:assert-equals actual="#[vars.myCookieHeader]" expected='#["TheCookieName=3"]'/>
+        </munit:validation>
+    </munit:test>
+
+    <flow name="getCookieHeaderAsPayloadFlow">
+        <http:listener config-ref="requestCookiesRedirectListenerConfig" path="/getMyCookieHeaderAsPayload" />
+        <set-payload value="#[attributes.headers.'Cookie']" />
+    </flow>
+
+    <flow name="incrementalCookieSetterFlow">
+        <http:listener config-ref="requestCookiesRedirectListenerConfig" path="/incrementalCookie" >
+            <http:response statusCode="#[301]" >
+                <http:headers>
+                    #[{'Set-Cookie' : vars.nextCookieStr, 'Location' : vars.redirectLocation}]
+                </http:headers>
+            </http:response>
+        </http:listener>
+
+        <os:retrieve objectStore="lastCookieOS" key="lastCookie" target="lastCookie" />
+        <set-variable variableName="nextCookie" value="#[vars.lastCookie + 1]" />
+        <set-variable variableName="nextCookieStr" value="#['TheCookieName=' ++ vars.nextCookie]" />
+        <os:store objectStore="lastCookieOS" key="lastCookie" >
+            <os:value>#[vars.nextCookie]</os:value>
+        </os:store>
+
+        <choice>
+            <when expression="#[vars.nextCookie as Number != 3]">
+                <set-variable variableName="redirectLocation" value="http://localhost:${dynamic.port}/incrementalCookie" />
+            </when>
+            <otherwise>
+                <set-variable variableName="redirectLocation" value="http://localhost:${dynamic.port}/getMyCookieHeaderAsPayload" />
+            </otherwise>
+        </choice>
+    </flow>
+</mule>
