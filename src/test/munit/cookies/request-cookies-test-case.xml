@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		       http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <munit:config name="request-cookies-test-case" />
+
+    <munit:dynamic-port propertyName="dynamic.port"/>
+
+    <http:listener-config name="requestCookiesListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="${dynamic.port}" usePersistentConnections="false"/>
+    </http:listener-config>
+
+    <http:request-config name="requestCookiesRequesterConfig1" enableCookies="true">
+        <http:request-connection host="localhost" port="${dynamic.port}"/>
+    </http:request-config>
+
+    <http:request-config name="requestCookiesRequesterConfig2" enableCookies="true">
+        <http:request-connection host="localhost" port="${dynamic.port}"/>
+    </http:request-config>
+
+    <http:request-config name="requestCookiesRequesterConfig3" enableCookies="true">
+        <http:request-connection host="localhost" port="${dynamic.port}"/>
+    </http:request-config>
+
+    <http:request-config name="requestCookiesRequesterConfig4" enableCookies="true">
+        <http:request-connection host="localhost" port="${dynamic.port}"/>
+    </http:request-config>
+
+    <http:request-config name="requestCookiesRequesterConfig5" enableCookies="true">
+        <http:request-connection host="localhost" port="${dynamic.port}"/>
+    </http:request-config>
+
+    <http:request-config name="requestCookiesRequesterConfig6" enableCookies="true">
+        <http:request-connection host="localhost" port="${dynamic.port}"/>
+    </http:request-config>
+
+    <munit:test name="requestWithoutCookieTest" description="Send a request without a Cookie header">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="getMyCookieHeaderAsPayloadFlow" />
+        </munit:enable-flow-sources>
+
+        <munit:execution>
+            <http:request method="GET" config-ref="requestCookiesRequesterConfig1" path="/getMyCookieHeaderAsPayload"/>
+            <set-variable value="#[payload as String]" variableName="myCookieHeader"/>
+        </munit:execution>
+
+        <munit:validation>
+            <munit-tools:assert-equals actual="#[vars.myCookieHeader]" expected='#[""]'/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="requestSpecifyingACookieAsHeaderTest" description="Send a request specifying a Cookie as header">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="getMyCookieHeaderAsPayloadFlow" />
+        </munit:enable-flow-sources>
+
+        <munit:execution>
+            <http:request method="GET" config-ref="requestCookiesRequesterConfig2" path="/getMyCookieHeaderAsPayload">
+                <http:headers>
+                    #[{'Cookie' : 'TheCookieName=TheCookieValue'}]
+                </http:headers>
+            </http:request>
+            <set-variable value="#[payload as String]" variableName="myCookieHeader"/>
+        </munit:execution>
+
+        <munit:validation>
+            <munit-tools:assert-equals actual="#[vars.myCookieHeader]" expected='#["TheCookieName=TheCookieValue"]'/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="requestSendingCookieBecauseServerSentSetCookieHeader" description="Server sends Set-Cookie header, then requester sends next request with Cookie header">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="pleaseSetThisCookieFlow" />
+            <munit:enable-flow-source value="getMyCookieHeaderAsPayloadFlow" />
+        </munit:enable-flow-sources>
+
+        <munit:execution>
+            <!-- First request, the server will respond with a Set-Cookie header -->
+            <http:request method="GET" config-ref="requestCookiesRequesterConfig3" path="/pleaseSetThisCookie">
+                <http:query-params>
+                    #[{'theCookie' : 'TheCookieName=TheCookieValue'}]
+                </http:query-params>
+            </http:request>
+
+            <!-- Second request will have the corresponding Cookie header -->
+            <http:request method="GET" config-ref="requestCookiesRequesterConfig3" path="/getMyCookieHeaderAsPayload"/>
+
+            <set-variable value="#[payload as String]" variableName="myCookieHeader"/>
+        </munit:execution>
+
+        <munit:validation>
+            <munit-tools:assert-equals actual="#[vars.myCookieHeader]" expected='#["TheCookieName=TheCookieValue"]'/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="cookieReplacement" description="Cookies should work as a key-value map, if a Set-Cookie sets an existing cookie name, the value should be replaced">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="pleaseSetThisCookieFlow" />
+            <munit:enable-flow-source value="getMyCookieHeaderAsPayloadFlow" />
+        </munit:enable-flow-sources>
+
+        <munit:execution>
+            <!-- First request, the server will respond with a Set-Cookie header -->
+            <http:request method="GET" config-ref="requestCookiesRequesterConfig4" path="/pleaseSetThisCookie">
+                <http:query-params>
+                    #[{'theCookie' : 'TheCookieName=TheOldCookieValue'}]
+                </http:query-params>
+            </http:request>
+
+            <!-- Second request, the server will respond with another Set-Cookie header -->
+            <http:request method="GET" config-ref="requestCookiesRequesterConfig4" path="/pleaseSetThisCookie">
+                <http:query-params>
+                    #[{'theCookie' : 'TheCookieName=TheNewCookieValue'}]
+                </http:query-params>
+            </http:request>
+
+            <!-- The Cookie value should be replaced -->
+            <http:request method="GET" config-ref="requestCookiesRequesterConfig4" path="/getMyCookieHeaderAsPayload"/>
+
+            <set-variable value="#[payload as String]" variableName="myCookieHeader"/>
+        </munit:execution>
+
+        <munit:validation>
+            <munit-tools:assert-equals actual="#[vars.myCookieHeader]" expected='#["TheCookieName=TheNewCookieValue"]'/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="cookieReplacementWithFirstValueManuallySet" description="Cookies should work as a key-value map, if a Set-Cookie sets an existing cookie name, the value should be replaced">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="pleaseSetThisCookieFlow" />
+            <munit:enable-flow-source value="getMyCookieHeaderAsPayloadFlow" />
+        </munit:enable-flow-sources>
+
+        <munit:execution>
+            <!-- We send a request with a Cookie header, but the server will respond with a Set-Cookie header -->
+            <http:request method="GET" config-ref="requestCookiesRequesterConfig5" path="/pleaseSetThisCookie">
+                <http:headers>
+                    #[{'Cookie' : 'TheCookieName=TheOldCookieValue'}]
+                </http:headers>
+                <http:query-params>
+                    #[{'theCookie' : 'TheCookieName=TheNewCookieValue'}]
+                </http:query-params>
+            </http:request>
+
+            <!-- The Cookie value should be replaced -->
+            <http:request method="GET" config-ref="requestCookiesRequesterConfig5" path="/getMyCookieHeaderAsPayload"/>
+            <set-variable value="#[payload as String]" variableName="myCookieHeader"/>
+        </munit:execution>
+
+        <munit:validation>
+            <munit-tools:assert-equals actual="#[vars.myCookieHeader]" expected='#["TheCookieName=TheNewCookieValue"]'/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="concatenateCookiesWithDifferentNames" description="When cookie name differ, we concatenate them instead of replacing">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="pleaseSetThisCookieFlow" />
+            <munit:enable-flow-source value="getMyCookieHeaderAsPayloadFlow" />
+        </munit:enable-flow-sources>
+
+        <munit:execution>
+            <http:request method="GET" config-ref="requestCookiesRequesterConfig6" path="/pleaseSetThisCookie">
+                <http:query-params>
+                    #[{'theCookie' : 'SomeCookieName=SomeCookieValue'}]
+                </http:query-params>
+            </http:request>
+
+            <http:request method="GET" config-ref="requestCookiesRequesterConfig6" path="/pleaseSetThisCookie">
+                <http:query-params>
+                    #[{'theCookie' : 'OtherCookieName=OtherCookieValue'}]
+                </http:query-params>
+            </http:request>
+
+            <http:request method="GET" config-ref="requestCookiesRequesterConfig6" path="/getMyCookieHeaderAsPayload"/>
+            <set-variable value="#[payload as String]" variableName="myCookieHeader"/>
+        </munit:execution>
+
+        <munit:validation>
+            <munit-tools:assert-equals actual="#[vars.myCookieHeader]" expected='#["SomeCookieName=SomeCookieValue; OtherCookieName=OtherCookieValue"]'/>
+        </munit:validation>
+    </munit:test>
+
+    <flow name="getMyCookieHeaderAsPayloadFlow">
+        <http:listener config-ref="requestCookiesListenerConfig" path="/getMyCookieHeaderAsPayload" />
+        <set-payload value="#[attributes.headers.'Cookie']" />
+    </flow>
+
+    <flow name="pleaseSetThisCookieFlow">
+        <http:listener config-ref="requestCookiesListenerConfig" path="/pleaseSetThisCookie" >
+            <http:response statusCode="200">
+                <http:headers>
+                    #[{'Set-Cookie' : attributes.queryParams.'theCookie'}]
+                </http:headers>
+            </http:response>
+        </http:listener>
+        <set-payload value="#['']" />
+    </flow>
+</mule>
