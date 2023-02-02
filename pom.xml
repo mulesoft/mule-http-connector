@@ -44,7 +44,7 @@
         <!-- Remove when a new parent version with MTF is available -->
         <munit.input.directory>src/test/munit</munit.input.directory>
         <munit.output.directory>${basedir}/target/test-mule/munit</munit.output.directory>
-        <munit.extensions.maven.plugin.version>1.1.2</munit.extensions.maven.plugin.version>
+        <munit.extensions.maven.plugin.version>1.2.0-SNAPSHOT</munit.extensions.maven.plugin.version>
         <munit.version>2.4.0-SNAPSHOT</munit.version>
         <mtf-tools.version>1.2.0-SNAPSHOT</mtf-tools.version>
 
@@ -119,19 +119,33 @@
                     </systemPropertyVariables>
 
                     <!-- Configuration for local builds, in Jenkins we configure this via command line arguments -->
-                    <runtimeConfiguration>
+                    <productConfiguration>
                         <!-- Compatibility with the minMuleVersion -->
-                        <additionalRuntimes>
+<!--                        <additionalRuntimes>
                             <additionalRuntime>MULE_EE:4.1.1</additionalRuntime>
-                        </additionalRuntimes>
+                        </additionalRuntimes>-->
 
                         <!-- Versions with support and snapshots -->
+                        <!--
                         <discoverRuntimes>
                             <product>EE</product>
                             <includeSnapshots>true</includeSnapshots>
                             <latestPatches>true</latestPatches>
                         </discoverRuntimes>
-                    </runtimeConfiguration>
+                        -->
+                        <discoverProducts>
+                        	<discoverProduct>
+                        		<id>MULE_FWK</id>
+                        	</discoverProduct>
+                        <!--
+                        	<discoverProduct>
+                        		<id>MULE_EE</id>
+                        		<minVersion>4.6.0-SNAPSHOT</minVersion>
+                        		<includeSnapshots>true</includeSnapshots>
+                        	</discoverProduct>
+                        	-->
+                        </discoverProducts>
+                    </productConfiguration>
                 </configuration>
                 <dependencies>
                     <dependency>
