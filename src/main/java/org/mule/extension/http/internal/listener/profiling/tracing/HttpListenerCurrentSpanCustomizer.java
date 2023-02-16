@@ -58,7 +58,6 @@ public class HttpListenerCurrentSpanCustomizer extends HttpCurrentSpanCustomizer
   public static HttpCurrentSpanCustomizer getHttpListenerCurrentSpanCustomizer(HttpRequestAttributes attributes,
                                                                                String host,
                                                                                int port,
-                                                                               //W-... gp
                                                                                String skipAttributes) {
     return new HttpListenerCurrentSpanCustomizer(attributes, host, port, skipAttributes);
   }
