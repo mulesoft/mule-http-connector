@@ -20,7 +20,6 @@ import org.mule.runtime.api.util.MultiMap;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Arrays;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
@@ -52,7 +51,6 @@ public class HttpListenerCurrentSpanCustomizer extends HttpCurrentSpanCustomizer
     this.attributes = attributes;
     this.host = host;
     this.port = port;
-    //W-12558102
     this.skipAttributesList = asList(skipAttributes.split(",", -1));
     this.skipAttributesList.replaceAll(String::trim);
   }
@@ -74,8 +72,7 @@ public class HttpListenerCurrentSpanCustomizer extends HttpCurrentSpanCustomizer
       distributedTraceContextManager.addCurrentSpanAttribute(NET_HOST_NAME, host);
       distributedTraceContextManager.addCurrentSpanAttribute(NET_HOST_PORT, valueOf(getURI().getPort()));
       distributedTraceContextManager.addCurrentSpanAttribute(HTTP_SCHEME, attributes.getScheme());
-      //W-12558102 - Parsing HTTP headers as Span Attributes
-      MultiMap<String, String> headers = getHeaders();
+      MultiMap<String, String> headers = getHeaders(attributes.getHeaders(), skipAttributesList);
       headers.keySet().forEach(key -> distributedTraceContextManager.addCurrentSpanAttribute(key, headers.get(key)));
 
     } catch (Throwable e) {
@@ -121,19 +118,4 @@ public class HttpListenerCurrentSpanCustomizer extends HttpCurrentSpanCustomizer
     return attributes.getListenerPath();
   }
 
-  /**
-   * W-12558102
-   * This provides a transparent way to obtain the definitive list of headers to add in the spans associated with Otel tracing.
-   * This list will have all headers except those that have been skipped via the skipHeadersOnTracing property.
-   */
-  @Override
-  public MultiMap<String, String> getHeaders() {
-    MultiMap<String, String> modifiedHeaders = new MultiMap<String, String>();
-    attributes.getHeaders().keySet().forEach(key -> {
-      if (!skipAttributesList.contains(key)) {
-        modifiedHeaders.put(key, attributes.getHeaders().get(key));
-      }
-    });
-    return modifiedHeaders;
-  }
 }

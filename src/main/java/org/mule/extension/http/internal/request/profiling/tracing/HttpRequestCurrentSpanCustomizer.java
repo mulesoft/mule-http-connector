@@ -10,6 +10,7 @@ package org.mule.extension.http.internal.request.profiling.tracing;
 import static org.mule.runtime.http.api.domain.HttpProtocol.HTTP_0_9;
 import static org.mule.runtime.http.api.domain.HttpProtocol.HTTP_1_0;
 import static java.lang.String.valueOf;
+import static java.util.Arrays.asList;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.extension.http.internal.listener.profiling.tracing.HttpListenerCurrentSpanCustomizer;
@@ -20,8 +21,6 @@ import org.mule.runtime.api.util.MultiMap;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Arrays;
-
 import org.slf4j.Logger;
 
 /**
@@ -56,8 +55,7 @@ public class HttpRequestCurrentSpanCustomizer extends HttpCurrentSpanCustomizer 
 
   private HttpRequestCurrentSpanCustomizer(HttpRequest httpRequest, String skipAttributes) {
     this.httpRequest = httpRequest;
-    //W-12558102
-    this.skipAttributesList = Arrays.asList(skipAttributes.split(",", -1));
+    this.skipAttributesList = asList(skipAttributes.split(",", -1));
     this.skipAttributesList.replaceAll(String::trim);
   }
 
@@ -69,8 +67,7 @@ public class HttpRequestCurrentSpanCustomizer extends HttpCurrentSpanCustomizer 
       distributedTraceContextManager.addCurrentSpanAttribute(HTTP_URL, getURI().toString());
       distributedTraceContextManager.addCurrentSpanAttribute(NET_PEER_PORT, valueOf(getURI().getPort()));
       distributedTraceContextManager.addCurrentSpanAttribute(NET_PEER_NAME, getURI().getHost());
-      //W-12558102 - Parsing HTTP headers as Span Attributes
-      MultiMap<String, String> headers = getHeaders();
+      MultiMap<String, String> headers = getHeaders(httpRequest.getHeaders(), skipAttributesList);
       headers.keySet().forEach(key -> distributedTraceContextManager.addCurrentSpanAttribute(key, headers.get(key)));
 
     } catch (Throwable e) {
@@ -119,19 +116,4 @@ public class HttpRequestCurrentSpanCustomizer extends HttpCurrentSpanCustomizer 
     return PROTOCOL_VERSION_1_1;
   }
 
-  /**
-   * W-12558102
-   * This provides a transparent way to obtain the definitive list of headers to add in the spans associated with Otel tracing.
-   * This list will have all headers except those that have been skipped via the skipHeadersOnTracing property.
-   */
-  @Override
-  public MultiMap<String, String> getHeaders() {
-    MultiMap<String, String> modifiedHeaders = new MultiMap<String, String>();
-    httpRequest.getHeaders().keySet().forEach(key -> {
-      if (!skipAttributesList.contains(key)) {
-        modifiedHeaders.put(key, httpRequest.getHeaders().get(key));
-      }
-    });
-    return modifiedHeaders;
-  }
 }
