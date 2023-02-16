@@ -8,7 +8,7 @@
 package org.mule.extension.http.internal.listener.profiling.tracing;
 
 import static java.lang.String.valueOf;
-
+import static java.util.Arrays.asList;
 import static com.google.common.net.HttpHeaders.USER_AGENT;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -16,14 +16,14 @@ import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.internal.request.profiling.tracing.HttpCurrentSpanCustomizer;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 import org.mule.runtime.api.util.MultiMap;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ListMultimap;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Arrays;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import org.slf4j.Logger;
 
 /**
@@ -46,7 +46,6 @@ public class HttpListenerCurrentSpanCustomizer extends HttpCurrentSpanCustomizer
   private final String host;
   private final int port;
 
-  //W-12558102
   private final List<String> skipAttributesList;
 
   private HttpListenerCurrentSpanCustomizer(HttpRequestAttributes attributes, String host, int port, String skipAttributes) {
@@ -54,7 +53,7 @@ public class HttpListenerCurrentSpanCustomizer extends HttpCurrentSpanCustomizer
     this.host = host;
     this.port = port;
     //W-12558102
-    this.skipAttributesList = Arrays.asList(skipAttributes.split(",", -1));
+    this.skipAttributesList = asList(skipAttributes.split(",", -1));
     this.skipAttributesList.replaceAll(String::trim);
   }
 

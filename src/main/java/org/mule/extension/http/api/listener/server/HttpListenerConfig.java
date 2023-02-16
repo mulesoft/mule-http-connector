@@ -84,8 +84,6 @@ public class HttpListenerConfig implements Initialisable {
   public void initialise() throws InitialisationException {
     basePath = sanitizePathWithStartSlash(this.basePath);
     httpHeaderValidators = new InvalidTransferEncodingValidator(rejectInvalidTransferEncoding);
-    //W-12558102
-    skipHeadersOnTracing = this.skipHeadersOnTracing;
   }
 
   public ListenerPath getFullListenerPath(String listenerPath) {
