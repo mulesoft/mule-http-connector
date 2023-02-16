@@ -10,6 +10,7 @@ package org.mule.extension.http.internal.request.profiling.tracing;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
+import org.mule.runtime.api.util.MultiMap;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -78,4 +79,10 @@ public abstract class HttpCurrentSpanCustomizer {
    * @return the span kind
    */
   protected abstract String getSpanKind();
+
+  /**
+   * W-12558102
+   * @return the headers for the http span.
+   */
+  public abstract MultiMap<String, String> getHeaders();
 }

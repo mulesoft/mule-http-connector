@@ -60,6 +60,8 @@ public class HttpCurrentSpanCustomizerTestCase {
   public static final String EXPECTED_PEER_NAME = "www.expectedhost.com";
   public static final int TEST_PORT = 8080;
   public static final String EXPECTED_SCHEME = HTTPS;
+  //W-  gp
+  public static final String SKIP_HEADERS_ATTRIBUTES = "";
 
   @Test
   @Description("The listener span customizer informs the distributed trace context manager the correct attributes/name")
@@ -74,7 +76,8 @@ public class HttpCurrentSpanCustomizerTestCase {
     when(headers.get(USER_AGENT)).thenReturn(EXPECTED_USER_AGENT);
     when(attributes.getLocalAddress()).thenReturn(LOCAL_ADDRESS);
 
-    HttpCurrentSpanCustomizer currentSpanCustomizer = getHttpListenerCurrentSpanCustomizer(attributes, TEST_HOST, TEST_PORT);
+    HttpCurrentSpanCustomizer currentSpanCustomizer =
+        getHttpListenerCurrentSpanCustomizer(attributes, TEST_HOST, TEST_PORT, SKIP_HEADERS_ATTRIBUTES);
     DistributedTraceContextManager distributedTraceContextManager = mock(DistributedTraceContextManager.class);
     currentSpanCustomizer.customizeSpan(distributedTraceContextManager);
 
@@ -99,7 +102,8 @@ public class HttpCurrentSpanCustomizerTestCase {
     when(httpRequest.getUri()).thenReturn(uri);
     when(httpRequest.getProtocol()).thenReturn(HTTP_1_1);
 
-    HttpCurrentSpanCustomizer httpCurrentSpanCustomizer = getHttpRequesterCurrentSpanCustomizer(httpRequest);
+    HttpCurrentSpanCustomizer httpCurrentSpanCustomizer =
+        getHttpRequesterCurrentSpanCustomizer(httpRequest, SKIP_HEADERS_ATTRIBUTES);
     httpCurrentSpanCustomizer.customizeSpan(distributedTraceContextManager);
 
     verify(distributedTraceContextManager).setCurrentSpanName(EXPECTED_SPAN_NAME);

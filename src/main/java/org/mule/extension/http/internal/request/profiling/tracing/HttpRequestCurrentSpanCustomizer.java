@@ -16,9 +16,12 @@ import org.mule.extension.http.internal.listener.profiling.tracing.HttpListenerC
 import org.mule.runtime.http.api.domain.HttpProtocol;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
+import org.mule.runtime.api.util.MultiMap;
 import org.slf4j.Logger;
 
 import java.net.URI;
+import java.util.List;
+import java.util.Arrays;
 
 /**
  * A customizer for the current span for HTTP Requests
@@ -38,17 +41,23 @@ public class HttpRequestCurrentSpanCustomizer extends HttpCurrentSpanCustomizer 
   public static final String PROTOCOL_VERSION_1_0 = "1.0";
   public static final String PROTOCOL_VERSION_1_1 = "1.1";
 
+  //W-12558102
+  private final List<String> skipAttributesList;
+
   /**
    * @return a new instance of a {@link HttpRequestCurrentSpanCustomizer}.
    */
-  public static HttpCurrentSpanCustomizer getHttpRequesterCurrentSpanCustomizer(HttpRequest httpRequest) {
-    return new HttpRequestCurrentSpanCustomizer(httpRequest);
+  public static HttpCurrentSpanCustomizer getHttpRequesterCurrentSpanCustomizer(HttpRequest httpRequest, String skipAttributes) {
+    return new HttpRequestCurrentSpanCustomizer(httpRequest, skipAttributes);
   }
 
   private HttpRequest httpRequest;
 
-  private HttpRequestCurrentSpanCustomizer(HttpRequest httpRequest) {
+  private HttpRequestCurrentSpanCustomizer(HttpRequest httpRequest, String skipAttributes) {
     this.httpRequest = httpRequest;
+    //W-12558102
+    this.skipAttributesList = Arrays.asList(skipAttributes.split(",", -1));
+    this.skipAttributesList.replaceAll(String::trim);
   }
 
   @Override
@@ -59,6 +68,10 @@ public class HttpRequestCurrentSpanCustomizer extends HttpCurrentSpanCustomizer 
       distributedTraceContextManager.addCurrentSpanAttribute(HTTP_URL, getURI().toString());
       distributedTraceContextManager.addCurrentSpanAttribute(NET_PEER_PORT, valueOf(getURI().getPort()));
       distributedTraceContextManager.addCurrentSpanAttribute(NET_PEER_NAME, getURI().getHost());
+      //W-12558102 - Parsing HTTP headers as Span Attributes
+      MultiMap<String, String> headers = getHeaders();
+      headers.keySet().forEach(key -> distributedTraceContextManager.addCurrentSpanAttribute(key, headers.get(key)));
+
     } catch (Throwable e) {
       LOGGER.warn("Error on setting the request span attributes", e);
     }
@@ -103,5 +116,21 @@ public class HttpRequestCurrentSpanCustomizer extends HttpCurrentSpanCustomizer 
     }
 
     return PROTOCOL_VERSION_1_1;
+  }
+
+  /**
+   * W-12558102
+   * This provides a transparent way to obtain the definitive list of headers to add in the spans associated with Otel tracing.
+   * This list will have all headers except those that have been skipped via the skipHeadersOnTracing property.
+   */
+  @Override
+  public MultiMap<String, String> getHeaders() {
+    MultiMap<String, String> modifiedHeaders = new MultiMap<String, String>();
+    httpRequest.getHeaders().keySet().forEach(key -> {
+      if (!skipAttributesList.contains(key)) {
+        modifiedHeaders.put(key, httpRequest.getHeaders().get(key));
+      }
+    });
+    return modifiedHeaders;
   }
 }

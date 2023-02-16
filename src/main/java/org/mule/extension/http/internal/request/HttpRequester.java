@@ -147,7 +147,8 @@ public class HttpRequester {
                                                           authentication, injectedHeaders, requestCreator,
                                                           distributedTraceContextManager);
 
-    getHttpRequesterCurrentSpanCustomizer(httpRequester).customizeSpan(distributedTraceContextManager);
+    getHttpRequesterCurrentSpanCustomizer(httpRequester, config.getSkipHeadersOnTracing())
+        .customizeSpan(distributedTraceContextManager);
 
     doRequestWithRetry(client, config, uri, method, streamingMode, sendBodyMode, followRedirects, authentication, resolvedTimeout,
                        responseValidator, transformationService, requestCreator, checkRetry, muleContext, scheduler,
