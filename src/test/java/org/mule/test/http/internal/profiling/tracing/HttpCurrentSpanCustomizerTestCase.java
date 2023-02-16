@@ -60,7 +60,7 @@ public class HttpCurrentSpanCustomizerTestCase {
   public static final String EXPECTED_PEER_NAME = "www.expectedhost.com";
   public static final int TEST_PORT = 8080;
   public static final String EXPECTED_SCHEME = HTTPS;
-  //W-  gp
+  //W-12558102
   public static final String SKIP_HEADERS_ATTRIBUTES = "";
 
   @Test
