@@ -71,6 +71,11 @@ public class HttpListenerCurrentSpanCustomizer extends HttpCurrentSpanCustomizer
       distributedTraceContextManager.addCurrentSpanAttribute(NET_HOST_NAME, host);
       distributedTraceContextManager.addCurrentSpanAttribute(NET_HOST_PORT, valueOf(getURI().getPort()));
       distributedTraceContextManager.addCurrentSpanAttribute(HTTP_SCHEME, attributes.getScheme());
+      String userAgent = attributes.getHeaders().get(USER_AGENT);
+
+      if (userAgent != null) {
+        distributedTraceContextManager.addCurrentSpanAttribute(HTTP_USER_AGENT, userAgent);
+      }
       MultiMap<String, String> headers = getHeaders(attributes.getHeaders(), skipAttributesList);
       headers.keySet().forEach(key -> distributedTraceContextManager.addCurrentSpanAttribute(key, headers.get(key)));
 
