@@ -42,6 +42,10 @@
         <http:request-connection host="localhost" port="${dynamic.port}"/>
     </http:request-config>
 
+    <http:request-config name="requestCookiesRequesterConfig7" enableCookies="true">
+        <http:request-connection host="localhost" port="${dynamic.port}"/>
+    </http:request-config>
+
     <munit:test name="requestWithoutCookieTest" description="Send a request without a Cookie header">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="getMyCookieHeaderAsPayloadFlow" />
@@ -185,6 +189,25 @@
 
         <munit:validation>
             <munit-tools:assert-equals actual="#[vars.myCookieHeader]" expected='#["SomeCookieName=SomeCookieValue; OtherCookieName=OtherCookieValue"]'/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="nullCookie" description="When cookie header is null, we don't raise a NPE">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="getMyCookieHeaderAsPayloadFlow" />
+        </munit:enable-flow-sources>
+
+        <munit:execution>
+            <http:request method="GET" config-ref="requestCookiesRequesterConfig7" path="/getMyCookieHeaderAsPayload">
+                <http:headers>
+                    #[{'Cookie' : null}]
+                </http:headers>
+            </http:request>
+            <set-variable value="#[payload as String]" variableName="myCookieHeader"/>
+        </munit:execution>
+
+        <munit:validation>
+            <munit-tools:assert-equals actual="#[vars.myCookieHeader]" expected='#[""]'/>
         </munit:validation>
     </munit:test>
 
