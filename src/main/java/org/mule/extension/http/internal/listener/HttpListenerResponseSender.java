@@ -6,7 +6,9 @@
  */
 package org.mule.extension.http.internal.listener;
 
+import static org.mule.extension.http.internal.listener.HttpListener.SPAN_STATUS;
 import static org.mule.extension.http.internal.request.profiling.tracing.HttpSpanUtils.addStatusCodeAttribute;
+import static org.mule.extension.http.internal.request.profiling.tracing.HttpSpanUtils.updateServerSpanStatus;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
@@ -44,7 +46,7 @@ public class HttpListenerResponseSender {
     HttpResponse httpResponse = buildResponse(response, context.getInterception(), context.isSupportStreaming());
     final HttpResponseReadyCallback responseCallback = context.getResponseCallback();
     addStatusCodeAttribute(distributedTraceContextManager, httpResponse.getStatusCode(), LOGGER);
-    // Agrego aca UNSET
+    updateServerSpanStatus(distributedTraceContextManager, httpResponse.getStatusCode(), LOGGER);
     responseCallback.responseReady(httpResponse, getResponseFailureCallback(responseCallback, completionCallback));
   }
 

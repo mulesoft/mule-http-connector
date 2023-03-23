@@ -20,6 +20,7 @@ import static org.mule.extension.http.internal.listener.HttpRequestToResult.tran
 import static org.mule.extension.http.internal.listener.profiling.tracing.HttpListenerCurrentSpanCustomizer.getHttpListenerCurrentSpanCustomizer;
 import static org.mule.extension.http.internal.request.EmptyDistributedTraceContextManager.getDistributedTraceContextManager;
 import static org.mule.extension.http.internal.request.profiling.tracing.HttpSpanUtils.addStatusCodeAttribute;
+import static org.mule.extension.http.internal.request.profiling.tracing.HttpSpanUtils.updateServerSpanStatus;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
@@ -291,10 +292,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
     }
 
     addStatusCodeAttribute(distributedTraceContextManager, response.getStatusCode(), LOGGER);
-    if (response.getStatusCode() == 500){
-      ResolverUtils.resolveDistributedTraceContextManager;
-      distributedTraceContextManager.addCurrentSpanAttribute(SPAN_STATUS, "Error");
-    }
+    updateServerSpanStatus(distributedTraceContextManager, response.getStatusCode(), LOGGER);
     final HttpResponseReadyCallback responseCallback = context.getResponseCallback();
     callbackContext.addVariable(RESPONSE_SEND_ATTEMPT, true);
     responseCallback.responseReady(response, new ResponseFailureStatusCallback(responseCallback, completionCallback));
