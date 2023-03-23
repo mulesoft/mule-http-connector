@@ -92,7 +92,6 @@ public class HttpRequester {
 
   private static final DataType REQUEST_NOTIFICATION_DATA_TYPE = DataType.fromType(HttpRequestNotificationData.class);
   private static final DataType RESPONSE_NOTIFICATION_DATA_TYPE = DataType.fromType(HttpResponseNotificationData.class);
-  public static final String SPAN_STATUS = "status.override";
 
   private final HttpRequestFactory httpRequestFactory;
   private final HttpResponseToResult httpResponseToResult;

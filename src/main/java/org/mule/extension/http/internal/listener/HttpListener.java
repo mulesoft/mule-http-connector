@@ -110,11 +110,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 import org.mule.sdk.compatibility.api.utils.ForwardCompatibilityHelper;
 
-import org.apache.xmlbeans.impl.common.ResolverUtil;
 import org.slf4j.Logger;
 
 /**
