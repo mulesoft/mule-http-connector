@@ -21,6 +21,9 @@ import org.slf4j.Logger;
 public class HttpSpanUtils {
 
   public static final String HTTP_STATUS_CODE = "http.status_code";
+  public static final String SPAN_STATUS = "status.override";
+  public static final String ERROR_STATUS = "ERROR";
+  public static final String UNSET_STATUS = "UNSET";
 
   private HttpSpanUtils() {}
 
@@ -39,7 +42,53 @@ public class HttpSpanUtils {
         distributedTraceContextManager.addCurrentSpanAttribute(HTTP_STATUS_CODE, valueOf(statusCode));
       }
     } catch (Throwable e) {
-      logger.warn("An exception on processing the listener span http status code", e);
+      logger.warn("An exception on processing the span http status code", e);
+    }
+  }
+
+  /**
+   * Update the server span status through the addition of an attribute
+   *
+   * @param distributedTraceContextManager the {@link DistributedTraceContextManager} to use.
+   * @param statusCode the status code.
+   * @param logger the LOGGER to use.
+   */
+  public static void updateServerSpanStatus(DistributedTraceContextManager distributedTraceContextManager,
+                                            int statusCode,
+                                            Logger logger) {
+    try {
+      if (distributedTraceContextManager != null) {
+        if (statusCode == 500) {
+          distributedTraceContextManager.addCurrentSpanAttribute(SPAN_STATUS, ERROR_STATUS);
+        } else {
+          distributedTraceContextManager.addCurrentSpanAttribute(SPAN_STATUS, UNSET_STATUS);
+        }
+      }
+    } catch (Throwable e) {
+      logger.warn("An exception on updating the server span status", e);
+    }
+  }
+
+  /**
+   * Update the client span status through the addition of an attribute
+   *
+   * @param distributedTraceContextManager the {@link DistributedTraceContextManager} to use.
+   * @param statusCode the status code.
+   * @param logger the LOGGER to use.
+   */
+  public static void updateClientSpanStatus(DistributedTraceContextManager distributedTraceContextManager,
+                                            int statusCode,
+                                            Logger logger) {
+    try {
+      if (distributedTraceContextManager != null) {
+        if (statusCode >= 400) {
+          distributedTraceContextManager.addCurrentSpanAttribute(SPAN_STATUS, "ERROR");
+        } else {
+          distributedTraceContextManager.addCurrentSpanAttribute(SPAN_STATUS, "UNSET");
+        }
+      }
+    } catch (Throwable e) {
+      logger.warn("An exception on updating the client span status", e);
     }
   }
 

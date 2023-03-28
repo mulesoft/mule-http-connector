@@ -7,12 +7,12 @@
 package org.mule.extension.http.internal.listener;
 
 import static org.mule.extension.http.internal.request.profiling.tracing.HttpSpanUtils.addStatusCodeAttribute;
+import static org.mule.extension.http.internal.request.profiling.tracing.HttpSpanUtils.updateServerSpanStatus;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.api.streaming.HttpStreamingType;
 import org.mule.extension.http.internal.listener.intercepting.Interception;
-import org.mule.extension.http.internal.request.profiling.tracing.HttpSpanUtils;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
@@ -44,6 +44,7 @@ public class HttpListenerResponseSender {
     HttpResponse httpResponse = buildResponse(response, context.getInterception(), context.isSupportStreaming());
     final HttpResponseReadyCallback responseCallback = context.getResponseCallback();
     addStatusCodeAttribute(distributedTraceContextManager, httpResponse.getStatusCode(), LOGGER);
+    updateServerSpanStatus(distributedTraceContextManager, httpResponse.getStatusCode(), LOGGER);
     responseCallback.responseReady(httpResponse, getResponseFailureCallback(responseCallback, completionCallback));
   }
 

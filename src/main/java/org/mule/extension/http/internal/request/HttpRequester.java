@@ -24,6 +24,7 @@ import static org.mule.extension.http.internal.HttpConnectorConstants.RETRY_ATTE
 import static org.mule.extension.http.internal.HttpConnectorConstants.RETRY_ON_ALL_METHODS_PROPERTY;
 import static org.mule.extension.http.internal.request.profiling.tracing.HttpRequestCurrentSpanCustomizer.getHttpRequesterCurrentSpanCustomizer;
 import static org.mule.extension.http.internal.request.profiling.tracing.HttpSpanUtils.addStatusCodeAttribute;
+import static org.mule.extension.http.internal.request.profiling.tracing.HttpSpanUtils.updateClientSpanStatus;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
 
@@ -222,6 +223,13 @@ public class HttpRequester {
                           requestCreator, false, muleContext, scheduler, notificationEmitter,
                           streamingHelper, callback, injectedHeaders, distributedTraceContextManager);
               }, () -> {
+                if (distributedTraceContextManager != null) {
+                  result.getAttributes().ifPresent(attributes -> {
+                    addStatusCodeAttribute(distributedTraceContextManager,
+                                           attributes.getStatusCode(), logger);
+                    updateClientSpanStatus(distributedTraceContextManager, attributes.getStatusCode(), logger);
+                  });
+                }
                 if (streamingHelper != null) {
                   responseValidator.validate((Result) result, httpRequest, streamingHelper);
                 } else {
@@ -237,10 +245,6 @@ public class HttpRequester {
                 profilingDataProducer
                     .ifPresent(profilingDataProducer -> profilingDataProducer.triggerProfilingEvent(result, correlationId));
 
-                if (distributedTraceContextManager != null) {
-                  result.getAttributes().ifPresent(attributes -> addStatusCodeAttribute(distributedTraceContextManager,
-                                                                                        attributes.getStatusCode(), logger));
-                }
                 callback.success((Result) freshResult);
               });
             } catch (Exception e) {

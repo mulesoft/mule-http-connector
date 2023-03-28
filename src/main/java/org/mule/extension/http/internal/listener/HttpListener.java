@@ -20,6 +20,7 @@ import static org.mule.extension.http.internal.listener.HttpRequestToResult.tran
 import static org.mule.extension.http.internal.listener.profiling.tracing.HttpListenerCurrentSpanCustomizer.getHttpListenerCurrentSpanCustomizer;
 import static org.mule.extension.http.internal.request.EmptyDistributedTraceContextManager.getDistributedTraceContextManager;
 import static org.mule.extension.http.internal.request.profiling.tracing.HttpSpanUtils.addStatusCodeAttribute;
+import static org.mule.extension.http.internal.request.profiling.tracing.HttpSpanUtils.updateServerSpanStatus;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
@@ -111,6 +112,7 @@ import javax.inject.Inject;
 
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 import org.mule.sdk.compatibility.api.utils.ForwardCompatibilityHelper;
+
 import org.slf4j.Logger;
 
 /**
@@ -138,6 +140,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   private static final String HEADER_MULE_CORRELATION_ID = MULE_CORRELATION_ID_PROPERTY.toLowerCase();
   private static final String REPEATED_HEADERS_LOG_FORMAT =
       "'X-Correlation-ID: {}' and 'MULE_CORRELATION_ID: {}' headers found. 'X-Correlation-ID' will be used.";
+  public static final String SPAN_STATUS = "status.override";
 
   @Inject
   private TransformationService transformationService;
@@ -287,6 +290,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
     }
 
     addStatusCodeAttribute(distributedTraceContextManager, response.getStatusCode(), LOGGER);
+    updateServerSpanStatus(distributedTraceContextManager, response.getStatusCode(), LOGGER);
     final HttpResponseReadyCallback responseCallback = context.getResponseCallback();
     callbackContext.addVariable(RESPONSE_SEND_ATTEMPT, true);
     responseCallback.responseReady(response, new ResponseFailureStatusCallback(responseCallback, completionCallback));
