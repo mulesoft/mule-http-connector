@@ -15,7 +15,7 @@
     <groupId>org.mule.connectors</groupId>
     <artifactId>mule-http-connector</artifactId>
     <packaging>mule-extension</packaging>
-    <version>1.8.0-SNAPSHOT</version>
+    <version>1.8.0-beta1</version>
 
     <name>HTTP Connector</name>
     <description>A Mule extension that provides HTTP server and client functionality</description>
@@ -38,8 +38,8 @@
         <muleHttpPolicyApiVersion>1.1.3</muleHttpPolicyApiVersion>
         <mulePolicyApiVersion>1.1.3</mulePolicyApiVersion>
         <muleProfilingApiVersion>1.0.0</muleProfilingApiVersion>
-        <muleSdkCompatibilityApiVersion>1.0.0-SNAPSHOT</muleSdkCompatibilityApiVersion>
-        <muleSdkApiVersion>1.0.0-SNAPSHOT</muleSdkApiVersion>
+        <muleSdkCompatibilityApiVersion>1.0.0-20230320</muleSdkCompatibilityApiVersion>
+        <muleSdkApiVersion>1.0.0-20230320</muleSdkApiVersion>
 
         <!-- Remove when a new parent version with MTF is available -->
         <munit.input.directory>src/test/munit</munit.input.directory>
