@@ -1,3 +1,5 @@
 projectType: extension
+
+# W-12943277: Revert test stage being disabled after 1.8.0-beta1 was released.
 enableMavenTestStage: false
 
