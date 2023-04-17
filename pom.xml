@@ -52,7 +52,7 @@
         <scriptingModuleVersion>1.1.7</scriptingModuleVersion>
         <muleObjectStoreConnectorTestVersion>1.2.1</muleObjectStoreConnectorTestVersion>
 
-        <springVersion>5.3.18</springVersion>
+        <springVersion>5.3.27</springVersion>
     </properties>
 
     <build>
