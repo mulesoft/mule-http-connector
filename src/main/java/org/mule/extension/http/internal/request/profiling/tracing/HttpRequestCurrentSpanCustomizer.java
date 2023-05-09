@@ -57,7 +57,11 @@ public class HttpRequestCurrentSpanCustomizer extends HttpCurrentSpanCustomizer 
 
     try {
       distributedTraceContextManager.addCurrentSpanAttribute(HTTP_URL, getURI().toString());
-      distributedTraceContextManager.addCurrentSpanAttribute(NET_PEER_PORT, valueOf(getURI().getPort()));
+      if (getURI().getPort() == -1) {
+        distributedTraceContextManager.addCurrentSpanAttribute(NET_PEER_PORT, valueOf(getURI().toURL().getDefaultPort()));
+      } else {
+        distributedTraceContextManager.addCurrentSpanAttribute(NET_PEER_PORT, valueOf(getURI().getPort()));
+      }
       distributedTraceContextManager.addCurrentSpanAttribute(NET_PEER_NAME, getURI().getHost());
     } catch (Throwable e) {
       LOGGER.warn("Error on setting the request span attributes", e);
