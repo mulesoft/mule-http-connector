@@ -43,6 +43,7 @@ import io.qameta.allure.Feature;
 import org.junit.Test;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 
 @Feature(HTTP_EXTENSION)
 @Story(TRACING)
@@ -54,7 +55,7 @@ public class HttpCurrentSpanCustomizerTestCase {
   public static final String LISTENER_PATH = "/listenerPath";
   public static final String EXPECTED_USER_AGENT = "userAgent";
   public static final String LOCAL_ADDRESS = "/localAddress:8080";
-  public static final String EXPECTED_SPAN_NAME = "HTTPS GET";
+  public static final String EXPECTED_METHOD = "GET";
   public static final String EXPECTED_PROTOCOL_VERSION = "1.1";
   public static final String EXPECTED_PORT = "8080";
   public static final String EXPECTED_PEER_NAME = "www.expectedhost.com";
@@ -92,9 +93,25 @@ public class HttpCurrentSpanCustomizerTestCase {
   @Test
   @Description("The request span customizer informs the distributed trace context manager the correct attributes/name")
   public void requestSpan() throws Exception {
+    testRequestSpanWithUri("https://www.expectedhost.com:8080/bla", EXPECTED_PORT);
+  }
+
+  @Test
+  @Description("The request span customizer informs the distributed trace context manager the correct attributes/name with default port for HTTPS")
+  public void requestSpanWithoutPortHTTPS() throws Exception {
+    testRequestSpanWithUri("https://www.expectedhost.com/bla", "443");
+  }
+
+  @Test
+  @Description("The request span customizer informs the distributed trace context manager the correct attributes/name with default port for HTTPS")
+  public void requestSpanWithoutPortHTTP() throws Exception {
+    testRequestSpanWithUri("http://www.expectedhost.com/bla", "80");
+  }
+
+  private void testRequestSpanWithUri(String uriString, String expectedPortValue) throws URISyntaxException {
     HttpRequest httpRequest = mock(HttpRequest.class);
     DistributedTraceContextManager distributedTraceContextManager = mock(DistributedTraceContextManager.class);
-    URI uri = new URI("https://www.expectedhost.com:8080/bla");
+    URI uri = new URI(uriString);
     when(httpRequest.getMethod()).thenReturn(GET.asString());
     when(httpRequest.getUri()).thenReturn(uri);
     when(httpRequest.getProtocol()).thenReturn(HTTP_1_1);
@@ -102,11 +119,18 @@ public class HttpCurrentSpanCustomizerTestCase {
     HttpCurrentSpanCustomizer httpCurrentSpanCustomizer = getHttpRequesterCurrentSpanCustomizer(httpRequest);
     httpCurrentSpanCustomizer.customizeSpan(distributedTraceContextManager);
 
-    verify(distributedTraceContextManager).setCurrentSpanName(EXPECTED_SPAN_NAME);
+    verify(distributedTraceContextManager).setCurrentSpanName(uri.getScheme().toUpperCase() + " " + EXPECTED_METHOD);
     verify(distributedTraceContextManager).addCurrentSpanAttribute(HTTP_METHOD, GET.asString());
     verify(distributedTraceContextManager).addCurrentSpanAttribute(HTTP_FLAVOR, EXPECTED_PROTOCOL_VERSION);
     verify(distributedTraceContextManager).addCurrentSpanAttribute(HTTP_URL, uri.toString());
-    verify(distributedTraceContextManager).addCurrentSpanAttribute(NET_PEER_PORT, EXPECTED_PORT);
+    verify(distributedTraceContextManager).addCurrentSpanAttribute(NET_PEER_PORT, expectedPortValue);
     verify(distributedTraceContextManager).addCurrentSpanAttribute(NET_PEER_NAME, EXPECTED_PEER_NAME);
   }
+
+  @Test
+  @Description("The request span customizer informs the distributed trace context manager the correct attributes/name")
+  public void requestSpanWithDefaultPort() throws Exception {
+
+  }
+
 }
