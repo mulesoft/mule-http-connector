@@ -7,8 +7,6 @@
 package org.mule.extension.http.internal.request;
 
 import static org.mule.extension.http.api.request.HttpSendBodyMode.ALWAYS;
-import static org.mule.extension.http.api.request.HttpSendBodyMode.NEVER;
-import static org.mule.extension.http.internal.request.HttpRequestFactory.DEFAULT_EMPTY_BODY_METHODS;
 
 import org.mule.extension.http.api.request.HttpSendBodyMode;
 import org.mule.runtime.http.api.client.HttpClient;
