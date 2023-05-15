@@ -125,7 +125,7 @@ public class HttpRequestTracingContextTestCase {
     when(message.getPayload()).thenReturn(new TypedValue("payload".getBytes(StandardCharsets.UTF_8), BYTE_ARRAY));
     when(transformationService.transform(any(), any())).thenReturn(message);
     CompletableFuture completableFuture = mock(CompletableFuture.class);
-    when(client.send(any(), anyInt(), anyBoolean(), any())).thenReturn(completableFuture);
+    when(client.send(any(), anyInt(), anyBoolean(), any(), any())).thenReturn(completableFuture);
     httpRequester.doRequest(client, config, "http://dummyUri", "GET",
                             HttpStreamingType.ALWAYS, HttpSendBodyMode.ALWAYS,
                             true, authentication,

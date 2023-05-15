@@ -201,7 +201,7 @@ public class HttpRequester {
     fireNotification(notificationEmitter, REQUEST_START, () -> HttpRequestNotificationData.from(httpRequest),
                      REQUEST_NOTIFICATION_DATA_TYPE);
 
-    client.send(httpRequest, responseTimeout, followRedirects, resolveAuthentication(authentication))
+    client.send(httpRequest, responseTimeout, followRedirects, resolveAuthentication(authentication), sendBodyMode)
         .whenComplete((response, exception) -> {
           if (response != null) {
             try {

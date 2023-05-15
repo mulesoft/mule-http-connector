@@ -79,7 +79,7 @@ public class HttpRequestFactory {
   private static final String MULE_CORRELATION_ID_PROPERTY_HEADER = MULE_CORRELATION_ID_PROPERTY.toLowerCase();
   private static final String COOKIE_HEADER = COOKIE.toLowerCase();
 
-  private static final Set<String> DEFAULT_EMPTY_BODY_METHODS = unmodifiableSet(new HashSet<>(asList("GET", "HEAD", "OPTIONS")));
+  static final Set<String> DEFAULT_EMPTY_BODY_METHODS = unmodifiableSet(new HashSet<>(asList("GET", "HEAD", "OPTIONS")));
 
   private static final String BOTH_TRANSFER_HEADERS_SET_MESSAGE =
       "Cannot send both Transfer-Encoding and Content-Length headers. Transfer-Encoding will not be sent.";
@@ -281,7 +281,7 @@ public class HttpRequestFactory {
     return entity;
   }
 
-  private boolean isEmptyBody(Object body, String method, HttpSendBodyMode sendBodyMode) {
+  boolean isEmptyBody(Object body, String method, HttpSendBodyMode sendBodyMode) {
     boolean emptyBody;
 
     boolean hasBody = body != null && !body.equals("");
