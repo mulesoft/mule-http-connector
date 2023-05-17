@@ -12,7 +12,6 @@ import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 
-import java.lang.reflect.Method;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -23,10 +22,11 @@ public class ShareableHttpClient {
 
   private HttpClient delegate;
   private Integer usageCount = new Integer(0);
-  HttpClientReflection httpClientReflection = new HttpClientReflection();
+  HttpClientReflection httpClientReflection;
 
   public ShareableHttpClient(HttpClient client) {
     delegate = client;
+    httpClientReflection = new HttpClientReflection(client);
   }
 
   public synchronized void start() {
@@ -52,12 +52,6 @@ public class ShareableHttpClient {
   public CompletableFuture<HttpResponse> sendAsync(HttpRequest request, int responseTimeout, boolean followRedirects,
                                                    HttpAuthentication authentication,
                                                    HttpSendBodyMode sendBodyMode) {
-    try {
-      return (CompletableFuture<HttpResponse>) httpClientReflection.getSendAsync(delegate)
-          .invoke(delegate, request,
-                  httpClientReflection.requestOptions(responseTimeout, followRedirects, authentication, sendBodyMode));
-    } catch (Exception ignored) {
-      return delegate.sendAsync(request, responseTimeout, followRedirects, authentication);
-    }
+    return httpClientReflection.sendAsync(delegate, request, responseTimeout, followRedirects, authentication, sendBodyMode);
   }
 }

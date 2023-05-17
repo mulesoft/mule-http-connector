@@ -12,68 +12,66 @@ import org.mule.extension.http.api.request.HttpSendBodyMode;
 import org.mule.runtime.http.api.client.HttpClient;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
+import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.CompletableFuture;
 
 public class HttpClientReflection {
 
-  final ConcurrentMap<String, Method> cache = new ConcurrentHashMap<>();
+  public static final String HTTP_REQUEST_OPTIONS_CLASS_NAME =
+      "org.mule.runtime.http.api.client.HttpRequestOptions";
 
-  Method getSendAsync(HttpClient delegate) throws NoSuchMethodException, ClassNotFoundException {
-    if (cache.containsKey("sendAsync")) {
-      return cache.get("sendAsync");
+  private Object requestOptionsBuilder;
+  Method sendAsyncMethod;
+  Method buildMethod;
+  Method responseTimeoutMethod;
+  Method followsRedirectMethod;
+  Method authenticationMethod;
+  Method sendBodyAlwaysMethod;
+
+  boolean loaded = true;
+
+  public HttpClientReflection(HttpClient client) {
+    try {
+      Class<?> httpRequestOptionsClass = Class.forName(HTTP_REQUEST_OPTIONS_CLASS_NAME);
+      sendAsyncMethod = client.getClass()
+          .getDeclaredMethod("sendAsync", HttpRequest.class, httpRequestOptionsClass);
+
+      Method builderMethod = httpRequestOptionsClass.getDeclaredMethod("builder");
+      requestOptionsBuilder = builderMethod.invoke(null);
+      buildMethod = requestOptionsBuilder.getClass().getDeclaredMethod("build");
+      responseTimeoutMethod = requestOptionsBuilder.getClass().getDeclaredMethod("responseTimeout", int.class);
+      followsRedirectMethod = requestOptionsBuilder.getClass().getDeclaredMethod("followsRedirect", boolean.class);
+      authenticationMethod = requestOptionsBuilder.getClass().getDeclaredMethod("authentication", HttpAuthentication.class);
+      sendBodyAlwaysMethod = requestOptionsBuilder.getClass().getDeclaredMethod("sendBodyAlways", boolean.class);
+    } catch (Exception ignored) {
+      loaded = false;
     }
-
-    Method method = delegate.getClass()
-        .getDeclaredMethod("sendAsync", HttpRequest.class,
-                           Class.forName("org.mule.runtime.http.api.client.HttpRequestOptions"));
-    return cache.computeIfAbsent("sendAsync", k -> method);
   }
 
   Object requestOptions(int responseTimeout, boolean followsRedirect,
                         HttpAuthentication authentication, HttpSendBodyMode sendBodyMode)
       throws Exception {
-    Object requestOptionsBuilder = getBuilder().invoke(null);
-    requestOptionsBuilder = with("responseTimeout", responseTimeout, requestOptionsBuilder, int.class);
-    requestOptionsBuilder = with("followsRedirect", followsRedirect, requestOptionsBuilder, boolean.class);
-    requestOptionsBuilder = with("authentication", authentication, requestOptionsBuilder, HttpAuthentication.class);
-    requestOptionsBuilder =
-        with("sendBody", sendBodyMode.equals(ALWAYS), requestOptionsBuilder, boolean.class);
+    requestOptionsBuilder = responseTimeoutMethod.invoke(requestOptionsBuilder, responseTimeout);
+    requestOptionsBuilder = followsRedirectMethod.invoke(requestOptionsBuilder, followsRedirect);
+    requestOptionsBuilder = authenticationMethod.invoke(requestOptionsBuilder, authentication);
+    requestOptionsBuilder = sendBodyAlwaysMethod.invoke(requestOptionsBuilder, sendBodyMode.equals(ALWAYS));
 
-    return getBuild(requestOptionsBuilder).invoke(requestOptionsBuilder);
+    return buildMethod.invoke(requestOptionsBuilder);
   }
 
-  private Method getBuild(Object requestOptionsBuilder) throws NoSuchMethodException {
-    if (cache.containsKey("build")) {
-      return cache.get("build");
+  public CompletableFuture<HttpResponse> sendAsync(HttpClient client, HttpRequest request, int responseTimeout,
+                                                   boolean followRedirects, HttpAuthentication authentication,
+                                                   HttpSendBodyMode sendBodyMode) {
+    if (loaded) {
+      try {
+        return (CompletableFuture<HttpResponse>) sendAsyncMethod
+            .invoke(client, request, requestOptions(responseTimeout, followRedirects, authentication, sendBodyMode));
+      } catch (Exception ignored) {
+      }
     }
 
-    Method method = requestOptionsBuilder.getClass().getDeclaredMethod("build");
-    return cache.computeIfAbsent("build", k -> method);
+    return client.sendAsync(request, responseTimeout, followRedirects, authentication);
   }
-
-  private Method getBuilder() throws NoSuchMethodException, ClassNotFoundException {
-    if (cache.containsKey("builder")) {
-      return cache.get("builder");
-    }
-
-    Method method = Class.forName("org.mule.runtime.http.api.client.HttpRequestOptions").getDeclaredMethod("builder");
-    return cache.computeIfAbsent("builder", k -> method);
-  }
-
-  private Object with(String name, Object arg, Object requestOptionsBuilder, Class<?> clazz)
-      throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-    Method method;
-    if (cache.containsKey(name)) {
-      method = cache.get(name);
-    } else {
-      method = requestOptionsBuilder.getClass().getDeclaredMethod(name, clazz);
-      cache.putIfAbsent(name, method);
-    }
-    return method.invoke(requestOptionsBuilder, arg);
-  }
-
 }
