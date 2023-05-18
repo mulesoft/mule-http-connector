@@ -22,11 +22,9 @@ public class ShareableHttpClient {
 
   private HttpClient delegate;
   private Integer usageCount = new Integer(0);
-  HttpClientReflection httpClientReflection;
 
   public ShareableHttpClient(HttpClient client) {
     delegate = client;
-    httpClientReflection = new HttpClientReflection(client);
   }
 
   public synchronized void start() {
@@ -52,6 +50,6 @@ public class ShareableHttpClient {
   public CompletableFuture<HttpResponse> sendAsync(HttpRequest request, int responseTimeout, boolean followRedirects,
                                                    HttpAuthentication authentication,
                                                    HttpSendBodyMode sendBodyMode) {
-    return httpClientReflection.sendAsync(delegate, request, responseTimeout, followRedirects, authentication, sendBodyMode);
+    return HttpClientReflection.sendAsync(delegate, request, responseTimeout, followRedirects, authentication, sendBodyMode);
   }
 }

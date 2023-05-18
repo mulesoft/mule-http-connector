@@ -17,25 +17,28 @@ import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import java.lang.reflect.Method;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Caches methods to avoid repeating reflection calls.
+ */
 public class HttpClientReflection {
 
   public static final String HTTP_REQUEST_OPTIONS_CLASS_NAME =
       "org.mule.runtime.http.api.client.HttpRequestOptions";
 
-  private Object requestOptionsBuilder;
-  Method sendAsyncMethod;
-  Method buildMethod;
-  Method responseTimeoutMethod;
-  Method followsRedirectMethod;
-  Method authenticationMethod;
-  Method sendBodyAlwaysMethod;
+  private static Object requestOptionsBuilder;
+  private static Method sendAsyncMethod;
+  private static Method buildMethod;
+  private static Method responseTimeoutMethod;
+  private static Method followsRedirectMethod;
+  private static Method authenticationMethod;
+  private static Method sendBodyAlwaysMethod;
 
-  boolean loaded = true;
+  static boolean loaded = true;
 
-  public HttpClientReflection(HttpClient client) {
+  static {
     try {
       Class<?> httpRequestOptionsClass = Class.forName(HTTP_REQUEST_OPTIONS_CLASS_NAME);
-      sendAsyncMethod = client.getClass()
+      sendAsyncMethod = Class.forName("org.mule.runtime.http.api.client.HttpClient")
           .getDeclaredMethod("sendAsync", HttpRequest.class, httpRequestOptionsClass);
 
       Method builderMethod = httpRequestOptionsClass.getDeclaredMethod("builder");
@@ -50,8 +53,8 @@ public class HttpClientReflection {
     }
   }
 
-  Object requestOptions(int responseTimeout, boolean followsRedirect,
-                        HttpAuthentication authentication, HttpSendBodyMode sendBodyMode)
+  private static Object requestOptions(int responseTimeout, boolean followsRedirect,
+                                       HttpAuthentication authentication, HttpSendBodyMode sendBodyMode)
       throws Exception {
     requestOptionsBuilder = responseTimeoutMethod.invoke(requestOptionsBuilder, responseTimeout);
     requestOptionsBuilder = followsRedirectMethod.invoke(requestOptionsBuilder, followsRedirect);
@@ -61,9 +64,9 @@ public class HttpClientReflection {
     return buildMethod.invoke(requestOptionsBuilder);
   }
 
-  public CompletableFuture<HttpResponse> sendAsync(HttpClient client, HttpRequest request, int responseTimeout,
-                                                   boolean followRedirects, HttpAuthentication authentication,
-                                                   HttpSendBodyMode sendBodyMode) {
+  public static CompletableFuture<HttpResponse> sendAsync(HttpClient client, HttpRequest request, int responseTimeout,
+                                                          boolean followRedirects, HttpAuthentication authentication,
+                                                          HttpSendBodyMode sendBodyMode) {
     if (loaded) {
       try {
         return (CompletableFuture<HttpResponse>) sendAsyncMethod
