@@ -8,6 +8,8 @@ package org.mule.extension.http.api.request;
 
 import static java.util.Collections.emptyList;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
+import static org.mule.extension.http.api.request.HttpSendBodyMode.AUTO;
 import static org.mule.extension.http.internal.request.KeyValuePairUtils.toMultiMap;
 import static org.mule.extension.http.internal.request.UriUtils.replaceUriParams;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
@@ -185,7 +187,7 @@ public class HttpConnectivityValidator implements Initialisable {
       throws InterruptedException, ExecutionException {
     int responseTimeoutInt = (int) responseTimeoutUnit.toMillis(responseTimeout.longValue());
     HttpResponse response =
-        client.send(request, responseTimeoutInt, followRedirects, resolveAuthentication(client)).get();
+        client.send(request, responseTimeoutInt, followRedirects, resolveAuthentication(client), AUTO).get();
 
     return new HttpResponseToResult()
         .convert(new VoidHttpRequesterCookieConfig(), muleContext, response, response.getEntity(),

@@ -147,6 +147,25 @@
         </munit:validation>
     </munit:test>
 
+    <munit:test name="302-redirect-test-honour-body-semantics"
+                description="Create a request to an endpoint that return 302. Should follow redirect with GET method and remove the body"
+                ignore="#[Munit::muleVersionPriorTo('4.3.0')]">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="302-redirect-body" />
+            <munit:enable-flow-source value="only-get-request-body" />
+        </munit:enable-flow-sources>
+
+        <munit:execution>
+            <set-payload value='#["body"]'/>
+            <http:request method="POST" config-ref="followRedirects" path="/302-move-body"/>
+            <set-variable value="#[payload as String]" variableName="moved_response"/>
+        </munit:execution>
+
+        <munit:validation>
+            <munit-tools:assert-equals actual="#[vars.moved_response]" expected='#[""]'/>
+        </munit:validation>
+    </munit:test>
+
     <munit:test name="303-redirect-test"
                 description="Create a request to an endpoint that return 303. Should follow redirect with GET method">
         <munit:enable-flow-sources>
@@ -256,6 +275,19 @@
         <set-payload value='#["moved"]' />
     </flow>
 
+    <flow name="302-redirect-body">
+        <http:listener config-ref="HTTP_Listener_config" path="/302-move-body">
+            <http:response statusCode="302" reasonPhrase="Moved Permanently">
+                <http:headers ><![CDATA[#[output application/java
+---
+{
+	"Location" : "http://localhost:${dynamic.port}/get-response-body"
+}]]]></http:headers>
+            </http:response>
+        </http:listener>
+        <set-payload value='#["moved"]' />
+    </flow>
+
     <flow name="303-redirect">
         <http:listener config-ref="HTTP_Listener_config" path="/303-move">
             <http:response statusCode="303" reasonPhrase="Moved Permanently">
@@ -272,6 +304,11 @@
     <flow name="only-get-request">
         <http:listener config-ref="HTTP_Listener_config" path="/get-response" allowedMethods="GET"/>
         <set-payload value='#["response"]'/>
+    </flow>
+
+    <flow name="only-get-request-body">
+        <http:listener config-ref="HTTP_Listener_config" path="/get-response-body" allowedMethods="GET"/>
+        <set-payload value='#[payload as String]'/>
     </flow>
 
     <flow name="only-post-request">

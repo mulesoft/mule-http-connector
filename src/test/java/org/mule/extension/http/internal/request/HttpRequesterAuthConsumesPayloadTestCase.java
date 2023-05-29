@@ -124,7 +124,7 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
 
     client = mock(HttpExtensionClient.class);
 
-    when(client.send(httpRequest, 0, false, null)).thenReturn(CompletableFuture.completedFuture(response));
+    when(client.send(httpRequest, 0, false, null, any())).thenReturn(CompletableFuture.completedFuture(response));
     requestCreator = getRequestCreator();
   }
 

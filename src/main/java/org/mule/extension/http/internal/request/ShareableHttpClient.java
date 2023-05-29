@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.internal.request;
 
+import org.mule.extension.http.api.request.HttpSendBodyMode;
 import org.mule.runtime.http.api.client.HttpClient;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
@@ -47,7 +48,8 @@ public class ShareableHttpClient {
   }
 
   public CompletableFuture<HttpResponse> sendAsync(HttpRequest request, int responseTimeout, boolean followRedirects,
-                                                   HttpAuthentication authentication) {
-    return delegate.sendAsync(request, responseTimeout, followRedirects, authentication);
+                                                   HttpAuthentication authentication,
+                                                   HttpSendBodyMode sendBodyMode) {
+    return HttpClientReflection.sendAsync(delegate, request, responseTimeout, followRedirects, authentication, sendBodyMode);
   }
 }
