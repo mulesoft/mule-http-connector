@@ -8,6 +8,8 @@ package org.mule.extension.http.internal.request.client;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+
+import org.mule.extension.http.api.request.HttpSendBodyMode;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.internal.request.HttpRequesterConnectionManager.ShareableHttpClient;
@@ -68,7 +70,8 @@ public class HttpExtensionClient implements Startable, Stoppable {
   }
 
   public CompletableFuture<HttpResponse> send(HttpRequest request, int responseTimeout, boolean followRedirects,
-                                              HttpAuthentication authentication) {
-    return httpClient.sendAsync(request, responseTimeout, followRedirects, authentication);
+                                              HttpAuthentication authentication,
+                                              HttpSendBodyMode sendBodyMode) {
+    return httpClient.sendAsync(request, responseTimeout, followRedirects, authentication, sendBodyMode);
   }
 }
