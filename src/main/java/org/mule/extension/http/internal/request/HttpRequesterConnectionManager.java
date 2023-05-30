@@ -9,6 +9,8 @@ package org.mule.extension.http.internal.request;
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
+import org.mule.extension.http.api.request.HttpSendBodyMode;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.http.api.client.HttpClient;
@@ -137,8 +139,8 @@ public class HttpRequesterConnectionManager implements Disposable {
     }
 
     public CompletableFuture<HttpResponse> sendAsync(HttpRequest request, int responseTimeout, boolean followRedirects,
-                                                     HttpAuthentication authentication) {
-      return delegate.sendAsync(request, responseTimeout, followRedirects, authentication);
+                                                     HttpAuthentication authentication, HttpSendBodyMode sendBodyMode) {
+      return HttpClientReflection.sendAsync(delegate, request, responseTimeout, followRedirects, authentication, sendBodyMode);
     }
   }
 }
