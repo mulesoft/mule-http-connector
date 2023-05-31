@@ -149,7 +149,7 @@
 
     <munit:test name="302-redirect-test-honour-body-semantics"
                 description="Create a request to an endpoint that return 302. Should follow redirect with GET method and remove the body"
-                ignore="#[Munit::muleVersionPriorTo('4.3.0')]">
+                ignore="#[Munit::muleVersionPriorTo('4.4.0') or Munit::muleVersionEqualTo('4.4.0')]">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="302-redirect-body" />
             <munit:enable-flow-source value="only-get-request-body" />
