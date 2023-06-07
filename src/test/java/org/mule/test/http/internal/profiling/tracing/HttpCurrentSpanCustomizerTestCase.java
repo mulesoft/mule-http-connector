@@ -77,7 +77,7 @@ public class HttpCurrentSpanCustomizerTestCase {
     when(attributes.getLocalAddress()).thenReturn(LOCAL_ADDRESS);
 
     HttpCurrentSpanCustomizer currentSpanCustomizer =
-        getHttpListenerCurrentSpanCustomizer(attributes, TEST_HOST, TEST_PORT, LISTENER_PATH);
+        getHttpListenerCurrentSpanCustomizer(attributes, TEST_HOST, TEST_PORT);
     DistributedTraceContextManager distributedTraceContextManager = mock(DistributedTraceContextManager.class);
     currentSpanCustomizer.customizeSpan(distributedTraceContextManager);
 

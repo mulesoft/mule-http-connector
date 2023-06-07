@@ -18,7 +18,6 @@ import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.Logger;
 
@@ -42,20 +41,17 @@ public class HttpListenerCurrentSpanCustomizer extends HttpCurrentSpanCustomizer
   private final HttpRequestAttributes attributes;
   private final String host;
   private final int port;
-  private final String path;
 
-  private HttpListenerCurrentSpanCustomizer(HttpRequestAttributes attributes, String host, int port, String path) {
+  private HttpListenerCurrentSpanCustomizer(HttpRequestAttributes attributes, String host, int port) {
     this.attributes = attributes;
     this.host = host;
     this.port = port;
-    this.path = path;
   }
 
   public static HttpCurrentSpanCustomizer getHttpListenerCurrentSpanCustomizer(HttpRequestAttributes attributes,
                                                                                String host,
-                                                                               int port,
-                                                                               String path) {
-    return new HttpListenerCurrentSpanCustomizer(attributes, host, port, path);
+                                                                               int port) {
+    return new HttpListenerCurrentSpanCustomizer(attributes, host, port);
   }
 
   @Override

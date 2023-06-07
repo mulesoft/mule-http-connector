@@ -445,7 +445,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
                 forwardCompatibilityHelper.get().getDistributedTraceContextManager(context);
             distributedTraceContextManager.setRemoteTraceContextMap(headers);
             getHttpListenerCurrentSpanCustomizer(result.getAttributes().get(), server.getServerAddress().getIp(),
-                                                 server.getServerAddress().getPort(), path)
+                                                 server.getServerAddress().getPort())
                                                      .customizeSpan(distributedTraceContextManager);
           }
 
