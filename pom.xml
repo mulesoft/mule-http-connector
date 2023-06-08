@@ -119,15 +119,19 @@
 
                     <!-- Configuration for local builds, in Jenkins we configure this via command line arguments -->
                     <runtimeConfiguration>
-                        <!-- Compatibility with the minMuleVersion -->
                         <additionalRuntimes>
+                            <!-- Compatibility with the minMuleVersion -->
                             <additionalRuntime>MULE_EE:4.1.1</additionalRuntime>
+
+                            <additionalRuntime>MULE_EE:4.4.1-SNAPSHOT</additionalRuntime>
+                            <!-- TODO (W-13562329): Uncomment this version -->
+                            <!-- <additionalRuntime>MULE_EE:4.5.0-SNAPSHOT</additionalRuntime>-->
                         </additionalRuntimes>
 
                         <!-- Versions with support and snapshots -->
                         <discoverRuntimes>
                             <product>EE</product>
-                            <includeSnapshots>true</includeSnapshots>
+                            <includeSnapshots>false</includeSnapshots>
                             <latestPatches>true</latestPatches>
                         </discoverRuntimes>
                     </runtimeConfiguration>
