@@ -131,7 +131,7 @@
                         <!-- Versions with support and snapshots -->
                         <discoverRuntimes>
                             <product>EE</product>
-                            <includeSnapshots>false</includeSnapshots>
+                            <includeSnapshots>true</includeSnapshots>
                             <latestPatches>true</latestPatches>
                         </discoverRuntimes>
                     </runtimeConfiguration>
