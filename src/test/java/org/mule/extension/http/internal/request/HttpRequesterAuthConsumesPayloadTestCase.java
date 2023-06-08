@@ -54,6 +54,7 @@ import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.inOrder;
@@ -124,7 +125,7 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
 
     client = mock(HttpExtensionClient.class);
 
-    when(client.send(httpRequest, 0, false, null, any())).thenReturn(CompletableFuture.completedFuture(response));
+    when(client.send(eq(httpRequest), eq(0), eq(false), eq(null), any())).thenReturn(CompletableFuture.completedFuture(response));
     requestCreator = getRequestCreator();
   }
 
