@@ -1,2 +1,4 @@
 projectType: extension
-mavenAdditionalArgs: "" 
+mavenAdditionalArgs: ""
+mavenSettingsXmlId: "mule-runtime-maven-settings-MuleRuntimeFullSettingsWithoutNexus3Proxy"
+
