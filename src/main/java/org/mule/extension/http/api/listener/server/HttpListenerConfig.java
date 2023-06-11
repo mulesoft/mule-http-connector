@@ -9,6 +9,7 @@ package org.mule.extension.http.api.listener.server;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.extension.http.api.listener.headers.HttpHeadersException;
@@ -66,6 +67,17 @@ public class HttpListenerConfig implements Initialisable {
   @Expression(NOT_SUPPORTED)
   private boolean rejectInvalidTransferEncoding;
 
+  /**
+   * W-12558102
+   * Indicates what headers should not be exported as attributes when generating Open Telemetry traces. By default, common headers associated with credentials are skipped.
+   *
+   * @since 1.8.0
+   */
+  @Parameter
+  @Optional(defaultValue = "client_id, client_secret, Authorization")
+  @Expression(SUPPORTED)
+  private String skipHeadersOnTracing;
+
   private HttpHeadersValidator httpHeaderValidators;
 
   @Override
@@ -98,5 +110,10 @@ public class HttpListenerConfig implements Initialisable {
    */
   public void validateHeaders(MultiMap<String, String> headers) throws HttpHeadersException {
     httpHeaderValidators.validateHeaders(headers);
+  }
+
+  //W-12558102
+  public String getSkipHeadersOnTracing() {
+    return skipHeadersOnTracing;
   }
 }

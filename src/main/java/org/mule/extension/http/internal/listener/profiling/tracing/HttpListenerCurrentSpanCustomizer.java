@@ -8,17 +8,21 @@
 package org.mule.extension.http.internal.listener.profiling.tracing;
 
 import static java.lang.String.valueOf;
-
+import static java.util.Arrays.asList;
 import static com.google.common.net.HttpHeaders.USER_AGENT;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.internal.request.profiling.tracing.HttpCurrentSpanCustomizer;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
+import org.mule.runtime.api.util.MultiMap;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import org.slf4j.Logger;
 
 /**
@@ -41,16 +45,21 @@ public class HttpListenerCurrentSpanCustomizer extends HttpCurrentSpanCustomizer
   private final String host;
   private final int port;
 
-  private HttpListenerCurrentSpanCustomizer(HttpRequestAttributes attributes, String host, int port) {
+  private final List<String> skipAttributesList;
+
+  private HttpListenerCurrentSpanCustomizer(HttpRequestAttributes attributes, String host, int port, String skipAttributes) {
     this.attributes = attributes;
     this.host = host;
     this.port = port;
+    this.skipAttributesList = asList(skipAttributes.split(",", -1));
+    this.skipAttributesList.replaceAll(String::trim);
   }
 
   public static HttpCurrentSpanCustomizer getHttpListenerCurrentSpanCustomizer(HttpRequestAttributes attributes,
                                                                                String host,
-                                                                               int port) {
-    return new HttpListenerCurrentSpanCustomizer(attributes, host, port);
+                                                                               int port,
+                                                                               String skipAttributes) {
+    return new HttpListenerCurrentSpanCustomizer(attributes, host, port, skipAttributes);
   }
 
   @Override
@@ -67,6 +76,8 @@ public class HttpListenerCurrentSpanCustomizer extends HttpCurrentSpanCustomizer
       if (userAgent != null) {
         distributedTraceContextManager.addCurrentSpanAttribute(HTTP_USER_AGENT, userAgent);
       }
+      MultiMap<String, String> headers = getHeaders(attributes.getHeaders(), skipAttributesList);
+      headers.keySet().forEach(key -> distributedTraceContextManager.addCurrentSpanAttribute(key, headers.get(key)));
 
     } catch (Throwable e) {
       LOGGER.warn("Error on setting listener span attributes.", e);
@@ -110,4 +121,5 @@ public class HttpListenerCurrentSpanCustomizer extends HttpCurrentSpanCustomizer
   protected String getSpanName() {
     return attributes.getListenerPath();
   }
+
 }

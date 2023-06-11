@@ -50,6 +50,11 @@ public class HttpRequesterConfig implements Initialisable, HttpRequesterCookieCo
   @Placement(order = 3)
   private ResponseSettings responseSettings;
 
+  //W-12558102
+  @ParameterGroup(name = "Tracing Settings")
+  @Placement(order = 4)
+  private TracingSettings tracingSettings;
+
   @Inject
   private MuleContext muleContext;
   private CookieManager cookieManager;
@@ -93,6 +98,11 @@ public class HttpRequesterConfig implements Initialisable, HttpRequesterCookieCo
     return responseSettings.getResponseTimeout();
   }
 
+  //W-12558102
+  public String getSkipHeadersOnTracing() {
+    return tracingSettings.getSkipHeadersOnTracing();
+  }
+
   @Override
   public boolean isEnableCookies() {
     return requestSettings.isEnableCookies();
@@ -116,6 +126,8 @@ public class HttpRequesterConfig implements Initialisable, HttpRequesterCookieCo
     private RequestUrlConfiguration urlConfiguration;
     private RequestSettings requestSettings;
     private ResponseSettings responseSettings;
+    //W-12558102
+    private TracingSettings tracingSettings;
     private MuleContext muleContext;
 
     private Builder() {}
@@ -135,6 +147,12 @@ public class HttpRequesterConfig implements Initialisable, HttpRequesterCookieCo
       return this;
     }
 
+    //W-12558102
+    public Builder withTracingSettings(TracingSettings tracingSettings) {
+      this.tracingSettings = tracingSettings;
+      return this;
+    }
+
     public Builder withMuleContext(MuleContext muleContext) {
       this.muleContext = muleContext;
       return this;
@@ -149,6 +167,8 @@ public class HttpRequesterConfig implements Initialisable, HttpRequesterCookieCo
       config.urlConfiguration = this.urlConfiguration;
       config.requestSettings = this.requestSettings;
       config.responseSettings = this.responseSettings;
+      //W-12558102
+      config.tracingSettings = this.tracingSettings;
       config.muleContext = this.muleContext;
       return config;
     }

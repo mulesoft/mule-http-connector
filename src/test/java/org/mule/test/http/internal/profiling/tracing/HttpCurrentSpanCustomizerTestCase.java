@@ -21,6 +21,7 @@ import static org.mule.extension.http.internal.request.profiling.tracing.HttpReq
 import static org.mule.extension.http.internal.request.profiling.tracing.HttpRequestCurrentSpanCustomizer.NET_PEER_NAME;
 import static org.mule.extension.http.internal.request.profiling.tracing.HttpRequestCurrentSpanCustomizer.NET_PEER_PORT;
 import static org.mule.extension.http.internal.request.profiling.tracing.HttpRequestCurrentSpanCustomizer.getHttpRequesterCurrentSpanCustomizer;
+import static org.mule.extension.http.internal.request.profiling.tracing.HttpCurrentSpanCustomizer.SPAN_KIND;
 import static org.mule.runtime.http.api.domain.HttpProtocol.HTTP_1_1;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
@@ -28,6 +29,7 @@ import static org.eclipse.jetty.http.HttpMethod.GET;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.never;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.TRACING;
 
 import io.qameta.allure.Description;
@@ -61,6 +63,11 @@ public class HttpCurrentSpanCustomizerTestCase {
   public static final String EXPECTED_PEER_NAME = "www.expectedhost.com";
   public static final int TEST_PORT = 8080;
   public static final String EXPECTED_SCHEME = HTTPS;
+  public static final String EXPECTED_SPAN_KIND = "SERVER";
+  public static final String SKIP_HEADERS_ATTRIBUTES = "client_id, client_secret";
+  public static final String EXPECTED_SKIPPED_HEADER_KEY = "client_id";
+  public static final String EXPECTED_SKIPPED_HEADER_VALUE = "1f6bdf78-ae39-11ed-afa1-0242ac120002";
+  public MultiMap<String, String> headers;
 
   @Test
   @Description("The listener span customizer informs the distributed trace context manager the correct attributes/name")
@@ -70,24 +77,30 @@ public class HttpCurrentSpanCustomizerTestCase {
     when(attributes.getScheme()).thenReturn(HTTPS);
     when(attributes.getVersion()).thenReturn(HTTP_1_1.asString());
     when(attributes.getListenerPath()).thenReturn(LISTENER_PATH);
-    MultiMap<String, String> headers = mock(MultiMap.class);
+    headers = mock(MultiMap.class);
+    headers.put(EXPECTED_SKIPPED_HEADER_KEY, EXPECTED_SKIPPED_HEADER_VALUE);
     when(attributes.getHeaders()).thenReturn(headers);
     when(headers.get(USER_AGENT)).thenReturn(EXPECTED_USER_AGENT);
     when(attributes.getLocalAddress()).thenReturn(LOCAL_ADDRESS);
 
-    HttpCurrentSpanCustomizer currentSpanCustomizer = getHttpListenerCurrentSpanCustomizer(attributes, TEST_HOST, TEST_PORT);
+    HttpCurrentSpanCustomizer currentSpanCustomizer =
+        getHttpListenerCurrentSpanCustomizer(attributes, TEST_HOST, TEST_PORT, SKIP_HEADERS_ATTRIBUTES);
+
     DistributedTraceContextManager distributedTraceContextManager = mock(DistributedTraceContextManager.class);
     currentSpanCustomizer.customizeSpan(distributedTraceContextManager);
 
     verify(distributedTraceContextManager).setCurrentSpanName(LISTENER_PATH);
 
     verify(distributedTraceContextManager).addCurrentSpanAttribute(HTTP_METHOD, GET.asString());
+    verify(distributedTraceContextManager).addCurrentSpanAttribute(SPAN_KIND, EXPECTED_SPAN_KIND);
     verify(distributedTraceContextManager).addCurrentSpanAttribute(HTTP_FLAVOR, EXPECTED_PROTOCOL_VERSION);
     verify(distributedTraceContextManager).addCurrentSpanAttribute(HTTP_TARGET, LISTENER_PATH);
     verify(distributedTraceContextManager).addCurrentSpanAttribute(NET_HOST_NAME, TEST_HOST);
     verify(distributedTraceContextManager).addCurrentSpanAttribute(NET_HOST_PORT, EXPECTED_PORT);
-    verify(distributedTraceContextManager).addCurrentSpanAttribute(HTTP_USER_AGENT, EXPECTED_USER_AGENT);
     verify(distributedTraceContextManager).addCurrentSpanAttribute(HTTP_SCHEME, EXPECTED_SCHEME);
+
+    verify(distributedTraceContextManager, never()).addCurrentSpanAttribute(EXPECTED_SKIPPED_HEADER_KEY,
+                                                                            EXPECTED_SKIPPED_HEADER_VALUE);
   }
 
   @Test
@@ -115,8 +128,11 @@ public class HttpCurrentSpanCustomizerTestCase {
     when(httpRequest.getMethod()).thenReturn(GET.asString());
     when(httpRequest.getUri()).thenReturn(uri);
     when(httpRequest.getProtocol()).thenReturn(HTTP_1_1);
+    headers = mock(MultiMap.class);
+    when(httpRequest.getHeaders()).thenReturn(headers);
 
-    HttpCurrentSpanCustomizer httpCurrentSpanCustomizer = getHttpRequesterCurrentSpanCustomizer(httpRequest);
+    HttpCurrentSpanCustomizer httpCurrentSpanCustomizer =
+        getHttpRequesterCurrentSpanCustomizer(httpRequest, SKIP_HEADERS_ATTRIBUTES);
     httpCurrentSpanCustomizer.customizeSpan(distributedTraceContextManager);
 
     verify(distributedTraceContextManager).setCurrentSpanName(uri.getScheme().toUpperCase() + " " + EXPECTED_METHOD);
@@ -125,6 +141,10 @@ public class HttpCurrentSpanCustomizerTestCase {
     verify(distributedTraceContextManager).addCurrentSpanAttribute(HTTP_URL, uri.toString());
     verify(distributedTraceContextManager).addCurrentSpanAttribute(NET_PEER_PORT, expectedPortValue);
     verify(distributedTraceContextManager).addCurrentSpanAttribute(NET_PEER_NAME, EXPECTED_PEER_NAME);
+
+    verify(distributedTraceContextManager, never()).addCurrentSpanAttribute(EXPECTED_SKIPPED_HEADER_KEY,
+                                                                            EXPECTED_SKIPPED_HEADER_VALUE);
+
   }
 
   @Test

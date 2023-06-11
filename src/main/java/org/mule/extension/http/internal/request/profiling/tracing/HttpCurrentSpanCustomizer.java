@@ -10,9 +10,11 @@ package org.mule.extension.http.internal.request.profiling.tracing;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
+import org.mule.runtime.api.util.MultiMap;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
 import org.slf4j.Logger;
 
@@ -78,4 +80,20 @@ public abstract class HttpCurrentSpanCustomizer {
    * @return the span kind
    */
   protected abstract String getSpanKind();
+
+  /**
+   * W-12558102
+   * @return the headers for the http span.
+   * This provides a transparent way to obtain the definitive list of headers to add in the spans associated with Otel tracing.
+   * This list will have all headers except those that have been skipped via the skipHeadersOnTracing property.
+   */
+  public MultiMap<String, String> getHeaders(MultiMap<String, String> headers, List<String> skipAttributesList) {
+    MultiMap<String, String> modifiedHeaders = new MultiMap<String, String>();
+    headers.keySet().forEach(key -> {
+      if (!skipAttributesList.contains(key)) {
+        modifiedHeaders.put(key, headers.get(key));
+      }
+    });
+    return modifiedHeaders;
+  };
 }
