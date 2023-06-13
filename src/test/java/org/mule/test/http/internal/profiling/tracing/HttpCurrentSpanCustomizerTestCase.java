@@ -9,6 +9,7 @@ package org.mule.test.http.internal.profiling.tracing;
 
 
 import static org.mule.extension.http.api.HttpHeaders.Names.USER_AGENT;
+import static org.mule.extension.http.internal.listener.profiling.tracing.HttpListenerCurrentSpanCustomizer.HTTP_ROUTE;
 import static org.mule.extension.http.internal.listener.profiling.tracing.HttpListenerCurrentSpanCustomizer.HTTP_SCHEME;
 import static org.mule.extension.http.internal.listener.profiling.tracing.HttpListenerCurrentSpanCustomizer.HTTP_TARGET;
 import static org.mule.extension.http.internal.listener.profiling.tracing.HttpListenerCurrentSpanCustomizer.HTTP_USER_AGENT;
@@ -75,7 +76,8 @@ public class HttpCurrentSpanCustomizerTestCase {
     when(headers.get(USER_AGENT)).thenReturn(EXPECTED_USER_AGENT);
     when(attributes.getLocalAddress()).thenReturn(LOCAL_ADDRESS);
 
-    HttpCurrentSpanCustomizer currentSpanCustomizer = getHttpListenerCurrentSpanCustomizer(attributes, TEST_HOST, TEST_PORT);
+    HttpCurrentSpanCustomizer currentSpanCustomizer =
+        getHttpListenerCurrentSpanCustomizer(attributes, TEST_HOST, TEST_PORT);
     DistributedTraceContextManager distributedTraceContextManager = mock(DistributedTraceContextManager.class);
     currentSpanCustomizer.customizeSpan(distributedTraceContextManager);
 
@@ -88,6 +90,7 @@ public class HttpCurrentSpanCustomizerTestCase {
     verify(distributedTraceContextManager).addCurrentSpanAttribute(NET_HOST_PORT, EXPECTED_PORT);
     verify(distributedTraceContextManager).addCurrentSpanAttribute(HTTP_USER_AGENT, EXPECTED_USER_AGENT);
     verify(distributedTraceContextManager).addCurrentSpanAttribute(HTTP_SCHEME, EXPECTED_SCHEME);
+    verify(distributedTraceContextManager).addCurrentSpanAttribute(HTTP_ROUTE, LISTENER_PATH);
   }
 
   @Test
