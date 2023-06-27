@@ -51,7 +51,7 @@ public abstract class HttpCurrentSpanCustomizer {
   }
 
   protected String getSpanName() {
-    return getProtocol() + " " + getMethod();
+    return getMethod();
   }
 
   /**
