@@ -81,7 +81,7 @@ public class HttpCurrentSpanCustomizerTestCase {
     DistributedTraceContextManager distributedTraceContextManager = mock(DistributedTraceContextManager.class);
     currentSpanCustomizer.customizeSpan(distributedTraceContextManager);
 
-    verify(distributedTraceContextManager).setCurrentSpanName(LISTENER_PATH);
+    verify(distributedTraceContextManager).setCurrentSpanName(EXPECTED_METHOD + " " + LISTENER_PATH);
 
     verify(distributedTraceContextManager).addCurrentSpanAttribute(HTTP_METHOD, GET.asString());
     verify(distributedTraceContextManager).addCurrentSpanAttribute(HTTP_FLAVOR, EXPECTED_PROTOCOL_VERSION);
@@ -122,7 +122,7 @@ public class HttpCurrentSpanCustomizerTestCase {
     HttpCurrentSpanCustomizer httpCurrentSpanCustomizer = getHttpRequesterCurrentSpanCustomizer(httpRequest);
     httpCurrentSpanCustomizer.customizeSpan(distributedTraceContextManager);
 
-    verify(distributedTraceContextManager).setCurrentSpanName(uri.getScheme().toUpperCase() + " " + EXPECTED_METHOD);
+    verify(distributedTraceContextManager).setCurrentSpanName(EXPECTED_METHOD);
     verify(distributedTraceContextManager).addCurrentSpanAttribute(HTTP_METHOD, GET.asString());
     verify(distributedTraceContextManager).addCurrentSpanAttribute(HTTP_FLAVOR, EXPECTED_PROTOCOL_VERSION);
     verify(distributedTraceContextManager).addCurrentSpanAttribute(HTTP_URL, uri.toString());
