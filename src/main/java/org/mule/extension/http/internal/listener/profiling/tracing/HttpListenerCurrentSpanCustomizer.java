@@ -110,6 +110,6 @@ public class HttpListenerCurrentSpanCustomizer extends HttpCurrentSpanCustomizer
 
   @Override
   protected String getSpanName() {
-    return attributes.getListenerPath();
+    return attributes.getMethod() + " " + attributes.getListenerPath();
   }
 }
