@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <!-- Global Anonymous Proxy -->
+    <http:proxy name="anonymousProxyConfig" host="localhost" port="${proxyPort}" />
+    <http:request-config name="configRefAnonymousProxy" basePath="basePath">
+        <http:request-connection host="localhost" port="${httpPort}" proxyConfig="anonymousProxyConfig"/>
+    </http:request-config>
+    <flow name="refAnonymousProxy">
+        <http:request config-ref="configRefAnonymousProxy" path="requestPath"/>
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
+    </flow>
+
+
+    <!-- nonProxyHosts Param -->
+    <http:proxy name="configNonProxyParamProxy" host="localhost" port="${proxyPort}" username="theUsername" password="thePassword" nonProxyHosts="localhost" />
+    <http:request-config name="configNonProxyParam" basePath="basePath">
+        <http:request-connection host="localhost" port="${httpPort}" proxyConfig="configNonProxyParamProxy"/>
+    </http:request-config>
+    <flow name="nonProxyParamProxy">
+        <http:request config-ref="configNonProxyParam" path="requestPath" />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
+    </flow>
+
+    <!-- nonProxyHosts Param Inner -->
+    <http:request-config name="configInnerNonProxyParamProxy" basePath="basePath">
+        <http:request-connection host="localhost" port="${httpPort}">
+            <http:proxy-config>
+                <http:proxy host="localhost" port="${proxyPort}" username="theUsername" password="thePassword" nonProxyHosts="localhost"/>
+            </http:proxy-config>
+        </http:request-connection>
+    </http:request-config>
+    <flow name="innerNonProxyParamProxy">
+        <http:request config-ref="configInnerNonProxyParamProxy" path="requestPath" />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
+    </flow>
+
+    <!-- Multple Hosts nonProxyHosts Param Inner -->
+    <http:request-config name="configInnerNonProxyParamProxyMultipleHosts" basePath="basePath">
+        <http:request-connection host="localhost" port="${httpPort}">
+            <http:proxy-config>
+                <http:proxy host="localhost" port="${proxyPort}" username="theUsername" password="thePassword" nonProxyHosts="test, another, localhost "/>
+            </http:proxy-config>
+        </http:request-connection>
+    </http:request-config>
+    <flow name="innerNonProxyParamProxyMultipleHosts">
+        <http:request config-ref="configInnerNonProxyParamProxyMultipleHosts" path="requestPath" />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
+    </flow>
+
+    <!-- nonProxyHosts another host  -->
+    <http:request-config name="configInnerNonProxyParamProxyAnotherHost" basePath="basePath">
+        <http:request-connection host="localhost" port="${httpPort}">
+            <http:proxy-config>
+                <http:proxy host="localhost" port="${proxyPort}" username="theUsername" password="thePassword" nonProxyHosts="anotherhost"/>
+            </http:proxy-config>
+        </http:request-connection>
+    </http:request-config>
+    <flow name="innerNonProxyParamProxyAnotherHost">
+        <http:request config-ref="configInnerNonProxyParamProxyAnotherHost" path="requestPath" />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
+    </flow>
+
+    <!-- No Proxy -->
+    <http:request-config name="configNoProxy" basePath="basePath">
+        <http:request-connection host="localhost" port="${httpPort}"/>
+    </http:request-config>
+    <flow name="noProxy">
+        <http:request config-ref="configNoProxy" path="requestPath" />
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
+    </flow>
+</mule>

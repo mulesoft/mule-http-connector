@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:request-config name="config">
+        <http:request-connection host="localhost" port="${httpPort}"/>
+    </http:request-config>
+
+    <flow name="uriParamList">
+        <http:request config-ref="config" path="testPath/{testParam1}/{testParam2}">
+            <http:uri-params>
+                #[{'testParam1' : 'testValue1', (vars.paramName) : vars.paramValue}]
+            </http:uri-params>
+        </http:request>
+    </flow>
+
+    <flow name="uriParamMap">
+        <http:request config-ref="config" path="testPath/{testParam1}/{testParam2}">
+            <http:uri-params>
+                #[vars.params]
+            </http:uri-params>
+        </http:request>
+    </flow>
+
+    <flow name="uriParamOverride">
+        <http:request config-ref="config" path="testPath/{testParam1}/{testParam2}">
+            <http:uri-params>
+                #[vars.params]
+            </http:uri-params>
+        </http:request>
+    </flow>
+
+    <flow name="uriParamNull">
+        <http:request config-ref="config" path="testPath/{testParam1}/{testParam2}">
+            <http:uri-params>
+                #[{'testParam1' : 'testValue1' , 'testParam2' : payload}]
+            </http:uri-params>
+        </http:request>
+    </flow>
+
+    <flow name="reservedUriCharacter">
+        <http:request config-ref="config" path="testPath/{testParam}">
+            <http:uri-params>
+                #[(vars.paramName): vars.paramValue]
+            </http:uri-params>
+        </http:request>
+    </flow>
+
+    <flow name="spaceUriCharacter">
+        <http:request config-ref="config" path="testPath/{testParam}">
+            <http:uri-params>
+                #[(vars['param name']): vars.paramValue]
+            </http:uri-params>
+        </http:request>
+    </flow>
+
+    <flow name="regEx">
+        <http:request config-ref="config" path="testPath/{8}">
+            <http:uri-params>
+                #[(vars.paramName): vars.paramValue]
+            </http:uri-params>
+        </http:request>
+    </flow>
+
+</mule>
