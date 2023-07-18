@@ -12,6 +12,6 @@
 
     <flow name="new_http_connector_show_content">
         <http:listener config-ref="listenerConfig" path="/" />
-        <set-payload value="#[mel:message.getAttributes().getQueryParams().get('longQueryParam')]"/>
+        <set-payload value="#[attributes.queryParams.'longQueryParam']"/>
     </flow>
 </mule>

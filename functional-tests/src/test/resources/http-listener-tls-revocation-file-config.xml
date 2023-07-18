@@ -8,25 +8,25 @@
                http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <tls:context name="serverCrlFileTlsContext">
-        <tls:trust-store path="tls/crl/trustFile.jceks" password="test" type="jceks" algorithm="PKIX"/>
-        <tls:key-store path="tls/crl/certificate-authority-entity.p12" keyPassword="test" password="test" type="pkcs12" algorithm="PKIX"/>
-        <tls:revocation-check>
-            <tls:crl-file path="${crlPath}"/>
-        </tls:revocation-check>
-    </tls:context>
-
-    <tls:context name="clientTlsContext" >
-        <tls:trust-store path="tls/crl/trustFile.jceks" password="test" type="jceks" algorithm="PKIX"/>
-        <tls:key-store path="tls/crl/entity1" keyPassword="test" password="test" type="pkcs12" algorithm="PKIX"/>
-    </tls:context>
-
     <http:listener-config name="serverConfig">
-        <http:listener-connection protocol="HTTPS" host="localhost" port="${port}" tlsContext="serverCrlFileTlsContext" />
+        <http:listener-connection protocol="HTTPS" host="localhost" port="${port}" >
+            <tls:context name="serverCrlFileTlsContext">
+                <tls:trust-store path="tls/crl/trustFile.jceks" password="test" type="jceks" algorithm="PKIX"/>
+                <tls:key-store path="tls/crl/certificate-authority-entity.p12" keyPassword="test" password="test" type="pkcs12" algorithm="PKIX"/>
+                <tls:revocation-check>
+                    <tls:crl-file path="${crlPath}"/>
+                </tls:revocation-check>
+            </tls:context>
+        </http:listener-connection>
     </http:listener-config>
 
     <http:request-config name="clientConfig">
-        <http:request-connection protocol="HTTPS" host="localhost" port="${port}" tlsContext="clientTlsContext" />
+        <http:request-connection protocol="HTTPS" host="localhost" port="${port}" >
+            <tls:context name="clientTlsContext" >
+                <tls:trust-store path="tls/crl/trustFile.jceks" password="test" type="jceks" algorithm="PKIX"/>
+                <tls:key-store path="tls/crl/entity1" keyPassword="test" password="test" type="pkcs12" algorithm="PKIX"/>
+            </tls:context>
+        </http:request-connection>
     </http:request-config>
 
     <flow name="testFlowServer">

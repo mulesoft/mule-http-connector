@@ -20,12 +20,12 @@
 
     <flow name="httpFlowWithDefaultResponseTimeout">
         <http:request config-ref="requestConfig" path="/service" method="POST"/>
-        <byte-array-to-string-transformer/>
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <flow name="httpFlowWithCustomResponseTimeout">
         <http:request config-ref="requestConfig" path="/service" method="POST" responseTimeout="200"/>
-        <byte-array-to-string-transformer/>
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <flow name="server">

@@ -6,7 +6,6 @@
  */
 package org.mule.test.http.functional.requester;
 
-
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -32,7 +31,7 @@ public class HttpRequestSendBodyTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void sendBodyAutoIgnoresPayloadGet() throws Exception {
-    assertEmptyBody("sendBodyAuto", TEST_MESSAGE, "GET");
+    assertNoContentLengthHeader("sendBodyAuto", TEST_MESSAGE, "GET");
   }
 
   @Test
@@ -57,7 +56,14 @@ public class HttpRequestSendBodyTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void sendBodyAlwaysIgnoresNullPayloadGet() throws Exception {
-    assertEmptyBody("sendBodyAlways", null, "GET");
+    assertNoContentLengthHeader("sendBodyAlways", null, "GET");
+  }
+
+  private void assertNoContentLengthHeader(String flowName, Object payload, String method) throws Exception {
+    flowRunner(flowName).withPayload(payload).withVariable("method", method).run();
+
+    assertThat(body, equalTo(""));
+    assertThat(getPresentHeaderNames().contains("Content-Length"), is(false));
   }
 
   private void assertEmptyBody(String flowName, Object payload, String method) throws Exception {

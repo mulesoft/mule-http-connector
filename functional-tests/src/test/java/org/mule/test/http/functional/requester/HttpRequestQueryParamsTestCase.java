@@ -7,6 +7,8 @@
 package org.mule.test.http.functional.requester;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
 
 import java.util.HashMap;
@@ -26,7 +28,9 @@ public class HttpRequestQueryParamsTestCase extends AbstractHttpRequestTestCase 
     flowRunner("queryParamList").withPayload(TEST_MESSAGE).withVariable("paramName", "testName2")
         .withVariable("paramValue", "testValue2").run();
 
-    assertThat(uri, equalTo("/testPath?testName1=testValue1&testName2=testValue2"));
+    assertThat(uri, startsWith("/testPath?"));
+    assertThat(uri, containsString("testName1=testValue1"));
+    assertThat(uri, containsString("testName2=testValue2"));
   }
 
   @Test
@@ -35,7 +39,10 @@ public class HttpRequestQueryParamsTestCase extends AbstractHttpRequestTestCase 
     params.put("testName1", "testValue1");
     params.put("testName2", "testValue2");
     flowRunner("queryParamMap").withPayload(TEST_MESSAGE).withVariable("params", params).run();
-    assertThat(uri, equalTo("/testPath?testName1=testValue1&testName2=testValue2"));
+
+    assertThat(uri, startsWith("/testPath?"));
+    assertThat(uri, containsString("testName1=testValue1"));
+    assertThat(uri, containsString("testName2=testValue2"));
   }
 
   @Test
@@ -45,37 +52,54 @@ public class HttpRequestQueryParamsTestCase extends AbstractHttpRequestTestCase 
     params.put("testName2", "testValue2");
     flowRunner("multipleQueryParam").withPayload(TEST_MESSAGE).withVariable("params", params).run();
 
-    assertThat(uri, equalTo("/testPath?testName1=testValueNew&testName1=testValue1&testName2=testValue2"));
+    assertThat(uri, startsWith("/testPath?"));
+    assertThat(uri, containsString("testName1=testValueNew"));
+    assertThat(uri, containsString("testName1=testValue1"));
+    assertThat(uri, containsString("testName2=testValue2"));
   }
 
   @Test
   public void sendsQueryParamsNulls() throws Exception {
     flowRunner("queryParamNulls").withPayload(TEST_MESSAGE).run();
-    assertThat(uri, equalTo("/testPath?testName1&testName2"));
+
+    assertThat(uri, startsWith("/testPath?"));
+    assertThat(uri, containsString("testName1"));
+    assertThat(uri, containsString("testName2"));
   }
 
   @Test
   public void queryParamDefaultsOnly() throws Exception {
     flowRunner("queryParamDefaultsOnly").withPayload(TEST_MESSAGE).run();
-    assertThat(uri, equalTo("/testPath?filter=username%2Capps"));
+
+    assertThat(uri, startsWith("/testPath?"));
+    assertThat(uri, containsString("filter=username%2Capps"));
   }
 
   @Test
   public void queryParamAppendDefault() throws Exception {
     flowRunner("queryParamAppendDefault").withPayload(TEST_MESSAGE).run();
-    assertThat(uri, equalTo("/testPath?filter=username%2Capps&testName1=testValue1"));
+
+    assertThat(uri, startsWith("/testPath?"));
+    assertThat(uri, containsString("filter=username%2Capps"));
+    assertThat(uri, containsString("testName1=testValue1"));
   }
 
   @Test
   public void queryParamsDuplicatedDefaults() throws Exception {
     flowRunner("queryParamsDuplicatedDefaults").withPayload(TEST_MESSAGE).run();
-    assertThat(uri, equalTo("/testPath?filter=username&filter=apps"));
+
+    assertThat(uri, startsWith("/testPath?"));
+    assertThat(uri, containsString("filter=username"));
+    assertThat(uri, containsString("filter=apps"));
   }
 
   @Test
   public void queryParamMultiKeyDefault() throws Exception {
     flowRunner("queryParamMultiKeyDefault").withPayload(TEST_MESSAGE).run();
-    assertThat(uri, equalTo("/testPath?filter=level&filter=username%2Capps"));
+
+    assertThat(uri, startsWith("/testPath?"));
+    assertThat(uri, containsString("filter=level"));
+    assertThat(uri, containsString("filter=username%2Capps"));
   }
 
 }

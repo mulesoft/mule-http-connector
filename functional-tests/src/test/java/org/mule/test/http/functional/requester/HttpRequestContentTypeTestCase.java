@@ -18,7 +18,7 @@ import static org.mule.extension.http.api.HttpMessageBuilder.refreshSystemProper
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.BINARY;
 import static org.mule.runtime.api.metadata.MediaType.HTML;
-import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.CONTENT;
 import org.mule.runtime.api.message.Message;
@@ -27,6 +27,7 @@ import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -91,7 +92,7 @@ public class HttpRequestContentTypeTestCase extends AbstractHttpRequestTestCase 
   @Test
   public void returnsContentTypeWhenAvailable() throws Exception {
     TypedValue<Object> result = runFlow("requesterContentType", "POST").getPayload();
-    assertThat(result.getDataType().getMediaType(), is(HTML.withCharset(ISO_8859_1)));
+    assertThat(result.getDataType().getMediaType(), is(HTML.withCharset(UTF_8)));
   }
 
   @Test

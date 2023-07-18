@@ -98,11 +98,7 @@ public class HttpRequestOutboundPartsTestCase extends AbstractHttpRequestTestCas
     MultiPartInputStreamParser inputStreamParser =
         new MultiPartInputStreamParser(request.getInputStream(), request.getContentType(), null, null);
 
-    try {
-      parts = inputStreamParser.getParts();
-    } catch (ServletException e) {
-      throw new IOException(e);
-    }
+    parts = inputStreamParser.getParts();
 
     response.setContentType(HTML.toString());
     response.setStatus(HttpServletResponse.SC_OK);

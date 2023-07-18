@@ -114,7 +114,7 @@ public abstract class AbstractClientTlsRestrictedTlsProtocolsAndCiphersTestCase
    * Creates a TLS server that doesn't support a specific cipher suite and protocol.
    */
   private Server createTlsServer(String disabledCipherSuite, String disabledProtocol) throws Exception {
-    SslContextFactory sslContextFactory = new SslContextFactory();
+    SslContextFactory sslContextFactory = new SslContextFactory.Server();
     sslContextFactory.setKeyStorePath(FileUtils.getResourcePath("tls/serverKeystore", getClass()));
     sslContextFactory.setKeyStorePassword("mulepassword");
     sslContextFactory.setKeyManagerPassword("mulepassword");

@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -79,7 +80,7 @@ public abstract class AbstractHttpRequestTestCase extends AbstractHttpTestCase {
   }
 
   protected void enableHttpsServer(Server server) {
-    SslContextFactory sslContextFactory = new SslContextFactory();
+    SslContextFactory sslContextFactory = new SslContextFactory.Server();
 
     try {
       sslContextFactory.setKeyStorePath(FileUtils.getResourcePath("tls/serverKeystore", getClass()));
@@ -119,7 +120,7 @@ public abstract class AbstractHttpRequestTestCase extends AbstractHttpTestCase {
 
   protected void extractBaseRequestParts(Request baseRequest) throws IOException {
     method = baseRequest.getMethod();
-    uri = baseRequest.getUri().getCompletePath();
+    uri = baseRequest.getHttpURI().getPathQuery();
 
     extractHeadersFromBaseRequest(baseRequest);
 
@@ -144,6 +145,10 @@ public abstract class AbstractHttpRequestTestCase extends AbstractHttpTestCase {
 
   public String getFirstReceivedHeader(String headerName) {
     return headers.get(headerName).iterator().next();
+  }
+
+  public Set<String> getPresentHeaderNames() {
+    return headers.keySet();
   }
 
   private List<String> getHeaderNames(Request baseRequest) {

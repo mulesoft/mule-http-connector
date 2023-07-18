@@ -28,11 +28,12 @@
         <fluentHcVersion>4.5.13</fluentHcVersion>
         <javaxActivationVersion>1.2.0</javaxActivationVersion>
         <javaxMailVersion>1.6.2</javaxMailVersion>
-        <jettyVersion>9.0.7.v20131107</jettyVersion>
+        <jettyVersion>9.4.39.v20210325</jettyVersion>
         <grizzlyVersion>2.3.36-MULE-024</grizzlyVersion>
         <grizzlyAhcVersion>1.14-MULE-019</grizzlyAhcVersion>
         <httpAsyncClientVersion>4.1.4</httpAsyncClientVersion>
         <httpMimeVersion>4.5.13</httpMimeVersion>
+        <commonsLangVersion>3.12.0</commonsLangVersion>
     </properties>
 
     <build>
@@ -50,6 +51,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.2</version>
                 <configuration>
                     <systemPropertyVariables>
                         <maven.projectVersion>${mule.version}</maven.projectVersion>
@@ -155,6 +157,24 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-util</artifactId>
+            <version>${jettyVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-http</artifactId>
+            <version>${jettyVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-io</artifactId>
+            <version>${jettyVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
             <version>${jettyVersion}</version>
             <scope>test</scope>
@@ -207,6 +227,12 @@
             <version>${httpAsyncClientVersion}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commonsLangVersion}</version>
+            <scope>test</scope>
+        </dependency>
 
         <!-- Testing Framework -->
         <dependency>
@@ -244,6 +270,12 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-spring-config</artifactId>
+            <version>${mule.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-extensions-spring-support</artifactId>
             <version>${mule.version}</version>
             <scope>provided</scope>
         </dependency>

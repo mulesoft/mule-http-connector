@@ -11,6 +11,7 @@ import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static java.lang.Integer.parseInt;
 import static java.lang.System.getProperty;
 
+import static org.apache.commons.lang3.JavaVersion.JAVA_1_8;
 import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -52,7 +53,7 @@ public class HttpTlsContextClient13ToServer13TestCase extends AbstractHttpTlsCon
   @BeforeClass
   public static void assumeJdkIsCompatible() {
     String[] javaVersion = getProperty("java.version").split("_");
-    assumeTrue(isJavaVersionAtLeast(JavaVersion.JAVA_1_8)
+    assumeTrue(isJavaVersionAtLeast(JAVA_1_8)
         && (!javaVersion[0].equals("1.8.0") || parseInt(javaVersion[1]) > 261));
   }
 

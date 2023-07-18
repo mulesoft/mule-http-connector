@@ -50,7 +50,7 @@ public class HttpRequestFollowRedirectsTestCase extends AbstractHttpRequestTestC
   @Override
   protected void handleRequest(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
     extractBaseRequestParts(baseRequest);
-    if (baseRequest.getUri().getPath().startsWith("/redirect")) {
+    if (baseRequest.getRequestURI().startsWith("/redirect")) {
       response.getWriter().print(REDIRECTED);
     } else {
       response.setHeader("Location", String.format("http://localhost:%s%s", httpPort.getNumber(), getRedirectUri()));

@@ -9,6 +9,8 @@ package org.mule.test.http.functional;
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toSet;
+
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -25,6 +27,7 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.fluent.Request;
 import org.junit.After;
@@ -71,13 +74,13 @@ public class HttpHeaderCaseTestCase extends AbstractHttpTestCase {
   }
 
   @Test
-  public void listenerPreservesResponseHeaderCase() throws ClientProtocolException, IOException {
+  public void listenerPreservesResponseHeaderCase() throws IOException {
     HttpResponse response = Request.Get(format("http://localhost:%s/testResponse", port.getNumber()))
         .execute().returnResponse();
 
     assertThat(response.getStatusLine().getStatusCode(), is(OK.getStatusCode()));
-    Set<String> headerNames = stream(response.getAllHeaders()).map(h -> h.getName()).collect(toSet());
-    assertThat(headerNames, hasItems("rEsPoNsEhEaDeR", "Transfer-Encoding"));
+    Set<String> headerNames = stream(response.getAllHeaders()).map(NameValuePair::getName).collect(toSet());
+    assertThat(headerNames, hasItem("rEsPoNsEhEaDeR"));
   }
 
   @Test

@@ -50,7 +50,7 @@
             </http:error-response>
         </http:listener>
 
-        <set-payload value="#[HEY ++]"/>
+        <raise-error type="MULE:EXPRESSION" />
     </flow>
 
 </mule>

@@ -6,22 +6,38 @@
  */
 package org.mule.test.http.functional;
 
-import static java.util.Collections.singletonMap;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getExtensionModel;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getTlsExtensionModel;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
+
+import static java.lang.Thread.currentThread;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
+import static java.util.Collections.singletonMap;
+
 import org.mule.extension.http.internal.temporary.HttpConnector;
 import org.mule.extension.socket.api.SocketsExtension;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
+import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.http.api.HttpService;
+import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.service.http.impl.service.HttpServiceImplementation;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import io.qameta.allure.Feature;
 
@@ -38,8 +54,13 @@ import io.qameta.allure.Feature;
 public abstract class AbstractHttpExtensionFunctionalTestCase extends ExtensionFunctionalTestCase {
 
   // TODO - MULE-11119: Remove once the service is injected higher up on the hierarchy
-  private SchedulerService schedulerService = new SimpleUnitTestSupportSchedulerService();
-  private HttpService httpService = new HttpServiceImplementation(schedulerService);
+  private final SchedulerService schedulerService = new SimpleUnitTestSupportSchedulerService();
+  private final HttpService httpService = new HttpServiceImplementation(schedulerService);
+
+  @Override
+  protected void doSetUp() throws Exception {
+    muleContext.getInjector().inject(this);
+  }
 
   @Override
   protected boolean doTestClassInjection() {
@@ -68,7 +89,7 @@ public abstract class AbstractHttpExtensionFunctionalTestCase extends ExtensionF
 
   @Override
   protected Class<?>[] getAnnotatedExtensionClasses() {
-    return new Class[] {SocketsExtension.class, HttpConnector.class};
+    return new Class[] {};
   }
 
   /**
@@ -87,5 +108,22 @@ public abstract class AbstractHttpExtensionFunctionalTestCase extends ExtensionF
     super.doTearDown();
     stopIfNeeded(httpService);
     stopIfNeeded(schedulerService);
+  }
+
+  @Override
+  protected Set<ExtensionModel> getExtensionModels() {
+    ExtensionModel core = getExtensionModel();
+    ExtensionModel tls = getTlsExtensionModel();
+    ExtensionModel sockets = loadExtension(SocketsExtension.class, emptySet());
+    ExtensionModel http = loadExtension(HttpConnector.class, singleton(sockets));
+    return new HashSet<>(asList(http, sockets, tls, core));
+  }
+
+  private ExtensionModel loadExtension(Class<?> extension, Set<ExtensionModel> deps) {
+    DefaultJavaExtensionModelLoader loader = new DefaultJavaExtensionModelLoader();
+    Map<String, Object> ctx = new HashMap<>();
+    ctx.put(TYPE_PROPERTY_NAME, extension.getName());
+    ctx.put(VERSION, "1.0.0-SNAPSHOT");
+    return loader.loadExtensionModel(currentThread().getContextClassLoader(), DslResolvingContext.getDefault(deps), ctx);
   }
 }

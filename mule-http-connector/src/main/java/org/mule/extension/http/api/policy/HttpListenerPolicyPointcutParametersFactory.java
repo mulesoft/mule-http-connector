@@ -32,10 +32,10 @@ import javax.inject.Inject;
  */
 public class HttpListenerPolicyPointcutParametersFactory implements SourcePolicyPointcutParametersFactory, Initialisable {
 
-  private final static ComponentIdentifier listenerIdentifier =
+  private static final ComponentIdentifier listenerIdentifier =
       builder().namespace("http").name("listener").build();
 
-  private Optional<PolicyProvider> policyProvider;
+  private PolicyProvider policyProvider;
   private SourcePolicyPointcutParametersFactory factoryDelegate;
 
   @Override
@@ -51,7 +51,8 @@ public class HttpListenerPolicyPointcutParametersFactory implements SourcePolicy
 
   @Inject
   public void setPolicyProvider(Optional<PolicyProvider> policyProvider) {
-    this.policyProvider = policyProvider;
+    // TODO: This isn't called in the tests, why?
+    policyProvider.ifPresent(pp -> this.policyProvider = pp);
   }
 
   @Override
@@ -60,7 +61,7 @@ public class HttpListenerPolicyPointcutParametersFactory implements SourcePolicy
       if (isInDomain()) {
         factoryDelegate = new HttpListenerOnDomainPolicyPointcutParametersFactory();
       } else {
-        factoryDelegate = new ReflectiveHttpListenerPolicyPointcutParametersFactory(policyProvider.get());
+        factoryDelegate = new ReflectiveHttpListenerPolicyPointcutParametersFactory(policyProvider);
       }
     } else
       factoryDelegate = new CompatibilityHttpListenerPolicyPointcutParametersFactory();
@@ -74,6 +75,6 @@ public class HttpListenerPolicyPointcutParametersFactory implements SourcePolicy
    * When configured in a Domain, Policy provider is not present since it belongs to the App
    */
   private boolean isInDomain() {
-    return !policyProvider.isPresent();
+    return policyProvider == null;
   }
 }

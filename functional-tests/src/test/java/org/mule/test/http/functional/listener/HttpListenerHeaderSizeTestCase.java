@@ -9,10 +9,13 @@ package org.mule.test.http.functional.listener;
 import static java.lang.String.format;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+
+import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.REQUEST_URI_TOO_LONG;
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.appendQueryParam;
+
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;
@@ -44,8 +47,8 @@ public class HttpListenerHeaderSizeTestCase extends AbstractHttpTestCase {
     HttpResponse response =
         sendRequestWithQueryParam(Integer.valueOf(maxHeaderSectionSizeSystemProperty.getValue()) + SIZE_DELTA);
     StatusLine statusLine = response.getStatusLine();
-    assertThat(statusLine.getStatusCode(), is(BAD_REQUEST.getStatusCode()));
-    assertThat(statusLine.getReasonPhrase(), is(BAD_REQUEST.getReasonPhrase()));
+    assertThat(statusLine.getStatusCode(), is(REQUEST_URI_TOO_LONG.getStatusCode()));
+    assertThat(statusLine.getReasonPhrase(), is(REQUEST_URI_TOO_LONG.getReasonPhrase()));
   }
 
   @Test

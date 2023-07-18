@@ -16,6 +16,7 @@
     </flow>
 
     <flow name="simple">
+        <logger level="ERROR" message="HOLA!! " />
         <http:request config-ref="config" path="simple"/>
         <set-payload value="#[attributes.headers['${header}']]"/>
     </flow>
