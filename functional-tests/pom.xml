@@ -53,6 +53,8 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.2</version>
                 <configuration>
+                    <!-- TODO: Remove this, at least the ALL-UNNAMED -->
+                    <argLine>-XX:+IgnoreUnrecognizedVMOptions --add-opens=java.base/java.lang=ALL-UNNAMED</argLine>
                     <systemPropertyVariables>
                         <maven.projectVersion>${mule.version}</maven.projectVersion>
                     </systemPropertyVariables>
