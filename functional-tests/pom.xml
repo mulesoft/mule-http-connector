@@ -15,6 +15,8 @@
     <properties>
         <javaModuleName>org.mule.connectors.http.tests.functional</javaModuleName>
 
+        <mavenCompilerVersion>3.11.0</mavenCompilerVersion>
+
         <skipExportTests>false</skipExportTests>
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
 
@@ -24,6 +26,8 @@
         <muleSocketsConnectorVersion>1.2.2</muleSocketsConnectorVersion>
         <muleCorsKernelVersion>1.1.2</muleCorsKernelVersion>
         <scriptingModuleVersion>1.1.7</scriptingModuleVersion>
+
+        <javaReleaseVersion>8</javaReleaseVersion>
 
         <fluentHcVersion>4.5.13</fluentHcVersion>
         <javaxActivationVersion>1.2.0</javaxActivationVersion>
@@ -41,21 +45,46 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>${mavenCompilerVersion}</version>
+                <executions>
+                    <execution>
+                        <id>default-compile</id>
+                        <configuration>
+                            <release>11</release>
+                            <!-- no excludes: compile everything to ensure module-info contains right entries -->
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>base-compile</id>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <release>${javaReleaseVersion}</release>
+                            <!-- recompile everything for target VM except the module-info.java -->
+                            <excludes>
+                                <exclude>module-info.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                </executions>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                    <encoding>UTF-8</encoding>
+                    <encoding>ISO-8859-1</encoding>
+                    <proc>none</proc>
+                    <source>11</source>
+                    <target>11</target>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
+                <version>3.1.2</version>
                 <configuration>
                     <!-- TODO: Remove this, at least the ALL-UNNAMED -->
-                    <argLine>-XX:+IgnoreUnrecognizedVMOptions --add-opens=java.base/java.lang=ALL-UNNAMED</argLine>
+                    <argLine>-XX:+IgnoreUnrecognizedVMOptions --add-modules=org.mule.runtime.jpms.utils --add-opens=java.base/java.lang=org.mule.runtime.jpms.utils</argLine>
                     <systemPropertyVariables>
+                        <!-- TODO: Remove this once Sockets supports Java 17 -->
+                        <mule.jvm.version.extension.enforcement>LOOSE</mule.jvm.version.extension.enforcement>
                         <maven.projectVersion>${mule.version}</maven.projectVersion>
                     </systemPropertyVariables>
                 </configuration>
@@ -71,6 +100,12 @@
             <classifier>mule-plugin</classifier>
             <version>${project.version}</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Needed?-->
@@ -151,6 +186,11 @@
         </dependency>
 
         <!-- Third party -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore-nio</artifactId>
+            <version>4.4.16</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>fluent-hc</artifactId>
@@ -274,12 +314,28 @@
             <artifactId>mule-module-spring-config</artifactId>
             <version>${mule.version}</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-jcl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mule.runtime</groupId>
+                    <artifactId>mule-module-extensions-support</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-extensions-spring-support</artifactId>
             <version>${mule.version}</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.mule.runtime</groupId>
+                    <artifactId>mule-module-extensions-support</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
@@ -288,12 +344,7 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-extensions-support</artifactId>
-            <version>${mule.version}</version>
-            <scope>test</scope>
-        </dependency>
+
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-policy-api</artifactId>
@@ -311,6 +362,12 @@
             <artifactId>mule-module-javaee</artifactId>
             <version>4.5.0-SNAPSHOT</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-jpms-utils</artifactId>
+            <version>${mule.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
