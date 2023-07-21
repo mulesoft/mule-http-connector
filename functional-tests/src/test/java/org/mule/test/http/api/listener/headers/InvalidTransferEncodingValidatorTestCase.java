@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.http.api.listener.headers;
+package org.mule.test.http.api.listener.headers;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.fail;
@@ -22,6 +22,10 @@ import org.hamcrest.Description;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import org.mule.extension.http.api.listener.headers.HttpHeadersException;
+import org.mule.extension.http.api.listener.headers.HttpHeadersValidator;
+import org.mule.extension.http.api.listener.headers.InvalidTransferEncodingValidator;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.HttpConstants.HttpStatus;
 

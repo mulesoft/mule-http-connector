@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.http.internal.request;
+package org.mule.test.http.internal.request;
 
 import io.qameta.allure.Issue;
 import org.apache.commons.io.IOUtils;
@@ -20,6 +20,12 @@ import org.mule.extension.http.api.error.HttpErrorMessageGenerator;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
+import org.mule.extension.http.internal.request.CorrelationData;
+import org.mule.extension.http.internal.request.HttpRequestFactory;
+import org.mule.extension.http.internal.request.HttpRequester;
+import org.mule.extension.http.internal.request.HttpRequesterConfig;
+import org.mule.extension.http.internal.request.HttpResponseToResult;
+import org.mule.extension.http.internal.request.RequestCreator;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.TypedValue;

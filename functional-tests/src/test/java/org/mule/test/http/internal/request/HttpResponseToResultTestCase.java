@@ -4,12 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.http.internal.request;
+package org.mule.test.http.internal.request;
 
 import io.qameta.allure.Issue;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
+
 import org.mule.extension.http.api.HttpResponseAttributes;
+import org.mule.extension.http.internal.request.HttpRequesterConfig;
+import org.mule.extension.http.internal.request.HttpRequesterCookieConfig;
+import org.mule.extension.http.internal.request.HttpResponseToResult;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -42,7 +47,7 @@ public class HttpResponseToResultTestCase {
 
   @Before
   public void setUp() {
-    config = mock(HttpRequesterConfig.class);
+    config = Mockito.mock(HttpRequesterConfig.class);
     when(config.isEnableCookies()).thenReturn(false);
 
     response = mock(HttpResponse.class);

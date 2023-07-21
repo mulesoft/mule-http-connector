@@ -4,11 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.http.internal.listener;
+package org.mule.test.http.internal.listener;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
+import org.mule.extension.http.internal.listener.ListenerPath;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;

@@ -16,7 +16,7 @@ import static org.mule.extension.http.internal.request.RequestConnectionParams.D
 import static org.mule.runtime.core.api.connection.util.ConnectionProviderUtils.unwrapProviderWrapper;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.REQUEST_CONFIG;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationInstanceFromRegistry;
+import static org.mule.test.util.ExtensionsTestUtils.getConfigurationInstanceFromRegistry;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Issue;

@@ -25,7 +25,7 @@
         <muleWeaveServiceVersion>2.5.0-SNAPSHOT</muleWeaveServiceVersion>
         <muleSocketsConnectorVersion>1.2.2</muleSocketsConnectorVersion>
         <muleCorsKernelVersion>1.1.2</muleCorsKernelVersion>
-        <scriptingModuleVersion>1.1.7</scriptingModuleVersion>
+        <scriptingModuleVersion>2.0.1</scriptingModuleVersion>
 
         <javaReleaseVersion>8</javaReleaseVersion>
 
@@ -81,7 +81,7 @@
                 <version>3.1.2</version>
                 <configuration>
                     <!-- TODO: Remove this, at least the ALL-UNNAMED -->
-                    <argLine>-XX:+IgnoreUnrecognizedVMOptions --add-modules=org.mule.runtime.jpms.utils --add-opens=java.base/java.lang=org.mule.runtime.jpms.utils</argLine>
+                    <argLine>-XX:+IgnoreUnrecognizedVMOptions --add-opens=java.base/java.lang=org.mule.runtime.jpms.utils</argLine>
                     <systemPropertyVariables>
                         <!-- TODO: Remove this once Sockets supports Java 17 -->
                         <mule.jvm.version.extension.enforcement>LOOSE</mule.jvm.version.extension.enforcement>
@@ -128,21 +128,13 @@
             <groupId>org.mule.services</groupId>
             <artifactId>mule-service-http</artifactId>
             <version>${muleHttpServiceTestVersion}</version>
-            <scope>test</scope>
             <type>test-jar</type>
         </dependency>
         <dependency>
             <groupId>org.mule.services</groupId>
             <artifactId>mule-service-http</artifactId>
             <version>${muleHttpServiceTestVersion}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.services</groupId>
-            <artifactId>mule-service-http</artifactId>
-            <version>${muleHttpServiceTestVersion}</version>
             <classifier>mule-service</classifier>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.services</groupId>
@@ -150,6 +142,20 @@
             <version>${muleWeaveServiceVersion}</version>
             <classifier>mule-service</classifier>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.mule.weave</groupId>
+                    <artifactId>jsonschema-module</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.parboiled</groupId>
+                    <artifactId>parboiled_2.12</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mule.syaml</groupId>
+                    <artifactId>syaml_2.12</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mule.services</groupId>
@@ -171,11 +177,6 @@
             <classifier>mule-plugin</classifier>
             <version>${scriptingModuleVersion}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-cors-kernel</artifactId>
-            <version>${muleCorsKernelVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
@@ -234,12 +235,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>javax.mail-api</artifactId>
-            <version>${javaxMailVersion}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.mule.glassfish.grizzly</groupId>
             <artifactId>tls-sni</artifactId>
             <version>${grizzlyVersion}</version>
@@ -256,6 +251,12 @@
             <artifactId>grizzly-http-client</artifactId>
             <version>${grizzlyAhcVersion}</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -337,11 +338,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-extensions-support</artifactId>
             <version>${mule.version}</version>
-            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
 
@@ -367,6 +368,11 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-jpms-utils</artifactId>
             <version>${mule.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.sdk</groupId>
+            <artifactId>mule-sdk-api</artifactId>
+            <version>0.6.1-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

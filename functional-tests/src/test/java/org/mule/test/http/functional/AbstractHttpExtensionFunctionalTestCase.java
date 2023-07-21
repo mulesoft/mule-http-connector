@@ -10,8 +10,6 @@ import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelPro
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getTlsExtensionModel;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
-import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
 import static java.lang.Thread.currentThread;
@@ -30,7 +28,7 @@ import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
-import org.mule.service.http.impl.service.HttpServiceImplementation;
+import org.mule.service.http.impl.TestHttpServiceProvider;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 
 import java.util.HashMap;
@@ -55,7 +53,7 @@ public abstract class AbstractHttpExtensionFunctionalTestCase extends ExtensionF
 
   // TODO - MULE-11119: Remove once the service is injected higher up on the hierarchy
   private final SchedulerService schedulerService = new SimpleUnitTestSupportSchedulerService();
-  private final HttpService httpService = new HttpServiceImplementation(schedulerService);
+  private final HttpService httpService = new TestHttpServiceProvider().get(schedulerService);
 
   @Override
   protected void doSetUp() throws Exception {
@@ -122,8 +120,8 @@ public abstract class AbstractHttpExtensionFunctionalTestCase extends ExtensionF
   private ExtensionModel loadExtension(Class<?> extension, Set<ExtensionModel> deps) {
     DefaultJavaExtensionModelLoader loader = new DefaultJavaExtensionModelLoader();
     Map<String, Object> ctx = new HashMap<>();
-    ctx.put(TYPE_PROPERTY_NAME, extension.getName());
-    ctx.put(VERSION, "1.0.0-SNAPSHOT");
+    ctx.put("type", extension.getName());
+    ctx.put("version", "1.0.0-SNAPSHOT");
     return loader.loadExtensionModel(currentThread().getContextClassLoader(), DslResolvingContext.getDefault(deps), ctx);
   }
 }
