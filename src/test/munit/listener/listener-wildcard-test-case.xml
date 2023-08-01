@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+
+    <munit:config name="listener-wildcard-test-case.xml" />
+
+    <munit:dynamic-port propertyName="dynamic.port"/>
+
+    <!-- Target Application -->
+    <http:listener-config name="ListenersWithWildcardsConfig" >
+        <http:listener-connection host="0.0.0.0" port="${dynamic.port}" usePersistentConnections="false" />
+    </http:listener-config>
+    <flow name="listener-wildcard-flow-1">
+        <http:listener path="prefix/*/suffix" config-ref="ListenersWithWildcardsConfig"/>
+        <set-payload value="First Listener invoked"/>
+    </flow>
+    <flow name="listener-wildcard-flow-2">
+        <http:listener path="prefix/keyword/differentSuffix/" config-ref="ListenersWithWildcardsConfig"/>
+        <set-payload value="Second Listener invoked"/>
+    </flow>
+    <flow name="listener-wildcard-flow-3">
+        <http:listener path="/a/*/b" config-ref="ListenersWithWildcardsConfig"/>
+        <set-payload value="OK"/>
+    </flow>
+    <flow name="listener-wildcard-flow-4">
+        <http:listener path="/a/*/c/*/e/*" config-ref="ListenersWithWildcardsConfig"/>
+        <set-payload value="OK"/>
+    </flow>
+
+    <!-- Test configuration -->
+    <http:request-config name="listener-wildcard-RequestConfig">
+        <http:request-connection host="localhost" port="${dynamic.port}" />
+    </http:request-config>
+
+    <!-- Test cases -->
+    <munit:test name="middlePathWildCard" description="Middle path with wildcard">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="listener-wildcard-flow-1" />
+            <munit:enable-flow-source value="listener-wildcard-flow-2" />
+            <munit:enable-flow-source value="listener-wildcard-flow-3" />
+            <munit:enable-flow-source value="listener-wildcard-flow-4" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <http:request config-ref="listener-wildcard-RequestConfig" path="prefix/keyword/suffix"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that is="#[MunitTools::containsString('First Listener invoked')]" expression="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="nullWildcard" description="Null wildcard">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="listener-wildcard-flow-1" />
+            <munit:enable-flow-source value="listener-wildcard-flow-2" />
+            <munit:enable-flow-source value="listener-wildcard-flow-3" />
+            <munit:enable-flow-source value="listener-wildcard-flow-4" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <try>
+                <http:request config-ref="listener-wildcard-RequestConfig" path="a/b" />
+                <error-handler>
+                    <on-error-continue>
+                        <set-variable value="#[error.description]" variableName="errorMessage"/>
+                    </on-error-continue>
+                </error-handler>
+            </try>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that is="#[MunitTools::containsString('not found (404)')]" expression="#[vars.errorMessage]"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="multipleWildcards" description="Multiple Wildcards">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="listener-wildcard-flow-1" />
+            <munit:enable-flow-source value="listener-wildcard-flow-2" />
+            <munit:enable-flow-source value="listener-wildcard-flow-3" />
+            <munit:enable-flow-source value="listener-wildcard-flow-4" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <http:request config-ref="listener-wildcard-RequestConfig" path="a/b/c/d/e/f"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that is="#[MunitTools::containsString('OK')]" expression="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
+        </munit:validation>
+    </munit:test>
+</mule>
