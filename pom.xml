@@ -147,6 +147,7 @@
                 </executions>
                 <configuration>
                     <argLines>
+                        <argLine>--add-opens=java.base/java.lang=ALL-UNNAMED</argLine>
                         <argLine>
                             -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${session.executionRootDirectory}/target/jacoco.exec
                         </argLine>
