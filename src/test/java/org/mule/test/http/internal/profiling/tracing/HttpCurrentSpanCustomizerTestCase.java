@@ -129,10 +129,4 @@ public class HttpCurrentSpanCustomizerTestCase {
     verify(distributedTraceContextManager).addCurrentSpanAttribute(NET_PEER_NAME, EXPECTED_PEER_NAME);
   }
 
-  @Test
-  @Description("The request span customizer informs the distributed trace context manager the correct attributes/name")
-  public void requestSpanWithDefaultPort() throws Exception {
-
-  }
-
 }
