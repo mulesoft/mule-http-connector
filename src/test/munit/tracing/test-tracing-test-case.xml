@@ -40,7 +40,7 @@
     </munit:test>
 
     <flow name="ListenerFlow" >
-        <http:listener path="*" config-ref="listenerConfig" />
+        <http:listener path="/" config-ref="listenerConfig" />
         <munit-tools:assert-that expression="#[attributes.headers]" is="#[MunitTools::hasKey('traceparent')]" message="Trace context propagation" />
     </flow>
 </mule>
