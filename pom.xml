@@ -181,6 +181,8 @@
                         <!-- Versions with support and snapshots -->
                         <discoverRuntimes>
                             <product>EE</product>
+                            <!-- MUnit minMuleVersion is 4.3.0 -->
+                            <minMuleVersion>4.3.0</minMuleVersion>
                             <includeSnapshots>false</includeSnapshots>
                             <latestPatches>true</latestPatches>
                         </discoverRuntimes>
