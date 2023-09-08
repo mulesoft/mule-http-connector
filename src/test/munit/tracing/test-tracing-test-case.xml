@@ -37,10 +37,13 @@
         <munit:execution>
             <http:request method="GET" path='/' config-ref="requestConfig"  />
         </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that is="#[MunitTools::not(MunitTools::isEmptyString())]" expression="#[%dw 2.0 output application/java --- payload.^raw as String]" message="Trace parent header should be present in propagation of W3C context"/>
+        </munit:validation>
     </munit:test>
 
     <flow name="ListenerFlow" >
         <http:listener path="*" config-ref="listenerConfig" />
-        <munit-tools:assert-that expression="#[attributes.headers]" is="#[MunitTools::hasKey('traceparent')]" message="Trace context propagation" />
+        <set-payload value="#[attributes.headers['traceparent']]" />
     </flow>
 </mule>

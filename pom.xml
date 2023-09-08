@@ -151,7 +151,9 @@
                     </argLines>
                     <!-- For testing tracing capabilities-->
                     <systemPropertyVariables>
+                        <!-- We keep the two OTEL properties for 4.5.0 and 4.6.0 -->
                         <mule.openetelemetry.export.enabled>true</mule.openetelemetry.export.enabled>
+                        <mule.openTelemetry.tracer.exporter.enabled>true</mule.openTelemetry.tracer.exporter.enabled>
                         <mule.enable.profiling.service>true</mule.enable.profiling.service>
                     </systemPropertyVariables>
 
