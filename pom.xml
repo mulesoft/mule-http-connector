@@ -152,6 +152,7 @@
                             -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${session.executionRootDirectory}/target/jacoco.exec
                         </argLine>
                     </argLines>
+
                     <!-- For testing tracing capabilities-->
                     <systemPropertyVariables>
                         <!-- We keep the two OTEL properties for 4.5.0 and 4.6.0 -->
