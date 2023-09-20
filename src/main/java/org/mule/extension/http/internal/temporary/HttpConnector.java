@@ -7,6 +7,10 @@
 package org.mule.extension.http.internal.temporary;
 
 import static org.mule.extension.http.internal.listener.HttpListener.HTTP_NAMESPACE;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_11;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_17;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_8;
+
 import org.mule.extension.http.api.error.HttpError;
 import org.mule.extension.http.api.listener.server.HttpListenerConfig;
 import org.mule.extension.http.api.notification.HttpNotificationAction;
@@ -39,6 +43,7 @@ import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 import org.mule.runtime.extension.api.annotation.notification.NotificationActions;
+import org.mule.sdk.api.annotation.JavaVersionSupport;
 
 /**
  * HTTP connector used to handle and perform HTTP requests.
@@ -49,6 +54,7 @@ import org.mule.runtime.extension.api.annotation.notification.NotificationAction
  * @since 1.0
  */
 @Extension(name = "HTTP")
+@JavaVersionSupport({JAVA_8, JAVA_11, JAVA_17})
 @Configurations({HttpListenerConfig.class, HttpRequesterConfig.class})
 @Operations(HttpOperations.class)
 @SubTypeMapping(baseType = HttpRequestAuthentication.class,
