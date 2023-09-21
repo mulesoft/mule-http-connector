@@ -33,7 +33,7 @@ public class CertificateProviderFactory {
         return new DefaultCertificateProvider(certificateSupplier);
       } catch (Exception e) {
         throw new MuleRuntimeException(createStaticMessage("Errors while creating " + SERIALIZABLE_LAZY_VALUE_CLASS_NAME
-            + " by reflection, even when class in on classpath."), e);
+            + " by reflection, even when class is on classpath."), e);
       }
     }
     return new CompatibilityCertificateProvider(certificateSupplier);
