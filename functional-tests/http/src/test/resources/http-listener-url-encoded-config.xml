@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:listener-config name="listenerConfig">
+        <http:listener-connection host="localhost" port="${port}"/>
+    </http:listener-config>
+
+    <flow name="inbound">
+        <http:listener config-ref="listenerConfig"  path="receive"/>
+        <set-payload value="#[output text/plain --- payload.param1 ++ payload.param2]"/>
+    </flow>
+
+    <flow name="outbound">
+        <http:listener config-ref="listenerConfig"  path="send">
+            <http:response>
+                <http:body>
+                    #[
+                    %dw 2.0
+                    output application/x-www-form-urlencoded
+                    ---
+                    {
+                    testName1: "testValue1",
+                    testName2: "testValue2"
+                    }]
+                </http:body>
+            </http:response>
+        </http:listener>
+        <set-payload value="OK"/>
+    </flow>
+
+</mule>

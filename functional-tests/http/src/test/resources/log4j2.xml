@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%-5p %d [%t] [processor: %X{processorPath}; event: %X{correlationId}] %c: %m%n"/>
+        </Console>
+        <Console name="ConsoleLogUtil" target="SYSTEM_OUT">
+            <PatternLayout pattern="%m%n"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+
+        <AsyncLogger name="org.mule.service.http.impl.service.HttpMessageLogger" level="DEBUG" />
+
+        <AsyncLogger name="org.mule.runtime.core.internal.processor.LoggerMessageProcessor" level="INFO"/>
+        <AsyncLogger name="com.mulesoft.agent" level="INFO"/>
+
+        <AsyncLogger name="org.mule.runtime.core.internal.logging" additivity="false" level="INFO">
+            <AppenderRef ref="ConsoleLogUtil"/>
+        </AsyncLogger>
+
+        <AsyncRoot level="WARN">
+            <AppenderRef ref="Console"/>
+        </AsyncRoot>
+
+        <AsyncLogger name="com.mulesoft.mule.runtime.gw" level="INFO"/>
+        <AsyncLogger name="com.mulesoft.extension.policies" level="INFO"/>
+        <AsyncLogger name="com.mulesoft.extension.gateway" level="INFO"/>
+        <AsyncLogger name="com.mulesoft.analytics" level="INFO"/>
+
+    </Loggers>
+
+</Configuration>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:request-config name="config">
+        <http:request-connection host="localhost" port="${httpPort}"/>
+    </http:request-config>
+
+    <flow name="payloadSourceFlow">
+        <http:request config-ref="config" path="test" method="POST">
+            <http:body>
+                #[payload]
+            </http:body>
+        </http:request>
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
+    </flow>
+
+    <flow name="customSourceFlow">
+        <http:request config-ref="config" path="test" method="POST">
+            <http:body>
+                #[vars.customSource]
+            </http:body>
+        </http:request>
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
+    </flow>
+
+    <flow name="payloadTargetFlow">
+        <http:request config-ref="config" path="test" method="POST"/>
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
+    </flow>
+</mule>
