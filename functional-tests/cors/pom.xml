@@ -14,6 +14,8 @@
     <packaging>jar</packaging>
 
     <properties>
+        <mule.version>4.6.0-SNAPSHOT</mule.version>
+
         <javaModuleName>org.mule.test.integration.mule.http.connector.cors.tests</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
@@ -38,32 +40,32 @@
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-unit</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-runner</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests.plugin</groupId>
             <artifactId>mule-tests-component-plugin</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-allure</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -75,13 +77,13 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-spring-config</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-extensions-spring-support</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
             <scope>provided</scope>
         </dependency>
 

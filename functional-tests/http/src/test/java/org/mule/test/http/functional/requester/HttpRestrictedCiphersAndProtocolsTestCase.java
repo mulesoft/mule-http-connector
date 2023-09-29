@@ -11,6 +11,7 @@ import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.HTTPS;
 
 import static java.lang.String.format;
 
+import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
@@ -34,6 +35,8 @@ import org.mule.test.http.functional.AbstractHttpTestCase;
 
 import io.qameta.allure.Story;
 import io.qameta.allure.junit4.DisplayName;
+import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -125,14 +128,14 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
   @Test
   public void failsWithProtocolMismatch() throws Exception {
     expectedError.expectCause(instanceOf(HttpRequestFailedException.class));
-    expectedError.expectMessage(containsString("Remotely closed"));
+    expectedError.expectMessage(anyOf(containsString("Remotely closed"), sslValidationError()));
     flowRunner("12Client1Server").withPayload(TEST_PAYLOAD).run();
   }
 
   @Test
   public void failsWithCipherSuiteMismatch() throws Exception {
     expectedError.expectCause(instanceOf(HttpRequestFailedException.class));
-    expectedError.expectMessage(containsString("Remotely closed"));
+    expectedError.expectMessage(anyOf(containsString("Remotely closed"), sslValidationError()));
     flowRunner("12CipherClient1CipherServer").withPayload(TEST_PAYLOAD).run();
   }
 }

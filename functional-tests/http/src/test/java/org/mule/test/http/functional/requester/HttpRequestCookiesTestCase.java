@@ -53,7 +53,7 @@ public class HttpRequestCookiesTestCase extends AbstractHttpRequestTestCase {
     assertNoCookiesSent();
 
     flowRunner(CLIENT_COOKIES_ENABLED_FLOW).withPayload(TEST_MESSAGE).withVariable("path", "/path").run();
-    assertCookiesSent(COOKIE_CUSTOM_PATH_LOCAL_DOMAIN, COOKIE_ROOT_PATH_LOCAL_DOMAIN);
+    assertCookiesSent(COOKIE_ROOT_PATH_LOCAL_DOMAIN, COOKIE_CUSTOM_PATH_LOCAL_DOMAIN);
   }
 
   @Test

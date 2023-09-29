@@ -12,6 +12,10 @@ import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static java.lang.System.clearProperty;
 import static java.lang.System.setProperty;
 
+import static org.hamcrest.Matchers.anyOf;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
+
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.functional.services.NullPolicyProvider;
 import org.mule.runtime.core.api.MuleContext;
@@ -25,6 +29,7 @@ import org.mule.service.http.TestHttpClient;
 import java.util.List;
 
 import io.qameta.allure.Feature;
+import org.hamcrest.Matcher;
 import org.junit.Rule;
 
 @Feature(HTTP_EXTENSION)
@@ -69,4 +74,10 @@ public abstract class AbstractHttpTestCase extends MuleArtifactFunctionalTestCas
     clearProperty(ProcessingStrategyFactory.class.getName());
   }
 
+  protected Matcher<String> sslValidationError() {
+    return is(anyOf(containsString(J8_262_SSL_ERROR_RESPONSE),
+                    containsString(J8_275_SSL_ERROR_RESPONSE),
+                    containsString(J11_SSL_ERROR_RESPONSE),
+                    containsString(J17_SSL_ERROR_RESPONSE)));
+  }
 }
