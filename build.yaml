@@ -1,5 +1,5 @@
 projectType: extension
-#additionalTestConfigs:
-#  munitJava17:
-#    testJdkTool: OPEN-JDK17
-#    mavenAdditionalArgs: -Dtest=None -DfailIfNoTests=false -DruntimeProduct=MULE_EE -DruntimeVersion=4.6.0-SNAPSHOT -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE
+additionalTestConfigs:
+  testsJava17:
+    testJdkTool: OPEN-JDK17
+    mavenAdditionalArgs: -DruntimeProduct=MULE_EE -DruntimeVersion=4.6.0-SNAPSHOT -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE
