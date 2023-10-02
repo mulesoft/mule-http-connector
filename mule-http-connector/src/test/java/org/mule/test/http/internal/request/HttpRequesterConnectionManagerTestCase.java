@@ -11,7 +11,7 @@ import static java.util.concurrent.Executors.newFixedThreadPool;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -139,11 +139,11 @@ public class HttpRequesterConnectionManagerTestCase extends AbstractMuleTestCase
 
   @Test
   public void clientIsStartedAfterFirstError() {
-    doThrow(Exception.class).doNothing().when(delegateHttpClient).start();
+    doThrow(RuntimeException.class).doNothing().when(delegateHttpClient).start();
     ShareableHttpClient client = connectionManager.create(CONFIG_NAME, getHttpClientConfiguration(CONFIG_NAME));
     try {
       client.start();
-    } catch (Exception e) {
+    } catch (RuntimeException e) {
       // Ignore first exception
     }
     client.start();

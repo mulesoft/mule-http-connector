@@ -7,7 +7,7 @@
 package org.mule.test.http.internal.request;
 
 import static java.util.Optional.of;
-import static org.mockito.Matchers.contains;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.extension.http.api.HttpResponseAttributes;

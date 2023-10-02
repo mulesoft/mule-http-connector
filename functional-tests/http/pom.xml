@@ -15,7 +15,6 @@
 
     <properties>
         <surefire.args>
-            -XX:+IgnoreUnrecognizedVMOptions
             ${surefire.slf4j.module.args}
         </surefire.args>
 
@@ -54,6 +53,8 @@
         </dependency>
 
         <!-- Third party dependencies -->
+
+
         <dependency>
             <groupId>org.apache.groovy</groupId>
             <artifactId>groovy</artifactId>
