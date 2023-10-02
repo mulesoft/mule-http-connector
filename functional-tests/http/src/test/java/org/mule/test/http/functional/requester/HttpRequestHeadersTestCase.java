@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -150,16 +149,12 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase {
   }
 
   @Test
-  @Ignore("TD-0144819")
-  // TODO (TD-0144819): un-ignore when org.mule.runtime.core/org.mule.runtime.core.internal.el.context is exported to DW
   public void acceptsHostHeader() throws Exception {
     flowRunner("hostHeader").withPayload(TEST_MESSAGE).run();
     assertThat(getFirstReceivedHeader(HOST), is(host.getValue()));
   }
 
   @Test
-  @Ignore("TD-0144819")
-  // TODO (TD-0144819): un-ignore when org.mule.runtime.core/org.mule.runtime.core.internal.el.context is exported to DW
   public void acceptsTransferEncodingHeader() throws Exception {
     flowRunner("transferEncodingHeader").withPayload(TEST_MESSAGE).run();
     assertThat(getFirstReceivedHeader(TRANSFER_ENCODING), is(encoding.getValue()));
