@@ -14,6 +14,7 @@ import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Collection;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
@@ -35,11 +36,11 @@ public class HttpRequesterOcspRevocationTestCase extends AbstractHttpOcspRevocat
   }
 
   @Test
+  // TODO: Un-ignore this!!
   public void testServerCertifiedAndRevoked() throws Exception {
     try {
       runRevocationTestFlow();
-      // TODO: Reintroduce this
-      // fail("CertificateRevokedException should have been thrown.");
+      fail("CertificateRevokedException should have been thrown.");
     } catch (Exception e) {
       verifyRevocationException(e);
     }
