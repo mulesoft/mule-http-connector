@@ -46,9 +46,9 @@
         <!-- Remove when a new parent version with MTF is available -->
         <munit.input.directory>src/test/munit</munit.input.directory>
         <munit.output.directory>${basedir}/target/test-mule/munit</munit.output.directory>
-        <munit.extensions.maven.plugin.version>1.2.0-SNAPSHOT</munit.extensions.maven.plugin.version>
-        <munit.version>3.0.0-SNAPSHOT</munit.version>
-        <mtf-tools.version>1.2.0-SNAPSHOT</mtf-tools.version>
+        <munit.extensions.maven.plugin.version>1.1.2</munit.extensions.maven.plugin.version>
+        <munit.version>2.3.18</munit.version>
+        <mtf-tools.version>1.1.2</mtf-tools.version>
         <mavenResources.version>3.0.2</mavenResources.version>
 
         <scriptingModuleVersion>1.1.7</scriptingModuleVersion>
