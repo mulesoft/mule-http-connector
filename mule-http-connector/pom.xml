@@ -24,7 +24,7 @@
         <jacoco.version>0.8.10</jacoco.version>
         <aspectjVersion>1.9.2</aspectjVersion>
 
-        <fluentHcVersion>4.5.13</fluentHcVersion>
+        <fluentHcVersion>4.5.14</fluentHcVersion>
         <grizzlyVersion>2.3.36-MULE-024</grizzlyVersion>
         <grizzlyAhcVersion>1.14-MULE-019</grizzlyAhcVersion>
         <javaxActivationVersion>1.2.0</javaxActivationVersion>
