@@ -13,6 +13,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.CERTIFICATE_REVOCATION;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -24,7 +25,7 @@ import java.security.cert.CertificateRevokedException;
 import io.qameta.allure.Story;
 import org.junit.Rule;
 
-@Story("Certificate Revocation Check")
+@Story(CERTIFICATE_REVOCATION)
 public abstract class AbstractHttpTlsRevocationTestCase extends AbstractHttpTestCase {
 
   private static final String UNDETERMINED_REVOCATION_ERROR_MESSAGE = "Could not determine revocation status";

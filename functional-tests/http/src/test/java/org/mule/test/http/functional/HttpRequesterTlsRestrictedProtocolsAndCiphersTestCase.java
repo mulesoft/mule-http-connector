@@ -13,7 +13,7 @@ import static org.junit.Assert.fail;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.DEFAULT_SECURITY_MODEL;
 import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.PROPERTIES_FILE_PATTERN;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.HTTPS;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.HTTPS;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;

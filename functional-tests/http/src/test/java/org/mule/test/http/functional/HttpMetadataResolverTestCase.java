@@ -8,7 +8,7 @@ package org.mule.test.http.functional;
 
 import static org.mule.runtime.api.component.location.Location.builder;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.METADATA;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.METADATA;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;

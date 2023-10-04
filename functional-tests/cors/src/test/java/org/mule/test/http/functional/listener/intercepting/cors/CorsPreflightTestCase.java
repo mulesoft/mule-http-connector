@@ -9,7 +9,8 @@ package org.mule.test.http.functional.listener.intercepting.cors;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_PROVIDER;
 import static org.mule.runtime.http.api.HttpConstants.Method.GET;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.http.functional.listener.intercepting.cors.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.http.functional.listener.intercepting.cors.AllureConstants.HttpFeature.HttpStory.CORS;
 
 import org.mule.functional.services.NullPolicyProvider;
 import org.mule.modules.cors.attributes.KernelTestAttributesBuilder;
@@ -40,7 +41,7 @@ import org.junit.Test;
  * Other tests have been added to deal with HTTP specifics
  */
 @Feature(HTTP_EXTENSION)
-@Story("CORS")
+@Story(CORS)
 public class CorsPreflightTestCase extends
     PreflightArtifactFunctionalTestCase<CorsHttpParameters, CorsHttpEndpoint> {
 

@@ -6,8 +6,8 @@
  */
 package org.mule.test.http.functional.requester;
 
-import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.ERRORS;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.ERROR_HANDLING;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.ERRORS;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.ERROR_HANDLING;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.anyOf;

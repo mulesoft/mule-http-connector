@@ -11,6 +11,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.PROXY;
+
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpExpectHeaderServerTestCase;
 
@@ -22,7 +24,7 @@ import org.apache.http.client.fluent.Response;
 import org.junit.Rule;
 import org.junit.Test;
 
-@Story("PROXY")
+@Story(PROXY)
 public class HttpProxyExpectHeaderTestCase extends AbstractHttpExpectHeaderServerTestCase {
 
   @Rule

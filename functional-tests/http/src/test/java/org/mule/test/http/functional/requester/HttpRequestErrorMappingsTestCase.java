@@ -8,8 +8,8 @@ package org.mule.test.http.functional.requester;
 
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.functional.junit4.matchers.ThatMatcher.that;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.ERROR_HANDLING;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.ERROR_MAPPINGS;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.ERROR_HANDLING;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.ERROR_MAPPINGS;
 
 import static java.util.Collections.emptyMap;
 

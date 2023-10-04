@@ -22,8 +22,8 @@ import static org.mule.runtime.http.api.HttpConstants.HttpStatus.TOO_MANY_REQUES
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.UNSUPPORTED_MEDIA_TYPE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.ERRORS;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.ERROR_HANDLING;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.ERRORS;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.ERROR_HANDLING;
 import static org.mule.test.http.functional.matcher.HttpResponseContentStringMatcher.body;
 import static org.mule.test.http.functional.matcher.HttpResponseHeaderStringMatcher.header;
 import static org.mule.test.http.functional.matcher.HttpResponseReasonPhraseMatcher.hasReasonPhrase;

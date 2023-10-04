@@ -21,6 +21,8 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpHeaders.Names.X_FORWARDED_FOR;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.PROXY;
+
 import org.mule.extension.http.api.HttpAttributes;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpRequestAttributesBuilder;
@@ -67,7 +69,7 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
-@Story("PROXY")
+@Story(PROXY)
 public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
 
   public static final String ENCODED_PATH = "hello%2C%20is%20anyone%20there%3F%21";

@@ -6,7 +6,7 @@
  */
 package org.mule.test.http.functional.tls;
 
-import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.HTTPS;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.HTTPS;
 
 import static org.apache.commons.io.FileUtils.getFile;
 import org.mule.runtime.core.api.util.FileUtils;

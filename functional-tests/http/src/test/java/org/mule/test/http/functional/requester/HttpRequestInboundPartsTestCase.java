@@ -9,7 +9,7 @@ package org.mule.test.http.functional.requester;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.runtime.api.metadata.MediaType.HTML;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.MULTIPART;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.MULTIPART;
 
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.Matchers.equalTo;

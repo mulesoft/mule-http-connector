@@ -6,8 +6,13 @@
  */
 package org.mule.test.http.functional;
 
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.SOURCE_OVERLOAD;
+
 import static java.lang.String.format;
 import static java.util.concurrent.Executors.newFixedThreadPool;
+
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -15,36 +20,31 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
 
-import org.hamcrest.Matcher;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.tck.junit4.rule.DynamicPort;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.ning.http.client.AsyncCompletionHandlerBase;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 import com.ning.http.client.Response;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
-
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import io.qameta.allure.Story;
-import org.mule.test.runner.RunnerDelegateTo;
+import org.hamcrest.Matcher;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 
-@Story("Source overload handling")
+@Story(SOURCE_OVERLOAD)
 public class HttpListenerFlowBackPressureTestCase extends AbstractHttpTestCase {
 
   @Rule

@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.SOURCE_OVERLOAD;
 
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -20,7 +21,7 @@ import org.apache.http.client.fluent.Request;
 import org.junit.Rule;
 import org.junit.Test;
 
-@Story("Overload response status")
+@Story(SOURCE_OVERLOAD)
 public class HttpListenerOverloadTestCase extends AbstractHttpTestCase {
 
   @Rule

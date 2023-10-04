@@ -53,8 +53,6 @@
         </dependency>
 
         <!-- Third party dependencies -->
-
-
         <dependency>
             <groupId>org.apache.groovy</groupId>
             <artifactId>groovy</artifactId>

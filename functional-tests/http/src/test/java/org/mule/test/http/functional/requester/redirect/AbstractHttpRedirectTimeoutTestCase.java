@@ -6,6 +6,8 @@
  */
 package org.mule.test.http.functional.requester.redirect;
 
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.TIMEOUT;
+
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
 
@@ -21,7 +23,7 @@ import io.qameta.allure.Story;
 import org.eclipse.jetty.server.Request;
 import org.junit.Rule;
 
-@Story("TIMEOUT")
+@Story(TIMEOUT)
 public abstract class AbstractHttpRedirectTimeoutTestCase extends AbstractHttpRequestTestCase {
 
   private final String REDIRECT_URL = format("http://localhost:%s/%s", httpPort.getNumber(), "secondPath");

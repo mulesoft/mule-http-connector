@@ -14,6 +14,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.http.api.HttpMessageBuilder.refreshSystemProperties;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.HEADER_CASE_PRESERVATION;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
@@ -37,7 +38,7 @@ import java.util.Set;
 
 import io.qameta.allure.Story;
 
-@Story("Header case preservation")
+@Story(HEADER_CASE_PRESERVATION)
 public class HttpHeaderCaseTestCase extends AbstractHttpTestCase {
 
   public static final String PRESERVE_HEADER_CASE = "org.glassfish.grizzly.http.PRESERVE_HEADER_CASE";

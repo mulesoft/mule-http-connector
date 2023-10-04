@@ -8,6 +8,7 @@ package org.mule.test.http.functional.requester;
 
 import static org.mule.extension.http.api.HttpMessageBuilder.refreshSystemProperties;
 import static org.mule.extension.http.internal.HttpConnectorConstants.RETRY_ATTEMPTS_PROPERTY;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.RETRY_POLICY;
 
 import static org.eclipse.jetty.server.HttpConnection.getCurrentConnection;
 import static org.hamcrest.core.Is.is;
@@ -29,7 +30,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-@Story("RETRY_POLICY")
+@Story(RETRY_POLICY)
 public class HttpRetryRequestStreamingPayloadTestCase extends AbstractHttpRequestTestCase {
 
   @Rule

@@ -12,6 +12,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.CONTENT;
+
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
@@ -26,7 +28,7 @@ import org.apache.http.client.fluent.Request;
 import org.junit.Rule;
 import org.junit.Test;
 
-@Story("CONTENT")
+@Story(CONTENT)
 public class HttpListenerLaxContentTypeTestCase extends AbstractHttpTestCase {
 
   @Rule

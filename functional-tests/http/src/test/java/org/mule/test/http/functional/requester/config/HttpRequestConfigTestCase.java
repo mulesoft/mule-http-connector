@@ -10,7 +10,8 @@ import static org.mule.extension.http.internal.request.RequestConnectionParams.D
 import static org.mule.extension.http.internal.request.RequestConnectionParams.DEFAULT_MAX_CONNECTIONS;
 import static org.mule.extension.http.internal.request.RequestConnectionParams.DEFAULT_RESPONSE_BUFFER_SIZE;
 import static org.mule.runtime.core.api.connection.util.ConnectionProviderUtils.unwrapProviderWrapper;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.REQUEST_CONFIG;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.core.Is.is;
@@ -41,7 +42,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 @Feature(HTTP_EXTENSION)
-@Story("REQUEST_CONFIG")
+@Story(REQUEST_CONFIG)
 public class HttpRequestConfigTestCase extends AbstractHttpTestCase {
 
   private static final String DEFAULT_HTTP_REQUEST_CONFIG_NAME = "requestConfig";

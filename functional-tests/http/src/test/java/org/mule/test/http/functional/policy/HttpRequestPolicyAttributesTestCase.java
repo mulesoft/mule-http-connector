@@ -6,6 +6,8 @@
  */
 package org.mule.test.http.functional.policy;
 
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.MULTI_VALUES_IN_POLICIES;
+
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -23,7 +25,7 @@ import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.junit.Test;
 
-@Story("Multi-values preservation in policy")
+@Story(MULTI_VALUES_IN_POLICIES)
 public class HttpRequestPolicyAttributesTestCase extends AbstractHttpTestCase {
 
   private static final String HEADER = "header";

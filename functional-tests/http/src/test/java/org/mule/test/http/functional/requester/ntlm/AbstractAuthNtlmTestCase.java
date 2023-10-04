@@ -7,7 +7,7 @@
 package org.mule.test.http.functional.requester.ntlm;
 
 
-import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.NTLM;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.NTLM;
 
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.CoreMatchers.equalTo;

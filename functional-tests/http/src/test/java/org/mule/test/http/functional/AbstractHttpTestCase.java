@@ -7,7 +7,7 @@
 package org.mule.test.http.functional;
 
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_PROVIDER;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
 import static java.lang.System.clearProperty;
 import static java.lang.System.setProperty;

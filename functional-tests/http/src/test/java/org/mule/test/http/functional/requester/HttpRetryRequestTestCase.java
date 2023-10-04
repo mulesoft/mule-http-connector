@@ -10,6 +10,7 @@ import static org.mule.extension.http.api.HttpMessageBuilder.refreshSystemProper
 import static org.mule.extension.http.internal.HttpConnectorConstants.DEFAULT_RETRY_ATTEMPTS;
 import static org.mule.extension.http.internal.HttpConnectorConstants.REMOTELY_CLOSED;
 import static org.mule.extension.http.internal.HttpConnectorConstants.RETRY_ATTEMPTS_PROPERTY;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.RETRY_POLICY;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.StringContains.containsString;
@@ -37,7 +38,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-@Story("RETRY_POLICY")
+@Story(RETRY_POLICY)
 @RunnerDelegateTo(Parameterized.class)
 public class HttpRetryRequestTestCase extends AbstractHttpTestCase {
 

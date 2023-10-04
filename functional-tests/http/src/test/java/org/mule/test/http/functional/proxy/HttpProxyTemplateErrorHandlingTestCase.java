@@ -6,6 +6,8 @@
  */
 package org.mule.test.http.functional.proxy;
 
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.PROXY;
+
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -27,7 +29,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-@Story("PROXY")
+@Story(PROXY)
 public class HttpProxyTemplateErrorHandlingTestCase extends AbstractHttpRequestTestCase {
 
   public static final String SERVICE_DOWN_MESSAGE = "Service Down";

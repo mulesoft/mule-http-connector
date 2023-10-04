@@ -12,6 +12,7 @@ import static org.mule.runtime.api.metadata.MediaType.BINARY;
 import static org.mule.runtime.api.metadata.MediaType.HTML;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.CONTENT;
 
 import static java.lang.Boolean.TRUE;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -37,7 +38,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-@Story("CONTENT")
+@Story(CONTENT)
 public class HttpRequestContentTypeTestCase extends AbstractHttpRequestTestCase {
 
   private static final String EXPECTED_CONTENT_TYPE = "application/json; charset=UTF-8";

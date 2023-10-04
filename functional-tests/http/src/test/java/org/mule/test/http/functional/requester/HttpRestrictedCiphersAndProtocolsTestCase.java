@@ -7,7 +7,7 @@
 package org.mule.test.http.functional.requester;
 
 import static org.mule.runtime.http.api.HttpConstants.Method.POST;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.HTTPS;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.HTTPS;
 
 import static java.lang.String.format;
 

@@ -13,7 +13,7 @@ import static org.mule.functional.junit4.matchers.MessageMatchers.hasAttributes;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.STREAMING;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.STREAMING;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.exception.MuleException;

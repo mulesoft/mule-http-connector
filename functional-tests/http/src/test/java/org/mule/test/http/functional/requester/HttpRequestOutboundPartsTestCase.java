@@ -10,7 +10,7 @@ import static org.mule.runtime.api.metadata.MediaType.HTML;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.MULTIPART;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.MULTIPART;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;

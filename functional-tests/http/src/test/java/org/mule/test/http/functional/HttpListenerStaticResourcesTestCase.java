@@ -16,6 +16,8 @@ import static org.mule.runtime.core.api.util.ClassUtils.getClassPathRoot;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.NOT_FOUND;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.STATIC_RESOURCE_LOADER;
+
 import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.util.IOUtils;
@@ -33,7 +35,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-@Story("STATIC_RESOURCE_LOADER")
+@Story(STATIC_RESOURCE_LOADER)
 public class HttpListenerStaticResourcesTestCase extends AbstractHttpTestCase {
 
   public static final String INDEX_HTML_CONTENT = "Test index.html";

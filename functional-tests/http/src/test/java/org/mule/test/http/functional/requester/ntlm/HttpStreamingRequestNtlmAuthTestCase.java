@@ -11,7 +11,7 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.AUTHORIZATION;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.runtime.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
 import static org.mule.runtime.http.api.HttpHeaders.Values.KEEP_ALIVE;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.NTLM;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.NTLM;
 
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.apache.http.entity.ContentType.TEXT_PLAIN;

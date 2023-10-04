@@ -9,7 +9,7 @@ package org.mule.test.http.functional.listener;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.URL_ENCODED;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.URL_ENCODED;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;

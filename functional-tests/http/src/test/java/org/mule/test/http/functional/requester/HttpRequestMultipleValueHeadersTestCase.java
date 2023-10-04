@@ -7,7 +7,7 @@
 package org.mule.test.http.functional.requester;
 
 import static org.mule.extension.http.api.HttpHeaders.Values.CHUNKED;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.MULTI_MAP;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.MULTI_MAP;
 
 import static org.hamcrest.CoreMatchers.isA;
 import static org.hamcrest.Matchers.contains;

@@ -8,7 +8,7 @@ package org.mule.test.http.functional;
 
 import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.DEFAULT_SECURITY_MODEL;
 import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.PROPERTIES_FILE_PATTERN;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.HTTPS;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.HTTPS;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

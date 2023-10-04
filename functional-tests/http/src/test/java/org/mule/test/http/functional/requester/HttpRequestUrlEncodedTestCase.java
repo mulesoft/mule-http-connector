@@ -9,7 +9,7 @@ package org.mule.test.http.functional.requester;
 
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.runtime.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.URL_ENCODED;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.URL_ENCODED;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.startsWith;

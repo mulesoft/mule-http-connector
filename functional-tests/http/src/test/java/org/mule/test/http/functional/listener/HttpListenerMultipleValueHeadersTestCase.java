@@ -16,6 +16,8 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.MULTI_MAP;
+
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.functional.api.component.TestConnectorQueueHandler;
 import org.mule.runtime.api.message.Message;
@@ -33,7 +35,7 @@ import org.apache.http.entity.StringEntity;
 import org.junit.Rule;
 import org.junit.Test;
 
-@Story("MULTI_MAP")
+@Story(MULTI_MAP)
 public class HttpListenerMultipleValueHeadersTestCase extends AbstractHttpTestCase {
 
   @Rule

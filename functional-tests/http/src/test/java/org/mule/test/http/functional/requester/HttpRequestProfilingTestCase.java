@@ -9,8 +9,8 @@ package org.mule.test.http.functional.requester;
 import static org.mule.extension.http.internal.HttpConnectorConstants.HTTP_ENABLE_PROFILING;
 import static org.mule.extension.http.internal.request.profiling.HttpRequestProfilingEventContext.REASON_PHRASE;
 import static org.mule.extension.http.internal.request.profiling.HttpRequestProfilingEventContext.STATUS_CODE;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
-import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.PROFILING;
 
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.Matchers.equalTo;

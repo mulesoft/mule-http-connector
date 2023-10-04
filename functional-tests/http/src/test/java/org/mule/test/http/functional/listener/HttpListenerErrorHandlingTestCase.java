@@ -10,7 +10,7 @@ import static org.apache.http.client.fluent.Request.Get;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.ERROR_HANDLING;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.ERROR_HANDLING;
 
 import org.mule.runtime.core.api.util.IOUtils;
 

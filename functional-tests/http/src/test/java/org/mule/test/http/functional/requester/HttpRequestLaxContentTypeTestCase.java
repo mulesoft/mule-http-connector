@@ -7,6 +7,7 @@
 package org.mule.test.http.functional.requester;
 
 import static org.mule.runtime.http.api.HttpConstants.Method.GET;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.CONTENT;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -22,7 +23,7 @@ import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.junit.Test;
 
-@Story("CONTENT")
+@Story(CONTENT)
 public class HttpRequestLaxContentTypeTestCase extends AbstractHttpTestCase {
 
   @Rule

@@ -6,7 +6,7 @@
  */
 package org.mule.test.http.functional.requester;
 
-import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.HTTPS;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.HTTPS;
 
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.containsString;

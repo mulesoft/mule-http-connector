@@ -10,7 +10,7 @@ import static org.mule.runtime.http.api.HttpConstants.Method.DELETE;
 import static org.mule.runtime.http.api.HttpConstants.Method.GET;
 import static org.mule.runtime.http.api.HttpConstants.Method.POST;
 import static org.mule.runtime.http.api.HttpConstants.Method.PUT;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.REQUEST_URL;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.REQUEST_URL;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyMap;

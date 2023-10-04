@@ -6,8 +6,8 @@
  */
 package org.mule.test.http.functional.listener;
 
-import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.ERROR_HANDLING;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.STREAMING;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.ERROR_HANDLING;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.STREAMING;
 
 import static org.apache.http.client.fluent.Request.Get;
 

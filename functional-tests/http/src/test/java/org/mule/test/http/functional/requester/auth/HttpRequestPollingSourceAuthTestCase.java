@@ -7,7 +7,8 @@
 package org.mule.test.http.functional.requester.auth;
 
 import static org.mule.runtime.core.api.util.FileUtils.getResourcePath;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.POLLING_SOURCE;
 import static org.mule.test.http.functional.requester.auth.HttpRequestAuthUtils.createAuthHandler;
 
 import static java.lang.Thread.sleep;
@@ -31,7 +32,7 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.junit.Test;
 
 @Feature(HTTP_EXTENSION)
-@Story("POLLING_SOURCE")
+@Story(POLLING_SOURCE)
 public class HttpRequestPollingSourceAuthTestCase extends AbstractHttpRequestTestCase {
 
   private static Latch basicAuthLatch = new Latch();

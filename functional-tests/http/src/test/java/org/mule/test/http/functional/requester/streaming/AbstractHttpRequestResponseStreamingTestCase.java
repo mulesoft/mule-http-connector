@@ -7,7 +7,7 @@
 package org.mule.test.http.functional.requester.streaming;
 
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.STREAMING;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.STREAMING;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 

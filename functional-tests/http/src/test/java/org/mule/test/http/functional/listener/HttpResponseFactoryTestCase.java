@@ -14,7 +14,7 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_EXTENSION;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 

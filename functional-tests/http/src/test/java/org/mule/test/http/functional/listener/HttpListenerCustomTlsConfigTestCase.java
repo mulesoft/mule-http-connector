@@ -7,7 +7,7 @@
 package org.mule.test.http.functional.listener;
 
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.HTTPS;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.HTTPS;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
