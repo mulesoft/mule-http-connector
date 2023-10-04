@@ -18,8 +18,8 @@ public class HttpListenerRevocationOutdatedCrlTestCase extends AbstractHttpListe
   }
 
   @Test
-  @Ignore
-  // TODO: Un-ignore this!!
+  @Ignore("W-14234781")
+  // TODO (W-14234781): Review this test.
   public void testClientCertifiedAndOutdatedCrl() throws Exception {
     try {
       runRevocationTestFlow();

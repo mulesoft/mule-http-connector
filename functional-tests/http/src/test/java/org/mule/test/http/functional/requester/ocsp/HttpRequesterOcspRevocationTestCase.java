@@ -36,7 +36,8 @@ public class HttpRequesterOcspRevocationTestCase extends AbstractHttpOcspRevocat
   }
 
   @Test
-  // TODO: Un-ignore this!!
+  @Ignore("W-14234781")
+  // TODO (W-14234781): Review this test.
   public void testServerCertifiedAndRevoked() throws Exception {
     try {
       runRevocationTestFlow();
