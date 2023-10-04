@@ -8,7 +8,7 @@ package org.mule.test.http.functional.requester;
 
 import static org.mule.runtime.http.api.HttpHeaders.Names.COOKIE;
 
-import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -68,11 +68,16 @@ public class HttpRequestCookiesTestCase extends AbstractHttpRequestTestCase {
 
   private void assertCookiesSent(String... cookies) {
     assertThat(headers.containsKey(COOKIE), is(true));
-
     Set<String> sentCookies = new HashSet<>(headers.get(COOKIE));
-    Set<String> expectedCookies = buildCookiesSet(cookies);
 
-    assertThat(sentCookies, equalTo(expectedCookies));
+    // The size must be always 1, because the cookies must be concatenated.
+    assertThat(sentCookies.size(), is(1));
+    String sentCookiesHeaderValue = sentCookies.iterator().next();
+
+    for (String expectedCookie : cookies) {
+      String expectedCookiePair = expectedCookie + "=" + COOKIE_TEST_VALUE;
+      assertThat(sentCookiesHeaderValue, containsString(expectedCookiePair));
+    }
   }
 
   private Set<String> buildCookiesSet(String... cookies) {
