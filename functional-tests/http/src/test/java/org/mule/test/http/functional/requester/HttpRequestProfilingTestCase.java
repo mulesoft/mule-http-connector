@@ -45,7 +45,7 @@ import org.junit.Test;
 
 @Feature(HTTP_EXTENSION)
 @Story(PROFILING)
-@Ignore
+@Ignore("W-14237334")
 public class HttpRequestProfilingTestCase extends AbstractHttpRequestTestCase {
 
   public static final String BODY = "OK";
@@ -58,7 +58,7 @@ public class HttpRequestProfilingTestCase extends AbstractHttpRequestTestCase {
   @Override
   protected Map<String, Object> getStartUpRegistryObjects() {
     Map<String, Object> registryObjects = new HashMap<>();
-    registryObjects.put("_muleProfilingService", new TestProfilingService(profilingDataProducer));
+    registryObjects.put("test.profiling.service", new TestProfilingService(profilingDataProducer));
     return registryObjects;
   }
 
