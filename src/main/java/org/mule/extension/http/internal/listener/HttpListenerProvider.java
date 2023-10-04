@@ -48,6 +48,9 @@ import org.mule.runtime.http.api.server.HttpServer;
 import org.mule.runtime.http.api.server.HttpServerConfiguration;
 import org.mule.runtime.http.api.server.ServerAddress;
 import org.mule.runtime.http.api.server.ServerCreationException;
+import org.mule.sdk.api.annotation.semantics.connectivity.ExcludeFromConnectivitySchema;
+import org.mule.sdk.api.annotation.semantics.connectivity.Host;
+import org.mule.sdk.api.annotation.semantics.connectivity.Port;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -89,6 +92,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
     @Example("0.0.0.0")
     @Expression(NOT_SUPPORTED)
     @Placement(order = 2)
+    @Host
     private String host;
 
     /**
@@ -98,6 +102,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
     @Example("8081")
     @Expression(NOT_SUPPORTED)
     @Placement(order = 3)
+    @Port
     private Integer port;
 
     /**
@@ -107,6 +112,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
     @Optional(defaultValue = "true")
     @Expression(NOT_SUPPORTED)
     @Placement(tab = ADVANCED, order = 1)
+    @ExcludeFromConnectivitySchema
     private boolean usePersistentConnections;
 
     /**
