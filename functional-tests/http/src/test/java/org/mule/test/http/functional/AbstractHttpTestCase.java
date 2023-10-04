@@ -51,6 +51,8 @@ public abstract class AbstractHttpTestCase extends MuleArtifactFunctionalTestCas
   // Expected validation error message for JDK 17.
   protected static final String J17_SSL_ERROR_RESPONSE = "PKIX path validation failed";
 
+  protected static final String APPROPRIATE_PROTOCOL_ERROR = "No appropriate protocol (protocol is disabled or cipher suites are inappropriate)";
+
   @Rule
   public TestHttpClient httpClient = new TestHttpClient.Builder(getService(HttpService.class)).build();
 
@@ -78,6 +80,7 @@ public abstract class AbstractHttpTestCase extends MuleArtifactFunctionalTestCas
     return is(anyOf(containsString(J8_262_SSL_ERROR_RESPONSE),
                     containsString(J8_275_SSL_ERROR_RESPONSE),
                     containsString(J11_SSL_ERROR_RESPONSE),
-                    containsString(J17_SSL_ERROR_RESPONSE)));
+                    containsString(J17_SSL_ERROR_RESPONSE),
+                    containsString(APPROPRIATE_PROTOCOL_ERROR)));
   }
 }
