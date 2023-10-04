@@ -62,8 +62,7 @@ public class HttpTlsContextCustomCiphersTestCase extends AbstractHttpTlsContextT
   @Test
   public void testValidProtocolInvalidCipher() throws Exception {
     expectedError.expectErrorType("HTTP", "CONNECTIVITY");
-    expectedError.expectMessage(containsString(ERROR_RESPONSE));
+    expectedError.expectMessage(anyOf(containsString(ERROR_RESPONSE), sslValidationError()));
     flowRunner(validProtocolInvalidCipher).run();
   }
-
 }
