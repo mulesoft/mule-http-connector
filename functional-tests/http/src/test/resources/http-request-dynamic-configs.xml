@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="
+            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:request-config name="dynamicConfig1" basePath="#[vars.basePath]" followRedirects="#[vars.follow]" sendBodyMode="#[vars.send]">
+        <http:request-connection host="#[vars.host]" port="${httpPort}"/>
+    </http:request-config>
+    <http:request-config name="dynamicConfig2" requestStreamingMode="#[vars.stream]" responseTimeout="#[vars.timeout]">
+        <http:request-connection host="localhost" port="#[vars.port]"/>
+    </http:request-config>
+
+    <flow name="client1">
+        <http:request config-ref="dynamicConfig1" path="#[vars.path]" method="#[vars.method]"/>
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
+    </flow>
+
+    <flow name="client2" >
+        <http:request config-ref="dynamicConfig2" path="testPath" method="POST">
+            <http:body>
+                #[vars.body]
+            </http:body>
+        </http:request>
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
+    </flow>
+
+    <http:request-config name="config">
+        <http:request-connection host="localhost" port="${httpPort}"/>
+        <http:default-headers>
+            <http:default-header key="queen" value="#['cersei']"/>
+        </http:default-headers>
+        <http:default-query-params>
+            <http:query-param key="Tyrion" value="#['rules']"/>
+        </http:default-query-params>
+    </http:request-config>
+</mule>

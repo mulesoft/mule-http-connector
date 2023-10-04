@@ -1,0 +1,158 @@
+/*
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+package org.mule.test.http.functional.requester.config;
+
+import static org.mule.extension.http.api.error.HttpError.CONNECTIVITY;
+import static org.mule.extension.http.internal.listener.HttpListener.HTTP_NAMESPACE;
+import static org.mule.functional.api.exception.ExpectedError.none;
+import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
+import static org.mule.runtime.http.api.HttpConstants.Method.GET;
+import static org.mule.runtime.http.api.HttpConstants.Method.POST;
+import static org.mule.runtime.http.api.HttpHeaders.Names.HOST;
+import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
+
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertThat;
+
+import org.mule.functional.api.exception.ExpectedError;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.test.http.functional.requester.AbstractHttpRequestTestCase;
+
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.Matchers;
+import org.junit.Rule;
+import org.junit.Test;
+
+public class HttpRequestDynamicConfigTestCase extends AbstractHttpRequestTestCase {
+
+  @Rule
+  public ExpectedError expectedError = none();
+
+  @Rule
+  public DynamicPort unusedPort = new DynamicPort("unusedPort");
+
+  @Override
+  protected String getConfigFile() {
+    return "http-request-dynamic-configs.xml";
+  }
+
+  @Test
+  public void requestsGoThroughClient1() throws Exception {
+    CoreEvent result = flowRunner("client1")
+        .withVariable("basePath", "api/v1")
+        .withVariable("follow", true)
+        .withVariable("send", "AUTO")
+        .withVariable("host", "localhost")
+        .withVariable("path", "clients")
+        .withVariable("method", GET)
+        .withPayload(AbstractMuleContextTestCase.TEST_MESSAGE)
+        .run();
+    assertThat(result.getMessage(), hasPayload(is(DEFAULT_RESPONSE)));
+    assertThat(method, is(GET.toString()));
+    assertThat(uri, is("/api/v1/clients"));
+    assertThat(body, is(""));
+    assertThat(headers.keys(), hasItem(HOST));
+    assertThat(headers.get(HOST), hasItem(containsString("localhost:")));
+
+    result = flowRunner("client1")
+        .withVariable("basePath", "api/v2")
+        .withVariable("follow", true)
+        .withVariable("send", "ALWAYS")
+        .withVariable("host", "localhost")
+        .withVariable("path", "items")
+        .withVariable("method", GET)
+        .withPayload(AbstractMuleContextTestCase.TEST_MESSAGE)
+        .run();
+    assertThat(result.getMessage(), hasPayload(is(DEFAULT_RESPONSE)));
+    assertThat(method, is(GET.toString()));
+    assertThat(uri, is("/api/v2/items"));
+    assertThat(body, Matchers.is(AbstractMuleContextTestCase.TEST_MESSAGE));
+    assertThat(headers.keys(), hasItem(HOST));
+    assertThat(headers.get(HOST), hasItem(containsString("localhost:")));
+  }
+
+  @Test
+  public void requestsGoThroughClient2() throws Exception {
+    CoreEvent result = flowRunner("client2")
+        .withVariable("parse", false)
+        .withVariable("stream", "AUTO")
+        .withVariable("timeout", 20000)
+        .withVariable("port", httpPort.getNumber())
+        .withVariable("body", AbstractMuleTestCase.TEST_PAYLOAD)
+        .withPayload(AbstractMuleContextTestCase.TEST_MESSAGE)
+        .run();
+    assertThat(result.getMessage(), hasPayload(is(DEFAULT_RESPONSE)));
+    assertThat(method, is(POST.toString()));
+    assertThat(uri, is("/testPath"));
+    assertThat(body, Matchers.is(AbstractMuleTestCase.TEST_PAYLOAD));
+    assertThat(headers.keys(), not(hasItem(TRANSFER_ENCODING)));
+
+    result = flowRunner("client2")
+        .withVariable("parse", false)
+        .withVariable("stream", "ALWAYS")
+        .withVariable("timeout", 20000)
+        .withVariable("port", httpPort.getNumber())
+        .withVariable("body", AbstractMuleTestCase.TEST_PAYLOAD)
+        .withPayload(AbstractMuleContextTestCase.TEST_MESSAGE)
+        .run();
+    assertThat(result.getMessage(), hasPayload(is(DEFAULT_RESPONSE)));
+    assertThat(method, is(POST.toString()));
+    assertThat(uri, is("/testPath"));
+    assertThat(body, Matchers.is(AbstractMuleTestCase.TEST_PAYLOAD));
+    assertThat(headers.keys(), hasItem(TRANSFER_ENCODING));
+  }
+
+  @Test
+  public void requestWithDynamicConnectionParamUsesDifferentConfigs() throws Exception {
+    CoreEvent result = flowRunner("client2")
+        .withVariable("parse", false)
+        .withVariable("stream", "AUTO")
+        .withVariable("timeout", 20000)
+        .withVariable("port", httpPort.getNumber())
+        .withVariable("body", AbstractMuleTestCase.TEST_PAYLOAD)
+        .withPayload(AbstractMuleContextTestCase.TEST_MESSAGE)
+        .run();
+    assertThat(result.getMessage(), hasPayload(is(DEFAULT_RESPONSE)));
+    assertThat(method, is(POST.toString()));
+    assertThat(uri, is("/testPath"));
+    assertThat(body, Matchers.is(AbstractMuleTestCase.TEST_PAYLOAD));
+    assertThat(headers.keys(), not(hasItem(TRANSFER_ENCODING)));
+
+
+    expectedError.expectErrorType(HTTP_NAMESPACE.toUpperCase(), CONNECTIVITY.name());
+    expectedError.expectMessage(containsString("Connection refused"));
+    flowRunner("client2")
+        .withVariable("parse", false)
+        .withVariable("stream", "AUTO")
+        .withVariable("timeout", 20000)
+        .withVariable("port", unusedPort.getNumber())
+        .withVariable("body", AbstractMuleTestCase.TEST_PAYLOAD)
+        .withPayload(AbstractMuleContextTestCase.TEST_MESSAGE)
+        .run();
+  }
+
+  @Test
+  public void sameInstanceForEquivalentValues() throws Exception {
+    ConfigurationProvider configurationProvider = registry.<ConfigurationProvider>lookupByName("config").get();
+    assertThat(configurationProvider, CoreMatchers.is(CoreMatchers.not(nullValue())));
+
+    ConfigurationInstance config1 = configurationProvider.get(testEvent());
+    ConfigurationInstance config2 = configurationProvider.get(testEvent());
+
+    assertThat(config1.getValue(), CoreMatchers.is(sameInstance(config2.getValue())));
+  }
+}
