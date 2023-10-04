@@ -6,13 +6,6 @@
  */
 package org.mule.extension.http.internal.request;
 
-import static java.lang.Boolean.getBoolean;
-import static java.lang.Integer.MAX_VALUE;
-import static java.lang.Integer.getInteger;
-import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
-import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
 import static org.mule.extension.http.api.error.HttpError.CONNECTIVITY;
 import static org.mule.extension.http.api.error.HttpError.TIMEOUT;
 import static org.mule.extension.http.api.notification.HttpNotificationAction.REQUEST_COMPLETE;
@@ -27,6 +20,14 @@ import static org.mule.extension.http.internal.request.profiling.tracing.HttpSpa
 import static org.mule.extension.http.internal.request.profiling.tracing.HttpSpanUtils.updateClientSpanStatus;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
+
+import static java.lang.Boolean.getBoolean;
+import static java.lang.Integer.MAX_VALUE;
+import static java.lang.Integer.getInteger;
+import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
+import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.error.HttpError;
@@ -49,7 +50,6 @@ import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.notification.NotificationActionDefinition;
 import org.mule.runtime.extension.api.notification.NotificationEmitter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -59,8 +59,6 @@ import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -76,6 +74,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Component capable of performing an HTTP request given a request.
@@ -217,7 +218,6 @@ public class HttpRequester {
                   .convert(config, muleContext, response, entity, resultInputStreamSupplier, httpRequest.getUri());
 
               resendRequest(result, checkRetry, authentication, () -> {
-                scheduler.submit(() -> consumePayload(result));
                 doRequest(client, config, uri, method, streamingMode, sendBodyMode, followRedirects,
                           authentication, responseTimeout, responseValidator, transformationService,
                           requestCreator, false, muleContext, scheduler, notificationEmitter,
@@ -347,16 +347,6 @@ public class HttpRequester {
       authentication.retryIfShould(result, retryCallback, notRetryCallback);
     } else {
       notRetryCallback.run();
-    }
-  }
-
-  private void consumePayload(final Result result) {
-    if (result.getOutput() instanceof InputStream) {
-      try {
-        IOUtils.toByteArray((InputStream) result.getOutput());
-      } catch (Exception e) {
-        throw new MuleRuntimeException(e);
-      }
     }
   }
 
