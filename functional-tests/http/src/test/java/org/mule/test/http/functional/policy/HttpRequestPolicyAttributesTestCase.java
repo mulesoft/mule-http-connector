@@ -8,6 +8,7 @@ package org.mule.test.http.functional.policy;
 
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.MULTI_VALUES_IN_POLICIES;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -19,7 +20,6 @@ import org.mule.test.http.functional.AbstractHttpTestCase;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
 import io.qameta.allure.Description;
 import io.qameta.allure.Story;
 import org.junit.Rule;
@@ -30,7 +30,7 @@ public class HttpRequestPolicyAttributesTestCase extends AbstractHttpTestCase {
 
   private static final String HEADER = "header";
   private static final String QUERY_PARAM = "queryParam";
-  private static final List<String> VALUES = Lists.newArrayList("first", "second");
+  private static final List<String> VALUES = newArrayList("first", "second");
 
   @Rule
   public DynamicPort port = new DynamicPort("port");

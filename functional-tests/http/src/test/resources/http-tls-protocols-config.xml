@@ -89,7 +89,7 @@
     </flow>
     <flow name="testFlowGlobalContextDefaultProtocolsFails">
         <http:listener config-ref="mainListenerConfig" path="/defaultFails" allowedMethods="GET"/>
-        <http:request config-ref="clientGlobalConfigDefaultFails" path="/" method="GET" /> <!-- Este falla -->
+        <http:request config-ref="clientGlobalConfigDefaultFails" path="/" method="GET" />
     </flow>
     <flow name="testFlowGlobalContextCustomProtocolsInvalid">
         <http:listener config-ref="mainListenerConfig" path="/customInvalid" allowedMethods="GET"/>
@@ -97,7 +97,7 @@
     </flow>
     <flow name="testFlowGlobalContextCustomProtocolsValid">
         <http:listener config-ref="mainListenerConfig" path="/customValid" allowedMethods="GET"/>
-        <http:request config-ref="clientGlobalConfigTLSv1" path="/" method="GET" /> <!-- Este falla -->
+        <http:request config-ref="clientGlobalConfigTLSv1" path="/" method="GET" />
     </flow>
     <flow name="testFlowGlobalContextCustomProtocolsProperty">
         <http:listener config-ref="mainListenerConfig" path="/property" allowedMethods="GET"/>

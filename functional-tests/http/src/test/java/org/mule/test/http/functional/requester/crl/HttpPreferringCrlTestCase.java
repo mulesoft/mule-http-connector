@@ -28,7 +28,8 @@ public class HttpPreferringCrlTestCase extends AbstractHttpTlsRevocationTestCase
   }
 
   @Test
-  @Ignore
+  @Ignore("W-14234781")
+  // TODO (W-14234781): Review this test.
   public void testPreferCrlWithFallback() throws Exception {
     try {
       runFlow("testFlowPreferCrl");
@@ -39,7 +40,8 @@ public class HttpPreferringCrlTestCase extends AbstractHttpTlsRevocationTestCase
   }
 
   @Test
-  @Ignore
+  @Ignore("W-14234781")
+  // TODO (W-14234781): Review this test.
   public void testPreferCrlNoFallback() throws Exception {
     try {
       runFlow("testFlowPreferCrlNoFallback");
@@ -50,7 +52,8 @@ public class HttpPreferringCrlTestCase extends AbstractHttpTlsRevocationTestCase
   }
 
   @Test
-  @Ignore
+  @Ignore("W-14234781")
+  // TODO (W-14234781): Review this test.
   public void testNotPreferCrlWithFallback() throws Exception {
     try {
       runFlow("testFlowNotPreferCrl");
@@ -61,7 +64,8 @@ public class HttpPreferringCrlTestCase extends AbstractHttpTlsRevocationTestCase
   }
 
   @Test
-  @Ignore
+  @Ignore("W-14234781")
+  // TODO (W-14234781): Review this test.
   public void testNotPreferCrlNoFallback() throws Exception {
     try {
       runFlow("testFlowNotPreferCrlNoFallback");

@@ -9,13 +9,14 @@
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <!--Forces TLSv1.2 because of the cipher suite being used-->
-    <tls:context name="tlsClientContext" enabledCipherSuites="TLS_DHE_RSA_WITH_AES_128_CBC_SHA256">
-        <tls:trust-store path="tls/trustStore" password="mulepassword"/>
-    </tls:context>
-
     <http:request-config name="requestConfig1">
-        <http:request-connection  protocol="${protocol}" host="localhost" port="${port1}" />
+        <http:request-connection  protocol="${protocol}" host="localhost" port="${port1}" >
+            <tls:context enabledCipherSuites="TLS_DHE_RSA_WITH_AES_128_CBC_SHA256">
+                <tls:trust-store path="tls/trustStore" password="mulepassword"/>
+            </tls:context>
+        </http:request-connection>
     </http:request-config>
+
     <!--Forces TLSv1.1 and TLSv1.2 with a cipher suite for each-->
     <http:request-config name="requestConfig2">
         <http:request-connection protocol="HTTPS" host="localhost" port="${port2}">
