@@ -173,6 +173,7 @@
                             <!--<additionalRuntime>MULE_EE:4.1.1</additionalRuntime> -->
 
                             <additionalRuntime>MULE_EE:4.4.1-SNAPSHOT</additionalRuntime>
+                            <additionalRuntime>MULE_EE:4.5.1-SNAPSHOT</additionalRuntime>
                         </additionalRuntimes>
 
                         <!-- Versions with support and snapshots -->
