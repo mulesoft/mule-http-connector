@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:request-config name="simpleConfig">
+        <http:request-connection host="localhost" port="#[vars.port]"/>
+    </http:request-config>
+
+    <flow name="handled">
+        <http:request config-ref="simpleConfig" path="testPath" responseTimeout="1000">
+            <http:headers>#[{'Content-Type': 'application/xml'}]</http:headers>
+        </http:request>
+        <error-handler>
+            <on-error-continue type="http:CONNECTIVITY">
+                <set-payload value="#[message.message.exceptionPayload.info.'Element DSL']"/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+
+</mule>
