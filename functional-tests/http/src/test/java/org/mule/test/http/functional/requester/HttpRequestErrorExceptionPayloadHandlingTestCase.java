@@ -38,7 +38,6 @@ public class HttpRequestErrorExceptionPayloadHandlingTestCase extends AbstractHt
 
   @Test
   public void connectivity() throws Exception {
-
     CoreEvent result = getFlowRunner("handled", unusedPort.getNumber()).run();
     assertThat(result.getMessage(),
                hasPayload(equalTo("<http:request config-ref=\"simpleConfig\" path=\"testPath\" responseTimeout=\"1000\">\n<http:headers><![CDATA[\n#[{'Content-Type': 'application/xml'}]\n]]></http:headers>\n</http:request>")));
