@@ -328,59 +328,6 @@
             </exclusions>
         </dependency>
 
-        <!-- Tests -->
-
-
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpmime</artifactId>
-            <version>4.5.13</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpasyncclient</artifactId>
-            <version>4.1.4</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mule.glassfish.grizzly</groupId>
-            <artifactId>tls-sni</artifactId>
-            <version>${grizzlyVersion}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mule.glassfish.grizzly</groupId>
-            <artifactId>grizzly-http-server</artifactId>
-            <version>${grizzlyVersion}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mule.glassfish.grizzly</groupId>
-            <artifactId>grizzly-http-client</artifactId>
-            <version>${grizzlyAhcVersion}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-scripting-module</artifactId>
-            <classifier>mule-plugin</classifier>
-            <version>${scriptingModuleVersion}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.connectors</groupId>
-            <artifactId>mule-objectstore-connector</artifactId>
-            <version>${muleObjectStoreConnectorTestVersion}</version>
-            <classifier>mule-plugin</classifier>
-            <scope>test</scope>
-        </dependency>
-
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-profiling-api</artifactId>
@@ -399,7 +346,6 @@
             <artifactId>mule-sdk-api</artifactId>
             <version>${muleSdkApiVersion}</version>
         </dependency>
-
 
         <dependency>
             <groupId>jakarta.xml.bind</groupId>
