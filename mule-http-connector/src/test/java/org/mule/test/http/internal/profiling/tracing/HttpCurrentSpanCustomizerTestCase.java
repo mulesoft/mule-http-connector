@@ -24,7 +24,6 @@ import static org.mule.extension.http.internal.request.profiling.tracing.HttpReq
 import static org.mule.runtime.http.api.domain.HttpProtocol.HTTP_1_1;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
-import static org.eclipse.jetty.http.HttpMethod.GET;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -66,7 +65,7 @@ public class HttpCurrentSpanCustomizerTestCase {
   @Description("The listener span customizer informs the distributed trace context manager the correct attributes/name")
   public void listenerSpan() {
     HttpRequestAttributes attributes = mock(HttpRequestAttributes.class);
-    when(attributes.getMethod()).thenReturn(GET.asString());
+    when(attributes.getMethod()).thenReturn("GET");
     when(attributes.getScheme()).thenReturn(HTTPS);
     when(attributes.getVersion()).thenReturn(HTTP_1_1.asString());
     when(attributes.getListenerPath()).thenReturn(LISTENER_PATH);
@@ -82,7 +81,7 @@ public class HttpCurrentSpanCustomizerTestCase {
 
     verify(distributedTraceContextManager).setCurrentSpanName(EXPECTED_METHOD + " " + LISTENER_PATH);
 
-    verify(distributedTraceContextManager).addCurrentSpanAttribute(HTTP_METHOD, GET.asString());
+    verify(distributedTraceContextManager).addCurrentSpanAttribute(HTTP_METHOD, "GET");
     verify(distributedTraceContextManager).addCurrentSpanAttribute(HTTP_FLAVOR, EXPECTED_PROTOCOL_VERSION);
     verify(distributedTraceContextManager).addCurrentSpanAttribute(HTTP_TARGET, LISTENER_PATH);
     verify(distributedTraceContextManager).addCurrentSpanAttribute(NET_HOST_NAME, TEST_HOST);
@@ -114,7 +113,7 @@ public class HttpCurrentSpanCustomizerTestCase {
     HttpRequest httpRequest = mock(HttpRequest.class);
     DistributedTraceContextManager distributedTraceContextManager = mock(DistributedTraceContextManager.class);
     URI uri = new URI(uriString);
-    when(httpRequest.getMethod()).thenReturn(GET.asString());
+    when(httpRequest.getMethod()).thenReturn("GET");
     when(httpRequest.getUri()).thenReturn(uri);
     when(httpRequest.getProtocol()).thenReturn(HTTP_1_1);
 
@@ -122,7 +121,7 @@ public class HttpCurrentSpanCustomizerTestCase {
     httpCurrentSpanCustomizer.customizeSpan(distributedTraceContextManager);
 
     verify(distributedTraceContextManager).setCurrentSpanName(EXPECTED_METHOD);
-    verify(distributedTraceContextManager).addCurrentSpanAttribute(HTTP_METHOD, GET.asString());
+    verify(distributedTraceContextManager).addCurrentSpanAttribute(HTTP_METHOD, "GET");
     verify(distributedTraceContextManager).addCurrentSpanAttribute(HTTP_FLAVOR, EXPECTED_PROTOCOL_VERSION);
     verify(distributedTraceContextManager).addCurrentSpanAttribute(HTTP_URL, uri.toString());
     verify(distributedTraceContextManager).addCurrentSpanAttribute(NET_PEER_PORT, expectedPortValue);
