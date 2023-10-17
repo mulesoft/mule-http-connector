@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+      xmlns:java="http://www.mulesoft.org/schema/mule/java"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+
+    <munit:config name="overload-test-case.xml" />
+
+    <munit:dynamic-port propertyName="dynamic.port"/>
+
+    <!-- Target Application (specific) -->
+    <http:listener-config name="overloadListenerConfig">
+        <http:listener-connection host="localhost" port="${dynamic.port}"/>
+    </http:listener-config>
+
+    <flow name="overloadFlow">
+        <http:listener path="/*" config-ref="overloadListenerConfig"/>
+        <java:invoke-static
+                class="org.mule.test.ExceptionUtils"
+                method="throwException(String, String)">
+            <java:args>
+                #[{
+                'className': 'org.mule.runtime.api.scheduler.SchedulerBusyException',
+                'message': 'Scheduler unavailable'
+                }]
+            </java:args>
+        </java:invoke-static>
+    </flow>
+
+    <!-- Test configuration -->
+    <http:request-config name="listener-overload-RequestConfig">
+        <http:request-connection host="localhost" port="${dynamic.port}" />
+    </http:request-config>
+
+    <!-- Test case -->
+    <munit:test name="overloadError" >
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="overloadFlow" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <http:request config-ref="listener-overload-RequestConfig" path="/test">
+                <http:response-validator>
+                    <http:success-status-code-validator values="0..599" />
+                </http:response-validator>
+            </http:request>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(500)]"/>
+            <munit-tools:assert-that expression="#[%dw 2.0 output application/java --- payload.^raw as String]" is="#[MunitTools::containsString('Scheduler unavailable')]" />
+        </munit:validation>
+    </munit:test>
+</mule>
