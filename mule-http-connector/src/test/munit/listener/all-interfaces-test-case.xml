@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+
+    <munit:config name="all-interfaces-test-case.xml" />
+
+    <munit:dynamic-port propertyName="dynamic.port"/>
+
+    <!-- Target Application -->
+    <http:listener-config name="allInterfacesListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="${dynamic.port}"/>
+    </http:listener-config>
+    <flow name="testFlow">
+        <http:listener path="/*" config-ref="allInterfacesListenerConfig"/>
+        <set-payload value="Expected Response" />
+    </flow>
+
+    <!-- Test configuration -->
+    <http:request-config name="all-interfaces-RequestConfig">
+        <http:request-connection host="localhost" port="${dynamic.port}" />
+    </http:request-config>
+
+    <!-- Test case -->
+    <munit:test name="listeningToAllInterfaces" >
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="testFlow" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <http:request config-ref="all-interfaces-RequestConfig" path="/test" />
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[%dw 2.0 output application/java --- payload.^raw as String]" is="#[MunitTools::containsString('Expected Response')]" />
+        </munit:validation>
+    </munit:test>
+</mule>
