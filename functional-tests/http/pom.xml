@@ -33,7 +33,126 @@
 
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
         <mule.version>4.6.0-SNAPSHOT</mule.version>
+
+        <!-- Remove when a new parent version with MTF is available -->
+        <munit.input.directory>src/test/munit</munit.input.directory>
+        <munit.output.directory>${basedir}/target/test-mule/munit</munit.output.directory>
+        <munit.extensions.maven.plugin.version>1.2.0-SNAPSHOT</munit.extensions.maven.plugin.version>
+        <munit.version>3.1.0-SNAPSHOT</munit.version>
+        <mtf-tools.version>1.2.0-SNAPSHOT</mtf-tools.version>
+        <mavenResources.version>3.0.2</mavenResources.version>
     </properties>
+
+    <build>
+        <plugins>
+
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${mavenResources.version}</version>
+                <executions>
+                    <execution>
+                        <id>copy-munit-resources</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${munit.output.directory}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${munit.input.directory}</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>com.mulesoft.munit</groupId>
+                <artifactId>munit-extensions-maven-plugin</artifactId>
+                <version>${munit.extensions.maven.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <phase>integration-test</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <argLines>
+                        <argLine>
+                            -XX:+IgnoreUnrecognizedVMOptions
+                        </argLine>
+                        <argLine>
+                            --add-opens=java.base/java.lang=ALL-UNNAMED
+                        </argLine>
+                        <argLine>
+                            -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${session.executionRootDirectory}/target/jacoco.exec
+                        </argLine>
+                    </argLines>
+
+                    <!-- For testing tracing capabilities-->
+                    <systemPropertyVariables>
+                        <!-- We keep the two OTEL properties for 4.5.0 and 4.6.0 -->
+                        <mule.openetelemetry.export.enabled>true</mule.openetelemetry.export.enabled>
+                        <mule.openTelemetry.tracer.exporter.enabled>true</mule.openTelemetry.tracer.exporter.enabled>
+                        <mule.enable.profiling.service>true</mule.enable.profiling.service>
+                    </systemPropertyVariables>
+
+                    <!-- Configuration for local builds, in Jenkins we configure this via command line arguments -->
+                    <runtimeConfiguration>
+                        <additionalRuntimes>
+                            <!-- Cannot test against 4.1.1 because MUnit minMuleVersion is 4.3.0 -->
+                            <!--<additionalRuntime>MULE_EE:4.1.1</additionalRuntime> -->
+
+                            <additionalRuntime>MULE_EE:4.4.1-SNAPSHOT</additionalRuntime>
+
+                            <!-- We have to indicate this here because otherwise MUnit discovers 4.5.1-SNAPSHOT wrongly -->
+                            <additionalRuntime>MULE_EE:4.5.1-SNAPSHOT</additionalRuntime>
+                        </additionalRuntimes>
+
+                        <!-- Versions with support and snapshots -->
+                        <discoverRuntimes>
+                            <product>EE</product>
+                            <!-- MUnit minMuleVersion is 4.3.0 -->
+                            <minMuleVersion>4.3.0</minMuleVersion>
+                            <includeSnapshots>false</includeSnapshots>
+                            <latestPatches>true</latestPatches>
+                        </discoverRuntimes>
+                    </runtimeConfiguration>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.mulesoft.munit</groupId>
+                        <artifactId>munit-runner</artifactId>
+                        <version>${munit.version}</version>
+                        <classifier>mule-plugin</classifier>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.mulesoft.munit</groupId>
+                        <artifactId>munit-tools</artifactId>
+                        <version>${munit.version}</version>
+                        <classifier>mule-plugin</classifier>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.mulesoft.munit</groupId>
+                        <artifactId>mtf-tools</artifactId>
+                        <version>${mtf-tools.version}</version>
+                        <classifier>mule-plugin</classifier>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.mule.module</groupId>
+                        <artifactId>mule-java-module</artifactId>
+                        <version>1.2.6</version>
+                        <classifier>mule-plugin</classifier>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
 
     <dependencies>
         <!-- HTTP Connector (Target) -->
