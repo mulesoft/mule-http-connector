@@ -1,4 +1,10 @@
 projectType: extension
+mavenCompileGoal: "verify
+    -DskipTests
+    -DskipITs
+    -Dinvoker.skip=true
+    -Darchetype.test.skip
+    -Dmaven.javadoc.skip"
 additionalTestConfigs:
   testsJava17:
     testJdkTool: OPEN-JDK17
