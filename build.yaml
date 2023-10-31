@@ -1,5 +1,6 @@
 projectType: extension
 mavenAdditionalArgs: -pl mule-http-connector
+mavenTool: 3.9.2
 additionalTestConfigs:
   functionalJava17:
     testJdkTool: OPEN-JDK17
