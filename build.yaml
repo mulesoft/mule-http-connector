@@ -1,5 +1,9 @@
 projectType: extension
+mavenAdditionalArgs: -pl mule-http-connector
 additionalTestConfigs:
-  testsJava17:
+  functionalJava17:
     testJdkTool: OPEN-JDK17
-    mavenAdditionalArgs: -DruntimeProduct=MULE_EE -DruntimeVersion=4.6.0-SNAPSHOT -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE
+    mavenAdditionalArgs: -pl functional-tests/cors,functional-tests/http -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE
+  munitJava17:
+    testJdkTool: OPEN-JDK17
+    mavenAdditionalArgs: -pl mule-http-connector -DruntimeProduct=MULE_EE -DruntimeVersion=4.6.0-SNAPSHOT -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE
