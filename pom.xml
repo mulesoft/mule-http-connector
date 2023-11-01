@@ -54,7 +54,7 @@
         <scriptingModuleVersion>1.1.7</scriptingModuleVersion>
         <muleObjectStoreConnectorTestVersion>1.2.1</muleObjectStoreConnectorTestVersion>
 
-        <springVersion>5.3.18</springVersion>
+        <springVersion>5.3.30</springVersion>
 
         <mulesoftLicenseVersion>1.4.0</mulesoftLicenseVersion>
         <license.maven.plugin.version>4.2</license.maven.plugin.version>
