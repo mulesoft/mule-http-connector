@@ -175,7 +175,7 @@
                             <additionalRuntime>MULE_EE:4.4.1-SNAPSHOT</additionalRuntime>
 
                             <!-- We have to indicate this here because otherwise MUnit discovers 4.5.1-SNAPSHOT wrongly -->
-                            <additionalRuntime>MULE_EE:4.5.1-SNAPSHOT</additionalRuntime>
+                            <additionalRuntime>MULE_EE:4.5.2-SNAPSHOT</additionalRuntime>
                         </additionalRuntimes>
 
                         <!-- Versions with support and snapshots -->
