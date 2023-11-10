@@ -355,12 +355,14 @@
             <groupId>org.mule.sdk</groupId>
             <artifactId>mule-sdk-compatibility-api</artifactId>
             <version>${muleSdkCompatibilityApiVersion}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.mule.sdk</groupId>
             <artifactId>mule-sdk-api</artifactId>
             <version>${muleSdkApiVersion}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Test dependencies -->
