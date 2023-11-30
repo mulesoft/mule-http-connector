@@ -407,6 +407,11 @@
             <name>Mule Repository</name>
             <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
         </repository>
+        <repository>
+            <id>mule-ci-releases</id>
+            <name>Mule CI Release Repository</name>
+            <url>https://repository.mulesoft.org/nexus/content/repositories/ci-releases</url>
+        </repository>
     </repositories>
 
     <pluginRepositories>
@@ -414,6 +419,11 @@
             <id>mule-plugin</id>
             <name>Mule Repository</name>
             <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>mule-ci-releases</id>
+            <name>Mule CI Release Repository</name>
+            <url>https://repository.mulesoft.org/nexus/content/repositories/ci-releases</url>
         </pluginRepository>
     </pluginRepositories>
 </project>
