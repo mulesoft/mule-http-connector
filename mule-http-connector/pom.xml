@@ -420,5 +420,10 @@
             <name>Mule Repository</name>
             <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
         </pluginRepository>
+        <pluginRepository>
+            <id>mule-ci-releases</id>
+            <name>Mule CI Release Repository</name>
+            <url>https://repository.mulesoft.org/nexus/content/repositories/ci-releases</url>
+        </pluginRepository>
     </pluginRepositories>
 </project>
