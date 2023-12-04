@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+    xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+    xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+    xmlns="http://www.mulesoft.org/schema/mule/core"
+    xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+
+    <munit:config name="fips-test-case.xml"/>
+
+    <munit:test name="TestFipsProvidersAndCipherSuites" description="Test">
+        <munit:validation>
+            <munit-tools:assert-equals
+                    actual='#[%dw 2.0 --- java!java::security::Security::getProviders() map $.^class joinBy ", "]'
+                    expected='#[[
+"org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider",
+"org.bouncycastle.jsse.provider.BouncyCastleJsseProvider",
+"sun.security.provider.Sun",
+"sun.security.rsa.SunRsaSign",
+"sun.security.ec.SunEC",
+"com.sun.net.ssl.internal.ssl.Provider",
+"com.sun.crypto.provider.SunJCE",
+"sun.security.jgss.SunProvider",
+"com.sun.security.sasl.Provider",
+"org.jcp.xml.dsig.internal.dom.XMLDSigRI",
+"sun.security.smartcardio.SunPCSC",
+"apple.security.AppleProvider"
+] joinBy ", "]'/>
+            <ee:transform>
+                <ee:message >
+                    <ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+                </ee:message>
+                <ee:variables >
+                    <ee:set-variable variableName="availableCipherSuites" ><![CDATA[%dw 2.0
+output application/java
+---
+[
+"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
+"TLS_DHE_RSA_WITH_AES_256_GCM_SHA384",
+"TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+"TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384",
+"TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384",
+"TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA",
+"TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
+"TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA"
+]]]></ee:set-variable>
+                    <ee:set-variable variableName="actualCipherSuites" ><![CDATA[%dw 2.0
+import invokeExactMethod from java!org::apache::commons::lang3::reflect::MethodUtils
+import builder from java!org::mule::runtime::api::tls::TlsContextFactory
+var factoryBuilder = builder()
+var contextFactory = invokeExactMethod(factoryBuilder, "build")
+var socketFactory = invokeExactMethod(contextFactory, "createSocketFactory")
+var supportedCipherSuites = invokeExactMethod(socketFactory, "getSupportedCipherSuites")
+---
+supportedCipherSuites]]></ee:set-variable>
+                </ee:variables>
+            </ee:transform>
+            <foreach collection="#[vars.actualCipherSuites]">
+                <munit-tools:assert-that is='#[MunitTools::hasItem(payload)]' expression="#[vars.availableCipherSuites]" />
+            </foreach>
+        </munit:validation>
+    </munit:test>
+</mule>

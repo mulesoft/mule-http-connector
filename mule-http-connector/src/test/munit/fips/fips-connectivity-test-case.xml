@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+        xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+        xmlns:mtf="http://www.mulesoft.org/schema/mule/mtf"
+        xmlns="http://www.mulesoft.org/schema/mule/core"
+        xmlns:http="http://www.mulesoft.org/schema/mule/http"
+        xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+        xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/mtf http://www.mulesoft.org/schema/mule/mtf/current/mule-mtf.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
+
+    <munit:config name="fips-connectivity-test-case.xml"/>
+
+    <munit:dynamic-port propertyName="http.port"/>
+
+    <http:request-config name="requestConfigWithConnectivityTesting">
+        <http:request-connection host="localhost" port="${http.port}" protocol="HTTPS" >
+            <tls:context>
+                <tls:trust-store path="tls/ssltestnew-cacerts.jks" password="changeit"/>
+                <tls:key-store path="tls/ssltestnew-keystore.jks" keyPassword="changeit" password="changeit"/>
+            </tls:context>
+            <http:connectivity-test requestPath="/successPath" />
+        </http:request-connection>
+    </http:request-config>
+
+    <http:listener-config name="fipsTestConnectivityListenerConfig" >
+        <http:listener-connection host="0.0.0.0" port="${http.port}" protocol="HTTPS" >
+            <tls:context>
+                <tls:trust-store path="tls/ssltestnew-cacerts.jks" password="changeit"/>
+                <tls:key-store path="tls/ssltestnew-keystore.jks" keyPassword="changeit" password="changeit"/>
+            </tls:context>
+        </http:listener-connection>
+    </http:listener-config>
+
+    <munit:test name="requestConfigWithNoCiphersuitesConnectionTestExpectedToFail" expectedErrorType="MULE:ANY">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="successFlow"/>
+        </munit:enable-flow-sources>
+
+        <munit:execution>
+            <mtf:test-connectivity config-ref="requestConfigWithConnectivityTesting"/>
+        </munit:execution>
+    </munit:test>
+
+    <munit:test name="listenerConfigWithNoCiphersuitesConnectionTestExpectedToFail" expectedErrorType="MULE:ANY">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="successFlow"/>
+        </munit:enable-flow-sources>
+
+        <munit:execution>
+            <mtf:test-connectivity config-ref="fipsTestConnectivityListenerConfig"/>
+        </munit:execution>
+    </munit:test>
+
+    <flow name="successFlow" >
+        <http:listener path="/successPath" config-ref="fipsTestConnectivityListenerConfig" />
+        <logger />
+    </flow>
+</mule>
