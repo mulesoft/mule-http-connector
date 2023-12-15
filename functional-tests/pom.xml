@@ -14,7 +14,7 @@
     <groupId>org.mule.connectors</groupId>
     <artifactId>mule-http-connector-functional-tests</artifactId>
     <packaging>pom</packaging>
-    <version>1.9.0</version>
+    <version>1.9.1-SNAPSHOT</version>
 
     <name>HTTP Connector's Functional Test Cases</name>
 
