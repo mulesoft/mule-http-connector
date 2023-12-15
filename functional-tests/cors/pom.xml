@@ -11,7 +11,7 @@
     </parent>
     <artifactId>mule-cors-tests</artifactId>
     <name>Mule HTTP Connector with CORS Integration Tests</name>
-    <version>1.9.1-SNAPSHOT</version>
+    <version>1.9.0</version>
     <packaging>jar</packaging>
 
     <properties>
