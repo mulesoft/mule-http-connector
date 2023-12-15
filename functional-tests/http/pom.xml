@@ -33,7 +33,7 @@
         <apacheHttpCoreVersion>4.4.15</apacheHttpCoreVersion>
 
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
-        <mule.version>4.6.0-SNAPSHOT</mule.version>
+        <mule.version>4.6.0-20231025</mule.version>
         <httpConnectorVersion>1.10.0-SNAPSHOT</httpConnectorVersion>
     </properties>
 

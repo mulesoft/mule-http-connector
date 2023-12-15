@@ -19,7 +19,7 @@
             ${surefire.slf4j.module.args}
         </surefire.args>
 
-        <mule.version>4.6.0-SNAPSHOT</mule.version>
+        <mule.version>4.6.0-20231025</mule.version>
 
         <javaModuleName>org.mule.test.integration.mule.http.connector.cors.tests</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
