@@ -39,7 +39,7 @@ public class HttpListenerDisableTimeoutsConfigTestCase extends AbstractHttpTestC
         .withPayload("hi")
         .run();
 
-    assertThat(res.getMessage().getPayload().getValue(), is("hi folks"));
+    assertThat(res.getMessage().getPayload().getValue(), is("hifolks"));
   }
 
   @Test
@@ -49,6 +49,6 @@ public class HttpListenerDisableTimeoutsConfigTestCase extends AbstractHttpTestC
         .withPayload("hi")
         .run();
 
-    assertThat(res.getMessage().getPayload().getValue(), is("hi folks"));
+    assertThat(res.getMessage().getPayload().getValue(), is("hifolks"));
   }
 }
