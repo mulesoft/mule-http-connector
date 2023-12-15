@@ -6,12 +6,12 @@
     <parent>
         <groupId>org.mule.tests</groupId>
         <artifactId>mule-extensions-integration-tests</artifactId>
-        <version>4.7.0-SNAPSHOT</version>
+        <version>4.6.0-SNAPSHOT</version>
         <relativePath />
     </parent>
     <artifactId>mule-http-connector-tests</artifactId>
     <name>Mule HTTP Connector Integration Tests</name>
-    <version>1.9.0</version>
+    <version>1.9.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -20,8 +20,6 @@
         </surefire.args>
 
         <javaModuleName>org.mule.test.integration.mule.http.connector.tests</javaModuleName>
-
-        <skipMuleModuleMojos>true</skipMuleModuleMojos>
 
         <junit.version>4.13.2</junit.version>
 
@@ -35,8 +33,8 @@
         <apacheHttpCoreVersion>4.4.15</apacheHttpCoreVersion>
 
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
-        <mule.version>4.7.0-SNAPSHOT</mule.version>
-        <httpConnectorVersion>1.9.0</httpConnectorVersion>
+        <mule.version>4.6.0-SNAPSHOT</mule.version>
+        <httpConnectorVersion>1.9.0-SNAPSHOT</httpConnectorVersion>
     </properties>
 
     <dependencies>

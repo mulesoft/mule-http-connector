@@ -6,12 +6,12 @@
     <parent>
         <groupId>org.mule.tests</groupId>
         <artifactId>mule-extensions-integration-tests</artifactId>
-        <version>4.7.0-SNAPSHOT</version>
+        <version>4.6.0-SNAPSHOT</version>
         <relativePath />
     </parent>
     <artifactId>mule-cors-tests</artifactId>
     <name>Mule HTTP Connector with CORS Integration Tests</name>
-    <version>1.9.0</version>
+    <version>1.9.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -19,9 +19,7 @@
             ${surefire.slf4j.module.args}
         </surefire.args>
 
-        <mule.version>4.7.0-SNAPSHOT</mule.version>
-
-        <skipMuleModuleMojos>true</skipMuleModuleMojos>
+        <mule.version>4.6.0-SNAPSHOT</mule.version>
 
         <javaModuleName>org.mule.test.integration.mule.http.connector.cors.tests</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
