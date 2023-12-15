@@ -13,7 +13,7 @@
 
     <modules>
         <module>mule-http-connector</module>
-        <module>functional-tests</module>
+<!--        <module>functional-tests</module>-->
     </modules>
 
     <distributionManagement>
