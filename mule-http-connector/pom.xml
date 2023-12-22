@@ -173,13 +173,14 @@
                             <!--<additionalRuntime>MULE_EE:4.1.1</additionalRuntime> -->
 
                             <!-- We have to indicate this here because otherwise MUnit discovers 4.5.1-SNAPSHOT wrongly -->
+                            <additionalRuntime>MULE_EE:4.6.0-SNAPSHOT</additionalRuntime>
                         </additionalRuntimes>
 
                         <!-- Versions with support and snapshots -->
                         <discoverRuntimes>
                             <product>EE</product>
                             <!-- MUnit minMuleVersion is 4.3.0 -->
-                            <minMuleVersion>4.5.0</minMuleVersion>
+                            <minMuleVersion>4.6.0</minMuleVersion>
                             <includeSnapshots>false</includeSnapshots>
                             <latestPatches>true</latestPatches>
                         </discoverRuntimes>
