@@ -15,10 +15,6 @@
     <packaging>jar</packaging>
 
     <properties>
-        <surefire.args>
-            ${surefire.slf4j.module.args}
-        </surefire.args>
-
         <javaModuleName>org.mule.test.integration.mule.http.connector.tests</javaModuleName>
 
         <junit.version>4.13.2</junit.version>
@@ -35,7 +31,7 @@
         <groovyVersionBuild>4.0.11</groovyVersionBuild>
 
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
-        <httpConnectorVersion>1.10.0-SNAPSHOT</httpConnectorVersion>
+        <httpConnectorVersion>${project.version}</httpConnectorVersion>
     </properties>
 
     <dependencies>
@@ -210,12 +206,6 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-dwb-api</artifactId>
-            <version>2.6.0-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core</artifactId>
             <version>${mule.version}</version>
             <scope>provided</scope>
@@ -271,6 +261,16 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.mule.weave</groupId>
+            <artifactId>dwb-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-dwb-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.mule.services</groupId>
             <artifactId>mule-service-http</artifactId>
             <classifier>mule-service</classifier>
@@ -283,21 +283,4 @@
             <type>test-jar</type>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <systemProperties>
-                        <property>
-                            <name>mule.classloader.container.jpmsModuleLayer</name>
-                            <value>true</value>
-                        </property>
-                    </systemProperties>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>
