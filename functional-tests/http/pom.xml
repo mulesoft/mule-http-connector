@@ -4,14 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.mule.tests</groupId>
-        <artifactId>mule-extensions-integration-tests</artifactId>
-        <version>4.6.0-SNAPSHOT</version>
-        <relativePath />
+        <groupId>org.mule.connectors</groupId>
+        <artifactId>mule-http-connector-functional-tests</artifactId>
+        <version>1.10.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
+
     <artifactId>mule-http-connector-tests</artifactId>
     <name>Mule HTTP Connector Integration Tests</name>
-    <version>1.9.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -31,9 +31,10 @@
         <jettyVersion>9.4.51.v20230217</jettyVersion>
         <httpMimeVersion>4.5.14</httpMimeVersion>
         <apacheHttpCoreVersion>4.4.15</apacheHttpCoreVersion>
+        <apacheHttpClientVersion>4.5.13</apacheHttpClientVersion>
+        <groovyVersionBuild>4.0.11</groovyVersionBuild>
 
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
-        <mule.version>4.6.0-SNAPSHOT</mule.version>
         <httpConnectorVersion>1.10.0-SNAPSHOT</httpConnectorVersion>
     </properties>
 

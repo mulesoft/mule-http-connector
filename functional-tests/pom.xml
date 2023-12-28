@@ -5,21 +5,44 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.mule.tests</groupId>
-        <artifactId>mule-extensions-integration-tests</artifactId>
-        <version>4.6.0-SNAPSHOT</version>
-        <relativePath />
+        <groupId>org.mule.connectors</groupId>
+        <artifactId>mule-http-connector-parent</artifactId>
+        <version>1.10.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>org.mule.connectors</groupId>
     <artifactId>mule-http-connector-functional-tests</artifactId>
     <packaging>pom</packaging>
-    <version>1.10.0-SNAPSHOT</version>
 
     <name>HTTP Connector's Functional Test Cases</name>
+
+    <properties>
+        <muleDependenciesVersion>1.x-SNAPSHOT</muleDependenciesVersion>
+        <mule.version>4.7.0-SNAPSHOT</mule.version>
+        <muleBomVersion>${mule.version}</muleBomVersion>
+    </properties>
 
     <modules>
         <module>cors</module>
         <module>http</module>
     </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.mulesoft.mule.runtime.bom</groupId>
+                <artifactId>mule-test-dependencies-bom</artifactId>
+                <version>${muleDependenciesVersion}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mule</groupId>
+                <artifactId>mule-runtime-bom</artifactId>
+                <version>${muleBomVersion}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>
