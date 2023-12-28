@@ -33,7 +33,7 @@
                 <http:body>#[payload]</http:body>
                 <http:headers>#[{'Name':'Value'}]</http:headers>
             </http:response>
-            <http:error-response statusCode="500" reasonPhrase="Internal Server Error">
+            <http:error-response statusCode="500" reasonPhrase="Internal Server Error Eze">
                 <http:body>#[error.description]</http:body>
                 <http:headers>#[{'Name':'Value'}]</http:headers>
             </http:error-response>
