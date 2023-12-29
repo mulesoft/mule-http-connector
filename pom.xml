@@ -11,6 +11,11 @@
 
     <name>HTTP Connector's Parent Pom</name>
 
+    <properties>
+        <jdk.version>1.8</jdk.version>
+        <mavenCompilerVersion>3.11.0</mavenCompilerVersion>
+    </properties>
+
     <modules>
         <module>mule-http-connector</module>
         <module>functional-tests</module>
@@ -29,4 +34,30 @@
             <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
     </distributionManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${mavenCompilerVersion}</version>
+                    <configuration>
+                        <encoding>ISO-8859-1</encoding>
+                        <source>${jdk.version}</source>
+                        <target>${jdk.version}</target>
+                        <proc>none</proc>
+                        <parameters>true</parameters>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>versions-maven-plugin</artifactId>
+                    <configuration>
+                        <processAllModules>true</processAllModules>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 </project>
