@@ -12,6 +12,9 @@ import static org.mule.extension.http.internal.HttpConnectorConstants.REMOTELY_C
 import static org.mule.extension.http.internal.HttpConnectorConstants.RETRY_ATTEMPTS_PROPERTY;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.RETRY_POLICY;
 
+import static java.nio.file.Files.newInputStream;
+import static java.nio.file.Paths.get;
+
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertThat;
@@ -24,8 +27,6 @@ import org.mule.test.http.functional.AbstractHttpTestCase;
 import org.mule.test.http.functional.utils.TestServerSocket;
 import org.mule.test.runner.RunnerDelegateTo;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 
 import io.qameta.allure.Story;
@@ -101,7 +102,7 @@ public class HttpRetryRequestTestCase extends AbstractHttpTestCase {
 
   @Test
   public void entityNotSupportRetry() throws Exception {
-    try (InputStream in = new FileInputStream("test-classes/http-retry-policy-payload.json")) {
+    try (InputStream in = newInputStream(get("src/test/resources/http-retry-policy-payload.json"))) {
       FlowRunner flowRunner = flowRunner("testRetryPolicyWithPayload").withVariable("httpMethod", "PUT").withPayload(in);
       runRetryPolicyTest(flowRunner, 0);
     }

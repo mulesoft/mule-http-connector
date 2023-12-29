@@ -5,21 +5,166 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.mule.tests</groupId>
-        <artifactId>mule-extensions-integration-tests</artifactId>
-        <version>4.6.0-SNAPSHOT</version>
-        <relativePath />
+        <groupId>org.mule.connectors</groupId>
+        <artifactId>mule-http-connector-parent</artifactId>
+        <version>1.10.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>org.mule.connectors</groupId>
     <artifactId>mule-http-connector-functional-tests</artifactId>
     <packaging>pom</packaging>
-    <version>1.10.0-SNAPSHOT</version>
 
     <name>HTTP Connector's Functional Test Cases</name>
+
+    <properties>
+        <surefire.args>
+            -XX:+TieredCompilation
+            -XX:+IgnoreUnrecognizedVMOptions
+            -Dfile.encoding=UTF-8
+            -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjVersion}/aspectjweaver-${aspectjVersion}.jar
+            -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile='${session.executionRootDirectory}/target/jacoco.exec'
+            --module-path=${org.slf4j:slf4j-api:jar}
+            --add-modules=org.slf4j
+            --add-opens=java.base/java.lang=ALL-UNNAMED
+        </surefire.args>
+
+        <aspectjVersion>1.9.2</aspectjVersion>
+        <jacoco.version>0.8.10</jacoco.version>
+        <maven.surefire.plugin.version>3.2.3</maven.surefire.plugin.version>
+
+        <muleDependenciesVersion>1.x-SNAPSHOT</muleDependenciesVersion>
+        <mule.version>4.7.0-SNAPSHOT</mule.version>
+        <muleBomVersion>${mule.version}</muleBomVersion>
+    </properties>
 
     <modules>
         <module>cors</module>
         <module>http</module>
     </modules>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.services</groupId>
+            <artifactId>mule-service-weave</artifactId>
+            <classifier>mule-service</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.weave</groupId>
+            <artifactId>dwb-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-dwb-api</artifactId>
+        </dependency>
+    </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.mulesoft.mule.runtime.bom</groupId>
+                <artifactId>mule-test-dependencies-bom</artifactId>
+                <version>${muleDependenciesVersion}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mule</groupId>
+                <artifactId>mule-runtime-bom</artifactId>
+                <version>${muleBomVersion}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.surefire.plugin.version}</version>
+                <configuration>
+                    <argLine>${surefire.args}</argLine>
+                    <systemProperties>
+                        <property>
+                            <name>mule.classloader.container.jpmsModuleLayer</name>
+                            <value>true</value>
+                        </property>
+                        <property>
+                            <name>maven.projectVersion</name>
+                            <value>${mule.version}</value>
+                        </property>
+                    </systemProperties>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.aspectj</groupId>
+                        <artifactId>aspectjweaver</artifactId>
+                        <version>${aspectjVersion}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>org.jacoco.agent</artifactId>
+                        <version>${jacoco.version}</version>
+                        <classifier>runtime</classifier>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>testJdkWithoutXmlModule</id>
+            <activation>
+                <!-- This profile cannot be activated based on the jdk because the jdk on which this has to be activated or not -->
+                <!-- is the one used to run the tests, not the one used to run Maven. -->
+                <property>
+                    <name>!testJdkWithXmlModule</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>3.5.0</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>properties</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>${maven.surefire.plugin.version}</version>
+                        <configuration>
+                            <additionalClasspathElements>
+                                <!-- Add this to the classpath so it is available when running tests with jvm8 -->
+                                <!-- but it does not interfere with the module system -->
+                                <!-- (it has colliding packages with java.xml module) when running with java11+ -->
+                                <additionalClasspathElement>${org.mule.apache:xerces2-xsd11:jar:}</additionalClasspathElement>
+                            </additionalClasspathElements>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencies>
+                <dependency>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                    <!-- This is needed only for jdk8, the required classes from here -->
+                    <!-- are already available in the jdk on versions 11+ -->
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 </project>
