@@ -6,18 +6,20 @@
  */
 package org.mule.extension.http.internal.listener;
 
-import static java.lang.Long.parseLong;
-import static java.lang.String.format;
 import static org.mule.extension.http.internal.HttpConnectorConstants.TLS_CONFIGURATION;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.util.ClassUtils.getMethod;
 import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.ADVANCED;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.SECURITY_TAB;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTP;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
-import static org.mule.runtime.core.api.util.ClassUtils.getMethod;
+
+import static java.lang.Long.parseLong;
+import static java.lang.String.format;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.connection.CachedConnectionProvider;
@@ -50,7 +52,6 @@ import org.mule.runtime.http.api.server.ServerAddress;
 import org.mule.runtime.http.api.server.ServerCreationException;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -240,10 +241,8 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
 
     setReadTimeout(builder);
 
-    if (useIOScheduler()) {
-      builder.setSchedulerSupplier(() -> schedulerService
-          .ioScheduler(SchedulerConfig.config().withName(getSchedulerName(connectionParams))));
-    }
+    builder.setSchedulerSupplier(() -> schedulerService
+        .ioScheduler(SchedulerConfig.config().withName(getSchedulerName(connectionParams))));
 
     return builder.build();
   }
@@ -259,15 +258,6 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
     } else if (connectionParams.getReadTimeout() != parseLong(DEFAULT_READ_TIME_OUT_IN_MILLIS)) {
       logger
           .warn("The current Mule version does not support the configuration of the Read Timeout parameter, please update to the newest version");
-    }
-  }
-
-  private boolean useIOScheduler() {
-    try {
-      Field result = httpService.getServerFactory().getClass().getDeclaredField("USE_IO_SCHEDULER");
-      return result.getBoolean(httpService);
-    } catch (NoSuchFieldException | IllegalAccessException e) {
-      return false;
     }
   }
 
