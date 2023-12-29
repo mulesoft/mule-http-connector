@@ -17,6 +17,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
@@ -45,21 +46,24 @@ public class HttpRequestPollingSourceAuthTestCase extends AbstractHttpRequestTes
 
   @Test
   @Description("Polling source should work correctly when basic auth is set correctly")
-  public void correctBasicAuth() throws InterruptedException {
+  public void correctBasicAuth() throws Exception {
+    startFlow("basicAuthRequest");
     basicAuthLatch.await();
     assertThat(BasicAuthProcessor.response, is(DEFAULT_RESPONSE));
   }
 
   @Test
   @Description("Polling source should work correctly when digest auth is set correctly")
-  public void correctDigestAuth() throws InterruptedException {
+  public void correctDigestAuth() throws Exception {
+    startFlow("digestAuthRequest");
     digestAuthLatch.await();
     assertThat(DigestAuthProcessor.response, is(DEFAULT_RESPONSE));
   }
 
   @Test
   @Description("Polling source should NOT work when basic auth is set incorrectly")
-  public void incorrectAuth() throws InterruptedException {
+  public void incorrectAuth() throws Exception {
+    startFlow("failingBasicAuthRequest");
     sleep(RECEIVE_TIMEOUT);
     assertThat(BasicFailingAuth.requests, is(0));
   }
@@ -118,5 +122,9 @@ public class HttpRequestPollingSourceAuthTestCase extends AbstractHttpRequestTes
       requests += 1;
       return event;
     }
+  }
+
+  private void startFlow(String flowName) throws Exception {
+    ((Startable) getFlowConstruct(flowName)).start();
   }
 }
