@@ -50,8 +50,9 @@
         <munit.version>3.1.0-rc4</munit.version>
         <mtf-tools.version>1.2.0-rc1</mtf-tools.version>
         <mavenResources.version>3.0.2</mavenResources.version>
+        <!-- MUnit minMuleVersion is 4.3.0 -->
+        <munitMinMuleVersion>4.3.0</munitMinMuleVersion>
 
-        <scriptingModuleVersion>2.0.3</scriptingModuleVersion>
         <muleObjectStoreConnectorTestVersion>1.3.0-SNAPSHOT</muleObjectStoreConnectorTestVersion>
 
         <springVersion>5.3.30</springVersion>
@@ -171,8 +172,7 @@
                         <!-- Versions with support and snapshots -->
                         <discoverRuntimes>
                             <product>EE</product>
-                            <!-- MUnit minMuleVersion is 4.3.0 -->
-                            <minMuleVersion>4.3.0</minMuleVersion>
+                            <minMuleVersion>${munitMinMuleVersion}</minMuleVersion>
                             <includeSnapshots>true</includeSnapshots>
                             <latestPatches>true</latestPatches>
                         </discoverRuntimes>
