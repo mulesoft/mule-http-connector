@@ -18,7 +18,7 @@
         </http:request-connection>
     </http:request-config>
 
-    <flow name="basicAuthRequest">
+    <flow name="basicAuthRequest" initialState="stopped" >
         <http:polling-source config-ref="basicConfig" path="/basic">
             <scheduling-strategy >
                 <fixed-frequency frequency="1" timeUnit="SECONDS" startDelay="2"/>
@@ -36,7 +36,7 @@
         </http:request-connection>
     </http:request-config>
 
-    <flow name="digestAuthRequest">
+    <flow name="digestAuthRequest" initialState="stopped">
         <http:polling-source config-ref="digestConfig" path="/digest">
             <scheduling-strategy >
                 <fixed-frequency frequency="1" timeUnit="SECONDS" startDelay="2"/>
@@ -54,7 +54,7 @@
         </http:request-connection>
     </http:request-config>
 
-    <flow name="failingBasicAuthRequest">
+    <flow name="failingBasicAuthRequest" initialState="stopped">
         <http:polling-source config-ref="basicFailingConfig" path="/basic">
             <scheduling-strategy >
                 <fixed-frequency frequency="1" timeUnit="SECONDS" startDelay="2"/>
