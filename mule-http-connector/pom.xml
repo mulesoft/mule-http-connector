@@ -7,7 +7,7 @@
         <artifactId>mule-core-modules-parent</artifactId>
         <!-- TODO MULE-15249 if this is upgraded, change the Map to Set in HttpResponseHeaderBuilder -->
         <!-- TODO MULE-15803 if this is upgraded, change HttpRequestAttributes#lazyClientCertificate-->
-        <version>1.1.10</version>
+        <version>1.1.11-SNAPSHOT</version>
         <relativePath/>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -25,7 +25,7 @@
         <aspectjVersion>1.9.2</aspectjVersion>
 
         <fluentHcVersion>4.5.13</fluentHcVersion>
-        <grizzlyVersion>2.3.36-MULE-024</grizzlyVersion>
+        <grizzlyVersion>2.3.36-MULE-025</grizzlyVersion>
         <grizzlyAhcVersion>1.14-MULE-019</grizzlyAhcVersion>
         <mockitoVersion>4.11.0</mockitoVersion>
 
@@ -239,20 +239,14 @@
             <version>${mule.version}</version>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
-            <groupId>org.mule.services</groupId>
-            <artifactId>mule-service-http</artifactId>
-            <version>${muleHttpServiceVersion}</version>
-            <classifier>mule-service</classifier>
+            <groupId>org.mule.glassfish.grizzly</groupId>
+            <artifactId>grizzly-http-server</artifactId>
+            <version>${grizzlyVersion}</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.mule.services</groupId>
-            <artifactId>mule-service-scheduler</artifactId>
-            <version>${muleSchedulerServiceVersion}</version>
-            <classifier>mule-service</classifier>
-            <scope>provided</scope>
-        </dependency>
+
         <dependency>
             <groupId>org.mule.connectors</groupId>
             <artifactId>mule-sockets-connector</artifactId>
@@ -351,6 +345,37 @@
             <groupId>org.mule.sdk</groupId>
             <artifactId>mule-sdk-api</artifactId>
             <version>${muleSdkApiVersion}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>2.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.woodstox</groupId>
+            <artifactId>woodstox-core</artifactId>
+            <version>6.4.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20231013</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.9.4</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.xmlbeans</groupId>
+            <artifactId>xmlbeans</artifactId>
+            <version>5.0.3</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Test dependencies -->
