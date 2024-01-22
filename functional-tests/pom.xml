@@ -28,8 +28,6 @@
             --add-opens=java.base/java.lang=ALL-UNNAMED
         </surefire.args>
 
-        <aspectjVersion>1.9.2</aspectjVersion>
-        <jacoco.version>0.8.10</jacoco.version>
         <maven.surefire.plugin.version>3.2.3</maven.surefire.plugin.version>
 
         <muleDependenciesVersion>1.x-SNAPSHOT</muleDependenciesVersion>
