@@ -31,6 +31,7 @@ public class TestServerSocket extends Thread {
   }
 
   public boolean startServer(long timeout) throws InterruptedException {
+    setName(TestServerSocket.class.getName());
     start();
     return serverConnectionLatch.await(timeout, MILLISECONDS);
   }
@@ -55,7 +56,7 @@ public class TestServerSocket extends Thread {
           sleep(50);
           socket.close();
         } catch (IOException | InterruptedException e) {
-          // Ignoring exception.
+          e.printStackTrace();
         }
       }
 
@@ -74,7 +75,11 @@ public class TestServerSocket extends Thread {
   }
 
   public boolean dispose(int timeout) throws InterruptedException {
-    return disposeLatch.await(timeout, MILLISECONDS);
+    if (!disposeLatch.await(timeout, MILLISECONDS)) {
+      return false;
+    }
+    join(timeout);
+    return true;
   }
 
 }

@@ -24,12 +24,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.server.Request;
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore("Netty doesn't have maxConnections config")
 public class HttpRequestMaxConnectionsTestCase extends AbstractHttpRequestTestCase {
 
-  private Latch messageArrived = new Latch();
-  private Latch messageHold = new Latch();
+  private final Latch messageArrived = new Latch();
+  private final Latch messageHold = new Latch();
 
   @Inject
   @Named("limitedConnections")
