@@ -11,7 +11,9 @@
     </http:request-config>
 
     <flow name="retryFlow">
+        <logger level="ERROR" message="BEFORE" />
         <http:request config-ref="requestConfig" method="#[vars.httpMethod]" path="test" />
+        <logger level="ERROR" message="AFTER" />
     </flow>
 
     <flow name="testRetryPolicyWithPayload">

@@ -15,6 +15,7 @@
 
     <flow name="encodingTest">
         <http:listener path="test" config-ref="listenerConfig"/>
+        <logger level="ERROR" message="#[payload]"/>
         <flow-ref name="objToStr" />
         <test:queue name="out"/>
     </flow>
