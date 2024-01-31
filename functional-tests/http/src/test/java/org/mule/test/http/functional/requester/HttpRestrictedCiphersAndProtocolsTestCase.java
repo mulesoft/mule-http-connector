@@ -90,8 +90,8 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
     assertThat(response.getMessage().getPayload().getValue(), is(TEST_PAYLOAD));
   }
 
-  // @Test
-  // @Ignore("Failing because of JDK defaults")
+  @Test
+  @Ignore("Failing because of JDK defaults")
   public void worksWithProtocolMatch() throws Exception {
     tlsContextFactory = tlsContextFactoryBuilder.build();
     createHttpClient();
@@ -103,7 +103,7 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
     assertThat(IOUtils.toString(response.getEntity().getContent()), is(TEST_PAYLOAD));
   }
 
-  // @Test
+  @Test
   public void worksWithCipherSuiteMatch() throws Exception {
     tlsContextFactoryBuilder.enabledCipherSuites(cipherSuites.getValue());
     tlsContextFactory = tlsContextFactoryBuilder.build();
@@ -125,14 +125,14 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
     httpClientWithCertificate.start();
   }
 
-  // @Test
+  @Test
   public void failsWithProtocolMismatch() throws Exception {
     expectedError.expectCause(instanceOf(HttpRequestFailedException.class));
     expectedError.expectMessage(anyOf(containsString("Remotely closed"), sslValidationError()));
     flowRunner("12Client1Server").withPayload(TEST_PAYLOAD).run();
   }
 
-  // @Test
+  @Test
   public void failsWithCipherSuiteMismatch() throws Exception {
     expectedError.expectCause(instanceOf(HttpRequestFailedException.class));
     expectedError.expectMessage(anyOf(containsString("Remotely closed"), sslValidationError()));
