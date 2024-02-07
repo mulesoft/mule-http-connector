@@ -38,9 +38,11 @@ public class HttpRequestExceptionMessagesTestCase extends AbstractHttpRequestTes
     assertThat(msg, containsString("HTTP GET on resource 'http://notarealsite.mulesoft:124/fakeresource'"));
 
     // Using runtime version 4.1.1, the message contains the name of the exception: "UnresolvedAddressException"
-    // Using latest, the message is "Couldn't resolve address"
+    // Using latest grizzly, the message is "Couldn't resolve address"
+    // Using latest Netty, the message is "nodename nor servname provided, or not known"
     assertThat(msg, anyOf(containsString("UnresolvedAddressException"),
-                          containsString("Couldn't resolve address")));
+                          containsString("Couldn't resolve address"),
+                          containsString("nodename nor servname provided, or not known")));
   }
 
 }
