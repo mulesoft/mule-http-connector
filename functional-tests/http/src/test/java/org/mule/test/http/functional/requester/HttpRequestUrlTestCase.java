@@ -19,6 +19,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import io.qameta.allure.Story;
@@ -67,13 +68,24 @@ public class HttpRequestUrlTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void queryParamsMergeRequest() throws Exception {
-    Map<String, String> queryParams = new HashMap<>();
+    Map<String, String> queryParams = new LinkedHashMap<>();
     queryParams.put("query1", "param1");
     queryParams.put("query2", "param2");
     flowRunner("queryParamsRequest").withVariable("queryParams", queryParams).run();
 
     assertThat(method, is(GET.toString()));
     assertThat(uri, is("/test?query=param&query1=param1&query2=param2"));
+  }
+
+  @Test
+  public void queryParamsComplexMergeRequest() throws Exception {
+    Map<String, String> queryParams = new LinkedHashMap<>();
+    queryParams.put("query3", "param3");
+    queryParams.put("query4", "param4");
+    flowRunner("complexQueryParamsRequest").withVariable("queryParams", queryParams).run();
+
+    assertThat(method, is(GET.toString()));
+    assertThat(uri, is("/test?query=param&query1&query2=param2&query3=param3&query4=param4"));
   }
 
 }

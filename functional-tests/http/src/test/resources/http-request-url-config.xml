@@ -24,6 +24,12 @@
         </http:request>
     </flow>
 
+    <flow name="complexQueryParamsRequest">
+        <http:request url="http://localhost:${httpPort}/test?query=param&amp;query1&amp;query2=param2" method="GET">
+            <http:query-params>#[vars.queryParams]</http:query-params>
+        </http:request>
+    </flow>
+
     <flow name="uriParamsRequest">
         <http:request url="http://localhost:${httpPort}/{1}/{2}" method="DELETE">
             <http:uri-params>
