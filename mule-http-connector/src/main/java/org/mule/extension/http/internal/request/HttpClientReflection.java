@@ -8,24 +8,37 @@ package org.mule.extension.http.internal.request;
 
 import static org.mule.extension.http.api.request.HttpSendBodyMode.ALWAYS;
 
+import static java.lang.Class.forName;
+
 import org.mule.extension.http.api.request.HttpSendBodyMode;
 import org.mule.runtime.http.api.client.HttpClient;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.concurrent.CompletableFuture;
 
 /**
  * Caches methods to avoid repeating reflection calls.
  */
-public class HttpClientReflection {
+public final class HttpClientReflection {
+
+  public static final String HTTP_CLIENT_CLASS_NAME =
+      "org.mule.runtime.http.api.client.HttpClient";
 
   public static final String HTTP_REQUEST_OPTIONS_CLASS_NAME =
       "org.mule.runtime.http.api.client.HttpRequestOptions";
 
-  private static Object requestOptionsBuilder;
+  public static final String HTTP_REQUEST_OPTIONS_BUILDER_CLASS_NAME =
+      "org.mule.runtime.http.api.client.HttpRequestOptionsBuilder";
+
+  private HttpClientReflection() {
+    // Empty private constructor to avoid instantiation.
+  }
+
+  private static Method builderMethod;
   private static Method sendAsyncMethod;
   private static Method buildMethod;
   private static Method responseTimeoutMethod;
@@ -37,17 +50,18 @@ public class HttpClientReflection {
 
   static {
     try {
-      Class<?> httpRequestOptionsClass = Class.forName(HTTP_REQUEST_OPTIONS_CLASS_NAME);
-      sendAsyncMethod = Class.forName("org.mule.runtime.http.api.client.HttpClient")
-          .getDeclaredMethod("sendAsync", HttpRequest.class, httpRequestOptionsClass);
+      Class<?> httpRequestOptionsClass = forName(HTTP_REQUEST_OPTIONS_CLASS_NAME);
+      builderMethod = httpRequestOptionsClass.getDeclaredMethod("builder");
 
-      Method builderMethod = httpRequestOptionsClass.getDeclaredMethod("builder");
-      requestOptionsBuilder = builderMethod.invoke(null);
-      buildMethod = requestOptionsBuilder.getClass().getDeclaredMethod("build");
-      responseTimeoutMethod = requestOptionsBuilder.getClass().getDeclaredMethod("responseTimeout", int.class);
-      followsRedirectMethod = requestOptionsBuilder.getClass().getDeclaredMethod("followsRedirect", boolean.class);
-      authenticationMethod = requestOptionsBuilder.getClass().getDeclaredMethod("authentication", HttpAuthentication.class);
-      sendBodyAlwaysMethod = requestOptionsBuilder.getClass().getDeclaredMethod("sendBodyAlways", boolean.class);
+      Class<?> builderClass = forName(HTTP_REQUEST_OPTIONS_BUILDER_CLASS_NAME);
+      buildMethod = builderClass.getDeclaredMethod("build");
+      responseTimeoutMethod = builderClass.getDeclaredMethod("responseTimeout", int.class);
+      followsRedirectMethod = builderClass.getDeclaredMethod("followsRedirect", boolean.class);
+      authenticationMethod = builderClass.getDeclaredMethod("authentication", HttpAuthentication.class);
+      sendBodyAlwaysMethod = builderClass.getDeclaredMethod("sendBodyAlways", boolean.class);
+
+      Class<?> httpClientClass = forName(HTTP_CLIENT_CLASS_NAME);
+      sendAsyncMethod = httpClientClass.getDeclaredMethod("sendAsync", HttpRequest.class, httpRequestOptionsClass);
     } catch (Exception ignored) {
       loaded = false;
     }
@@ -55,12 +69,12 @@ public class HttpClientReflection {
 
   private static Object requestOptions(int responseTimeout, boolean followsRedirect,
                                        HttpAuthentication authentication, HttpSendBodyMode sendBodyMode)
-      throws Exception {
+      throws InvocationTargetException, IllegalAccessException {
+    Object requestOptionsBuilder = builderMethod.invoke(null);
     requestOptionsBuilder = responseTimeoutMethod.invoke(requestOptionsBuilder, responseTimeout);
     requestOptionsBuilder = followsRedirectMethod.invoke(requestOptionsBuilder, followsRedirect);
     requestOptionsBuilder = authenticationMethod.invoke(requestOptionsBuilder, authentication);
     requestOptionsBuilder = sendBodyAlwaysMethod.invoke(requestOptionsBuilder, sendBodyMode.equals(ALWAYS));
-
     return buildMethod.invoke(requestOptionsBuilder);
   }
 
@@ -69,12 +83,31 @@ public class HttpClientReflection {
                                                           HttpSendBodyMode sendBodyMode) {
     if (loaded) {
       try {
-        return (CompletableFuture<HttpResponse>) sendAsyncMethod
-            .invoke(client, request, requestOptions(responseTimeout, followRedirects, authentication, sendBodyMode));
-      } catch (Exception ignored) {
+        return invokeSendAsyncUnsafe(client, request, responseTimeout, followRedirects, authentication, sendBodyMode);
+      } catch (InvocationTargetException e) {
+        throw wrapRuntimeException(e.getTargetException());
+      } catch (IllegalAccessException e) {
+        return client.sendAsync(request, responseTimeout, followRedirects, authentication);
       }
+    } else {
+      return client.sendAsync(request, responseTimeout, followRedirects, authentication);
     }
+  }
 
-    return client.sendAsync(request, responseTimeout, followRedirects, authentication);
+  private static CompletableFuture<HttpResponse> invokeSendAsyncUnsafe(HttpClient client, HttpRequest request,
+                                                                       int responseTimeout, boolean followRedirects,
+                                                                       HttpAuthentication authentication,
+                                                                       HttpSendBodyMode sendBodyMode)
+      throws IllegalAccessException, InvocationTargetException {
+    return (CompletableFuture<HttpResponse>) sendAsyncMethod
+        .invoke(client, request, requestOptions(responseTimeout, followRedirects, authentication, sendBodyMode));
+  }
+
+  private static RuntimeException wrapRuntimeException(Throwable exception) {
+    if (exception instanceof RuntimeException) {
+      return (RuntimeException) exception;
+    } else {
+      return new RuntimeException(exception);
+    }
   }
 }
