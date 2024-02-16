@@ -40,83 +40,85 @@ import org.junit.Test;
 
 public class HttpClientReflectionTestCase extends AbstractMuleTestCase {
 
-    private static final int POOL_SIZE = 15;
+  private static final int POOL_SIZE = 15;
 
-    private static final ExecutorService executorService = newFixedThreadPool(POOL_SIZE);
+  private static final ExecutorService executorService = newFixedThreadPool(POOL_SIZE);
 
-    @Test
-    @Issue("W-15043656")
-    @Description("Regression test: the HttpClientReflection was using always the same options builder")
-    public void differentConcurrentInvocationsUseDifferentBuilders() throws ExecutionException, InterruptedException {
-        Set<Integer> seenResponseTimeouts = new ConcurrentSkipListSet<>();
-        HttpClient client = new TestHttpClientSavingTheResponseTimeout(seenResponseTimeouts);
+  @Test
+  @Issue("W-15043656")
+  @Description("Regression test: the HttpClientReflection was using always the same options builder")
+  public void differentConcurrentInvocationsUseDifferentBuilders() throws ExecutionException, InterruptedException {
+    Set<Integer> seenResponseTimeouts = new ConcurrentSkipListSet<>();
+    HttpClient client = new TestHttpClientSavingTheResponseTimeout(seenResponseTimeouts);
 
-        int sendAsyncCallsCount = 1000;
-        callSendAsyncMultipleTimesConcurrentlyWithDifferentResponseTimeouts(client, sendAsyncCallsCount);
-        assertThat(seenResponseTimeouts.size(), is(sendAsyncCallsCount));
+    int sendAsyncCallsCount = 1000;
+    callSendAsyncMultipleTimesConcurrentlyWithDifferentResponseTimeouts(client, sendAsyncCallsCount);
+    assertThat(seenResponseTimeouts.size(), is(sendAsyncCallsCount));
+  }
+
+  private static void callSendAsyncMultipleTimesConcurrentlyWithDifferentResponseTimeouts(HttpClient client,
+                                                                                          int sendAsyncCallsCount)
+      throws InterruptedException, ExecutionException {
+    HttpRequest request = mock(HttpRequest.class);
+    HttpAuthentication authentication = mock(HttpAuthentication.class);
+    List<Future<?>> futureList = new ArrayList<>(sendAsyncCallsCount);
+    for (int i = 0; i < sendAsyncCallsCount; ++i) {
+      futureList.add(executorService.submit(new SendAsyncRunnable(client, request, i, true, authentication, AUTO)));
+    }
+    for (Future<?> future : futureList) {
+      future.get();
+    }
+  }
+
+  private static final class SendAsyncRunnable implements Runnable {
+
+    private final HttpClient client;
+    private final HttpRequest request;
+    private final int responseTimeout;
+    private final boolean followRedirects;
+    private final HttpAuthentication authentication;
+    private final HttpSendBodyMode sendBodyMode;
+
+    private SendAsyncRunnable(HttpClient client, HttpRequest request, int responseTimeout, boolean followRedirects,
+                              HttpAuthentication authentication, HttpSendBodyMode sendBodyMode) {
+      this.client = client;
+      this.request = request;
+      this.responseTimeout = responseTimeout;
+      this.followRedirects = followRedirects;
+      this.authentication = authentication;
+      this.sendBodyMode = sendBodyMode;
     }
 
-    private static void callSendAsyncMultipleTimesConcurrentlyWithDifferentResponseTimeouts(HttpClient client, int sendAsyncCallsCount) throws InterruptedException, ExecutionException {
-        HttpRequest request = mock(HttpRequest.class);
-        HttpAuthentication authentication = mock(HttpAuthentication.class);
-        List<Future<?>> futureList = new ArrayList<>(sendAsyncCallsCount);
-        for (int i = 0; i < sendAsyncCallsCount; ++i) {
-            futureList.add(executorService.submit(new SendAsyncRunnable(client, request, i, true, authentication, AUTO)));
-        }
-        for (Future<?> future : futureList) {
-            future.get();
-        }
+    @Override
+    public void run() {
+      HttpClientReflection.sendAsync(client, request, responseTimeout, followRedirects, authentication, sendBodyMode);
+    }
+  }
+
+  private static class TestHttpClientSavingTheResponseTimeout implements HttpClient {
+
+    private final Set<Integer> seenResponseTimeouts;
+
+    public TestHttpClientSavingTheResponseTimeout(Set<Integer> seenResponseTimeouts) {
+      this.seenResponseTimeouts = seenResponseTimeouts;
     }
 
-    private static final class SendAsyncRunnable implements Runnable {
+    @Override
+    public void start() {}
 
-        private final HttpClient client;
-        private final HttpRequest request;
-        private final int responseTimeout;
-        private final boolean followRedirects;
-        private final HttpAuthentication authentication;
-        private final HttpSendBodyMode sendBodyMode;
+    @Override
+    public void stop() {}
 
-        private SendAsyncRunnable(HttpClient client, HttpRequest request, int responseTimeout, boolean followRedirects,
-                                  HttpAuthentication authentication, HttpSendBodyMode sendBodyMode) {
-            this.client = client;
-            this.request = request;
-            this.responseTimeout = responseTimeout;
-            this.followRedirects = followRedirects;
-            this.authentication = authentication;
-            this.sendBodyMode = sendBodyMode;
-        }
-
-        @Override
-        public void run() {
-            HttpClientReflection.sendAsync(client, request, responseTimeout, followRedirects, authentication, sendBodyMode);
-        }
+    @Override
+    public HttpResponse send(HttpRequest request, HttpRequestOptions options) throws IOException, TimeoutException {
+      seenResponseTimeouts.add(options.getResponseTimeout());
+      return mock(HttpResponse.class);
     }
 
-    private static class TestHttpClientSavingTheResponseTimeout implements HttpClient {
-
-        private final Set<Integer> seenResponseTimeouts;
-
-        public TestHttpClientSavingTheResponseTimeout(Set<Integer> seenResponseTimeouts) {
-            this.seenResponseTimeouts = seenResponseTimeouts;
-        }
-
-        @Override
-        public void start() {}
-
-        @Override
-        public void stop() {}
-
-        @Override
-        public HttpResponse send(HttpRequest request, HttpRequestOptions options) throws IOException, TimeoutException {
-            seenResponseTimeouts.add(options.getResponseTimeout());
-            return mock(HttpResponse.class);
-        }
-
-        @Override
-        public CompletableFuture<HttpResponse> sendAsync(HttpRequest request, HttpRequestOptions options) {
-            seenResponseTimeouts.add(options.getResponseTimeout());
-            return CompletableFuture.completedFuture(mock(HttpResponse.class));
-        }
+    @Override
+    public CompletableFuture<HttpResponse> sendAsync(HttpRequest request, HttpRequestOptions options) {
+      seenResponseTimeouts.add(options.getResponseTimeout());
+      return CompletableFuture.completedFuture(mock(HttpResponse.class));
     }
+  }
 }
