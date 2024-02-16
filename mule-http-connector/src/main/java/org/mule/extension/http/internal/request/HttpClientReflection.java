@@ -20,12 +20,12 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Caches methods to avoid repeating reflection calls.
  */
-public class HttpClientReflection {
+public final class HttpClientReflection {
 
   public static final String HTTP_REQUEST_OPTIONS_CLASS_NAME =
       "org.mule.runtime.http.api.client.HttpRequestOptions";
 
-  private static Object requestOptionsBuilder;
+  private static Method builderMethod;
   private static Method sendAsyncMethod;
   private static Method buildMethod;
   private static Method responseTimeoutMethod;
@@ -41,13 +41,12 @@ public class HttpClientReflection {
       sendAsyncMethod = Class.forName("org.mule.runtime.http.api.client.HttpClient")
           .getDeclaredMethod("sendAsync", HttpRequest.class, httpRequestOptionsClass);
 
-      Method builderMethod = httpRequestOptionsClass.getDeclaredMethod("builder");
-      requestOptionsBuilder = builderMethod.invoke(null);
-      buildMethod = requestOptionsBuilder.getClass().getDeclaredMethod("build");
-      responseTimeoutMethod = requestOptionsBuilder.getClass().getDeclaredMethod("responseTimeout", int.class);
-      followsRedirectMethod = requestOptionsBuilder.getClass().getDeclaredMethod("followsRedirect", boolean.class);
-      authenticationMethod = requestOptionsBuilder.getClass().getDeclaredMethod("authentication", HttpAuthentication.class);
-      sendBodyAlwaysMethod = requestOptionsBuilder.getClass().getDeclaredMethod("sendBodyAlways", boolean.class);
+      builderMethod = httpRequestOptionsClass.getDeclaredMethod("builder");
+      buildMethod = httpRequestOptionsClass.getDeclaredMethod("build");
+      responseTimeoutMethod = httpRequestOptionsClass.getDeclaredMethod("responseTimeout", int.class);
+      followsRedirectMethod = httpRequestOptionsClass.getDeclaredMethod("followsRedirect", boolean.class);
+      authenticationMethod = httpRequestOptionsClass.getDeclaredMethod("authentication", HttpAuthentication.class);
+      sendBodyAlwaysMethod = httpRequestOptionsClass.getDeclaredMethod("sendBodyAlways", boolean.class);
     } catch (Exception ignored) {
       loaded = false;
     }
@@ -56,11 +55,11 @@ public class HttpClientReflection {
   private static Object requestOptions(int responseTimeout, boolean followsRedirect,
                                        HttpAuthentication authentication, HttpSendBodyMode sendBodyMode)
       throws Exception {
+    Object requestOptionsBuilder = builderMethod.invoke(null);
     requestOptionsBuilder = responseTimeoutMethod.invoke(requestOptionsBuilder, responseTimeout);
     requestOptionsBuilder = followsRedirectMethod.invoke(requestOptionsBuilder, followsRedirect);
     requestOptionsBuilder = authenticationMethod.invoke(requestOptionsBuilder, authentication);
     requestOptionsBuilder = sendBodyAlwaysMethod.invoke(requestOptionsBuilder, sendBodyMode.equals(ALWAYS));
-
     return buildMethod.invoke(requestOptionsBuilder);
   }
 
