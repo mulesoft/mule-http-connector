@@ -12,7 +12,15 @@ import static java.util.concurrent.Executors.newFixedThreadPool;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.mule.extension.http.api.request.HttpSendBodyMode;
 import org.mule.extension.http.internal.request.HttpClientReflection;
@@ -36,13 +44,18 @@ import java.util.concurrent.TimeoutException;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class HttpClientReflectionTestCase extends AbstractMuleTestCase {
 
   private static final int POOL_SIZE = 15;
 
   private static final ExecutorService executorService = newFixedThreadPool(POOL_SIZE);
+
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
   @Test
   @Issue("W-15043656")
@@ -54,6 +67,24 @@ public class HttpClientReflectionTestCase extends AbstractMuleTestCase {
     int sendAsyncCallsCount = 1000;
     callSendAsyncMultipleTimesConcurrentlyWithDifferentResponseTimeouts(client, sendAsyncCallsCount);
     assertThat(seenResponseTimeouts.size(), is(sendAsyncCallsCount));
+  }
+
+  @Test
+  @Issue("W-14989356")
+  public void callSendAsyncOnceWhenRuntimeExceptionIsThrown() {
+    HttpClient client = spy(HttpClient.class);
+    when(client.sendAsync(any(HttpRequest.class), any(HttpRequestOptions.class))).thenThrow(new RuntimeException("Expected"));
+
+    HttpRequest request = mock(HttpRequest.class);
+    HttpAuthentication authentication = mock(HttpAuthentication.class);
+
+    try {
+      HttpClientReflection.sendAsync(client, request, 0, true, authentication, AUTO);
+      fail("sendAsync method was expected to throw a RuntimeException");
+    } catch (RuntimeException runtimeException) {
+      verify(client, times(1)).sendAsync(eq(request), any(HttpRequestOptions.class));
+      verify(client, never()).sendAsync(request, 0, true, authentication);
+    }
   }
 
   private static void callSendAsyncMultipleTimesConcurrentlyWithDifferentResponseTimeouts(HttpClient client,
