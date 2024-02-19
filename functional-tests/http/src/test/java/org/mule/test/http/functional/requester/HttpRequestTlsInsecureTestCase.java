@@ -58,8 +58,8 @@ public class HttpRequestTlsInsecureTestCase extends AbstractHttpTestCase {
   @Parameterized.Parameters
   public static Collection<Object[]> parameters() {
     return Arrays.asList(new Object[][] {
-      {"http-request-insecure-hostname-config.xml"},
-      // {"http-request-insecure-certificate-config.xml"}
+        {"http-request-insecure-hostname-config.xml"},
+        // {"http-request-insecure-certificate-config.xml"}
     });
   }
 

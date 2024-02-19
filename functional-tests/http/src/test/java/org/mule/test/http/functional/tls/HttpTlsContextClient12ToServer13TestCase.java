@@ -63,8 +63,8 @@ public class HttpTlsContextClient12ToServer13TestCase extends AbstractHttpTlsCon
   public void testClient12ToServer13() throws Exception {
     expectedError.expectErrorType("HTTP", "CONNECTIVITY");
     expectedError.expectMessage(anyOf(
-        containsString(ERROR_RESPONSE),
-        containsString("Received fatal alert: protocol_version")));
+                                      containsString(ERROR_RESPONSE),
+                                      containsString("Received fatal alert: protocol_version")));
     flowRunner(client12).run();
   }
 }
