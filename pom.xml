@@ -50,6 +50,8 @@
         <munit.version>2.3.18</munit.version>
         <mtf-tools.version>1.1.2</mtf-tools.version>
         <mavenResources.version>3.0.2</mavenResources.version>
+        <!-- MUnit minMuleVersion is 4.3.0 -->
+        <munitMinMuleVersion>4.3.0</munitMinMuleVersion>
 
         <scriptingModuleVersion>1.1.7</scriptingModuleVersion>
         <muleObjectStoreConnectorTestVersion>1.2.1</muleObjectStoreConnectorTestVersion>
@@ -166,24 +168,12 @@
                         <mule.enable.profiling.service>true</mule.enable.profiling.service>
                     </systemPropertyVariables>
 
-                    <!-- Configuration for local builds, in Jenkins we configure this via command line arguments -->
                     <runtimeConfiguration>
-                        <additionalRuntimes>
-                            <!-- Cannot test against 4.1.1 because MUnit minMuleVersion is 4.3.0 -->
-                            <!--<additionalRuntime>MULE_EE:4.1.1</additionalRuntime> -->
-
-                            <additionalRuntime>MULE_EE:4.4.1-SNAPSHOT</additionalRuntime>
-
-                            <!-- We have to indicate this here because otherwise MUnit discovers 4.5.1-SNAPSHOT wrongly -->
-                            <additionalRuntime>MULE_EE:4.5.3-SNAPSHOT</additionalRuntime>
-                        </additionalRuntimes>
-
                         <!-- Versions with support and snapshots -->
                         <discoverRuntimes>
                             <product>EE</product>
-                            <!-- MUnit minMuleVersion is 4.3.0 -->
-                            <minMuleVersion>4.3.0</minMuleVersion>
-                            <includeSnapshots>false</includeSnapshots>
+                            <minMuleVersion>${munitMinMuleVersion}</minMuleVersion>
+                            <includeSnapshots>true</includeSnapshots>
                             <latestPatches>true</latestPatches>
                         </discoverRuntimes>
                     </runtimeConfiguration>
