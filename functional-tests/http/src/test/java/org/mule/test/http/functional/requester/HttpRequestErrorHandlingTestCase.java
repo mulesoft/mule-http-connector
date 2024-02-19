@@ -160,11 +160,14 @@ public class HttpRequestErrorHandlingTestCase extends AbstractHttpRequestTestCas
   @Test
   public void connectivity() throws Exception {
     String errorMessageGrizzly = getErrorMessage(": Connection refused", unusedPort) + " connectivity";
-    String errorMessageNetty = getErrorMessage(": Connection refused: localhost/127.0.0.1:" + unusedPort.getNumber(), unusedPort) + " connectivity";
-    String errorMessageGrizzlyWindows = getErrorMessage(": Connection refused: no further information", unusedPort) + " connectivity";
+    String errorMessageNetty =
+        getErrorMessage(": Connection refused: localhost/127.0.0.1:" + unusedPort.getNumber(), unusedPort) + " connectivity";
+    String errorMessageGrizzlyWindows =
+        getErrorMessage(": Connection refused: no further information", unusedPort) + " connectivity";
 
     CoreEvent result = getFlowRunner("handled", unusedPort.getNumber()).run();
-    assertThat(result.getMessage(), hasPayload(anyOf(equalTo(errorMessageNetty), equalTo(errorMessageGrizzly), equalTo(errorMessageGrizzlyWindows))));
+    assertThat(result.getMessage(),
+               hasPayload(anyOf(equalTo(errorMessageNetty), equalTo(errorMessageGrizzly), equalTo(errorMessageGrizzlyWindows))));
   }
 
   @Test
