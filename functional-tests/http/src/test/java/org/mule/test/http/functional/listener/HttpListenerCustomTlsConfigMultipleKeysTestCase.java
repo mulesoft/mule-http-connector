@@ -44,7 +44,8 @@ public class HttpListenerCustomTlsConfigMultipleKeysTestCase extends AbstractHtt
     expectedException.expectMessage(anyOf(containsString(J8_262_SSL_ERROR_RESPONSE),
                                           containsString(J8_275_SSL_ERROR_RESPONSE),
                                           containsString(J11_SSL_ERROR_RESPONSE),
-                                          containsString(J17_SSL_ERROR_RESPONSE)));
+                                          containsString(J17_SSL_ERROR_RESPONSE),
+                                          containsString("Remotely closed")));
     flowRunner("testFlowClientWithoutCertificate").withPayload(TEST_MESSAGE).run();
   }
 
