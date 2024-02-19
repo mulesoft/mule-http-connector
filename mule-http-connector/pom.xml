@@ -21,6 +21,9 @@
     <description>A Mule extension that provides HTTP server and client functionality</description>
 
     <properties>
+        <jacoco.version>0.8.11</jacoco.version>
+        <aspectjVersion>1.9.2</aspectjVersion>
+
         <fluentHcVersion>4.5.13</fluentHcVersion>
         <grizzlyVersion>2.3.36-MULE-026</grizzlyVersion>
         <mockitoVersion>4.11.0</mockitoVersion>
