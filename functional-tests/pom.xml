@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.mule.connectors</groupId>
         <artifactId>mule-http-connector-parent</artifactId>
-        <version>1.9.1-SNAPSHOT</version>
+        <version>1.9.1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -44,8 +44,9 @@
         <maven.surefire.plugin.version>3.2.3</maven.surefire.plugin.version>
 
         <muleDependenciesVersion>1.x-SNAPSHOT</muleDependenciesVersion>
-        <mule.version>4.7.0-SNAPSHOT</mule.version>
+        <mule.version>4.6.0</mule.version>
         <muleBomVersion>${mule.version}</muleBomVersion>
+        <muleSocketsConnectorVersion>1.2.4</muleSocketsConnectorVersion>
     </properties>
 
     <modules>

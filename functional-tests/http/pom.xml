@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.connectors</groupId>
         <artifactId>mule-http-connector-functional-tests</artifactId>
-        <version>1.9.1-SNAPSHOT</version>
+        <version>1.9.1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -40,7 +40,14 @@
             <groupId>org.mule.connectors</groupId>
             <artifactId>mule-http-connector</artifactId>
             <classifier>mule-plugin</classifier>
+            <version>${project.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.connectors</groupId>
+            <artifactId>mule-sockets-connector</artifactId>
+            <classifier>mule-plugin</classifier>
+            <version>${muleSocketsConnectorVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.connectors</groupId>
