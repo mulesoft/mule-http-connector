@@ -6,14 +6,14 @@
  */
 package org.mule.test.http.functional;
 
+import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.HTTPS;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
-import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.DEFAULT_SECURITY_MODEL;
-import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.PROPERTIES_FILE_PATTERN;
-import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.HTTPS;
+
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -66,7 +66,7 @@ public class HttpRequesterTlsRestrictedProtocolsAndCiphersTestCase extends Abstr
 
 
   private static File getTlsPropertiesFile() {
-    return new File(String.format(PROPERTIES_FILE_PATTERN, DEFAULT_SECURITY_MODEL));
+    return new File("tls-default.conf");
   }
 
   @Override
