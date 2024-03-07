@@ -6,8 +6,6 @@
  */
 package org.mule.test.http.functional;
 
-import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.DEFAULT_SECURITY_MODEL;
-import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.PROPERTIES_FILE_PATTERN;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.HTTPS;
 
 import static org.junit.Assert.assertEquals;
@@ -58,7 +56,7 @@ public class HttpListenerTlsRestrictedProtocolsAndCiphersTestCase extends Abstra
   }
 
   private static File getTlsPropertiesFile() {
-    return new File(String.format(PROPERTIES_FILE_PATTERN, DEFAULT_SECURITY_MODEL));
+    return new File("tls-default.conf");
   }
 
   @Override
