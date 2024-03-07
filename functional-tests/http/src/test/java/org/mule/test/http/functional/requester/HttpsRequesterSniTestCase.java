@@ -6,14 +6,12 @@
  */
 package org.mule.test.http.functional.requester;
 
-import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
-import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.DEFAULT_SECURITY_MODEL;
-import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.PROPERTIES_FILE_PATTERN;
+
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
@@ -82,7 +80,7 @@ public class HttpsRequesterSniTestCase extends AbstractHttpTestCase {
     if (path == null) {
       path = ClassUtils.getClassPathRoot(HttpsRequesterSniTestCase.class).getPath();
     }
-    return new File(path, format(PROPERTIES_FILE_PATTERN, DEFAULT_SECURITY_MODEL));
+    return new File(path, "tls-default.conf");
   }
 
   @Before
