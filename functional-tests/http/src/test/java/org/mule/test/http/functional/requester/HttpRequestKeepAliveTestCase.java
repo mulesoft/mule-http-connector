@@ -33,8 +33,7 @@ public class HttpRequestKeepAliveTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void persistentRequestSendsKeepAliveHeader() throws Exception {
-    // TODO: Netty removes the "Connection: close" header because it's the default. Check if we want this behavior.
-    assertConnectionHeader("persistentRequestFlow", null, "");
+    assertConnectionHeader("persistentRequestFlow", null, KEEP_ALIVE);
   }
 
   @Test
@@ -44,8 +43,7 @@ public class HttpRequestKeepAliveTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void persistentRequestWithKeepAlivePropertySendsKeepAliveHeader() throws Exception {
-    // TODO: Netty removes the "Connection: close" header because it's the default. Check if we want this behavior.
-    assertConnectionHeader("persistentRequestFlow", KEEP_ALIVE, "");
+    assertConnectionHeader("persistentRequestFlow", KEEP_ALIVE, KEEP_ALIVE);
   }
 
   @Test
