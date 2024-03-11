@@ -26,7 +26,7 @@
         <apacheAsyncClientVersion>4.1.5</apacheAsyncClientVersion>
         <jettyVersion>9.4.53.v20231009</jettyVersion>
         <httpMimeVersion>4.5.14</httpMimeVersion>
-        <apacheHttpCoreVersion>4.4.15</apacheHttpCoreVersion>
+        <apacheHttpCoreVersion>4.4.16</apacheHttpCoreVersion>
         <apacheHttpClientVersion>4.5.13</apacheHttpClientVersion>
         <groovyVersionBuild>4.0.11</groovyVersionBuild>
 
