@@ -31,7 +31,7 @@
                     #[{'Connection' : 'close'}]
                 </http:headers>
             </http:response>
-                </http:listener>
+        </http:listener>
         <logger/>
     </flow>
 
