@@ -57,10 +57,8 @@ public class HttpRequestTlsInsecureTestCase extends AbstractHttpTestCase {
 
   @Parameterized.Parameters
   public static Collection<Object[]> parameters() {
-    return Arrays.asList(new Object[][] {
-        {"http-request-insecure-hostname-config.xml"},
-        // {"http-request-insecure-certificate-config.xml"}
-    });
+    return Arrays
+        .asList(new Object[][] {{"http-request-insecure-hostname-config.xml"}, {"http-request-insecure-certificate-config.xml"}});
   }
 
   @Test
@@ -73,8 +71,7 @@ public class HttpRequestTlsInsecureTestCase extends AbstractHttpTestCase {
   public void secureRequest() throws Exception {
     expectedError.expectCause(instanceOf(IOException.class));
     expectedError
-        .expectCause(anyOf(hasMessage(containsString("Remotely closed")),
-                           hasMessage(containsString(J8_262_SSL_ERROR_RESPONSE)),
+        .expectCause(anyOf(hasMessage(containsString(J8_262_SSL_ERROR_RESPONSE)),
                            hasMessage(containsString("No trusted certificate found")),
                            hasMessage(containsString(J11_SSL_ERROR_RESPONSE))));
     flowRunner("testSecureRequest").withPayload(TEST_PAYLOAD).run();
