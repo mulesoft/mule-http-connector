@@ -8,7 +8,6 @@ package org.mule.test.http.functional.listener.crl;
 
 import static org.junit.Assert.fail;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class HttpListenerCrlRevocationTestCase extends AbstractHttpListenerClrTestCase {
@@ -18,9 +17,7 @@ public class HttpListenerCrlRevocationTestCase extends AbstractHttpListenerClrTe
   }
 
   @Test
-  @Ignore("W-14234781")
-  // TODO (W-14234781): Review this test.
-  public void testClientCertifiedAndRevoked() throws Exception {
+  public void testClientCertifiedAndRevoked() {
     try {
       runRevocationTestFlow();
       fail("Expected exception but nothing was thrown");

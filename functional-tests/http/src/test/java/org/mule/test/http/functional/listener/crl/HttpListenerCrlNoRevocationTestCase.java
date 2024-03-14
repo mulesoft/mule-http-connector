@@ -6,7 +6,6 @@
  */
 package org.mule.test.http.functional.listener.crl;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class HttpListenerCrlNoRevocationTestCase extends AbstractHttpListenerClrTestCase {
@@ -16,8 +15,6 @@ public class HttpListenerCrlNoRevocationTestCase extends AbstractHttpListenerClr
   }
 
   @Test
-  @Ignore("W-14234781")
-  // TODO (W-14234781): Review this test.
   public void testNotRevokedClient() throws Exception {
     verifyNotRevokedEntity();
   }
