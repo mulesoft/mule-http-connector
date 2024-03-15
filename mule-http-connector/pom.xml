@@ -48,7 +48,7 @@
         <munit.extensions.maven.plugin.version>1.2.0-rc3</munit.extensions.maven.plugin.version>
         <munit.version>3.1.0-rc4</munit.version>
         <mtf-tools.version>1.2.0</mtf-tools.version>
-        <mavenResources.version>3.0.2</mavenResources.version>
+        <mavenResources.version>3.3.1</mavenResources.version>
         <!-- MUnit minMuleVersion is 4.3.0 -->
         <munitMinMuleVersion>4.3.0</munitMinMuleVersion>
 
