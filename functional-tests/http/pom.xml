@@ -28,7 +28,7 @@
         <httpMimeVersion>4.5.14</httpMimeVersion>
         <apacheHttpCoreVersion>4.4.16</apacheHttpCoreVersion>
         <apacheHttpClientVersion>4.5.14</apacheHttpClientVersion>
-        <groovyVersionBuild>4.0.11</groovyVersionBuild>
+        <groovyVersionBuild>4.0.20</groovyVersionBuild>
 
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
         <httpConnectorVersion>${project.version}</httpConnectorVersion>
