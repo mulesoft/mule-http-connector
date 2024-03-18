@@ -24,7 +24,7 @@
         <grizzly.version>2.3.36-MULE-026</grizzly.version>
         <grizzly.ahc.version>1.14-MULE-024</grizzly.ahc.version>
         <apacheAsyncClientVersion>4.1.5</apacheAsyncClientVersion>
-        <jettyVersion>9.4.53.v20231009</jettyVersion>
+        <jettyVersion>9.4.54.v20240208</jettyVersion>
         <httpMimeVersion>4.5.14</httpMimeVersion>
         <apacheHttpCoreVersion>4.4.16</apacheHttpCoreVersion>
         <apacheHttpClientVersion>4.5.14</apacheHttpClientVersion>
