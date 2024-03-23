@@ -389,6 +389,9 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   }
 
   private boolean isContextStopping() {
+    if (muleContextStopWatcher == null) {
+      return false;
+    }
     return muleContextStopWatcher.isStopping();
   }
 
