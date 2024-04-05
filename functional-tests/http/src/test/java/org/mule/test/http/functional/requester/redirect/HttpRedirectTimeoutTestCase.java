@@ -17,7 +17,6 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
-@Ignore("Seems like Netty doesn't have a redirect config")
 public class HttpRedirectTimeoutTestCase extends AbstractHttpRedirectTimeoutTestCase {
 
   private static final String GLOBAL_TIMEOUT = "300";

@@ -19,7 +19,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-@Ignore("Seems like Netty doesn't have a redirect config")
 public class HttpRedirectExceededTimeoutTestCase extends AbstractHttpRedirectTimeoutTestCase {
 
   @Rule
@@ -42,5 +41,4 @@ public class HttpRedirectExceededTimeoutTestCase extends AbstractHttpRedirectTim
     expectedException.reportMissingExceptionWithMessage("Timeout exception must be triggered");
     runFlow("requestFlow");
   }
-
 }
