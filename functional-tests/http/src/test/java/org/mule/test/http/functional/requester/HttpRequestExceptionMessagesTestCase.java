@@ -40,9 +40,11 @@ public class HttpRequestExceptionMessagesTestCase extends AbstractHttpRequestTes
     // Using runtime version 4.1.1, the message contains the name of the exception: "UnresolvedAddressException"
     // Using latest grizzly, the message is "Couldn't resolve address"
     // Using latest Netty, the message is "nodename nor servname provided, or not known"
+    // Using Reactor Netty, the message is "Failed to resolve..."
     assertThat(msg, anyOf(containsString("UnresolvedAddressException"),
                           containsString("Couldn't resolve address"),
-                          containsString("nodename nor servname provided, or not known")));
+                          containsString("nodename nor servname provided, or not known"),
+                          containsString("Failed to resolve")));
   }
 
 }

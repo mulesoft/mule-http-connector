@@ -6,7 +6,6 @@
  */
 package org.mule.test.http.functional.requester.crl;
 
-
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
