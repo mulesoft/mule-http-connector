@@ -15,7 +15,7 @@
         <jdk.version>1.8</jdk.version>
         <mavenCompilerVersion>3.11.0</mavenCompilerVersion>
 
-        <jacoco.version>0.8.11</jacoco.version>
+        <jacoco.version>0.8.12</jacoco.version>
         <aspectjVersion>1.9.22</aspectjVersion>
     </properties>
 
