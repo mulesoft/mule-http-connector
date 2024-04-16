@@ -13,11 +13,10 @@ package org.mule.test.http.functional.requester.ntlm;
  * LICENSE.txt file.
  */
 
-import static org.mule.runtime.core.api.util.NetworkUtils.getLocalHost;
-
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
+import org.mule.runtime.core.api.util.Base64;
 import org.mule.test.http.functional.requester.TestAuthorizer;
 
 import java.io.IOException;
@@ -25,13 +24,10 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.ning.http.client.ntlm.NTLMEngine;
-
 public class NtlmProxyTestAuthorizer implements TestAuthorizer {
 
   private static final String TYPE_2_MESSAGE_CHALLENGE = "TlRMTVNTUAACAAAAAAAAACgAAAABggAAU3J2Tm9uY2UAAAAAAAAAAA==";
   private static final String TYPE_2_MESSAGE = "NTLM " + TYPE_2_MESSAGE_CHALLENGE;
-  private static final String TYPE_1_MESSAGE = "NTLM TlRMTVNTUAABAAAAAYIIogAAAAAoAAAAAAAAACgAAAAFASgKAAAADw==";
   private static final String AUTHORIZED = "Authorized";
 
   private String clientAuthHeader;
@@ -41,8 +37,6 @@ public class NtlmProxyTestAuthorizer implements TestAuthorizer {
   private String password;
   private String domain;
   private String workstation;
-
-  private String type3Message;
 
 
   public NtlmProxyTestAuthorizer(String clientAuthHeader, String serverAuthHeader, int unauthorizedHeader, String user,
@@ -56,12 +50,6 @@ public class NtlmProxyTestAuthorizer implements TestAuthorizer {
     this.workstation = workstation;
   }
 
-  public void setUp() throws Exception {
-    String ntlmHost = workstation != null ? workstation : getLocalHost().getHostName();
-    String type3Challenge = NTLMEngine.INSTANCE.generateType3Msg(user, password, domain, ntlmHost, TYPE_2_MESSAGE_CHALLENGE);
-    type3Message = "NTLM " + type3Challenge;
-  }
-
   @Override
   public boolean authorizeRequest(String address, HttpServletRequest request, HttpServletResponse response,
                                   boolean addAuthorizeMessageInProxy)
@@ -72,11 +60,12 @@ public class NtlmProxyTestAuthorizer implements TestAuthorizer {
       response.addHeader(serverAuthHeader, "NTLM");
       return false;
     }
-    if (TYPE_1_MESSAGE.equals(auth)) {
+    if (isNtlmTypeN(auth, 1)) {
       response.setStatus(unauthorizedHeader);
       response.setHeader(serverAuthHeader, TYPE_2_MESSAGE);
       return false;
-    } else if (type3Message.equals(auth)) {
+    } else if (isNtlmTypeN(auth, 3)) {
+      // TODO: Validate credentials
       response.setStatus(SC_OK);
       if (addAuthorizeMessageInProxy) {
         response.getWriter().print(AUTHORIZED);
@@ -86,6 +75,17 @@ public class NtlmProxyTestAuthorizer implements TestAuthorizer {
       response.setStatus(SC_UNAUTHORIZED);
       return false;
     }
+  }
+
+  private static boolean isNtlmTypeN(String header, int n) {
+    if (!header.startsWith("NTLM ")) {
+      return false;
+    }
+
+    String base64 = header.substring(5);
+    byte[] asByteArray = Base64.decode(base64);
+    byte type = asByteArray[8];
+    return type == n;
   }
 
   public static class Builder {
@@ -134,11 +134,8 @@ public class NtlmProxyTestAuthorizer implements TestAuthorizer {
     }
 
     public NtlmProxyTestAuthorizer build() throws Exception {
-      NtlmProxyTestAuthorizer testAuthorizer = new NtlmProxyTestAuthorizer(clientAuthHeader, serverAuthHeader, unauthorizedHeader,
-                                                                           user, password, domain, workstation);
-      testAuthorizer.setUp();
-
-      return testAuthorizer;
+      return new NtlmProxyTestAuthorizer(clientAuthHeader, serverAuthHeader, unauthorizedHeader, user, password, domain,
+                                         workstation);
     }
   }
 }
