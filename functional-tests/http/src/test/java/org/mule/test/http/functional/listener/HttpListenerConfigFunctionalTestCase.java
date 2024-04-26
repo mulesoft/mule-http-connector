@@ -17,6 +17,7 @@ import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.anyOf;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.util.IOUtils;
@@ -43,13 +44,13 @@ import java.util.regex.Pattern;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
 public class HttpListenerConfigFunctionalTestCase extends AbstractHttpTestCase {
 
   private static final String NO_LISTENER_ENTITY_FORMAT = "No listener for endpoint: %s";
+  private static final String ERROR_PARSING_REQUEST_URL = "HTTP request parsing failed with error: \"%s";
   private static final Pattern IPADDRESS_PATTERN = Pattern.compile("^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
       + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
   private static final int TIMEOUT = 1000;
@@ -108,15 +109,17 @@ public class HttpListenerConfigFunctionalTestCase extends AbstractHttpTestCase {
     assertThat(IOUtils.toString(httpResponse.getEntity().getContent()), is(format(NO_LISTENER_ENTITY_FORMAT, "/noListener")));
   }
 
+  // Grizzly and netty implementation diverge here, Netty will fail before even trying to find a listener, because the path
+  // is not valid. Grizzly will not fail but throw an error that the listener is not found for that path
   @Test
-  @Ignore("With Netty, the path is requested because of the invalid chars, so it doesn't trigger a 404")
   public void noListenerConfigWithSpecialCharacters() throws Exception {
     String invalidPathWithSpecialCharacters = "/<script></script>";
     SocketRequester socketRequester = new SocketRequester("localhost", noListenerConfigPort.getNumber());
     socketRequester.initialize();
     socketRequester.doRequest("GET " + invalidPathWithSpecialCharacters + " HTTP/1.1");
     assertThat(socketRequester.getResponse(),
-               containsString(format(NO_LISTENER_ENTITY_FORMAT, escapeHtml4(invalidPathWithSpecialCharacters))));
+               anyOf(containsString(format(NO_LISTENER_ENTITY_FORMAT, escapeHtml4(invalidPathWithSpecialCharacters))),
+                     containsString(format(ERROR_PARSING_REQUEST_URL, "Illegal character"))));
     socketRequester.finalizeGracefully();
   }
 

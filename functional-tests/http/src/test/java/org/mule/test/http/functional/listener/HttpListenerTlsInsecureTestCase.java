@@ -7,6 +7,7 @@
 package org.mule.test.http.functional.listener;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -53,7 +54,8 @@ public class HttpListenerTlsInsecureTestCase extends AbstractHttpTestCase {
   @Test
   public void rejectsInvalidCertificateIfSecure() throws Exception {
     expectedError.expectCause(instanceOf(IOException.class));
-    expectedError.expectCause(hasMessage(containsString("Remotely close")));
+    expectedError.expectCause(hasMessage(anyOf(containsString("Remotely close"),
+                                               containsString("Received fatal alert: bad_certificate"))));
     flowRunner("testRequestToSecure")
         .withPayload("data")
         .withVariable("port", port2.getNumber())

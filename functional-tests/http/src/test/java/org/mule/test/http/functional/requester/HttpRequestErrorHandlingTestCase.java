@@ -174,7 +174,6 @@ public class HttpRequestErrorHandlingTestCase extends AbstractHttpRequestTestCas
   }
 
   @Test
-  @Ignore("Failing in Netty, investigate...")
   public void errorPayloadStreamIsManaged() throws Exception {
     serverStatus = NOT_FOUND.getStatusCode();
     assertThat(getFlowRunner("streaming", httpPort.getNumber()).keepStreamsOpen().run().getMessage(),

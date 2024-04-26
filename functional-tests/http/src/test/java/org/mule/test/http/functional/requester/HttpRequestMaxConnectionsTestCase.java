@@ -24,10 +24,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.server.Request;
-import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore("Netty doesn't have maxConnections config")
 public class HttpRequestMaxConnectionsTestCase extends AbstractHttpRequestTestCase {
 
   private final Latch messageArrived = new Latch();
@@ -48,8 +46,9 @@ public class HttpRequestMaxConnectionsTestCase extends AbstractHttpRequestTestCa
     messageArrived.await();
 
     // Max connections should be reached
-    flowRunner("limitedConnections").runExpectingException(allOf(instanceOf(HttpRequestFailedException.class),
-                                                                 hasMessage(containsString("process"))));
+    flowRunner("limitedConnections")
+        .runExpectingException(allOf(instanceOf(HttpRequestFailedException.class),
+                                     hasMessage(containsString("Connection limit exceeded"))));
 
     messageHold.release();
     t1.join();
@@ -58,6 +57,7 @@ public class HttpRequestMaxConnectionsTestCase extends AbstractHttpRequestTestCa
   private Thread processAsynchronously(final Flow flow) {
     Thread thread = new Thread(() -> {
       try {
+        System.out.println("Sent one request");
         flowRunner("limitedConnections").run();
       } catch (Exception e) {
         throw new RuntimeException(e);
