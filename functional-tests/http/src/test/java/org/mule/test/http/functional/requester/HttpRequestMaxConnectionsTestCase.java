@@ -57,7 +57,6 @@ public class HttpRequestMaxConnectionsTestCase extends AbstractHttpRequestTestCa
   private Thread processAsynchronously(final Flow flow) {
     Thread thread = new Thread(() -> {
       try {
-        System.out.println("Sent one request");
         flowRunner("limitedConnections").run();
       } catch (Exception e) {
         throw new RuntimeException(e);
