@@ -21,12 +21,11 @@
     <description>A Mule extension that provides HTTP server and client functionality</description>
 
     <properties>
-        <jacoco.version>0.8.10</jacoco.version>
-        <aspectjVersion>1.9.2</aspectjVersion>
+        <jacoco.version>0.8.12</jacoco.version>
+        <aspectjVersion>1.9.22</aspectjVersion>
 
         <fluentHcVersion>4.5.13</fluentHcVersion>
-        <grizzlyVersion>2.3.36-MULE-024</grizzlyVersion>
-        <grizzlyAhcVersion>1.14-MULE-019</grizzlyAhcVersion>
+        <grizzlyVersion>2.3.36-MULE-026</grizzlyVersion>
         <mockitoVersion>4.11.0</mockitoVersion>
 
         <commonsLang3Version>3.12.0</commonsLang3Version>
@@ -46,16 +45,16 @@
         <!-- Remove when a new parent version with MTF is available -->
         <munit.input.directory>src/test/munit</munit.input.directory>
         <munit.output.directory>${basedir}/target/test-mule/munit</munit.output.directory>
-        <munit.extensions.maven.plugin.version>1.2.0-rc3</munit.extensions.maven.plugin.version>
-        <munit.version>3.1.0-rc4</munit.version>
-        <mtf-tools.version>1.2.0-rc1</mtf-tools.version>
-        <mavenResources.version>3.0.2</mavenResources.version>
+        <munit.extensions.maven.plugin.version>1.2.0</munit.extensions.maven.plugin.version>
+        <munit.version>3.2.0-rc4</munit.version>
+        <mtf-tools.version>1.2.0</mtf-tools.version>
+        <mavenResources.version>3.3.1</mavenResources.version>
         <!-- MUnit minMuleVersion is 4.3.0 -->
         <munitMinMuleVersion>4.3.0</munitMinMuleVersion>
 
         <muleObjectStoreConnectorTestVersion>1.2.2</muleObjectStoreConnectorTestVersion>
 
-        <springVersion>5.3.32</springVersion>
+        <springVersion>5.3.34</springVersion>
 
         <mulesoftLicenseVersion>1.4.0</mulesoftLicenseVersion>
         <license.maven.plugin.version>4.2</license.maven.plugin.version>

@@ -21,14 +21,14 @@
 
         <javax.servlet.api.version>3.1.0</javax.servlet.api.version>
 
-        <grizzly.version>2.3.36-MULE-025</grizzly.version>
-        <grizzly.ahc.version>1.14-MULE-023</grizzly.ahc.version>
+        <grizzly.version>2.3.36-MULE-026</grizzly.version>
+        <grizzly.ahc.version>1.14-MULE-024</grizzly.ahc.version>
         <apacheAsyncClientVersion>4.1.5</apacheAsyncClientVersion>
-        <jettyVersion>9.4.51.v20230217</jettyVersion>
+        <jettyVersion>9.4.54.v20240208</jettyVersion>
         <httpMimeVersion>4.5.14</httpMimeVersion>
-        <apacheHttpCoreVersion>4.4.15</apacheHttpCoreVersion>
-        <apacheHttpClientVersion>4.5.13</apacheHttpClientVersion>
-        <groovyVersionBuild>4.0.11</groovyVersionBuild>
+        <apacheHttpCoreVersion>4.4.16</apacheHttpCoreVersion>
+        <apacheHttpClientVersion>4.5.14</apacheHttpClientVersion>
+        <groovyVersionBuild>4.0.21</groovyVersionBuild>
 
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
         <httpConnectorVersion>${project.version}</httpConnectorVersion>
