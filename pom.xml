@@ -7,7 +7,7 @@
     <groupId>org.mule.connectors</groupId>
     <artifactId>mule-http-connector-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.9.3</version>
+    <version>1.9.4-SNAPSHOT</version>
 
     <name>HTTP Connector's Parent Pom</name>
 
