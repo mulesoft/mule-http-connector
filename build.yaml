@@ -5,4 +5,4 @@ additionalTestConfigs:
     testJdkTool: OPEN-JDK17
     mavenAdditionalArgs: -DskipMunitTests -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE -Dmule.module.tweaking.validation.skip=true
   testNetty:
-    mavenAdditionalArgs: -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.http.service.implementation=NETTY
+    mavenAdditionalArgs: -DruntimeVersion=4.8.0-SNAPSHOT -DruntimeProduct=MULE_EE -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.http.service.implementation=NETTY
