@@ -13,4 +13,7 @@ additionalTestConfigs:
 #    testJdkTool: OPEN-JDK11
 #    mavenAdditionalArgs: -pl mule-http-connector -DskipUnitTests=true
   jdk21:
-    testJdkTool: TEMURIN-JDK21    
+    testJdkTool: TEMURIN-JDK21
+  netty-jdk17:
+    mavenAdditionalArgs: -Dmule.http.service.implementation=NETTY
+
