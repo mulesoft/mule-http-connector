@@ -18,8 +18,6 @@ public class HttpListenerCrlRevocationTestCase extends AbstractHttpListenerClrTe
   }
 
   @Test
-  @Ignore("W-14234781")
-  // TODO (W-14234781): Review this test.
   public void testClientCertifiedAndRevoked() throws Exception {
     try {
       runRevocationTestFlow();
