@@ -16,8 +16,6 @@
 
     <properties>
         <muleDependenciesVersion>1.x-SNAPSHOT</muleDependenciesVersion>
-        <mule.version>4.8.0-SNAPSHOT</mule.version>
-        <muleApiVersion>1.8.0-SNAPSHOT</muleApiVersion>
 
         <javaModuleName>org.mule.test.integration.mule.http.connector.cors.tests</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>

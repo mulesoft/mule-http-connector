@@ -41,7 +41,9 @@
         <maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
 
         <muleDependenciesVersion>1.x-SNAPSHOT</muleDependenciesVersion>
+        <mule.version>4.8.0-SNAPSHOT</mule.version>
         <muleBomVersion>${mule.version}</muleBomVersion>
+        <muleApiVersion>1.8.0-SNAPSHOT</muleApiVersion>
     </properties>
 
     <modules>
