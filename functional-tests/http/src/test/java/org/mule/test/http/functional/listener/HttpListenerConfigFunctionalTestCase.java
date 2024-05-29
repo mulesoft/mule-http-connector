@@ -23,6 +23,7 @@ import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.http.api.HttpConstants.HttpStatus;
 import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
+import org.mule.service.http.netty.impl.provider.NettyHttpServiceProvider;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;
@@ -113,8 +114,18 @@ public class HttpListenerConfigFunctionalTestCase extends AbstractHttpTestCase {
     SocketRequester socketRequester = new SocketRequester("localhost", noListenerConfigPort.getNumber());
     socketRequester.initialize();
     socketRequester.doRequest("GET " + invalidPathWithSpecialCharacters + " HTTP/1.1");
-    assertThat(socketRequester.getResponse(),
-               containsString(format(NO_LISTENER_ENTITY_FORMAT, escapeHtml4(invalidPathWithSpecialCharacters))));
+
+    String errorMessage;
+    if (System.getProperty("mule.http.service.implementation", "GRIZZLY").equals("GRIZZLY")) {
+      errorMessage = format(NO_LISTENER_ENTITY_FORMAT, escapeHtml4(invalidPathWithSpecialCharacters));
+    } else {
+      String url = format("http://127.0.0.1:%d%s", noListenerConfigPort.getNumber(), invalidPathWithSpecialCharacters);
+      int indexOfLT = url.indexOf('<');
+      errorMessage =
+          format("HTTP request parsing failed with error: \"Illegal character in path at index %d: %s\"", indexOfLT, url);
+    }
+
+    assertThat(socketRequester.getResponse(), containsString(errorMessage));
     socketRequester.finalizeGracefully();
   }
 
