@@ -52,6 +52,8 @@ public abstract class AbstractHttpTestCase extends MuleArtifactFunctionalTestCas
   protected static final String J17_SSL_ERROR_RESPONSE = "PKIX path validation failed";
   // Expected validation messages for certificates when testing fips.
   public static final String BOUNCY_CASTLE_CERTIFICATE_UNKNOWN_ERROR_MESSAGE = "certificate_unknown";
+  // Expected validation error message when using Netty.
+  protected static final String NETTY_SSL_ERROR_RESPONSE = "Received fatal alert: handshake_failure";
   protected static final String APPROPRIATE_PROTOCOL_ERROR =
       "No appropriate protocol (protocol is disabled or cipher suites are inappropriate)";
 
@@ -83,6 +85,7 @@ public abstract class AbstractHttpTestCase extends MuleArtifactFunctionalTestCas
                     containsString(J8_275_SSL_ERROR_RESPONSE),
                     containsString(J11_SSL_ERROR_RESPONSE),
                     containsString(J17_SSL_ERROR_RESPONSE),
+                    containsString(NETTY_SSL_ERROR_RESPONSE),
                     containsString(APPROPRIATE_PROTOCOL_ERROR)));
   }
 }
