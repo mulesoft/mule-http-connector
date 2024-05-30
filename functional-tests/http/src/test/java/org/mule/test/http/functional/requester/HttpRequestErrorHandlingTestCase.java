@@ -32,6 +32,7 @@ import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStor
 
 import static java.lang.String.format;
 
+import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -53,7 +54,6 @@ import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Stories;
 import io.qameta.allure.Story;
-import org.apache.commons.lang3.SystemUtils;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -157,17 +157,18 @@ public class HttpRequestErrorHandlingTestCase extends AbstractHttpRequestTestCas
 
   @Test
   public void connectivity() throws Exception {
-
-    String customMessage = ": Connection refused";
-    if (SystemUtils.IS_OS_WINDOWS) {
-      customMessage = customMessage.concat(": no further information");
-    }
+    String errorMessageGrizzly = getErrorMessage(": Connection refused", unusedPort) + " connectivity";
+    String errorMessageNetty =
+        getErrorMessage(": Connection refused: localhost/127.0.0.1:" + unusedPort.getNumber(), unusedPort) + " connectivity";
+    String errorMessageReactorNetty =
+        getErrorMessage(": Connection refused: localhost/0:0:0:0:0:0:0:1:" + unusedPort.getNumber(), unusedPort)
+            + " connectivity";
+    String errorMessageGrizzlyWindows =
+        getErrorMessage(": Connection refused: no further information", unusedPort) + " connectivity";
 
     CoreEvent result = getFlowRunner("handled", unusedPort.getNumber()).run();
-    assertThat(result.getMessage(),
-               hasPayload(equalTo(getErrorMessage(customMessage, unusedPort)
-                   + " connectivity")));
-
+    assertThat(result.getMessage(), hasPayload(anyOf(equalTo(errorMessageNetty), equalTo(errorMessageGrizzly),
+                                                     equalTo(errorMessageReactorNetty), equalTo(errorMessageGrizzlyWindows))));
   }
 
   @Test
