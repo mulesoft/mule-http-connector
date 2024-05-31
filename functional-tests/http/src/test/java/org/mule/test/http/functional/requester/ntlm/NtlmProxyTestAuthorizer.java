@@ -13,8 +13,6 @@ package org.mule.test.http.functional.requester.ntlm;
  * LICENSE.txt file.
  */
 
-import static org.mule.runtime.core.api.util.NetworkUtils.getLocalHost;
-
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
@@ -25,8 +23,6 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import com.ning.http.client.ntlm.NTLMEngine;
 
 public class NtlmProxyTestAuthorizer implements TestAuthorizer {
 
