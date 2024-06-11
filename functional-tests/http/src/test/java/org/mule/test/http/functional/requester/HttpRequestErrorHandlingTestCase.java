@@ -161,7 +161,7 @@ public class HttpRequestErrorHandlingTestCase extends AbstractHttpRequestTestCas
     String errorMessageNetty =
         getErrorMessage(": Connection refused: localhost/127.0.0.1:" + unusedPort.getNumber(), unusedPort) + " connectivity";
     String errorMessageReactorNetty =
-        getErrorMessage(": Connection refused: localhost/0:0:0:0:0:0:0:1:" + unusedPort.getNumber(), unusedPort)
+        getErrorMessage(": Connection refused: localhost/[0:0:0:0:0:0:0:1]:" + unusedPort.getNumber(), unusedPort)
             + " connectivity";
     String errorMessageGrizzlyWindows =
         getErrorMessage(": Connection refused: no further information", unusedPort) + " connectivity";
