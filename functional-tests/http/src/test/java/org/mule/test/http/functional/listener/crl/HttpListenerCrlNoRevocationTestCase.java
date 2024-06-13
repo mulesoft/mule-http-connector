@@ -16,8 +16,6 @@ public class HttpListenerCrlNoRevocationTestCase extends AbstractHttpListenerClr
   }
 
   @Test
-  @Ignore("W-14234781")
-  // TODO (W-14234781): Review this test.
   public void testNotRevokedClient() throws Exception {
     verifyNotRevokedEntity();
   }
