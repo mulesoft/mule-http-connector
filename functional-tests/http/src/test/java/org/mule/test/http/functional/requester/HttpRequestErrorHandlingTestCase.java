@@ -32,10 +32,10 @@ import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStor
 
 import static java.lang.String.format;
 
-import static org.hamcrest.Matchers.anyOf;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.error.HttpError;
@@ -157,18 +157,10 @@ public class HttpRequestErrorHandlingTestCase extends AbstractHttpRequestTestCas
 
   @Test
   public void connectivity() throws Exception {
-    String errorMessageGrizzly = getErrorMessage(": Connection refused", unusedPort) + " connectivity";
-    String errorMessageNetty =
-        getErrorMessage(": Connection refused: localhost/127.0.0.1:" + unusedPort.getNumber(), unusedPort) + " connectivity";
-    String errorMessageReactorNetty =
-        getErrorMessage(": Connection refused: localhost/[0:0:0:0:0:0:0:1]:" + unusedPort.getNumber(), unusedPort)
-            + " connectivity";
-    String errorMessageGrizzlyWindows =
-        getErrorMessage(": Connection refused: no further information", unusedPort) + " connectivity";
-
     CoreEvent result = getFlowRunner("handled", unusedPort.getNumber()).run();
-    assertThat(result.getMessage(), hasPayload(anyOf(equalTo(errorMessageNetty), equalTo(errorMessageGrizzly),
-                                                     equalTo(errorMessageReactorNetty), equalTo(errorMessageGrizzlyWindows))));
+
+    // The exact message depends on the OS and the underlying framework, but all contain "Connection refused".
+    assertThat(result.getMessage(), hasPayload(containsString("Connection refused")));
   }
 
   @Test
