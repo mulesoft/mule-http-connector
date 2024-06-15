@@ -22,7 +22,7 @@
 
     <properties>
         <jacoco.version>0.8.11</jacoco.version>
-        <aspectjVersion>1.9.22</aspectjVersion>
+        <aspectjVersion>1.9.22.1</aspectjVersion>
 
         <fluentHcVersion>4.5.13</fluentHcVersion>
         <grizzlyVersion>2.3.36-MULE-026</grizzlyVersion>
