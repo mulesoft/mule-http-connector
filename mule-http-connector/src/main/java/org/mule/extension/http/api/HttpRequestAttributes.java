@@ -8,6 +8,7 @@ package org.mule.extension.http.api;
 
 import static java.lang.System.lineSeparator;
 
+import org.mule.extension.http.CertificateData;
 import org.mule.extension.http.internal.certificate.CertificateProvider;
 import org.mule.extension.http.internal.certificate.CertificateProviderFactory;
 import org.mule.runtime.api.util.MultiMap;
@@ -115,7 +116,7 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
    */
   @Parameter
   @Optional
-  private Certificate clientCertificate;
+  private CertificateData clientCertificate;
 
   /**
    * Actual {@link Certificate} to use, avoid any processing until it's actually needed.
@@ -140,7 +141,7 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
   public HttpRequestAttributes(MultiMap<String, String> headers, String listenerPath, String relativePath, String version,
                                String scheme, String method, String requestPath, String requestUri, String queryString,
                                MultiMap<String, String> queryParams, Map<String, String> uriParams, String remoteAddress,
-                               Certificate clientCertificate) {
+                               CertificateData clientCertificate) {
     this(headers, listenerPath, relativePath, null, version, scheme, method, requestPath, "", requestUri, "", queryString,
          queryParams,
          uriParams, "", remoteAddress, () -> clientCertificate);
@@ -150,7 +151,7 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
                         String version, String scheme, String method, String requestPath, String rawRequestPath,
                         String requestUri, String rawRequestUri, String queryString, MultiMap<String, String> queryParams,
                         Map<String, String> uriParams, String localAddress, String remoteAddress,
-                        Supplier<Certificate> certificateSupplier) {
+                        Supplier<CertificateData> certificateSupplier) {
     super(headers, queryParams, uriParams, requestPath);
     this.listenerPath = listenerPath;
     this.rawRequestPath = rawRequestPath;
@@ -215,7 +216,7 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
     return remoteAddress;
   }
 
-  public Certificate getClientCertificate() {
+  public CertificateData getClientCertificate() {
     this.clientCertificate = lazyClientCertificateProvider.getCertificate();
     return this.clientCertificate;
   }
