@@ -150,13 +150,9 @@ public class HttpListenerValidateCertificateTestCase extends AbstractHttpTestCas
       HttpRequestAttributes attributes = (HttpRequestAttributes) event.getMessage().getAttributes().getValue();
       assertThat(attributes.getClientCertificate(), notNullValue());
       assertThat(attributes.getClientCertificate(), instanceOf(java.security.cert.Certificate.class));
-      try {
-        // Only the client certificate contains CN=OLEKSIYS-W3T this way we validate that we are actually publishing the client
-        // cert
-        assertThat(new String(attributes.getClientCertificate().getEncoded(), UTF_8), containsString("OLEKSIYS-W3T0"));
-      } catch (CertificateEncodingException encodingException) {
-        fail("Encoding exception: " + encodingException);
-      }
+      // Only the client certificate contains CN=OLEKSIYS-W3T this way we validate that we are actually publishing the client
+      // cert
+      assertThat(new String(attributes.getClientCertificate().getEncoded(), UTF_8), containsString("OLEKSIYS-W3T0"));
       return event;
     }
   }

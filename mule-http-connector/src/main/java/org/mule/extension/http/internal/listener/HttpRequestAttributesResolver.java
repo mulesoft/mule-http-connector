@@ -9,6 +9,7 @@ package org.mule.extension.http.internal.listener;
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.decodeQueryString;
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.decodeUriParams;
 
+import org.mule.extension.http.CertificateData;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpRequestAttributesBuilder;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
@@ -16,6 +17,8 @@ import org.mule.runtime.http.api.domain.request.ClientConnection;
 import org.mule.runtime.http.api.domain.request.HttpRequestContext;
 
 import java.net.URI;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
 
 /**
  * Creates {@link HttpRequestAttributes} based on an {@link HttpRequestContext}, it's parts and a {@link ListenerPath}.
@@ -76,7 +79,19 @@ public class HttpRequestAttributesResolver {
         .queryParams(decodeQueryString(rawQuery))
         .localAddress(requestContext.getServerConnection().getLocalHostAddress().toString())
         .remoteAddress(clientConnection.getRemoteHostAddress().toString())
-        .clientCertificate(clientConnection::getClientCertificate)
+        .clientCertificate(() -> {
+          try {
+            return buildCertificateData(clientConnection);
+          } catch (CertificateEncodingException e) {
+            throw new RuntimeException(e);
+          }
+        })
         .build();
+  }
+
+  private CertificateData buildCertificateData(ClientConnection clientConnection) throws CertificateEncodingException {
+    Certificate certificate = clientConnection.getClientCertificate();
+    CertificateData certificateData = new CertificateData(certificate.getType(), certificate.getEncoded());
+    return certificateData;
   }
 }

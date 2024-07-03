@@ -14,6 +14,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotLoadFromClasspath;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
+
+import org.mule.extension.http.CertificateData;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpRequestAttributesBuilder;
 
@@ -21,6 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
 
 import io.qameta.allure.Description;
 import org.junit.BeforeClass;
@@ -68,15 +71,22 @@ public class HttpRequestAttributesSerializationTestCase extends AbstractHttpAttr
 
   @Test
   @Description("HttpRequestAttributes are correctly serialized and deserialized with an explicit certificate. Certificate can be recover after deserialization")
-  public void withResolvedCertificate() {
-    HttpRequestAttributes processed = assertSerialization(baseBuilder.clientCertificate(certificate).build());
+  public void withResolvedCertificate() throws CertificateEncodingException {
+    HttpRequestAttributes processed =
+        assertSerialization(baseBuilder.clientCertificate(buildCertificateData(certificate)).build());
     assertThat(processed.getClientCertificate(), is(certificate));
   }
 
   @Test
   @Description("HttpRequestAttributes are correctly serialized and deserialized with a certificate supplier. Certificate can be recover after deserialization")
   public void withLazyCertificate() {
-    HttpRequestAttributes processed = assertSerialization(baseBuilder.clientCertificate(() -> certificate).build());
+    HttpRequestAttributes processed = assertSerialization(baseBuilder.clientCertificate(() -> {
+      try {
+        return buildCertificateData(certificate);
+      } catch (CertificateEncodingException e) {
+        throw new RuntimeException(e);
+      }
+    }).build());
     assertThat(processed.getClientCertificate(), equalTo(certificate));
   }
 
@@ -98,5 +108,10 @@ public class HttpRequestAttributesSerializationTestCase extends AbstractHttpAttr
     assertThat(processed.getMaskedRequestPath(), equalTo(original.getMaskedRequestPath()));
 
     return processed;
+  }
+
+  private CertificateData buildCertificateData(Certificate certificate) throws CertificateEncodingException {
+    CertificateData certificateData = new CertificateData(certificate.getType(), certificate.getEncoded());
+    return certificateData;
   }
 }

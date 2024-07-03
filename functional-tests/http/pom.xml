@@ -282,5 +282,11 @@
             <scope>test</scope>
             <type>test-jar</type>
         </dependency>
+        <dependency>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-java-commons</artifactId>
+            <version>2.27.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
