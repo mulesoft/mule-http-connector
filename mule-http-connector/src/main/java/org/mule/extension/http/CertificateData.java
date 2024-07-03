@@ -6,14 +6,16 @@
  */
 package org.mule.extension.http;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
 import java.util.Date;
 import java.util.List;
 
 public class CertificateData {
-
-  //todo: 3) add test (refer to HttpListenerCustomTlsConfigTestCase)
 
   private String type;
   private byte[] encoded;
@@ -75,8 +77,35 @@ public class CertificateData {
     return type;
   }
 
-  public byte[] getEncoded() {
-    return encoded;
+  public byte[] getEncoded() throws CertificateEncodingException {
+    try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+
+      oos.writeObject(type);
+      oos.writeObject(encoded);
+      oos.writeObject(version);
+      oos.writeObject(subjectDN != null ? subjectDN : "null");
+      oos.writeObject(issuerDN != null ? issuerDN : "null");
+      oos.writeObject(serialNumber != null ? serialNumber : "null");
+      oos.writeObject(notBefore != null ? notBefore : "null");
+      oos.writeObject(notAfter != null ? notAfter : "null");
+      oos.writeObject(publicKey != null ? publicKey.getEncoded() : "null");
+      oos.writeObject(sigAlgName != null ? sigAlgName : "null");
+      oos.writeObject(sigAlgOID != null ? sigAlgOID : "null");
+      oos.writeObject(sigAlgParams != null ? sigAlgParams : "null");
+      oos.writeObject(signature != null ? signature : "null");
+      oos.writeObject(basicConstraints);
+      oos.writeObject(extendedKeyUsage != null ? extendedKeyUsage : "null");
+      oos.writeObject(keyUsage != null ? keyUsage : "null");
+      oos.writeObject(issuerUniqueID != null ? issuerUniqueID : "null");
+      oos.writeObject(subjectAlternativeNames != null ? subjectAlternativeNames : "null");
+      oos.writeObject(issuerAlternativeNames != null ? issuerAlternativeNames : "null");
+      oos.writeObject(extensions != null ? extensions : "null");
+      oos.flush();
+      return baos.toByteArray();
+    } catch (IOException e) {
+      throw new CertificateEncodingException("Failed to encode certificate", e);
+    }
   }
 
   public String getName() {
