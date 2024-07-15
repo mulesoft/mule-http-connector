@@ -101,10 +101,6 @@
                     <argLine>${surefire.args}</argLine>
                     <systemProperties>
                         <property>
-                            <name>mule.classloader.container.jpmsModuleLayer</name>
-                            <value>true</value>
-                        </property>
-                        <property>
                             <name>maven.projectVersion</name>
                             <value>${mule.version}</value>
                         </property>
