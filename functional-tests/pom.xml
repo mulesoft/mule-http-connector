@@ -26,6 +26,7 @@
             --module-path=${org.slf4j:slf4j-api:jar}
             --add-modules=org.slf4j
             --add-opens=java.base/java.lang=ALL-UNNAMED
+            --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
         </surefire.args>
 
         <javaVersion>1.8</javaVersion>
