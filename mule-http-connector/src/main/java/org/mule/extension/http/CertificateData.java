@@ -9,13 +9,13 @@ package org.mule.extension.http;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.math.BigInteger;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.util.Date;
 import java.util.List;
 
-public class CertificateData {
+public class CertificateData implements Serializable {
 
   private String type;
   private byte[] encoded;
@@ -74,8 +74,8 @@ public class CertificateData {
 
 
   public String getType() {
-    return type;
-  }
+    return "X.509";
+  } //todo: test
 
   public byte[] getEncoded() throws CertificateEncodingException {
     try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
