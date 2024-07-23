@@ -11,6 +11,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 
+import org.mule.extension.http.CertificateData;
 import org.mule.runtime.api.util.MultiMap;
 
 import java.security.cert.Certificate;
@@ -43,7 +44,7 @@ public class HttpRequestAttributesBuilder {
   private String queryString = "";
   private String localAddress;
   private String remoteAddress;
-  private Supplier<Certificate> clientCertificate = () -> null;
+  private Supplier<CertificateData> clientCertificate = () -> null;
 
   private boolean resolveMaskedRequestPath = false;
 
@@ -156,7 +157,7 @@ public class HttpRequestAttributesBuilder {
     return this;
   }
 
-  public HttpRequestAttributesBuilder clientCertificate(Certificate clientCertificate) {
+  public HttpRequestAttributesBuilder clientCertificate(CertificateData clientCertificate) {
     this.clientCertificate = () -> clientCertificate;
     return this;
   }
@@ -168,7 +169,7 @@ public class HttpRequestAttributesBuilder {
    * @return this builder
    * @since 1.4.0
    */
-  public HttpRequestAttributesBuilder clientCertificate(Supplier<Certificate> clientCertificate) {
+  public HttpRequestAttributesBuilder clientCertificate(Supplier<CertificateData> clientCertificate) {
     this.clientCertificate = clientCertificate;
     return this;
   }

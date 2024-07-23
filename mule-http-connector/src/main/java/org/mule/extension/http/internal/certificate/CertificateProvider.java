@@ -6,6 +6,8 @@
  */
 package org.mule.extension.http.internal.certificate;
 
+import org.mule.extension.http.CertificateData;
+
 import java.io.Serializable;
 import java.security.cert.Certificate;
 
@@ -20,6 +22,6 @@ public interface CertificateProvider extends Serializable {
    * Compute the logic for obtaining the {@link Certificate} and return it.
    * @return a {@link Certificate}
    */
-  Certificate getCertificate();
+  CertificateData getCertificate();
 
 }
