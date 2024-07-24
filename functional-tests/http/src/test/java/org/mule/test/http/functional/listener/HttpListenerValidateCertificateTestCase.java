@@ -9,11 +9,15 @@ package org.mule.test.http.functional.listener;
 import static org.mule.runtime.http.api.HttpConstants.Method.POST;
 import static org.mule.tck.processor.FlowAssert.verify;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import org.mule.extension.http.api.certificate.CertificateData;
 import org.mule.extension.http.api.HttpRequestAttributes;
@@ -34,6 +38,7 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
 import java.io.IOException;
+import java.security.cert.CertificateEncodingException;
 
 import org.junit.After;
 import org.junit.Before;
@@ -154,6 +159,11 @@ public class HttpListenerValidateCertificateTestCase extends AbstractHttpTestCas
       assertThat(certificateData, notNullValue());
       assertThat(attributes.getClientCertificate(), instanceOf(CertificateData.class));
       assertThat(attributes.getClientCertificate().getType(), is("X.509"));
+      try {
+        assertThat(new String(attributes.getClientCertificate().getEncoded(), UTF_8), containsString("OLEKSIYS-W3T0"));
+      } catch (CertificateEncodingException encodingException) {
+        fail("Encoding exception: " + encodingException);
+      }
 
       return event;
     }
