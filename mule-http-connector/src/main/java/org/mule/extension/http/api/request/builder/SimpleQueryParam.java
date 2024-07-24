@@ -39,9 +39,17 @@ public class SimpleQueryParam implements KeyValuePair {
     return key;
   }
 
+  public void setKey(String key) {
+    this.key = key;
+  }
+
   @Override
   public String getValue() {
     return value.getLiteralValue().orElse("");
+  }
+
+  public void setValue(Literal<String> value) {
+    this.value = value;
   }
 
   @Override
