@@ -9,6 +9,7 @@ package org.mule.extension.http.api.request.builder;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ImmutableLiteral;
 
 import java.util.Objects;
 
@@ -40,9 +41,17 @@ public class SimpleUriParam implements KeyValuePair {
     return key;
   }
 
+  public void setKey(String key) {
+    this.key = key;
+  }
+
   @Override
   public String getValue() {
     return value.getLiteralValue().orElse("");
+  }
+
+  public void setValue(String value) {
+    this.value = new ImmutableLiteral<>(value, String.class);
   }
 
   @Override
