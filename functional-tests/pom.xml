@@ -26,6 +26,7 @@
             --module-path=${org.slf4j:slf4j-api:jar}
             --add-modules=org.slf4j
             --add-opens=java.base/java.lang=ALL-UNNAMED
+            --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
         </surefire.args>
 
         <aspectjVersion>1.9.22</aspectjVersion>
@@ -103,10 +104,6 @@
                 <configuration>
                     <argLine>${surefire.args}</argLine>
                     <systemProperties>
-                        <property>
-                            <name>mule.classloader.container.jpmsModuleLayer</name>
-                            <value>true</value>
-                        </property>
                         <property>
                             <name>maven.projectVersion</name>
                             <value>${mule.version}</value>
