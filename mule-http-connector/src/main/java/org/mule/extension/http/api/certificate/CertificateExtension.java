@@ -4,10 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.http;
+package org.mule.extension.http.api.certificate;
 
 import java.io.Serializable;
 
+/**
+ * A custom Data Transfer Object (DTO) to replace the certificate extension class from the {@link java.security.cert.X509Extension} package.
+ * <p>
+ * This class encapsulates details of a certificate extension, including its OID, value, criticality,
+ * and an optional subject alternative name. It implements {@link java.io.Serializable} to allow its instances to be serialized.
+ * </p>
+ */
 public class CertificateExtension implements Serializable {
 
   private String oid;
@@ -15,6 +22,14 @@ public class CertificateExtension implements Serializable {
   private boolean criticality;
   private String subjectAlternativeName;
 
+  /**
+   * Constructs a new {@code CertificateExtension} instance with the specified attributes.
+   *
+   * @param oid                     the OID of the extension
+   * @param criticality             the criticality of the extension
+   * @param value                   the value of the extension
+   * @param subjectAlternativeName  the subject alternative name (if applicable)
+   */
   public CertificateExtension(String oid, boolean criticality, byte[] value, String subjectAlternativeName) {
     this.oid = oid;
     this.criticality = criticality;
@@ -22,14 +37,29 @@ public class CertificateExtension implements Serializable {
     this.subjectAlternativeName = subjectAlternativeName;
   }
 
+  /**
+   * Returns the OID of the extension.
+   *
+   * @return the OID of the extension
+   */
   public String getOid() {
     return oid;
   }
 
+  /**
+   * Returns the value of the extension.
+   *
+   * @return the value of the extension
+   */
   public byte[] getValue() {
     return value;
   }
 
+  /**
+   * Returns the criticality of the extension.
+   *
+   * @return the criticality of the extension
+   */
   public boolean getCriticality() {
     return criticality;
   }
@@ -59,6 +89,12 @@ public class CertificateExtension implements Serializable {
     return sb.toString();
   }
 
+  /**
+   * Parses the Subject Key Identifier from the given byte array.
+   *
+   * @param value the byte array containing the Subject Key Identifier
+   * @return a string representation of the Subject Key Identifier
+   */
   private String parseSubjectKeyIdentifier(byte[] value) {
     StringBuilder sb = new StringBuilder();
     sb.append("KeyIdentifier [\n");
@@ -67,6 +103,12 @@ public class CertificateExtension implements Serializable {
     return sb.toString();
   }
 
+  /**
+   * Formats the given byte array into a hex and ASCII string representation.
+   *
+   * @param value the byte array to format
+   * @return a formatted string representation of the byte array
+   */
   public static String formatHexAndAscii(byte[] value) {
     StringBuilder sb = new StringBuilder();
     int lineLength = 16;

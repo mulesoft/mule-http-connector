@@ -10,7 +10,7 @@ import static org.mule.extension.http.internal.certificate.DefaultCertificatePro
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.ClassUtils.isClassOnPath;
 
-import org.mule.extension.http.CertificateData;
+import org.mule.extension.http.api.certificate.CertificateData;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 
 import java.util.function.Supplier;

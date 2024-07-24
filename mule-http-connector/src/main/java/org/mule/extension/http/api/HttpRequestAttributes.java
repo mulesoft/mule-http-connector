@@ -8,7 +8,7 @@ package org.mule.extension.http.api;
 
 import static java.lang.System.lineSeparator;
 
-import org.mule.extension.http.CertificateData;
+import org.mule.extension.http.api.certificate.CertificateData;
 import org.mule.extension.http.internal.certificate.CertificateProvider;
 import org.mule.extension.http.internal.certificate.CertificateProviderFactory;
 import org.mule.runtime.api.util.MultiMap;

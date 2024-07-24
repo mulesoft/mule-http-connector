@@ -7,7 +7,7 @@
 package org.mule.extension.http.internal.certificate;
 
 
-import org.mule.extension.http.CertificateData;
+import org.mule.extension.http.api.certificate.CertificateData;
 import org.mule.runtime.api.util.LazyValue;
 
 import java.io.IOException;

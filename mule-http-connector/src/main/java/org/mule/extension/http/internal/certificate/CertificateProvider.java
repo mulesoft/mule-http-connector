@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.internal.certificate;
 
-import org.mule.extension.http.CertificateData;
+import org.mule.extension.http.api.certificate.CertificateData;
 
 import java.io.Serializable;
 import java.security.cert.Certificate;

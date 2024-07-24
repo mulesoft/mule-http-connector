@@ -11,7 +11,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 
-import org.mule.extension.http.CertificateData;
+import org.mule.extension.http.api.certificate.CertificateData;
 import org.mule.runtime.api.util.MultiMap;
 
 import java.security.cert.Certificate;

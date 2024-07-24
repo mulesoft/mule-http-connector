@@ -10,11 +10,12 @@ import static org.mule.runtime.http.api.HttpConstants.Method.POST;
 import static org.mule.tck.processor.FlowAssert.verify;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
-import org.mule.extension.http.CertificateData;
+import org.mule.extension.http.api.certificate.CertificateData;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
@@ -151,7 +152,7 @@ public class HttpListenerValidateCertificateTestCase extends AbstractHttpTestCas
       // Get CertificateData
       CertificateData certificateData = attributes.getClientCertificate();
       assertThat(certificateData, notNullValue());
-
+      assertThat(attributes.getClientCertificate(), instanceOf(CertificateData.class));
       assertThat(attributes.getClientCertificate().getType(), is("X.509"));
 
       return event;

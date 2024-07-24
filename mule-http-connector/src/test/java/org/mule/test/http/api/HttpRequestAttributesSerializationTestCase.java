@@ -6,22 +6,25 @@
  */
 package org.mule.test.http.api;
 
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotLoadFromClasspath;
+import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
+
+import static java.lang.System.arraycopy;
+
 import static org.apache.commons.lang3.SerializationUtils.deserialize;
 import static org.apache.commons.lang3.SerializationUtils.serialize;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotLoadFromClasspath;
-import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
 
-import org.mule.extension.http.AlternativeNameData;
-import org.mule.extension.http.CertificateData;
-import org.mule.extension.http.CertificateExtension;
-import org.mule.extension.http.PrincipalData;
-import org.mule.extension.http.PublicKeyData;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpRequestAttributesBuilder;
+import org.mule.extension.http.api.certificate.AlternativeNameData;
+import org.mule.extension.http.api.certificate.CertificateData;
+import org.mule.extension.http.api.certificate.CertificateExtension;
+import org.mule.extension.http.api.certificate.PrincipalData;
+import org.mule.extension.http.api.certificate.PublicKeyData;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -32,10 +35,12 @@ import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import io.qameta.allure.Description;
@@ -87,7 +92,7 @@ public class HttpRequestAttributesSerializationTestCase extends AbstractHttpAttr
   public void withResolvedCertificate() throws Exception {
     HttpRequestAttributes processed =
         assertSerialization(baseBuilder.clientCertificate(buildCertificateData(certificate)).build());
-    assertThat(processed.getClientCertificate().toString(), is(certificate.toString()));
+    areSameCertificate(certificate, processed.getClientCertificate());
   }
 
   @Test
@@ -100,7 +105,7 @@ public class HttpRequestAttributesSerializationTestCase extends AbstractHttpAttr
         throw new RuntimeException(e);
       }
     }).build());
-    assertThat(processed.getClientCertificate().toString(), is(certificate.toString()));
+    areSameCertificate(certificate, processed.getClientCertificate());
   }
 
   private HttpRequestAttributes assertSerialization(HttpRequestAttributes original) {
@@ -123,6 +128,36 @@ public class HttpRequestAttributesSerializationTestCase extends AbstractHttpAttr
     return processed;
   }
 
+  @Test
+  public void testCertificateComparison() throws Exception {
+    Certificate cert1 = certificate;
+    CertificateData cert2 = buildCertificateData(certificate);
+
+    areSameCertificate(cert1, cert2);
+  }
+
+  private static void areSameCertificate(Certificate cert1, CertificateData cert2) {
+    // Check if cert1 is an instance of X509Certificate
+    if (!(cert1 instanceof X509Certificate)) {
+      throw new IllegalArgumentException("cert1 is not an instance of X509Certificate");
+    }
+
+    X509Certificate x509Cert1 = (X509Certificate) cert1;
+    // Compare each relevant field
+    assert x509Cert1.getVersion() == cert2.getVersion() : "Version mismatch";
+    assert x509Cert1.getSubjectDN().getName().equals(cert2.getSubjectDN().getName()) : "Subject DN mismatch";
+    assert x509Cert1.getIssuerDN().getName().equals(cert2.getIssuerDN().getName()) : "Issuer DN mismatch";
+    assert x509Cert1.getSigAlgName().equals(cert2.getSigAlgName()) : "Signature Algorithm mismatch";
+    assert x509Cert1.getNotBefore().equals(cert2.getNotBefore()) : "Not Before date mismatch";
+    assert x509Cert1.getSerialNumber().equals(cert2.getSerialNumber()) : "Serial Number mismatch";
+
+    // Compare public key
+    assert Arrays.equals(x509Cert1.getPublicKey().getEncoded(), cert2.getPublicKey().getEncoded()) : "Public Key mismatch";
+    // Compare certificate extensions if they exist
+    assert x509Cert1.getCriticalExtensionOIDs().equals(cert2.getCriticalExtensionOIDs());
+    assert x509Cert1.getNonCriticalExtensionOIDs().equals(cert2.getNonCriticalExtensionOIDs());
+  }
+
   public static CertificateData buildCertificateData(Certificate certificate) throws Exception {
     if (!(certificate instanceof X509Certificate)) {
       throw new IllegalArgumentException("Only X509Certificates are supported.");
@@ -133,8 +168,8 @@ public class HttpRequestAttributesSerializationTestCase extends AbstractHttpAttr
     String type = x509Certificate.getType();
     byte[] encoded = x509Certificate.getEncoded();
     int version = x509Certificate.getVersion();
-    PrincipalData subjectDN = new PrincipalData(x509Certificate.getSubjectX500Principal().getName());
-    PrincipalData issuerDN = new PrincipalData(x509Certificate.getIssuerX500Principal().getName());
+    PrincipalData subjectDN = new PrincipalData(x509Certificate.getSubjectDN().getName());
+    PrincipalData issuerDN = new PrincipalData(x509Certificate.getIssuerDN().getName());
     BigInteger serialNumber = x509Certificate.getSerialNumber();
     Date notBefore = x509Certificate.getNotBefore();
     Date notAfter = x509Certificate.getNotAfter();
@@ -194,12 +229,16 @@ public class HttpRequestAttributesSerializationTestCase extends AbstractHttpAttr
     }
     Collections.reverse(extensions);
 
+    Set<String> criticalOids = x509Certificate.getCriticalExtensionOIDs();
+    Set<String> nonCriticalOids = x509Certificate.getNonCriticalExtensionOIDs();
+    boolean hasUnsupportedCriticalExtensions = x509Certificate.hasUnsupportedCriticalExtension();
+
 
     return new CertificateData(
                                type, encoded, version, subjectDN, issuerDN, serialNumber, notBefore, notAfter,
                                publicKeyData, sigAlgName, sigAlgOID, sigAlgParams, signature, basicConstraints,
                                extendedKeyUsage, keyUsage, issuerUniqueID, subjectAlternativeNames, issuerAlternativeNames,
-                               extensions);
+                               extensions, criticalOids, nonCriticalOids, hasUnsupportedCriticalExtensions);
   }
 
   public static String parseSubjectAlternativeName(X509Certificate certificate) {
@@ -239,7 +278,7 @@ public class HttpRequestAttributesSerializationTestCase extends AbstractHttpAttr
         // Inner OCTET STRING
         int innerLength = extensionValue[3] & 0xFF;
         byte[] value = new byte[innerLength];
-        System.arraycopy(extensionValue, 4, value, 0, innerLength);
+        arraycopy(extensionValue, 4, value, 0, innerLength);
         return value;
       }
     }

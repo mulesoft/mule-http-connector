@@ -9,7 +9,7 @@ package org.mule.extension.http.internal.certificate;
 import static java.lang.Class.forName;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
-import org.mule.extension.http.CertificateData;
+import org.mule.extension.http.api.certificate.CertificateData;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 
 import java.lang.reflect.Constructor;
