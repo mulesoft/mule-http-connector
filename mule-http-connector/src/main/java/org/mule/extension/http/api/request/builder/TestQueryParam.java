@@ -43,9 +43,17 @@ public class TestQueryParam implements KeyValuePair {
     return key;
   }
 
+  public void setKey(String key) {
+    this.key = key;
+  }
+
   @Override
   public String getValue() {
     return value;
+  }
+
+  public void setValue(String value) {
+    this.value = value;
   }
 
   @Override
