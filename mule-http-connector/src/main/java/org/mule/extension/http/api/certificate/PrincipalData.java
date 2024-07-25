@@ -7,6 +7,8 @@
 package org.mule.extension.http.api.certificate;
 
 import java.io.Serializable;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A custom Data Transfer Object (DTO) to replace the {@link java.security.Principal} class.
@@ -35,6 +37,36 @@ public class PrincipalData implements Serializable {
    */
   public String getName() {
     return name;
+  }
+
+  /**
+   * Extracts and returns the common name (CN) from the principal's name.
+   * <p>
+   * This method assumes that the name is a distinguished name (DN) string,
+   * and attempts to find and return the value of the CN attribute.
+   * If the CN attribute is not found, the method returns an empty string.
+   * </p>
+   *
+   * @return the common name (CN) if found, otherwise an empty string
+   */
+  public String getCommonName() {
+    try {
+      // Get the subject DN
+      String subjectDN = this.name;
+
+      // Regular expression to extract CN
+      Pattern pattern = Pattern.compile("CN=([^,]*)");
+      Matcher matcher = pattern.matcher(subjectDN);
+
+      if (matcher.find()) {
+        return matcher.group(1);
+      } else {
+        return "";
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      return "";
+    }
   }
 
   @Override

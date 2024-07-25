@@ -25,6 +25,10 @@ public class PublicKeyData implements Serializable {
   private BigInteger modulus;
   private String publicKey;
 
+  public String getPublicKey() {
+    return publicKey;
+  }
+
   /**
    * Constructs a new {@code PublicKeyData} instance with the specified algorithm and encoded form.
    *

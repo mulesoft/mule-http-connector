@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+      xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dataweave"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <tls:context name="globalTlsContext">
+        <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit"/>
+        <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+    </tls:context>
+
+
+    <http:listener-config name="configSubjectDN">
+        <http:listener-connection protocol="HTTPS" host="localhost" port="${port1}" tlsContext="globalTlsContext"/>
+    </http:listener-config>
+
+    <http:listener-config name="configSerialNumber">
+        <http:listener-connection protocol="HTTPS" host="localhost" port="${port2}" tlsContext="globalTlsContext"/>
+    </http:listener-config>
+
+    <http:listener-config name="configPublicKey">
+        <http:listener-connection protocol="HTTPS" host="localhost" port="${port3}" tlsContext="globalTlsContext"/>
+    </http:listener-config>
+
+    <http:listener-config name="configValidityPeriod">
+        <http:listener-connection protocol="HTTPS" host="localhost" port="${port4}" tlsContext="globalTlsContext"/>
+    </http:listener-config>
+
+    <http:request-config name="clientConfig">
+        <http:request-connection protocol="HTTPS" host="localhost" port="#[vars.port]" tlsContext="globalTlsContext"/>
+    </http:request-config>
+
+    <flow name="testFlowSubjectDN">
+        <http:listener config-ref="configSubjectDN" path="/" allowedMethods="GET"/>
+        <set-payload value="#['subjectDN common name : ' ++ attributes.clientCertificate.subjectDN.commonName]"/>
+    </flow>
+
+    <flow name="testFlowSerialNumber">
+        <http:listener config-ref="configSerialNumber" path="/" allowedMethods="GET"/>
+        <set-payload value="#['serial number : ' ++ attributes.clientCertificate.serialNumber]"/>
+    </flow>
+
+    <flow name="testFlowPublicKey">
+        <http:listener config-ref="configPublicKey" path="/" allowedMethods="GET"/>
+        <set-payload value="#['public key algorithm : ' ++ attributes.clientCertificate.publicKey.algorithm]"/>
+    </flow>
+
+    <flow name="testFlowValidityPeriod">
+        <http:listener config-ref="configValidityPeriod" path="/" allowedMethods="GET"/>
+        <set-payload value="#['valid from : ' ++ attributes.clientCertificate.notBefore]"/>
+    </flow>
+
+    <flow name="testFlowSubjectDNClient">
+        <http:request config-ref="clientConfig" path="/" method="GET"/>
+    </flow>
+
+    <flow name="testFlowSerialNumberClient">
+        <http:request config-ref="clientConfig" path="/" method="GET"/>
+    </flow>
+
+    <flow name="testFlowPublicKeyClient">
+        <http:request config-ref="clientConfig" path="/" method="GET"/>
+    </flow>
+
+    <flow name="testFlowValidityPeriodClient">
+        <http:request config-ref="clientConfig" path="/" method="GET"/>
+    </flow>
+
+</mule>

@@ -138,7 +138,7 @@ public class CertificateData implements Serializable {
    * @return the type of the certificate
    */
   public String getType() {
-    return "X.509";
+    return type;
   }
 
   /**
