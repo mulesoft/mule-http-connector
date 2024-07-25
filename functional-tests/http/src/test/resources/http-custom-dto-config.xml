@@ -27,7 +27,7 @@
         <http:listener-connection protocol="HTTPS" host="localhost" port="${port3}" tlsContext="globalTlsContext"/>
     </http:listener-config>
 
-    <http:listener-config name="configValidityPeriod">
+    <http:listener-config name="configVersion">
         <http:listener-connection protocol="HTTPS" host="localhost" port="${port4}" tlsContext="globalTlsContext"/>
     </http:listener-config>
 
@@ -50,9 +50,9 @@
         <set-payload value="#['public key algorithm : ' ++ attributes.clientCertificate.publicKey.algorithm]"/>
     </flow>
 
-    <flow name="testFlowValidityPeriod">
-        <http:listener config-ref="configValidityPeriod" path="/" allowedMethods="GET"/>
-        <set-payload value="#['valid from : ' ++ attributes.clientCertificate.notBefore]"/>
+    <flow name="testFlowVersion">
+        <http:listener config-ref="configVersion" path="/" allowedMethods="GET"/>
+        <set-payload value="#['version : ' ++ attributes.clientCertificate.version]"/>
     </flow>
 
     <flow name="testFlowSubjectDNClient">
@@ -67,7 +67,7 @@
         <http:request config-ref="clientConfig" path="/" method="GET"/>
     </flow>
 
-    <flow name="testFlowValidityPeriodClient">
+    <flow name="testFlowVersionClient">
         <http:request config-ref="clientConfig" path="/" method="GET"/>
     </flow>
 

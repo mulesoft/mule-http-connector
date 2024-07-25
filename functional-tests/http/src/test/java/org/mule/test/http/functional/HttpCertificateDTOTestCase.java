@@ -74,13 +74,13 @@ public class HttpCertificateDTOTestCase extends AbstractHttpTestCase {
 
 
   @Test
-  public void testValidityPeriod() throws Exception {
-    final CoreEvent res = flowRunner("testFlowValidityPeriodClient")
+  public void testVersion() throws Exception {
+    final CoreEvent res = flowRunner("testFlowVersionClient")
         .withVariable("port", port4.getNumber())
         .withPayload("data")
         .keepStreamsOpen()
         .run();
-    assertThat(res.getMessage(), hasPayload(equalTo("valid from : 2014-03-25T16:49:11")));
+    assertThat(res.getMessage(), hasPayload(equalTo("version : 3")));
   }
 
 }
