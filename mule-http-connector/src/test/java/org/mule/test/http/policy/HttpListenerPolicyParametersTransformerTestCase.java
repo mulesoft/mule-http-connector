@@ -14,6 +14,7 @@ import static org.mule.runtime.api.metadata.DataType.ATOM_STRING;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.POLICY_SUPPORT;
 
+import org.mule.extension.http.api.certificate.CertificateData;
 import org.mule.extension.http.api.HttpRequestAttributesBuilder;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.HttpResponseAttributesBuilder;
@@ -29,6 +30,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import com.google.common.collect.ImmutableMap;
 
 import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
 import java.util.Map;
 import java.util.OptionalLong;
 
@@ -82,7 +84,16 @@ public class HttpListenerPolicyParametersTransformerTestCase extends AbstractMul
             .uriParams(URI_PARAMS)
             .localAddress(LOCAL_ADDRESS)
             .remoteAddress(REMOTE_ADDRESS)
-            .clientCertificate(CLIENT_CERTIFICATE)
+            .clientCertificate(() -> {
+              if (CLIENT_CERTIFICATE == null) {
+                return null;
+              }
+              try {
+                return buildCertificateData(CLIENT_CERTIFICATE);
+              } catch (CertificateEncodingException e) {
+                throw new RuntimeException(e);
+              }
+            })
             .build())
         .build();
 
@@ -93,6 +104,11 @@ public class HttpListenerPolicyParametersTransformerTestCase extends AbstractMul
                is(EXPECTED_PAYLOAD));
     assertThat(((HttpListenerErrorResponseBuilder) result.get("errorResponse")).getBody().getDataType().getMediaType().toString(),
                is(EXPECTED_MEDIA_TYPE.toString()));
+  }
+
+  private CertificateData buildCertificateData(Certificate certificate) throws CertificateEncodingException {
+    CertificateData certificateData = new CertificateData(certificate.getType(), certificate.getEncoded());
+    return certificateData;
   }
 
   @Test

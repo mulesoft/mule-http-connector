@@ -9,6 +9,7 @@ package org.mule.extension.http.internal.certificate;
 import static java.lang.Class.forName;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
+import org.mule.extension.http.api.certificate.CertificateData;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 
 import java.lang.reflect.Constructor;
@@ -52,15 +53,15 @@ public class DefaultCertificateProvider implements CertificateProvider {
    *
    * @param certificateSupplier actual supplier that returns the {@link Certificate}
    */
-  DefaultCertificateProvider(Supplier<Certificate> certificateSupplier)
+  DefaultCertificateProvider(Supplier<CertificateData> certificateSupplier)
       throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
     this.serializableLazyValue = SERIALIZABLE_LAZY_VALUE_CONSTRUCTOR.newInstance(certificateSupplier);
   }
 
   @Override
-  public Certificate getCertificate() {
+  public CertificateData getCertificate() {
     try {
-      return (Certificate) GET.invoke(this.serializableLazyValue);
+      return (CertificateData) GET.invoke(this.serializableLazyValue);
     } catch (InvocationTargetException | IllegalAccessException e) {
       throw new MuleRuntimeException(createStaticMessage("Exception while calling method by reflection"), e);
     }

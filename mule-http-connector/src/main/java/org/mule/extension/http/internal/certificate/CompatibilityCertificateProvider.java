@@ -7,6 +7,7 @@
 package org.mule.extension.http.internal.certificate;
 
 
+import org.mule.extension.http.api.certificate.CertificateData;
 import org.mule.runtime.api.util.LazyValue;
 
 import java.io.IOException;
@@ -23,8 +24,8 @@ public class CompatibilityCertificateProvider implements CertificateProvider {
 
   private static final long serialVersionUID = -6620659020113867138L;
 
-  private Certificate certificate;
-  private transient LazyValue<Certificate> certificateLazyValue;
+  private CertificateData certificate;
+  private transient LazyValue<CertificateData> certificateLazyValue;
 
   /**
    * Returns a new {@link CompatibilityCertificateProvider}.
@@ -32,12 +33,12 @@ public class CompatibilityCertificateProvider implements CertificateProvider {
    *
    * @param certificateSupplier actual supplier that returns the {@link Certificate}
    */
-  CompatibilityCertificateProvider(Supplier<Certificate> certificateSupplier) {
+  CompatibilityCertificateProvider(Supplier<CertificateData> certificateSupplier) {
     this.certificateLazyValue = new LazyValue<>(certificateSupplier);
   }
 
   @Override
-  public Certificate getCertificate() {
+  public CertificateData getCertificate() {
     if (certificate == null && certificateLazyValue != null) {
       certificate = certificateLazyValue.get();
     }

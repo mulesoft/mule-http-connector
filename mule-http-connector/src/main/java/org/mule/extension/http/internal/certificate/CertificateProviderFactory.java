@@ -10,9 +10,9 @@ import static org.mule.extension.http.internal.certificate.DefaultCertificatePro
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.ClassUtils.isClassOnPath;
 
+import org.mule.extension.http.api.certificate.CertificateData;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 
-import java.security.cert.Certificate;
 import java.util.function.Supplier;
 
 
@@ -27,7 +27,7 @@ public class CertificateProviderFactory {
     isSerializableLazyValuePresent = isClassOnPath(SERIALIZABLE_LAZY_VALUE_CLASS_NAME, CertificateProvider.class);
   }
 
-  public static CertificateProvider create(Supplier<Certificate> certificateSupplier) {
+  public static CertificateProvider create(Supplier<CertificateData> certificateSupplier) {
     if (isSerializableLazyValuePresent) {
       try {
         return new DefaultCertificateProvider(certificateSupplier);
