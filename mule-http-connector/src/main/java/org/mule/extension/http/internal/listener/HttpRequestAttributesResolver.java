@@ -111,6 +111,9 @@ public class HttpRequestAttributesResolver {
 
   public static CertificateData buildCertificateData(ClientConnection clientConnection) throws Exception {
     Certificate certificate = clientConnection.getClientCertificate();
+    if (certificate == null) {
+      return null;
+    }
     if (!(certificate instanceof X509Certificate)) {
       throw new IllegalArgumentException("Only X509Certificates are supported.");
     }
