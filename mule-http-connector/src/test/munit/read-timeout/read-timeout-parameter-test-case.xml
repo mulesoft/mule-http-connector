@@ -4,7 +4,7 @@
       xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
       xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns="http://www.mulesoft.org/schema/mule/core"
-      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/1.9.3/mule-http.xsd
 		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
 		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
@@ -22,6 +22,13 @@
         <logger level="ERROR" message="#[payload]"/>
         <error-handler >
             <on-error-continue>
+                <logger level="ERROR" message="error.cause Class: #[error.message]"/>
+                <logger level="ERROR" message="error.cause Class: #[error.description]"/>
+                <logger level="ERROR" message="error Class: #[error.class]"/>
+                <logger level="ERROR" message="error.cause Class: #[error.cause.class]"/>
+                <logger level="ERROR" message="error.cause.cause Class: #[error.cause.cause.class]"/>
+                <logger level="ERROR" message="error.cause.cause.cause Class: #[error.cause.cause.cause.class]"/>
+                <logger level="ERROR" message="error.cause.cause.cause.cause Class: #[error.cause.cause.cause.cause.class]"/>
                 <set-payload value="#[error.cause.cause.cause.class]"/>
             </on-error-continue>
         </error-handler>
