@@ -22,13 +22,6 @@
         <logger level="ERROR" message="#[payload]"/>
         <error-handler >
             <on-error-continue>
-                <logger level="ERROR" message="error.cause Class: #[error.message]"/>
-                <logger level="ERROR" message="error.cause Class: #[error.description]"/>
-                <logger level="ERROR" message="error Class: #[error.class]"/>
-                <logger level="ERROR" message="error.cause Class: #[error.cause.class]"/>
-                <logger level="ERROR" message="error.cause.cause Class: #[error.cause.cause.class]"/>
-                <logger level="ERROR" message="error.cause.cause.cause Class: #[error.cause.cause.cause.class]"/>
-                <logger level="ERROR" message="error.cause.cause.cause.cause Class: #[error.cause.cause.cause.cause.class]"/>
                 <set-payload value="#[error.cause.cause.cause.class]"/>
             </on-error-continue>
         </error-handler>
