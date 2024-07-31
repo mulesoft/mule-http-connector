@@ -4,10 +4,12 @@
       xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
       xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
-		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+		http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 
     <munit:config name="read-timeout-parameter-test-case.xml" minMuleVersion="4.5.0"/>
 
@@ -22,7 +24,23 @@
         <logger level="ERROR" message="#[payload]"/>
         <error-handler >
             <on-error-continue>
-                <set-payload value="#[error.cause.cause.cause.class]"/>
+                <ee:transform>
+                    <ee:message>
+                    <ee:set-payload><![CDATA[
+                        %dw 2.0
+                        output application/json
+                        fun getTimeoutCauseOrNull(ex) =
+                            if (ex.class.name == "TimeoutException")
+                            ex
+                            else if (ex == null)
+                            null
+                            else
+                            getTimeoutCauseOrNull(ex.cause)
+                            ---
+                            getTimeoutCauseOrNull(error.cause)
+                        ]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
             </on-error-continue>
         </error-handler>
     </flow>
