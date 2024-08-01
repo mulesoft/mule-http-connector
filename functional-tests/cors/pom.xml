@@ -27,6 +27,7 @@
             <groupId>org.mule.connectors</groupId>
             <artifactId>mule-http-connector</artifactId>
             <classifier>mule-plugin</classifier>
+            <version>${httpConnectorVersion}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
