@@ -45,6 +45,7 @@
         <mule.version>4.8.0-SNAPSHOT</mule.version>
         <muleBomVersion>${mule.version}</muleBomVersion>
         <muleApiVersion>1.8.0-SNAPSHOT</muleApiVersion>
+        <httpConnectorVersion>${project.version}</httpConnectorVersion>
     </properties>
 
     <modules>
