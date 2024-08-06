@@ -64,10 +64,6 @@
             <classifier>mule-service</classifier>
         </dependency>
         <dependency>
-            <groupId>org.mule.weave</groupId>
-            <artifactId>dwb-api</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-dwb-api</artifactId>
         </dependency>
