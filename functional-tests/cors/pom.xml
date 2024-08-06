@@ -29,6 +29,18 @@
             <classifier>mule-plugin</classifier>
             <version>${httpConnectorVersion}</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.mule.connectors</groupId>
+                    <artifactId>mule-sockets-connector</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.connectors</groupId>
+            <artifactId>mule-sockets-connector</artifactId>
+            <version>1.2.4</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
@@ -102,11 +114,13 @@
             <groupId>org.mule.services</groupId>
             <artifactId>mule-service-weave</artifactId>
             <classifier>mule-service</classifier>
+            <version>2.8.0-20240729</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-dwb-api</artifactId>
+            <version>2.7.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -116,4 +130,15 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.mule.connectors</groupId>
+                <artifactId>mule-sockets-connector</artifactId>
+                <version>1.2.4</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>
