@@ -31,7 +31,7 @@
         <commonsLang3Version>3.12.0</commonsLang3Version>
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
 
-        <muleJavaEeBomVersion>4.6.0-20231025</muleJavaEeBomVersion>
+        <muleJavaEeBomVersion>4.7.2</muleJavaEeBomVersion>
         <muleSocketsConnectorVersion>1.2.4</muleSocketsConnectorVersion>
         <muleCorsKernelVersion>1.1.2</muleCorsKernelVersion>
 
