@@ -15,7 +15,7 @@
     <groupId>org.mule.connectors</groupId>
     <artifactId>mule-http-connector</artifactId>
     <packaging>mule-extension</packaging>
-    <version>1.10.0-SNAPSHOT</version>
+    <version>1.10.0</version>
 
     <name>HTTP Connector</name>
     <description>A Mule extension that provides HTTP server and client functionality</description>
@@ -31,7 +31,7 @@
         <commonsLang3Version>3.12.0</commonsLang3Version>
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
 
-        <muleJavaEeBomVersion>4.6.0-20231025</muleJavaEeBomVersion>
+        <muleJavaEeBomVersion>4.7.2</muleJavaEeBomVersion>
         <muleSocketsConnectorVersion>1.2.4</muleSocketsConnectorVersion>
         <muleCorsKernelVersion>1.1.2</muleCorsKernelVersion>
 
@@ -45,14 +45,14 @@
         <!-- Remove when a new parent version with MTF is available -->
         <munit.input.directory>src/test/munit</munit.input.directory>
         <munit.output.directory>${basedir}/target/test-mule/munit</munit.output.directory>
-        <munit.extensions.maven.plugin.version>1.4.0-SNAPSHOT</munit.extensions.maven.plugin.version>
-        <munit.version>3.3.0-SNAPSHOT</munit.version>
+        <munit.extensions.maven.plugin.version>1.3.1</munit.extensions.maven.plugin.version>
+        <munit.version>3.2.1</munit.version>
         <mtf-tools.version>1.2.0</mtf-tools.version>
         <mavenResources.version>3.3.1</mavenResources.version>
         <!-- MUnit minMuleVersion is 4.3.0 -->
         <munitMinMuleVersion>4.3.0</munitMinMuleVersion>
 
-        <muleObjectStoreConnectorTestVersion>1.3.0-SNAPSHOT</muleObjectStoreConnectorTestVersion>
+        <muleObjectStoreConnectorTestVersion>1.2.2</muleObjectStoreConnectorTestVersion>
 
         <springVersion>5.3.34</springVersion>
 
