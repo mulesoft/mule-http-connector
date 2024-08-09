@@ -50,9 +50,11 @@ public abstract class AbstractHttpTestCase extends MuleArtifactFunctionalTestCas
   protected static final String J11_SSL_ERROR_RESPONSE = "PKIX path building failed";
   // Expected validation error message for JDK 17.
   protected static final String J17_SSL_ERROR_RESPONSE = "PKIX path validation failed";
-
+  // Expected validation error message when using Netty.
+  protected static final String NETTY_SSL_ERROR_RESPONSE = "Received fatal alert: handshake_failure";
   protected static final String APPROPRIATE_PROTOCOL_ERROR =
       "No appropriate protocol (protocol is disabled or cipher suites are inappropriate)";
+  protected static final String NETTY_APPROPRIATE_PROTOCOL_ERROR = "Received fatal alert: protocol_version";
 
   @Rule
   public TestHttpClient httpClient = new TestHttpClient.Builder(getService(HttpService.class)).build();
@@ -82,6 +84,8 @@ public abstract class AbstractHttpTestCase extends MuleArtifactFunctionalTestCas
                     containsString(J8_275_SSL_ERROR_RESPONSE),
                     containsString(J11_SSL_ERROR_RESPONSE),
                     containsString(J17_SSL_ERROR_RESPONSE),
-                    containsString(APPROPRIATE_PROTOCOL_ERROR)));
+                    containsString(NETTY_SSL_ERROR_RESPONSE),
+                    containsString(APPROPRIATE_PROTOCOL_ERROR),
+                    containsString(NETTY_APPROPRIATE_PROTOCOL_ERROR)));
   }
 }
