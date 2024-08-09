@@ -9,12 +9,27 @@
     <http:request-config name="ntlmProxy" basePath="basePath">
         <http:request-connection host="localhost" port="9999">
             <http:proxy-config>
-                <http:ntlm-proxy host="localhost" port="${httpPort}" username="Zaphod" password="Beeblebrox" ntlmDomain="Ursa-Minor" />
+                <http:ntlm-proxy host="localhost" port="${httpPort}" username="client@EXAMPLE.COM" password="${keytabPath}" ntlmDomain="Ursa-Minor" />
             </http:proxy-config>
         </http:request-connection>
     </http:request-config>
     <flow name="ntlmFlow">
         <http:request config-ref="ntlmProxy" path="requestPath"/>
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
+    </flow>
+
+
+
+    <http:request-config name="ntlmConfigWithDomain">
+        <http:request-connection host="localhost" port="${httpPort}">
+            <http:authentication>
+                <http:ntlm-authentication username="client@EXAMPLE.COM" password="${keytabPath}" domain="Ursa-Minor"/>
+            </http:authentication>
+        </http:request-connection>
+    </http:request-config>
+
+    <flow name="ntlmAuthRequestWithDomain">
+        <http:request config-ref="ntlmConfigWithDomain" path="/" method="GET"/>
         <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
