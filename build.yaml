@@ -3,5 +3,4 @@ mavenTool: "3.9.5"
 additionalTestConfigs:
   testsJava17:
     testJdkTool: OPEN-JDK17
-    # TODO W-16243181 - set `munitMinMuleVersion` to 4.6.0
-    mavenAdditionalArgs: -DmunitMinMuleVersion=4.7.0 -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE -Dmule.module.tweaking.validation.skip=true
+    mavenAdditionalArgs: -DmunitMinMuleVersion=4.6.0 -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE -Dmule.module.tweaking.validation.skip=true
