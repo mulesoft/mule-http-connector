@@ -1,5 +1,6 @@
 projectType: extension
 mavenTool: "3.9.5"
+devBranch: "1.10.0-TEST-DEPS-IN-PUBLIC-REPOS"
 additionalTestConfigs:
   testsJava17:
     testJdkTool: OPEN-JDK17
