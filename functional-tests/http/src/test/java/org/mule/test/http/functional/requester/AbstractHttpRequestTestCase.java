@@ -116,7 +116,11 @@ public abstract class AbstractHttpRequestTestCase extends AbstractHttpTestCase {
 
   protected void handleRequest(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
     extractBaseRequestParts(baseRequest);
-    writeResponse(response);
+    if ("CONNECT".equals(request.getMethod())) {
+      response.setStatus(HttpServletResponse.SC_OK);
+    } else {
+      writeResponse(response);
+    }
   }
 
   protected void extractBaseRequestParts(Request baseRequest) throws IOException {
