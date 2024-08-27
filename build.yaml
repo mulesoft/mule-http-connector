@@ -1,6 +1,8 @@
 projectType: extension
 mavenTool: "3.9.5"
+mavenAdditionalArgs: -DskipMunitTests -pl mule-http-connector
+
 additionalTestConfigs:
-  testsJava17:
+  functionalTests:
     testJdkTool: OPEN-JDK17
     mavenAdditionalArgs: -DmunitMinMuleVersion=4.6.0 -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE -Dmule.module.tweaking.validation.skip=true
