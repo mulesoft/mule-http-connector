@@ -8,14 +8,14 @@ package org.mule.test.http.functional.requester.ntlm;
 
 
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.NTLM;
+import static org.mule.test.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
 
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.message.Message;
-import org.mule.test.http.functional.matcher.HttpMessageAttributesMatchers;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Story;
@@ -31,7 +31,7 @@ public abstract class AbstractAuthNtlmTestCase extends AbstractNtlmTestCase {
   public void validNtlmAuth() throws Exception {
     Message response = runFlow(getFlowName()).getMessage();
 
-    assertThat((HttpResponseAttributes) response.getAttributes().getValue(), HttpMessageAttributesMatchers.hasStatusCode(SC_OK));
+    assertThat((HttpResponseAttributes) response.getAttributes().getValue(), hasStatusCode(SC_OK));
     assertThat(getPayloadAsString(response), equalTo(AUTHORIZED));
   }
 
