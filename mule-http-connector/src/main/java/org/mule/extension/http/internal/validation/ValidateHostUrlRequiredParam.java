@@ -82,7 +82,7 @@ public class ValidateHostUrlRequiredParam implements Validation {
                        asList(urlParam(httpRequest)),
                        this,
                        "`http:request` does not have `url`, and its config `" + configName
-                           + "` does not have a connection provider"));
+                           + "` does not have a `http:request-connection`"));
     }
 
     ComponentAst connProvider = connProviderOptional.get();
