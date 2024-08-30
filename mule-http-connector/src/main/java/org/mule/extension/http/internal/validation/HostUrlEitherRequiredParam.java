@@ -32,7 +32,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 
-public class ValidateHostUrlRequiredParam implements Validation {
+public class HostUrlEitherRequiredParam implements Validation {
 
   private final ComponentIdentifier HTTP_REQUEST_IDENTIFIER =
       ComponentIdentifier.builder().namespace("http").name("request").build();
@@ -63,6 +63,13 @@ public class ValidateHostUrlRequiredParam implements Validation {
   @Override
   public Optional<ValidationResultItem> validate(ComponentAst httpRequest, ArtifactAst artifact) {
     final String configName = httpRequest.getParameter(DEFAULT_GROUP_NAME, "config-ref").getRawValue();
+    if (configName == null) {
+      return of(create(httpRequest,
+                       urlParam(httpRequest),
+                       this,
+                       "`http:request` does not have `url`, and does not have a `config-ref` parameter."));
+    }
+
     final Optional<ComponentAst> reqConfigOptional = artifact.topLevelComponents()
         .stream()
         .filter(equalsComponentId(configName))

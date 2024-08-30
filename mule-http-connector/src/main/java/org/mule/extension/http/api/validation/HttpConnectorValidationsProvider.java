@@ -6,7 +6,11 @@
  */
 package org.mule.extension.http.api.validation;
 
-import org.mule.extension.http.internal.validation.ValidateHostUrlRequiredParam;
+import org.mule.extension.http.internal.validation.HostUrlEitherRequiredParam;
+import org.mule.extension.http.internal.validation.RequesterUrlValid;
+import org.mule.extension.http.internal.validation.SecureEndpointInListener;
+import org.mule.extension.http.internal.validation.SecureEndpointInRequester;
+import org.mule.extension.http.internal.validation.SecureEndpointInRequesterUrl;
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationsProvider;
 
@@ -19,7 +23,11 @@ public class HttpConnectorValidationsProvider implements ValidationsProvider {
   public List<Validation> get() {
     final List<Validation> validations = new ArrayList<>();
 
-    validations.add(new ValidateHostUrlRequiredParam());
+    validations.add(new RequesterUrlValid());
+    validations.add(new HostUrlEitherRequiredParam());
+    validations.add(new SecureEndpointInListener());
+    validations.add(new SecureEndpointInRequester());
+    validations.add(new SecureEndpointInRequesterUrl());
 
     return validations;
   }
