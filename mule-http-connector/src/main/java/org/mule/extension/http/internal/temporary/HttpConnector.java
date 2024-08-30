@@ -27,6 +27,7 @@ import org.mule.extension.http.api.request.validator.ExpressionResponseValidator
 import org.mule.extension.http.api.request.validator.FailureStatusCodeValidator;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.request.validator.SuccessStatusCodeValidator;
+import org.mule.extension.http.api.validation.HttpConnectorValidationsProvider;
 import org.mule.extension.http.internal.HttpOperations;
 import org.mule.extension.http.internal.request.HttpRequesterConfig;
 import org.mule.extension.socket.api.socket.tcp.TcpClientSocketProperties;
@@ -70,7 +71,9 @@ import org.mule.sdk.api.annotation.JavaVersionSupport;
 @Xml(namespace = "http://www.mulesoft.org/schema/mule/http", prefix = HTTP_NAMESPACE)
 // TODO move back to package org.mule.extension.http.internal as part of MULE-10651. Now we are using this package
 // because it doesn't work in the former package since the classloader mechanism will try to load the class from another bundle.
-@Export(classes = {HttpPolicyRequestAttributes.class, HttpProxyConfig.class, HttpNotificationData.class})
+@Export(classes = {HttpPolicyRequestAttributes.class, HttpProxyConfig.class, HttpNotificationData.class,
+    HttpConnectorValidationsProvider.class},
+    resources = {"META-INF/services/org.mule.runtime.ast.api.validation.ValidationsProvider"})
 public class HttpConnector {
 
 }

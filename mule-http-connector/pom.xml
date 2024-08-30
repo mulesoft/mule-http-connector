@@ -67,7 +67,6 @@
             <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
-                <version>${license.maven.plugin.version}</version>
                 <dependencies>
                     <dependency>
                         <groupId>com.mulesoft.license</groupId>
@@ -112,7 +111,6 @@
 
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>${mavenResources.version}</version>
                 <executions>
                     <execution>
                         <id>copy-munit-resources</id>
@@ -363,6 +361,12 @@
             <artifactId>mule-sdk-api</artifactId>
             <version>${muleSdkApiVersion}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-artifact-ast</artifactId>
+            <version>1.0.0</version>
+            <scope>provided</scope>
+        </dependency>
 
         <!-- Test dependencies -->
         <dependency>
@@ -376,7 +380,6 @@
         <dependency>
             <groupId>jakarta.xml.bind</groupId>
             <artifactId>jakarta.xml.bind-api</artifactId>
-            <version>2.3.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
