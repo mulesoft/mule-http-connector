@@ -27,6 +27,7 @@
             --add-modules=org.slf4j
             --add-opens=java.base/java.lang=ALL-UNNAMED
             --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
+            --add-opens=java.base/java.lang.invoke=ALL-UNNAMED
         </surefire.args>
 
         <javaVersion>1.8</javaVersion>
