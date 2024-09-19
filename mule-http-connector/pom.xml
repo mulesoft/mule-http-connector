@@ -28,7 +28,7 @@
         <grizzlyVersion>2.3.36-MULE-026</grizzlyVersion>
         <mockitoVersion>4.11.0</mockitoVersion>
 
-        <commonsLang3Version>3.12.0</commonsLang3Version>
+        <commonsLang3Version>3.17.0</commonsLang3Version>
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
 
         <muleJavaEeBomVersion>4.7.2</muleJavaEeBomVersion>
