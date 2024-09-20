@@ -1,7 +1,7 @@
 projectType: extension
 mavenTool: "3.9.5"
 
-mavenAdditionalArgs: -pl mule-http-connector
+mavenAdditionalArgs: -pl '!functional-tests,!functional-tests/http,!functional-tests/cors'
 
 additionalTestConfigs:
   functionalTests:
