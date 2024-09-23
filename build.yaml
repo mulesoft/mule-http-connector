@@ -15,4 +15,4 @@ additionalTestConfigs:
     mavenAdditionalArgs: -pl functional-tests,functional-tests/http,functional-tests/cors -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE -Dmule.module.tweaking.validation.skip=true -Dmule.http.service.implementation=NETTY
   munitTestsNetty:
     testJdkTool: OPEN-JDK17
-    mavenAdditionalArgs: -pl mule-http-connector -DmunitMinMuleVersion=4.6.0 -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE -Dmule.module.tweaking.validation.skip=true -Dmule.http.service.implementation=NETTY
+    mavenAdditionalArgs: -pl mule-http-connector -DmunitMinMuleVersion=4.8.0 -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE -Dmule.module.tweaking.validation.skip=true -Dmule.http.service.implementation=NETTY
