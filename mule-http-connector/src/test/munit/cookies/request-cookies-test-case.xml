@@ -42,6 +42,14 @@
         <http:request-connection host="localhost" port="${dynamic.port}"/>
     </http:request-config>
 
+    <http:request-config name="requestCookiesRequesterConfig7" enableCookies="true">
+        <http:request-connection host="localhost" port="${dynamic.port}"/>
+    </http:request-config>
+
+    <http:request-config name="requestCookiesRequesterConfig8" enableCookies="true">
+        <http:request-connection host="localhost" port="${dynamic.port}"/>
+    </http:request-config>
+
     <munit:test name="requestWithoutCookieTest" description="Send a request without a Cookie header">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="getMyCookieHeaderAsPayloadFlow" />
@@ -188,9 +196,61 @@
         </munit:validation>
     </munit:test>
 
+    <munit:test name="nullCookie" description="When cookie header is null, we don't raise a NPE">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="getMyCookieHeaderAsPayloadFlow" />
+        </munit:enable-flow-sources>
+
+        <munit:execution>
+            <http:request method="GET" config-ref="requestCookiesRequesterConfig7" path="/getMyCookieHeaderAsPayload">
+                <http:headers>
+                    #[{'Cookie' : null}]
+                </http:headers>
+            </http:request>
+            <set-variable value="#[payload as String]" variableName="myCookieHeader"/>
+        </munit:execution>
+
+        <munit:validation>
+            <munit-tools:assert-equals actual="#[vars.myCookieHeader]" expected='#[""]'/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="cookieReplacementMultipleAdds" description="Adding cookies with the same name should replace the old ones">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="pleaseSetThisCookieFlow" />
+            <munit:enable-flow-source value="getMyCookieHeaderAsPayloadFlow" />
+        </munit:enable-flow-sources>
+
+        <munit:execution>
+            <!-- First request: sets a cookie 'DuplicateCookie' with value 'FirstValue' -->
+            <http:request method="GET" config-ref="requestCookiesRequesterConfig8" path="/pleaseSetThisCookie">
+                <http:query-params>
+                    #[{'theCookie' : 'DuplicateCookie=FirstValue'}]
+                </http:query-params>
+            </http:request>
+
+            <!-- Second request: sets the same cookie with a new value 'SecondValue' -->
+            <http:request method="GET" config-ref="requestCookiesRequesterConfig8" path="/pleaseSetThisCookie">
+                <http:query-params>
+                    #[{'theCookie' : 'DuplicateCookie=SecondValue'}]
+                </http:query-params>
+            </http:request>
+
+            <!-- Third request: Retrieve the current value of the 'Cookie' header -->
+            <http:request method="GET" config-ref="requestCookiesRequesterConfig8" path="/getMyCookieHeaderAsPayload"/>
+            <set-variable value="#[payload as String]" variableName="myCookieHeader"/>
+        </munit:execution>
+
+        <munit:validation>
+            <!-- Assert that the cookie value is 'DuplicateCookie=SecondValue' -->
+            <munit-tools:assert-equals actual="#[vars.myCookieHeader]" expected='#["DuplicateCookie=SecondValue"]'/>
+        </munit:validation>
+    </munit:test>
+
+
     <flow name="getMyCookieHeaderAsPayloadFlow">
         <http:listener config-ref="requestCookiesListenerConfig" path="/getMyCookieHeaderAsPayload" />
-        <set-payload value="#[attributes.headers.'Cookie']" />
+        <set-payload value="#[attributes.headers.'Cookie' default '']" />
     </flow>
 
     <flow name="pleaseSetThisCookieFlow">
