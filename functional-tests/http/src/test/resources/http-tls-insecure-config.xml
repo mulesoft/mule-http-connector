@@ -9,16 +9,16 @@
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <tls:context name="globalTlsContextInsecure" >
-        <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit" insecure="true"/>
-        <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+        <tls:trust-store path="${sslCacerts}" password="${sslCacertsPassword}" insecure="true" type="${storeType}"/>
+        <tls:key-store path="${sslKeyStore}" keyPassword="changeit" password="${sslKeyStorePassword}" type="${storeType}"/>
     </tls:context>
     <tls:context name="globalTlsContextSecure" >
-        <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit" insecure="false"/>
-        <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+        <tls:trust-store path="${sslCacerts}" password="${sslCacertsPassword}" insecure="false" type="${storeType}"/>
+        <tls:key-store path="${sslKeyStore}" keyPassword="changeit" password="${sslKeyStorePassword}" type="${storeType}"/>
     </tls:context>
     <tls:context name="globalTlsContextDefault" >
-        <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit"/>
-        <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+        <tls:trust-store path="${sslCacerts}" password="${sslCacertsPassword}" type="${storeType}"/>
+        <tls:key-store path="${sslKeyStore}" keyPassword="changeit" password="${sslKeyStorePassword}" type="${storeType}"/>
     </tls:context>
 
     <http:listener-config name="mainListenerConfig" basePath="test">
@@ -38,7 +38,7 @@
     <http:listener-config name="globalConfigSecureInvalid">
         <http:listener-connection host="localhost" port="${https.internal.secure.invalid}" protocol="HTTPS">
             <tls:context>
-                <tls:key-store path="tls/ssltest-keystore-invalid.jks" keyPassword="changeit" password="changeit"/>
+                <tls:key-store path="${sslKeyStoreInvalid}" keyPassword="changeit" password="${sslKeyStorePassword}" type="${storeType}"/>
             </tls:context>
         </http:listener-connection>
     </http:listener-config>
@@ -50,7 +50,7 @@
     <http:listener-config name="globalConfigDefaultInvalid">
         <http:listener-connection host="localhost" port="${https.internal.default.invalid}" protocol="HTTPS">
             <tls:context>
-                <tls:key-store path="tls/ssltest-keystore-invalid.jks" keyPassword="changeit" password="changeit"/>
+                <tls:key-store path="${sslKeyStoreInvalid}" keyPassword="changeit" password="${sslKeyStorePassword}" type="${storeType}"/>
             </tls:context>
         </http:listener-connection>
     </http:listener-config>
@@ -71,8 +71,8 @@
     <http:request-config name="clientGlobalConfigDefaultInvalid">
         <http:request-connection host="localhost" port="${https.internal.default.invalid}" protocol="HTTPS">
             <tls:context>
-                <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit"/>
-                <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+                <tls:trust-store path="${sslCacerts}" password="${sslCacertsPassword}" type="${storeType}"/>
+                <tls:key-store path="${sslKeyStore}" keyPassword="changeit" password="${sslKeyStorePassword}" type="${storeType}" />
             </tls:context>
         </http:request-connection>
     </http:request-config>

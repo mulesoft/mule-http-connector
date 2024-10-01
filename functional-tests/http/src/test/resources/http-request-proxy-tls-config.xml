@@ -13,7 +13,7 @@
     <http:request-config name="requestConfig">
         <http:request-connection host="#[vars.host]" port="${httpPort}" protocol="HTTPS">
             <tls:context>
-                <tls:trust-store path="${trustStorePath}" password="changeit"/>
+                <tls:trust-store path="${trustStorePath}" password="${password}" type="${storeType}"/>
             </tls:context>
             <http:proxy-config>
                 <http:proxy host="localhost" port="${proxyPort}" />
@@ -24,7 +24,7 @@
     <http:listener-config name="listenerConfig">
         <http:listener-connection host="0.0.0.0" port="${httpPort}" protocol="HTTPS">
             <tls:context>
-                <tls:key-store path="${keyStorePath}" keyPassword="changeit" password="changeit"/>
+                <tls:key-store path="${keyStorePath}" keyPassword="changeit" password="${password}" type="${storeType}"/>
             </tls:context>
         </http:listener-connection>
     </http:listener-config>

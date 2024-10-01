@@ -15,8 +15,8 @@
 
 
     <tls:context name="globalTlsContext" >
-        <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit"/>
-        <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+        <tls:trust-store path="${sslTestCacerts}" password="${password}" type="${storeType}"/>
+        <tls:key-store path="${sslTestKeyStore}" keyPassword="changeit" password="${password}" type="${storeType}"/>
     </tls:context>
 
 

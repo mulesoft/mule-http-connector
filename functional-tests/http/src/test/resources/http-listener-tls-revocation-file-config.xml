@@ -9,16 +9,16 @@
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <tls:context name="serverCrlFileTlsContext">
-        <tls:trust-store path="tls/crl/trustFile.jceks" password="test" type="jceks" algorithm="PKIX"/>
-        <tls:key-store path="tls/crl/certificate-authority-entity.p12" keyPassword="test" password="test" type="pkcs12" algorithm="PKIX"/>
+        <tls:trust-store path="${trustStore}" password="${password}" type="${trustStoreType}" algorithm="PKIX"/>
+        <tls:key-store path="${certificateAuthorityEntity}" keyPassword="test" password="${password}" type="${keyStoreType}" algorithm="PKIX"/>
         <tls:revocation-check>
             <tls:crl-file path="${crlPath}"/>
         </tls:revocation-check>
     </tls:context>
 
     <tls:context name="clientTlsContext" >
-        <tls:trust-store path="tls/crl/trustFile.jceks" password="test" type="jceks" algorithm="PKIX"/>
-        <tls:key-store path="tls/crl/entity1" keyPassword="test" password="test" type="pkcs12" algorithm="PKIX"/>
+        <tls:trust-store path="${trustStore}" password="${password}" type="${trustStoreType}" algorithm="PKIX"/>
+        <tls:key-store path="${entity1KeyStore}" keyPassword="test" password="${password}" type="${keyStoreType}" algorithm="PKIX"/>
     </tls:context>
 
     <http:listener-config name="serverConfig">

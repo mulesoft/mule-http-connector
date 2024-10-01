@@ -6,6 +6,8 @@
  */
 package org.mule.test.http.functional.listener;
 
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.getDefaultEnvironmentConfiguration;
+
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -13,6 +15,7 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
 import org.junit.Rule;
@@ -26,6 +29,24 @@ public class HttpListenerCustomTlsConfigMultipleKeysTestCase extends AbstractHtt
 
   @Rule
   public DynamicPort port = new DynamicPort("port");
+
+  @Rule
+  public SystemProperty serverKeyStoreType =
+      new SystemProperty("storeType", getDefaultEnvironmentConfiguration().getTestStoreType());
+
+  @Rule
+  public SystemProperty tlsClientServerKeyStore =
+      new SystemProperty("tlsClientServerKeyStore", getDefaultEnvironmentConfiguration().getTlsClientKeyStoreWithMultipleKeys());
+
+
+  @Rule
+  public SystemProperty tlsTrustStore =
+      new SystemProperty("tlsTrustStore", getDefaultEnvironmentConfiguration().getTestGenericTrustKeyStore());
+
+  @Rule
+  public SystemProperty tlsTrustStoreFileWithoutMuleServerCertificate =
+      new SystemProperty("tlsTrustStoreFileWithoutMuleServerCertificate",
+                         getDefaultEnvironmentConfiguration().getTlsTrustStoreFileWithoutMuleServerCertificate());
 
 
   @Override
@@ -44,7 +65,8 @@ public class HttpListenerCustomTlsConfigMultipleKeysTestCase extends AbstractHtt
     expectedException.expectMessage(anyOf(containsString(J8_262_SSL_ERROR_RESPONSE),
                                           containsString(J8_275_SSL_ERROR_RESPONSE),
                                           containsString(J11_SSL_ERROR_RESPONSE),
-                                          containsString(J17_SSL_ERROR_RESPONSE)));
+                                          containsString(J17_SSL_ERROR_RESPONSE),
+                                          containsString(BOUNCY_CASTLE_CERTIFICATE_UNKNOWN_ERROR_MESSAGE)));
     flowRunner("testFlowClientWithoutCertificate").withPayload(TEST_MESSAGE).run();
   }
 

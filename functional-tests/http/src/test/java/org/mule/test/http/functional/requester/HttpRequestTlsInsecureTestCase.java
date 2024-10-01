@@ -7,6 +7,7 @@
 package org.mule.test.http.functional.requester;
 
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.HTTPS;
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.getDefaultEnvironmentConfiguration;
 
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -39,6 +40,23 @@ import org.junit.runners.Parameterized;
 @RunnerDelegateTo(Parameterized.class)
 @Story(HTTPS)
 public class HttpRequestTlsInsecureTestCase extends AbstractHttpTestCase {
+
+  @Rule
+  public SystemProperty serverKeyStore =
+      new SystemProperty("serverKeyStore", getDefaultEnvironmentConfiguration().getTestServerKeyStore());
+
+  @Rule
+  public SystemProperty password = new SystemProperty("password", getDefaultEnvironmentConfiguration().getTestStorePassword());
+
+  @Rule
+  public SystemProperty storeType = new SystemProperty("storeType", getDefaultEnvironmentConfiguration().getTestStoreType());
+
+  @Rule
+  public SystemProperty sslCacerts = new SystemProperty("sslCacerts", getDefaultEnvironmentConfiguration().getTestSslCaCerts());
+
+  @Rule
+  public SystemProperty sslKeyStoreWithTestHostname =
+      new SystemProperty("sslKeyStoreWithTestHostname", getDefaultEnvironmentConfiguration().getTestSslKeyStoreWithHostName());
 
   @Parameterized.Parameter
   public String config;
@@ -73,7 +91,8 @@ public class HttpRequestTlsInsecureTestCase extends AbstractHttpTestCase {
     expectedError
         .expectCause(anyOf(hasMessage(containsString(J8_262_SSL_ERROR_RESPONSE)),
                            hasMessage(containsString("No trusted certificate found")),
-                           hasMessage(containsString(J11_SSL_ERROR_RESPONSE))));
+                           hasMessage(containsString(J11_SSL_ERROR_RESPONSE)),
+                           hasMessage(containsString(BOUNCY_CASTLE_CERTIFICATE_UNKNOWN_ERROR_MESSAGE))));
     flowRunner("testSecureRequest").withPayload(TEST_PAYLOAD).run();
   }
 

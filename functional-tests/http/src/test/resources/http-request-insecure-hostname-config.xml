@@ -9,7 +9,7 @@
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <tls:context name="globalTlsContext">
-        <tls:key-store path="tls/ssltest-keystore-with-test-hostname.jks" keyPassword="changeit" password="changeit"/>
+        <tls:key-store path="${sslKeyStoreWithTestHostname}" keyPassword="changeit" password="${password}" type="${storeType}"/>
     </tls:context>
 
     <http:listener-config name="hostnameListener">
@@ -19,7 +19,7 @@
     <http:request-config name="insecureClient">
         <http:request-connection protocol="HTTPS" host="localhost" port="${port1}">
             <tls:context>
-                <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit" insecure="${insecure}"/>
+                <tls:trust-store path="${sslCacerts}" password="${password}" insecure="${insecure}" type="${storeType}"/>
             </tls:context>
         </http:request-connection>
     </http:request-config>
@@ -27,7 +27,7 @@
     <http:request-config name="secureClient">
         <http:request-connection protocol="HTTPS" host="localhost" port="${port1}">
             <tls:context>
-                <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit"/>
+                <tls:trust-store path="${sslCacerts}" password="${password}" type="${storeType}"/>
             </tls:context>
         </http:request-connection>
     </http:request-config>

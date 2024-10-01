@@ -6,9 +6,14 @@
  */
 package org.mule.test.http.functional.requester.ocsp;
 
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.isFipsTesting;
+
 import static java.util.Arrays.asList;
+import static org.junit.Assume.assumeFalse;
 
 import org.mule.test.runner.RunnerDelegateTo;
+
+import org.junit.BeforeClass;
 
 import java.util.Collection;
 
@@ -18,6 +23,12 @@ import org.junit.runners.Parameterized.Parameters;
 
 @RunnerDelegateTo(Parameterized.class)
 public class HttpRequesterOcspNoRevocationTestCase extends AbstractHttpOcspRevocationTestCase {
+
+  @BeforeClass
+  public static void before() {
+    assumeFalse("Check that this is not in fips where the standard revocation check does not work. Another of the documented options should be used",
+                isFipsTesting());
+  }
 
   public HttpRequesterOcspNoRevocationTestCase(String configFile, String certAlias) {
     super(configFile, VALID_OCSP_LIST, certAlias);

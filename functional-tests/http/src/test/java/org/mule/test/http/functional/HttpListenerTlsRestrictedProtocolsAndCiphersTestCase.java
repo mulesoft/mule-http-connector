@@ -7,12 +7,14 @@
 package org.mule.test.http.functional;
 
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.HTTPS;
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.getDefaultEnvironmentConfiguration;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -20,7 +22,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
@@ -41,6 +42,14 @@ public class HttpListenerTlsRestrictedProtocolsAndCiphersTestCase extends Abstra
 
   private static final String SERVER_PROTOCOL_ENABLED = "TLSv1.2";
   private static final String SERVER_PROTOCOL_DISABLED = "TLSv1";
+
+  @Rule
+  public SystemProperty serverKeyStoreFile =
+      new SystemProperty("serverKeyStoreFile", getDefaultEnvironmentConfiguration().getTestServerKeyStore());
+
+  @Rule
+  public SystemProperty serverKeyStoreType =
+      new SystemProperty("serverKeyStoreType", getDefaultEnvironmentConfiguration().getTestStoreType());
 
   @BeforeClass
   public static void createTlsPropertiesFile() throws Exception {
@@ -83,13 +92,13 @@ public class HttpListenerTlsRestrictedProtocolsAndCiphersTestCase extends Abstra
   }
 
 
-  @Test(expected = SSLException.class)
+  @Test(expected = Exception.class)
   public void handshakeFailureWithDisabledCipherSuite() throws Exception {
     SSLSocket socket = createSocket(new String[] {SERVER_CIPHER_SUITE_DISABLED}, new String[] {SERVER_PROTOCOL_ENABLED});
     socket.startHandshake();
   }
 
-  @Test(expected = SSLException.class)
+  @Test(expected = Exception.class)
   public void handshakeFailureWithDisabledProtocol() throws Exception {
     SSLSocket socket = createSocket(new String[] {SERVER_CIPHER_SUITE_ENABLED}, new String[] {SERVER_PROTOCOL_DISABLED});
     socket.startHandshake();
@@ -98,7 +107,8 @@ public class HttpListenerTlsRestrictedProtocolsAndCiphersTestCase extends Abstra
 
   private SSLSocket createSocket(String[] cipherSuites, String[] enabledProtocols) throws Exception {
     TlsContextFactory tlsContextFactory = TlsContextFactory.builder()
-        .trustStorePath("tls/trustStore")
+        .trustStorePath(getDefaultEnvironmentConfiguration().getTestGenericTrustKeyStore())
+        .trustStoreType(getDefaultEnvironmentConfiguration().getTestStoreType())
         .trustStorePassword("mulepassword")
         .build();
 

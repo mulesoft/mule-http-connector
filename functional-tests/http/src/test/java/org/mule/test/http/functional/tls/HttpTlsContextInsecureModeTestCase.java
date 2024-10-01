@@ -12,13 +12,16 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.anyOf;
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.getDefaultEnvironmentConfiguration;
 import static org.mule.test.http.functional.matcher.HttpResponseContentStringMatcher.body;
 import static org.mule.test.http.functional.matcher.HttpResponseStatusCodeMatcher.hasStatusCode;
+
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.apache.http.HttpResponse;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 public class HttpTlsContextInsecureModeTestCase extends AbstractHttpTlsContextTestCase {
 
@@ -34,6 +37,30 @@ public class HttpTlsContextInsecureModeTestCase extends AbstractHttpTlsContextTe
   public static final DynamicPort httpsInternalDefaultPort = new DynamicPort("https.internal.default");
   @ClassRule
   public static final DynamicPort httpsInternalDefaultInvalidPort = new DynamicPort("https.internal.default.invalid");
+
+  @ClassRule
+  public static final SystemProperty sslCacerts =
+      new SystemProperty("sslCacerts", getDefaultEnvironmentConfiguration().getTestSslCaCerts());
+
+  @ClassRule
+  public static final SystemProperty sslKeyStore =
+      new SystemProperty("sslKeyStore", getDefaultEnvironmentConfiguration().getTestSslKeyStore());
+
+  @ClassRule
+  public static final SystemProperty storeType =
+      new SystemProperty("storeType", getDefaultEnvironmentConfiguration().getTestStoreType());
+
+  @ClassRule
+  public static final SystemProperty sslKeyStorePassword =
+      new SystemProperty("sslKeyStorePassword", getDefaultEnvironmentConfiguration().resolveStorePassword("changeit"));
+
+  @ClassRule
+  public static final SystemProperty sslCacertsPassword =
+      new SystemProperty("sslCacertsPassword", getDefaultEnvironmentConfiguration().resolveStorePassword("changeit"));
+
+  @ClassRule
+  public static final SystemProperty sslKeyStoreInvalid =
+      new SystemProperty("sslKeyStoreInvalid", getDefaultEnvironmentConfiguration().getInvalidTestKeyStore());
 
   private static final String urlPrefix = "https://localhost:" + httpsPort.getValue();
   private static final String insecureModeUrl = urlPrefix + "/test/insecure";
@@ -71,7 +98,8 @@ public class HttpTlsContextInsecureModeTestCase extends AbstractHttpTlsContextTe
     assertThat(response, hasStatusCode(SC_INTERNAL_SERVER_ERROR));
     assertThat(response, body(anyOf(containsString(J8_262_SSL_ERROR_RESPONSE),
                                     containsString("No trusted certificate found"),
-                                    containsString(J11_SSL_ERROR_RESPONSE))));
+                                    containsString(J11_SSL_ERROR_RESPONSE),
+                                    containsString(BOUNCY_CASTLE_CERTIFICATE_UNKNOWN_ERROR_MESSAGE))));
   }
 
   @Test
@@ -89,7 +117,8 @@ public class HttpTlsContextInsecureModeTestCase extends AbstractHttpTlsContextTe
     assertThat(response, hasStatusCode(SC_INTERNAL_SERVER_ERROR));
     assertThat(response, body(anyOf(containsString(J8_262_SSL_ERROR_RESPONSE),
                                     containsString("No trusted certificate found"),
-                                    containsString(J11_SSL_ERROR_RESPONSE))));
+                                    containsString(J11_SSL_ERROR_RESPONSE),
+                                    containsString(BOUNCY_CASTLE_CERTIFICATE_UNKNOWN_ERROR_MESSAGE))));
   }
 
 }

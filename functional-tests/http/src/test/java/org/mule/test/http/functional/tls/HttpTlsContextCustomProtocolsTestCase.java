@@ -6,15 +6,18 @@
  */
 package org.mule.test.http.functional.tls;
 
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.getDefaultEnvironmentConfiguration;
+import static org.mule.test.http.functional.matcher.HttpResponseContentStringMatcher.body;
+
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mule.test.http.functional.matcher.HttpResponseContentStringMatcher.body;
+
+import org.mule.test.http.functional.matcher.HttpResponseStatusCodeMatcher;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.test.http.functional.matcher.HttpResponseStatusCodeMatcher;
 
 import org.apache.http.HttpResponse;
 import org.junit.ClassRule;
@@ -45,6 +48,22 @@ public class HttpTlsContextCustomProtocolsTestCase extends AbstractHttpTlsContex
   private static final String customProtocolsPropertyUrl = urlPrefix + "/test/property";
   private static final String OK_RESPONSE = "ok";
   private static final String ERROR_RESPONSE = "failed";
+
+  @ClassRule
+  public static final SystemProperty sslCacerts =
+      new SystemProperty("sslTestTrustStore", getDefaultEnvironmentConfiguration().getTestSslCaCerts());
+
+  @ClassRule
+  public static final SystemProperty sslKeyStore =
+      new SystemProperty("sslTestKeyStore", getDefaultEnvironmentConfiguration().getTestSslKeyStore());
+
+  @ClassRule
+  public static final SystemProperty storeType =
+      new SystemProperty("storeType", getDefaultEnvironmentConfiguration().getTestStoreType());
+
+  @ClassRule
+  public static final SystemProperty password =
+      new SystemProperty("password", getDefaultEnvironmentConfiguration().resolveStorePassword("changeit"));
 
   @Override
   protected String getConfigFile() {

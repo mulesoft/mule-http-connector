@@ -9,6 +9,7 @@ package org.mule.test.http.functional.requester.proxy;
 import static org.mule.functional.api.component.FunctionalTestProcessor.getFromFlow;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.PROXY;
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.getDefaultEnvironmentConfiguration;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -51,6 +52,14 @@ public class HttpRequestProxyTlsTestCase extends AbstractHttpTestCase {
   @Rule
   public SystemProperty trustStorePathProperty;
 
+  @Rule
+  public SystemProperty storeType =
+      new SystemProperty("storeType", getDefaultEnvironmentConfiguration().getTestStoreType());
+
+  @Rule
+  public SystemProperty password =
+      new SystemProperty("password", getDefaultEnvironmentConfiguration().resolveStorePassword("changeit"));
+
   private TestProxyServer proxyServer = new TestProxyServer(proxyPort.getNumber(), httpPort.getNumber(), true);
 
   private String requestURI;
@@ -71,9 +80,12 @@ public class HttpRequestProxyTlsTestCase extends AbstractHttpTestCase {
   @Parameterized.Parameters
   public static Collection<Object[]> parameters() {
     return Arrays.asList(new Object[][] {
-        {"tls/ssltest-keystore-with-test-hostname.jks", "tls/ssltest-truststore-with-test-hostname.jks", "test"},
-        {"tls/ssltest-keystore.jks", "tls/ssltest-cacerts.jks", "localhost"}});
+        {getDefaultEnvironmentConfiguration().getTestSslKeyStoreWithHostName(),
+            getDefaultEnvironmentConfiguration().getTestSslTrustStoreWithHostName(), "test"},
+        {getDefaultEnvironmentConfiguration().getTestSslKeyStore(), getDefaultEnvironmentConfiguration().getTestSslCaCerts(),
+            "localhost"}});
   }
+
 
   @Override
   protected String getConfigFile() {

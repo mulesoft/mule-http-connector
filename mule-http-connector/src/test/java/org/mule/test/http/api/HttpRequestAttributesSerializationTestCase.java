@@ -6,6 +6,7 @@
  */
 package org.mule.test.http.api;
 
+import static java.lang.System.getProperty;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotLoadFromClasspath;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
 
@@ -46,6 +47,7 @@ import java.util.stream.Collectors;
 import io.qameta.allure.Description;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mule.test.AllureJunit4;
 
 public class HttpRequestAttributesSerializationTestCase extends AbstractHttpAttributesTestCase {
 
@@ -69,15 +71,30 @@ public class HttpRequestAttributesSerializationTestCase extends AbstractHttpAttr
 
   @BeforeClass
   public static void setup() throws Exception {
-    KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+    String keyStoreType = getKeyStoreType();
+    KeyStore keyStore = KeyStore.getInstance(keyStoreType);
 
-    InputStream is = getResourceAsStream("tls/serverKeystore", HttpRequestAttributesSerializationTestCase.class);
+    InputStream is = getResourceAsStream(getKeyStore(), HttpRequestAttributesSerializationTestCase.class);
     if (null == is) {
-      throw new FileNotFoundException(cannotLoadFromClasspath("serverKeystore").getMessage());
+      throw new FileNotFoundException(cannotLoadFromClasspath(getKeyStore()).getMessage());
     }
 
     keyStore.load(is, "mulepassword".toCharArray());
     certificate = keyStore.getCertificate("muleserver");
+  }
+
+  private static String getKeyStoreType() {
+    if (AllureJunit4.isFipsEnabled()) {
+      return "bcfks";
+    }
+    return "jks";
+  }
+
+  private static String getKeyStore() {
+    if (AllureJunit4.isFipsEnabled()) {
+      return "tls/serverKeystoreFips";
+    }
+    return "tls/serverKeystore";
   }
 
   @Test
