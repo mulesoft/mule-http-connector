@@ -21,8 +21,6 @@
             -XX:+TieredCompilation
             -XX:+IgnoreUnrecognizedVMOptions
             -Dfile.encoding=UTF-8
-            -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjVersion}/aspectjweaver-${aspectjVersion}.jar
-            -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile='${session.executionRootDirectory}/target/jacoco.exec'
             --module-path=${org.slf4j:slf4j-api:jar}
             --add-modules=org.slf4j
             --add-opens=java.base/java.lang=ALL-UNNAMED
