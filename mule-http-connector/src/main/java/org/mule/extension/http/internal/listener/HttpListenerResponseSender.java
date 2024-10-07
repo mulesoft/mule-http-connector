@@ -11,15 +11,17 @@ import static org.mule.extension.http.internal.request.profiling.tracing.HttpSpa
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
-import org.mule.extension.http.api.streaming.HttpStreamingType;
 import org.mule.extension.http.internal.listener.intercepting.Interception;
-import org.mule.runtime.api.transformation.TransformationService;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.mule.runtime.http.api.domain.message.response.HttpResponseBuilder;
 import org.mule.runtime.http.api.server.async.HttpResponseReadyCallback;
 import org.mule.runtime.http.api.server.async.ResponseStatusCallback;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
+
+import java.util.concurrent.RejectedExecutionException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,23 +30,40 @@ public class HttpListenerResponseSender {
   private static final Logger LOGGER = LoggerFactory.getLogger(HttpListenerResponseSender.class);
 
   private final HttpResponseFactory responseFactory;
+  private final Scheduler scheduler;
 
-  public HttpListenerResponseSender(HttpResponseFactory responseFactory) {
+  public HttpListenerResponseSender(HttpResponseFactory responseFactory, Scheduler responseSenderScheduler) {
     this.responseFactory = responseFactory;
-  }
-
-  public HttpListenerResponseSender(TransformationService transformationService) {
-    this.responseFactory = new HttpResponseFactory(HttpStreamingType.NEVER, transformationService, () -> false);
+    this.scheduler = responseSenderScheduler;
   }
 
   public void sendResponse(HttpResponseContext context,
                            HttpListenerResponseBuilder response,
-                           SourceCompletionCallback completionCallback,
+                           final SourceCompletionCallback completionCallback,
                            DistributedTraceContextManager distributedTraceContextManager) {
-    HttpResponse httpResponse = buildResponse(response, context.getInterception(), context.isSupportStreaming());
+    final HttpResponse httpResponse = buildResponse(response, context.getInterception(), context.isSupportStreaming());
     final HttpResponseReadyCallback responseCallback = context.getResponseCallback();
     addStatusCodeAttribute(distributedTraceContextManager, httpResponse.getStatusCode(), LOGGER);
     updateServerSpanStatus(distributedTraceContextManager, httpResponse.getStatusCode(), LOGGER);
+    if (context.isDeferredResponse()) {
+      try {
+        scheduler.submit(() -> {
+          try {
+            internalSendResponse(completionCallback, responseCallback, httpResponse)
+          } catch (Exception e) {
+            completionCallback.error(e);
+          }
+        });
+      } catch (RejectedExecutionException rejectedExecutionException) {
+        internalSendResponse(completionCallback, responseCallback, httpResponse);
+      }
+    } else {
+      internalSendResponse(completionCallback, responseCallback, httpResponse);
+    }
+  }
+
+  private void internalSendResponse(SourceCompletionCallback completionCallback, HttpResponseReadyCallback responseCallback,
+                                    HttpResponse httpResponse) {
     responseCallback.responseReady(httpResponse, getResponseFailureCallback(responseCallback, completionCallback));
   }
 

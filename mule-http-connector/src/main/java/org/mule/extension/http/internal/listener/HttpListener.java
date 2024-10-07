@@ -24,6 +24,7 @@ import static org.mule.extension.http.internal.request.profiling.tracing.HttpSpa
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SECURITY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -59,6 +60,9 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerConfig;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.MuleContext;
@@ -146,6 +150,9 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   private TransformationService transformationService;
 
   @Inject
+  private SchedulerService schedulerService;
+
+  @Inject
   private MuleContext muleContext;
 
   @Config
@@ -189,6 +196,18 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   @Placement(tab = ADVANCED_TAB)
   private HttpStreamingType responseStreamingMode;
 
+  /**
+   * Defines if the response should be sent in the same thread where the listener's
+   * callback is notified, or scheduled to another {@link Scheduler}.
+   * This is useful when the user knows that the payload to send is generated slowly.
+   *
+   * @since 1.11.0
+   */
+  @Parameter
+  @Optional(defaultValue = "false")
+  @Placement(tab = ADVANCED_TAB)
+  private boolean deferredResponse = false;
+
   private HttpServer server;
   private HttpListenerResponseSender responseSender;
   private ListenerPath listenerPath;
@@ -196,6 +215,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   private HttpResponseFactory responseFactory;
   private ErrorTypeMatcher knownErrors;
   private Class interpretedAttributes;
+  private Scheduler responseSenderScheduler;
 
   // TODO: MULE-10900 figure out a way to have a shared group between callbacks and possibly regular params
   @OnSuccess
@@ -341,8 +361,10 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   public void onStart(SourceCallback<InputStream, HttpRequestAttributes> sourceCallback) throws MuleException {
     server = serverProvider.connect();
     resolveFullPath();
+
+    responseSenderScheduler = schedulerService.ioScheduler(config().withName("request-sender-io"));
     responseFactory = new HttpResponseFactory(responseStreamingMode, transformationService, this::isContextStopping);
-    responseSender = new HttpListenerResponseSender(responseFactory);
+    responseSender = new HttpListenerResponseSender(responseFactory, responseSenderScheduler);
     startIfNeeded(responseFactory);
 
     validatePath();
@@ -406,6 +428,10 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
       requestHandlerManager.dispose();
     }
 
+    if (responseSenderScheduler != null) {
+      responseSenderScheduler.stop();
+    }
+
     if (server != null) {
       serverProvider.disconnect(server);
     }
@@ -432,6 +458,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
           responseContext.setHttpVersion(httpVersion);
           responseContext.setSupportStreaming(supportsTransferEncoding(httpVersion));
           responseContext.setResponseCallback(responseCallback);
+          responseContext.setDeferredResponse(deferredResponse);
           MultiMap<String, String> headers = getHeaders(result);
           config.validateHeaders(headers);
           config.getInterceptor().ifPresent(interceptor -> responseContext
