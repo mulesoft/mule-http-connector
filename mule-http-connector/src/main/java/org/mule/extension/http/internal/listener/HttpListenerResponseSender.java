@@ -49,7 +49,7 @@ public class HttpListenerResponseSender {
       try {
         scheduler.submit(() -> {
           try {
-            internalSendResponse(completionCallback, responseCallback, httpResponse)
+            internalSendResponse(completionCallback, responseCallback, httpResponse);
           } catch (Exception e) {
             completionCallback.error(e);
           }
