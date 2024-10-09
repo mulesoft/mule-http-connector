@@ -19,12 +19,12 @@
 
         <junit.version>4.13.2</junit.version>
 
-        <javax.servlet.api.version>3.1.0</javax.servlet.api.version>
+        <jakarta.servlet.api.version>6.1.0</jakarta.servlet.api.version>
 
         <grizzly.version>2.3.36-MULE-026</grizzly.version>
         <grizzly.ahc.version>1.14-MULE-024</grizzly.ahc.version>
         <apacheAsyncClientVersion>4.1.5</apacheAsyncClientVersion>
-        <jettyVersion>9.4.55.v20240627</jettyVersion>
+        <jettyVersion>11.0.24</jettyVersion>
         <httpMimeVersion>4.5.14</httpMimeVersion>
         <apacheHttpCoreVersion>4.4.16</apacheHttpCoreVersion>
         <apacheHttpClientVersion>4.5.14</apacheHttpClientVersion>
@@ -90,9 +90,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>${javax.servlet.api.version}</version>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>${jakarta.servlet.api.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -118,6 +118,11 @@
             <artifactId>jetty-proxy</artifactId>
             <version>${jettyVersion}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-io</artifactId>
+            <version>${jettyVersion}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

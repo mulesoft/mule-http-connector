@@ -6,9 +6,9 @@
  */
 package org.mule.test.http.functional.requester;
 
-import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
-import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static javax.servlet.http.HttpServletResponse.SC_PROXY_AUTHENTICATION_REQUIRED;
+import static jakarta.servlet.http.HttpServletResponse.SC_FORBIDDEN;
+import static jakarta.servlet.http.HttpServletResponse.SC_OK;
+import static jakarta.servlet.http.HttpServletResponse.SC_PROXY_AUTHENTICATION_REQUIRED;
 import static org.glassfish.grizzly.http.server.Constants.CLOSE;
 import static org.glassfish.grizzly.http.server.Constants.CONNECTION;
 import static org.glassfish.grizzly.http.server.Constants.KEEPALIVE;
@@ -20,10 +20,10 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.Executor;
 
-import javax.servlet.AsyncContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.io.Connection;
 import org.eclipse.jetty.io.EndPoint;
@@ -109,7 +109,9 @@ public class NtlmConnectHandler extends ConnectHandler {
       asyncContext.setTimeout(0);
 
       LOG.debug("Connecting to {}", address);
-      ConnectContext connectContext = new ConnectContext(request, response, asyncContext, HttpConnection.getCurrentConnection());
+      ConnectContext connectContext =
+          new ConnectContext(request, response, asyncContext, HttpConnection.getCurrentConnection().getHttpChannel()
+              .getEndPoint());
       selector.connect(channel, connectContext);
     } catch (Exception x) {
       onConnectFailure(request, response, null, x);
@@ -149,7 +151,7 @@ public class NtlmConnectHandler extends ConnectHandler {
     @Override
     protected EndPoint newEndPoint(SelectableChannel selectableChannel, ManagedSelector managedSelector,
                                    SelectionKey selectionKey) {
-      return new SocketChannelEndPoint(selectableChannel, managedSelector, selectionKey, getScheduler());
+      return new SocketChannelEndPoint((SocketChannel) selectableChannel, managedSelector, selectionKey, getScheduler());
     }
 
     @Override

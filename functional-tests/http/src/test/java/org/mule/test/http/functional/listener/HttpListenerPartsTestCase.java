@@ -40,8 +40,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.Part;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Part;
 
 import io.qameta.allure.Story;
 import org.apache.commons.lang3.StringUtils;
@@ -54,7 +54,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.eclipse.jetty.util.MultiPartInputStreamParser;
+import org.eclipse.jetty.server.MultiPartInputStreamParser;
 import org.junit.Rule;
 import org.junit.Test;
 

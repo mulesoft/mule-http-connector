@@ -19,7 +19,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import io.qameta.allure.Story;
 import org.junit.Test;

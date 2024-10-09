@@ -12,7 +12,7 @@ import static org.mule.extension.http.internal.request.profiling.HttpRequestProf
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.PROFILING;
 
-import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -33,8 +33,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;

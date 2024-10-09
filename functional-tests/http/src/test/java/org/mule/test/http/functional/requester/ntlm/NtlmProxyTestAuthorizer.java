@@ -15,15 +15,15 @@ package org.mule.test.http.functional.requester.ntlm;
 
 import static org.mule.runtime.core.api.util.NetworkUtils.getLocalHost;
 
-import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
+import static jakarta.servlet.http.HttpServletResponse.SC_OK;
+import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 import org.mule.test.http.functional.requester.TestAuthorizer;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import com.ning.http.client.ntlm.NTLMEngine;
 

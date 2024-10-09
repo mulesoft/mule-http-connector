@@ -12,8 +12,8 @@ import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStor
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.PROXY;
 import static org.mule.test.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
 
-import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static javax.servlet.http.HttpServletResponse.SC_PROXY_AUTHENTICATION_REQUIRED;
+import static jakarta.servlet.http.HttpServletResponse.SC_OK;
+import static jakarta.servlet.http.HttpServletResponse.SC_PROXY_AUTHENTICATION_REQUIRED;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.mule.extension.http.api.HttpResponseAttributes;

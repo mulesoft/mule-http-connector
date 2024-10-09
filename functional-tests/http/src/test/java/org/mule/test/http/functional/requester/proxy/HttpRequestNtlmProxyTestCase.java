@@ -11,7 +11,7 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.PROXY_AUTHORIZATION;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.NTLM;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.PROXY;
 
-import static javax.servlet.http.HttpServletResponse.SC_PROXY_AUTHENTICATION_REQUIRED;
+import static jakarta.servlet.http.HttpServletResponse.SC_PROXY_AUTHENTICATION_REQUIRED;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 

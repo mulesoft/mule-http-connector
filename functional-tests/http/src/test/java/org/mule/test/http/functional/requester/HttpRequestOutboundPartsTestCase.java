@@ -26,15 +26,15 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import java.io.IOException;
 import java.util.Collection;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Story;
+import org.eclipse.jetty.server.MultiPartInputStreamParser;
 import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.util.MultiPartInputStreamParser;
 import org.junit.Rule;
 import org.junit.Test;
 
