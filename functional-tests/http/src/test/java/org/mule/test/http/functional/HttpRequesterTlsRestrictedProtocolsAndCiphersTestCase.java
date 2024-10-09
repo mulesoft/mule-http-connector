@@ -22,9 +22,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import io.qameta.allure.Story;
 import org.eclipse.jetty.server.Request;
@@ -126,7 +126,7 @@ public class HttpRequesterTlsRestrictedProtocolsAndCiphersTestCase extends Abstr
     sslContextFactory.addExcludeProtocols(disabledProtocol);
 
     Server server = new Server();
-    ServerConnector connector = new ServerConnector(server, sslContextFactory);
+    ServerConnector connector = new ServerConnector(server, new SslContextFactory.Server());
     connector.setPort(httpsPort.getNumber());
 
     server.addConnector(connector);

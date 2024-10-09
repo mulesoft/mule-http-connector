@@ -20,7 +20,7 @@ import org.mule.runtime.http.api.HttpHeaders;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import io.qameta.allure.Story;
 import org.junit.Test;

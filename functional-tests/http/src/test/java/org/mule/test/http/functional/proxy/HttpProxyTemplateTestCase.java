@@ -7,7 +7,7 @@
 package org.mule.test.http.functional.proxy;
 
 import static java.lang.String.valueOf;
-import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.hasSize;
@@ -53,8 +53,8 @@ import java.util.OptionalLong;
 import java.util.Set;
 import java.util.function.Function;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import io.qameta.allure.Story;
 import org.apache.http.Header;

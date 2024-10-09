@@ -19,8 +19,8 @@ import org.mule.tck.probe.PollingProber;
 import java.io.IOException;
 import java.util.Collection;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.io.EndPoint;
 import org.eclipse.jetty.server.Request;

@@ -23,9 +23,9 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
@@ -92,7 +92,7 @@ public abstract class AbstractHttpRequestTestCase extends AbstractHttpTestCase {
     sslContextFactory.setKeyStorePassword("mulepassword");
     sslContextFactory.setKeyManagerPassword("mulepassword");
 
-    ServerConnector connector = new ServerConnector(server, sslContextFactory);
+    ServerConnector connector = new ServerConnector(server, new SslContextFactory.Server());
     connector.setPort(httpsPort.getNumber());
     server.addConnector(connector);
   }
