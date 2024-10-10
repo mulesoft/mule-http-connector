@@ -362,7 +362,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
     server = serverProvider.connect();
     resolveFullPath();
 
-    responseSenderScheduler = schedulerService.ioScheduler(config().withName("request-sender-io"));
+    responseSenderScheduler = schedulerService.ioScheduler(config().withName("response-sender-io"));
     responseFactory = new HttpResponseFactory(responseStreamingMode, transformationService, this::isContextStopping);
     responseSender = new HttpListenerResponseSender(responseFactory, responseSenderScheduler);
     startIfNeeded(responseFactory);
