@@ -21,6 +21,7 @@ public class HttpResponseContext {
   private boolean supportStreaming = true;
   private HttpResponseReadyCallback responseCallback;
   private Interception interception;
+  private boolean deferredResponse = false;
 
   public String getHttpVersion() {
     return httpVersion;
@@ -52,5 +53,13 @@ public class HttpResponseContext {
 
   public Interception getInterception() {
     return interception != null ? interception : new NoInterception();
+  }
+
+  public boolean isDeferredResponse() {
+    return deferredResponse;
+  }
+
+  public void setDeferredResponse(boolean deferredResponse) {
+    this.deferredResponse = deferredResponse;
   }
 }
