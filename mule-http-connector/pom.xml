@@ -224,14 +224,6 @@
                         <version>${aspectjVersion}</version>
                     </dependency>
                 </dependencies>
-                <configuration>
-                    <properties>
-                        <property>
-                            <name>listener</name>
-                            <value>org.mule.test.AllureJunit4</value>
-                        </property>
-                    </properties>
-                </configuration>
             </plugin>
         </plugins>
     </build>
@@ -568,6 +560,12 @@
                                 <systemProperties>
                                     <mule.fips.testing>true</mule.fips.testing>
                                 </systemProperties>
+                                    <properties>
+                                        <property>
+                                            <name>listener</name>
+                                            <value>org.mule.test.AllureJunit4</value>
+                                        </property>
+                                    </properties>
                             </configuration>
                         </plugin>
                         <plugin>

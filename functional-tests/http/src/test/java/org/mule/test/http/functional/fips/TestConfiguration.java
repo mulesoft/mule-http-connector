@@ -59,11 +59,6 @@ public interface TestConfiguration {
    *
    * @return a {@code String} representing the test client's key store.
    */
-  /**
-   * Retrieves the key store for the test client.
-   *
-   * @return a {@code String} representing the test client's key store.
-   */
   String getTestClientKeyStore();
 
   /**
@@ -131,6 +126,12 @@ public interface TestConfiguration {
    * @return a {@code String} representing the test SSL key store with the associated host name.
    */
   String getTestSslKeyStoreWithHostName();
+
+  /**
+   * Retrieves the SSL trust store for testing, associated with a specific host name.
+   *
+   * @return a {@code String} representing the test SSL trust store with the associated host name.
+   */
 
   String getTestSslTrustStoreWithHostName();
 

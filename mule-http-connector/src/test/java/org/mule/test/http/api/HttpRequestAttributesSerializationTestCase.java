@@ -6,9 +6,9 @@
  */
 package org.mule.test.http.api;
 
-import static java.lang.System.getProperty;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotLoadFromClasspath;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
+import static org.mule.test.AllureJunit4.isFipsEnabled;
 
 import static java.lang.System.arraycopy;
 
@@ -47,7 +47,6 @@ import java.util.stream.Collectors;
 import io.qameta.allure.Description;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mule.test.AllureJunit4;
 
 public class HttpRequestAttributesSerializationTestCase extends AbstractHttpAttributesTestCase {
 
@@ -84,14 +83,14 @@ public class HttpRequestAttributesSerializationTestCase extends AbstractHttpAttr
   }
 
   private static String getKeyStoreType() {
-    if (AllureJunit4.isFipsEnabled()) {
+    if (isFipsEnabled()) {
       return "bcfks";
     }
     return "jks";
   }
 
   private static String getKeyStore() {
-    if (AllureJunit4.isFipsEnabled()) {
+    if (isFipsEnabled()) {
       return "tls/serverKeystoreFips";
     }
     return "tls/serverKeystore";

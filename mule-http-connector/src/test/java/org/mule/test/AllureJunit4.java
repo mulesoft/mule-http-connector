@@ -6,13 +6,17 @@
  */
 package org.mule.test;
 
-import org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider;
-import org.junit.runner.notification.RunListener;
+import static java.lang.Boolean.getBoolean;
 
 import static org.bouncycastle.crypto.CryptoServicesRegistrar.setSecureRandom;
 
-import static java.lang.Boolean.getBoolean;
+import org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider;
+import org.junit.runner.notification.RunListener;
 
+/**
+ * Done to avoid the use of md5 by allure.
+ * This will only be present in fips testing.
+ */
 public class AllureJunit4 extends RunListener {
 
   private static final String FIPS_TESTING_PROPERTY = "mule.fips.testing";
@@ -26,6 +30,5 @@ public class AllureJunit4 extends RunListener {
   public static boolean isFipsEnabled() {
     return getBoolean(FIPS_TESTING_PROPERTY);
   }
-
 
 }
