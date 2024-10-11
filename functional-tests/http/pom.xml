@@ -291,12 +291,28 @@
             <artifactId>mule-service-http</artifactId>
             <classifier>mule-service</classifier>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcprov-jdk18on</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mule.services</groupId>
             <artifactId>mule-service-http</artifactId>
             <scope>test</scope>
             <type>test-jar</type>
+            <!-- Exclusion: this is needed for registering the secure random for
+             fips testing.
+             The bouncy castle is sealed so the packages can only be registered
+             once -->
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcprov-jdk18on</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 </project>

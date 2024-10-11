@@ -128,6 +128,16 @@
             <artifactId>mule-service-http</artifactId>
             <classifier>mule-service</classifier>
             <scope>provided</scope>
+            <!-- Exclusion: this is needed for registering the secure random for
+             fips testing.
+             The bouncy castle is sealed so the packages can only be registered
+             once -->
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcprov-jdk18on</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 </project>
