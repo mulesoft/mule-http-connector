@@ -32,6 +32,11 @@ public class HttpListenerHeaderSizeTestCase extends AbstractHttpTestCase {
   @Rule
   public SystemProperty maxHeaderSectionSizeSystemProperty =
       new SystemProperty(SYSTEM_PROPERTY_PREFIX + "http.headerSectionSize", "10000");
+
+  @Rule
+  public SystemProperty maxInitialLineLengthSystemProperty =
+      new SystemProperty(SYSTEM_PROPERTY_PREFIX + "http.initialLineLength", "10000");
+
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port");
 
