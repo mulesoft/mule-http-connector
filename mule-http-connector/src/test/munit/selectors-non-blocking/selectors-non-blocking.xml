@@ -53,17 +53,17 @@
             <munit:enable-flow-source value="proxyFlow" />
         </munit:enable-flow-sources>
         <munit:execution >
-            <logger level="ERROR" message="Starting server..." />
+            <logger level="INFO" message="Starting server..." />
             <java:invoke-static class="org.mule.test.SlowResponderServer" method="startServer(int)" >
                 <java:args><![CDATA[#[{arg0: ${slow.responder.port}}]]]></java:args>
             </java:invoke-static>
 
-            <logger level="ERROR" message="Spawn as many clients as listener selector threads with a delay time of 30 seconds..." />
+            <logger level="INFO" message="Spawn as many clients as listener selector threads with a delay time of 30 seconds..." />
             <java:invoke-static class="org.mule.test.ParallelRequester" method="startRequests(int, int)" >
                 <java:args><![CDATA[#[{arg0: ${dynamic.port}, arg1: 30}]]]></java:args>
             </java:invoke-static>
 
-            <logger level="ERROR" message="Sending the request without delay..." />
+            <logger level="INFO" message="Sending the request without delay..." />
             <http:request method="GET" path="/proxy" config-ref="selectorsNonBlockingRequestConfig" responseTimeout="4000">
                 <http:query-params>
                     #[{'sleep' : 0}]
@@ -71,13 +71,13 @@
             </http:request>
             <set-variable value="#[%dw 2.0 output application/java --- payload.^raw as String]" variableName="test_response"/>
 
-            <logger level="ERROR" message="Making other responders to respond faster..." />
+            <logger level="INFO" message="Making other responders to respond faster..." />
             <java:invoke-static class="org.mule.test.SlowResponderServer" method="forceFinishAllResponders()" />
 
-            <logger level="ERROR" message="Wait for all the requesters to finish..." />
+            <logger level="INFO" message="Wait for all the requesters to finish..." />
             <java:invoke-static class="org.mule.test.ParallelRequester" method="waitRequests()" />
 
-            <logger level="ERROR" message="Stopping server..." />
+            <logger level="INFO" message="Stopping server..." />
             <java:invoke-static class="org.mule.test.SlowResponderServer" method="stopServer()" />
         </munit:execution>
         <munit:validation>
