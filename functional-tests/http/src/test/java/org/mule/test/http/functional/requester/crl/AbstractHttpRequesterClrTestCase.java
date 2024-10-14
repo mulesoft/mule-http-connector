@@ -43,6 +43,11 @@ public abstract class AbstractHttpRequesterClrTestCase extends AbstractHttpTlsRe
       new SystemProperty("keystore", getEntity1KeyStore());
 
   @Rule
+  public SystemProperty storeType =
+      new SystemProperty("keyStoreType", getDefaultEnvironmentConfiguration().getKeyStorePKS12Type());
+
+
+  @Rule
   public SystemProperty certificationAuthority =
       new SystemProperty("certificationAuthority", getDefaultEnvironmentConfiguration().getCertificateAuthorityEntity());
 

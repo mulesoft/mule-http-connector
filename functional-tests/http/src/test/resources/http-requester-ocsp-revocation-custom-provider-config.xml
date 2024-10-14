@@ -9,13 +9,13 @@
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <tls:context name="serverTlsContext" >
-        <tls:trust-store path="${truststore}" password="${password}" type="${trustStoreType}" algorithm="PKIX"/>
-        <tls:key-store path="${keystore}" keyPassword="test" password="${password}" type="${trustStoreType}" algorithm="PKIX"/>
+        <tls:trust-store path="tls/crl/trustFile.jceks" password="test" type="jceks" algorithm="PKIX"/>
+        <tls:key-store path="tls/crl/${entityCertifiedSubPath}" keyPassword="test" password="test" type="pkcs12" algorithm="PKIX"/>
     </tls:context>
 
     <tls:context name="clientTlsContext" >
-        <tls:trust-store path="${truststore}" password="${password}" type="${trustStoreType}" algorithm="PKIX"/>
-        <tls:key-store path="${certificationAuthority}" keyPassword="test" password="${password}" type="${trustStoreType}" algorithm="PKIX"/>
+        <tls:trust-store path="tls/crl/trustFile.jceks" password="test" type="jceks" algorithm="PKIX"/>
+        <tls:key-store path="tls/crl/certificate-authority-entity.p12" keyPassword="test" password="test" type="pkcs12" algorithm="PKIX"/>
         <tls:revocation-check>
             <tls:custom-ocsp-responder certAlias="${certAlias}" url="http://localhost:${dynamicOcspPort}"/>
         </tls:revocation-check>

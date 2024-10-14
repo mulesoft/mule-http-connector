@@ -20,7 +20,7 @@
         <http:listener-connection protocol="HTTPS" host="localhost" port="${port}">
             <tls:context>
                 <tls:trust-store path="${truststore}" password="${password}" type="${trustStoreType}" algorithm="PKIX"/>
-                <tls:key-store path="${keystore}" keyPassword="test" password="${password}" type="${trustStoreType}" algorithm="PKIX"/>
+                <tls:key-store path="${keystore}" keyPassword="test" password="${password}" type="${keyStoreType}" algorithm="PKIX"/>
             </tls:context>
         </http:listener-connection>
     </http:listener-config>
@@ -29,7 +29,7 @@
         <http:request-connection protocol="HTTPS" host="localhost" port="${port}">
             <tls:context>
                 <tls:trust-store path="${truststore}" password="${password}" type="${trustStoreType}" algorithm="PKIX"/>
-                <tls:key-store path="${certificationAuthority}" keyPassword="test" password="${password}" type="${trustStoreType}" algorithm="PKIX"/>
+                <tls:key-store path="${certificationAuthority}" keyPassword="test" password="${password}" type="${keyStoreType}" algorithm="PKIX"/>
                 <tls:revocation-check>
                     <tls:crl-file path="${crlPath}"/>
                 </tls:revocation-check>
