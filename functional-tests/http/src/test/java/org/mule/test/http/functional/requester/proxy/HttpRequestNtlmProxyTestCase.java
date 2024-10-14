@@ -10,10 +10,12 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.PROXY_AUTHENTICATE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.PROXY_AUTHORIZATION;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.NTLM;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.PROXY;
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.isFipsTesting;
 
 import static javax.servlet.http.HttpServletResponse.SC_PROXY_AUTHENTICATION_REQUIRED;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assume.assumeFalse;
 
 import org.mule.test.http.functional.requester.ntlm.AbstractAuthNtlmTestCase;
 
@@ -21,9 +23,17 @@ import io.qameta.allure.Description;
 import io.qameta.allure.Stories;
 import io.qameta.allure.Story;
 import org.junit.Before;
+import org.junit.BeforeClass;
+
 
 @Stories({@Story(PROXY), @Story(NTLM)})
 public class HttpRequestNtlmProxyTestCase extends AbstractAuthNtlmTestCase {
+
+  @BeforeClass
+  public static void before() {
+    assumeFalse("Ntlm is based on MD5. So this should not run on FIPS",
+                isFipsTesting());
+  }
 
   @Before
   public void setup() {

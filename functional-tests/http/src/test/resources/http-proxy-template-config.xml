@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<mule xmlns:java="http://www.mulesoft.org/schema/mule/java"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
-      xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-               http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
-               http://www.mulesoft.org/schema/mule/test  http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
+               http://www.mulesoft.org/schema/mule/test  http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+               http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd">
 
     <object name="proxyPolicyProcessor" class="org.mule.test.http.functional.proxy.HttpProxyTemplateTestCase$ProxyPolicyProcessor"/>
 
@@ -28,11 +28,10 @@
             </http:response>
         </http:listener>
 
-        <script:execute engine="groovy" target="isExpectedThreadName">
-            <script:code>
-                return java.lang.Thread.currentThread().getName().startsWith('[MuleRuntime].io')
-            </script:code>
-        </script:execute>
+        <!-- Changed from groovy so that no md5 is used -->
+        <java:invoke-static
+                class="org.mule.test.http.functional.proxy.HttpProxyExpectHeaderTestCase"
+                method="getThread()" target="isExpectedThreadName" />
         <test:assert count="1" expression="#[vars.isExpectedThreadName]"/>
 
         <flow-ref name="proxyPolicyProcessor" />
@@ -41,11 +40,10 @@
             <http:headers>#[attributes.headers ++ {'X-Forwarded-For':attributes.remoteAddress}]</http:headers>
             <http:query-params>#[attributes.queryParams]</http:query-params>
         </http:request>
-        <script:execute engine="groovy" target="isExpectedThreadName">
-            <script:code>
-                return java.lang.Thread.currentThread().getName().startsWith('[MuleRuntime].io')
-            </script:code>
-        </script:execute>
+        <!-- Changed from groovy so that no md5 is used -->
+        <java:invoke-static
+                class="org.mule.test.http.functional.proxy.HttpProxyExpectHeaderTestCase"
+                method="getThread()" target="isExpectedThreadName" />
         <test:assert count="1" expression="#[vars.isExpectedThreadName]"/>
 
         <flow-ref name="proxyPolicyProcessor" />
@@ -58,11 +56,11 @@
             </http:response>
         </http:listener>
 
-        <script:execute engine="groovy" target="isExpectedThreadName">
-            <script:code>
-                return java.lang.Thread.currentThread().getName().startsWith('[MuleRuntime].io')
-            </script:code>
-        </script:execute>
+        <!-- Changed from groovy so that no md5 is used -->
+        <java:invoke-static
+                class="org.mule.test.http.functional.proxy.HttpProxyExpectHeaderTestCase"
+                method="getThread()" target="isExpectedThreadName" />
+
         <test:assert count="1" expression="#[vars.isExpectedThreadName]"/>
 
         <flow-ref name="proxyProcessor"/>
@@ -71,11 +69,10 @@
             <http:headers>#[attributes.headers ++ {'X-Forwarded-For':attributes.remoteAddress}]</http:headers>
             <http:query-params>#[attributes.queryParams]</http:query-params>
         </http:request>
-        <script:execute engine="groovy" target="isExpectedThreadName">
-            <script:code>
-                return java.lang.Thread.currentThread().getName().startsWith('[MuleRuntime].io')
-            </script:code>
-        </script:execute>
+        <!-- Changed from groovy so that no md5 is used -->
+        <java:invoke-static
+                class="org.mule.test.http.functional.proxy.HttpProxyExpectHeaderTestCase"
+                method="getThread()" target="isExpectedThreadName" />
         <test:assert count="1" expression="#[vars.isExpectedThreadName]"/>
 
         <flow-ref name="proxyProcessor"/>

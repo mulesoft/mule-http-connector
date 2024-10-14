@@ -7,10 +7,12 @@
 package org.mule.test.http.functional.requester.auth;
 
 import static org.mule.runtime.core.api.util.FileUtils.getResourcePath;
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.isFipsTesting;
 import static org.mule.test.http.functional.requester.auth.HttpRequestAuthUtils.createAuthHandler;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assume.assumeFalse;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -45,6 +47,8 @@ public class HttpRequestAuthTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void validDigestAuth() throws Exception {
+    assumeFalse("Digest authentication is based on MD5. So this should not run on FIPS",
+                isFipsTesting());
     assertValidRequest("digestAuthRequest", "user", "password", false);
   }
 

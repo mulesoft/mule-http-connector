@@ -26,7 +26,7 @@ public class HttpRequesterOcspNoRevocationTestCase extends AbstractHttpOcspRevoc
 
   @BeforeClass
   public static void before() {
-    assumeFalse("Check that this is not in fips where the standard revocation check does not work. Another of the documented options should be used",
+    assumeFalse("W-16968647: Check that this is not in fips where the standard revocation check does not work. Another of the documented options should be used",
                 isFipsTesting());
   }
 

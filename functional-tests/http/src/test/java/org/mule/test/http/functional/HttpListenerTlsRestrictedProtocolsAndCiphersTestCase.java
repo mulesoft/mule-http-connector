@@ -92,12 +92,16 @@ public class HttpListenerTlsRestrictedProtocolsAndCiphersTestCase extends Abstra
   }
 
 
+  // In FIPS, the propagated exception depends on the security provided and its version. That is why we expect a generic
+  // exception.
   @Test(expected = Exception.class)
   public void handshakeFailureWithDisabledCipherSuite() throws Exception {
     SSLSocket socket = createSocket(new String[] {SERVER_CIPHER_SUITE_DISABLED}, new String[] {SERVER_PROTOCOL_ENABLED});
     socket.startHandshake();
   }
 
+  // In FIPS, the propagated exception depends on the security provided and its version. That is why we expect a generic
+  // exception.
   @Test(expected = Exception.class)
   public void handshakeFailureWithDisabledProtocol() throws Exception {
     SSLSocket socket = createSocket(new String[] {SERVER_CIPHER_SUITE_ENABLED}, new String[] {SERVER_PROTOCOL_DISABLED});

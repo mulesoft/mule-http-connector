@@ -6,14 +6,18 @@
  */
 package org.mule.test.http.functional;
 
+import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.CERTIFICATE_REVOCATION;
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.isFipsTesting;
+
 import static java.security.cert.CRLReason.KEY_COMPROMISE;
+
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
-import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.CERTIFICATE_REVOCATION;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -40,6 +44,10 @@ public abstract class AbstractHttpTlsRevocationTestCase extends AbstractHttpTest
 
   protected static final String OUTDATED_CRL_FILE_PATH = "tls/crl/outdatedCrl";
 
+  protected static final String NO_CR_LS_FOUND_FOR_ISSUER_BC_ERROR_MESSGE = "No CRLs found for issuer";
+
+  protected static final String KEY_COMPROMISE_BC_ERROR_MESSAGE = "keyCompromise";
+
   /**
    * For avoiding flaky tests, it is necessary to use consistently the certified entities. Each certified entity (i.e. each
    * certificate ) has a hardcoded crl distribution with the format: http://localhost:8093/crl/{numberOfTheEntity}. Java SSL
@@ -51,7 +59,7 @@ public abstract class AbstractHttpTlsRevocationTestCase extends AbstractHttpTest
    */
   protected static String ENTITY_CERTIFIED_NO_REVOCATION_SUB_PATH = "entity1";
 
-  protected static String ENTITY_CERTIFIED_OUTDATED_CRL_SUB_PATH = "entity2";
+  protected static String ENTITY_CERTIFIED_OUTDATED_CRL_SUB_PATH = getEntity2KeyStore();
 
   protected static String ENTITY_CERTIFIED_REVOCATION_SUB_PATH = "entity3";
 
@@ -88,18 +96,38 @@ public abstract class AbstractHttpTlsRevocationTestCase extends AbstractHttpTest
 
   protected void verifyUndeterminedRevocationException(Throwable e) {
     Throwable rootException = getRootCause(e);
-    assertThat(rootException, is(instanceOf(CertPathValidatorException.class)));
-    assertThat(rootException.getMessage(), is(UNDETERMINED_REVOCATION_ERROR_MESSAGE));
+    if (isFipsTesting()) {
+      // The exception of bouncy castle is not exported.
+      // We assert the message.
+      assertThat(rootException.getMessage(), containsString(NO_CR_LS_FOUND_FOR_ISSUER_BC_ERROR_MESSGE));
+    } else {
+      assertThat(rootException, is(instanceOf(CertPathValidatorException.class)));
+      assertThat(rootException.getMessage(), is(UNDETERMINED_REVOCATION_ERROR_MESSAGE));
+    }
   }
 
   protected void verifyRevocationException(Throwable e) {
     Throwable rootException = getRootCause(e);
-    assertThat(rootException, is(instanceOf(CertificateRevokedException.class)));
-    assertThat(((CertificateRevokedException) rootException).getRevocationReason(), is(KEY_COMPROMISE));
+    if (isFipsTesting()) {
+      // The exception of bouncy castle is not exported.
+      // We assert the message.
+      assertThat(rootException.getMessage(), containsString(KEY_COMPROMISE_BC_ERROR_MESSAGE));
+    } else {
+      assertThat(rootException, is(instanceOf(CertificateRevokedException.class)));
+      assertThat(((CertificateRevokedException) rootException).getRevocationReason(), is(KEY_COMPROMISE));
+    }
   }
 
   protected void verifyNotRevokedEntity() throws Exception {
     CoreEvent result = runRevocationTestFlow();
     assertThat(result.getMessage(), hasPayload(equalTo("OK")));
+  }
+
+  private static String getEntity2KeyStore() {
+    if (isFipsTesting()) {
+      return "entity2-fips";
+    }
+
+    return "entity2";
   }
 }
