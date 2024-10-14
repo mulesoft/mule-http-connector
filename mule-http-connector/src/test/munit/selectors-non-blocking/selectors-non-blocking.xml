@@ -48,7 +48,7 @@
         </munit:validation>
     </munit:test>
 
-    <munit:test name="HTTP Listener not blocking the selector" description="HTTP Listener not blocking the selector">
+    <munit:test name="HTTP Listener doesn't use the selector if deferredResponse=true" description="HTTP Listener doesn't use the selector if deferredResponse=true">
         <munit:enable-flow-sources >
             <munit:enable-flow-source value="proxyFlow" />
         </munit:enable-flow-sources>
