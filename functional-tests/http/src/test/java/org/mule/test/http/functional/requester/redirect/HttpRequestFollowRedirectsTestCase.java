@@ -6,9 +6,12 @@
  */
 package org.mule.test.http.functional.requester.redirect;
 
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.getDefaultEnvironmentConfiguration;
+
 import static java.lang.String.format;
 
 import static javax.servlet.http.HttpServletResponse.SC_MOVED_TEMPORARILY;
+
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
@@ -16,6 +19,7 @@ import static org.junit.rules.ExpectedException.none;
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.requester.AbstractHttpRequestTestCase;
 
 import java.io.IOException;
@@ -42,6 +46,19 @@ public class HttpRequestFollowRedirectsTestCase extends AbstractHttpRequestTestC
   private static final String REDIRECT_WITH_PARAMS_URI = REDIRECT_URI + "?param1=value1&param2=value2";
 
   private boolean addParams = false;
+
+
+  @Rule
+  public SystemProperty storeType = new SystemProperty("storeType", getDefaultEnvironmentConfiguration().getTestStoreType());
+
+  @Rule
+  public SystemProperty tlsTrustStore =
+      new SystemProperty("tlsTrustStore", getDefaultEnvironmentConfiguration().getTestGenericTrustKeyStore());
+
+  @Rule
+  public SystemProperty tlsClientStore =
+      new SystemProperty("tlsClientStore", getDefaultEnvironmentConfiguration().getTestClientKeyStore());
+
 
   @Override
   protected String getConfigFile() {

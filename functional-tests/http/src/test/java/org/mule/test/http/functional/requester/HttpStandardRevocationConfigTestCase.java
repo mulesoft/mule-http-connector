@@ -8,11 +8,13 @@ package org.mule.test.http.functional.requester;
 
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.isFipsTesting;
 
 import static org.hamcrest.CoreMatchers.both;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
@@ -24,6 +26,7 @@ import java.net.URL;
 
 import org.hamcrest.MatcherAssert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class HttpStandardRevocationConfigTestCase extends AbstractHttpTestCase {
@@ -31,6 +34,12 @@ public class HttpStandardRevocationConfigTestCase extends AbstractHttpTestCase {
   @Override
   protected String getConfigFile() {
     return "http-requester-standard-revocation-config.xml";
+  }
+
+  @BeforeClass
+  public static void before() {
+    assumeFalse("W-16968647: Check that this is not in fips where the standard revocation check does not work. Another of the documented options should be used",
+                isFipsTesting());
   }
 
   @Before

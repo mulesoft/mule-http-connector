@@ -6,10 +6,12 @@
  */
 package org.mule.test.http.functional.requester.auth;
 
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.isFipsTesting;
 import static org.mule.test.http.functional.requester.auth.HttpRequestAuthUtils.createAuthHandler;
 
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assume.assumeFalse;
 import static org.junit.Assert.assertThat;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -45,6 +47,8 @@ public class HttpRequesterTestConnectivityWithAuthTestCase extends AbstractHttpR
 
   @Test
   public void digestAuthentication() throws MuleException {
+    assumeFalse("Digest authentication is based on MD5. So this should not run on FIPS",
+                isFipsTesting());
     testAuthenticationSuccess("digestConfig");
   }
 
@@ -55,6 +59,8 @@ public class HttpRequesterTestConnectivityWithAuthTestCase extends AbstractHttpR
 
   @Test
   public void digestAuthenticationFailing() throws MuleException {
+    assumeFalse("Digest authentication is based on MD5. So this should not run on FIPS",
+                isFipsTesting());
     testAuthenticationFailing("digestConfigFailing");
   }
 

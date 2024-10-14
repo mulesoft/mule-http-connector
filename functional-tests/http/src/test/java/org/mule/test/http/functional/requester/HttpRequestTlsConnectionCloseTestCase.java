@@ -10,12 +10,14 @@ import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CLOSE;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.HTTPS;
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.getDefaultEnvironmentConfiguration;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.IOException;
 
@@ -23,9 +25,21 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.qameta.allure.Story;
 import org.junit.Test;
+import org.junit.Rule;
 
 @Story(HTTPS)
 public class HttpRequestTlsConnectionCloseTestCase extends AbstractHttpRequestTestCase {
+
+  @Rule
+  public SystemProperty trustStoreFile =
+      new SystemProperty("trustStore", getDefaultEnvironmentConfiguration().getTestGenericTrustKeyStore());
+
+  @Rule
+  public SystemProperty clientKeystoreFile =
+      new SystemProperty("clientKeyStore", getDefaultEnvironmentConfiguration().getTestClientKeyStore());
+
+  @Rule
+  public SystemProperty storeType = new SystemProperty("storeType", getDefaultEnvironmentConfiguration().getTestStoreType());
 
   @Override
   protected String getConfigFile() {

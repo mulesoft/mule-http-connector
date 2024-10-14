@@ -7,8 +7,10 @@
 package org.mule.test.http.functional.tls;
 
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.HTTPS;
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.getDefaultEnvironmentConfiguration;
 
 import static org.apache.commons.io.FileUtils.getFile;
+
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
@@ -28,9 +30,6 @@ import org.apache.http.ssl.SSLContexts;
 @Story(HTTPS)
 public abstract class AbstractHttpTlsContextTestCase extends AbstractHttpTestCase {
 
-  private static final String keyStorePath = "tls/ssltest-keystore.jks";
-  private static final String trustStorePath = "tls/ssltest-cacerts.jks";
-  private static final String storePassword = "changeit";
   private static final String keyPassword = "changeit";
   private static final String protocol = "TLSv1.2";
 
@@ -50,16 +49,20 @@ public abstract class AbstractHttpTlsContextTestCase extends AbstractHttpTestCas
 
   private static SSLContext getSslContext() throws IOException, GeneralSecurityException {
     SSLContext customSslContext;
-    File keyStore = getFile(FileUtils.getResourcePath(keyStorePath, AbstractHttpTlsContextTestCase.class));
-    File trustStore = getFile(FileUtils.getResourcePath(trustStorePath, AbstractHttpTlsContextTestCase.class));
-    char[] storePass = storePassword.toCharArray();
+    File keyStore = getFile(FileUtils.getResourcePath(getDefaultEnvironmentConfiguration()
+        .getTestSslKeyStore(), AbstractHttpTlsContextTestCase.class));
+    File trustStore = getFile(FileUtils.getResourcePath(getDefaultEnvironmentConfiguration().getTestSslCaCerts(),
+                                                        AbstractHttpTlsContextTestCase.class));
+    char[] storePass = getDefaultEnvironmentConfiguration().getTestStorePassword().toCharArray();
     char[] keyPass = keyPassword.toCharArray();
     customSslContext =
         SSLContexts.custom()
+            .setKeyStoreType(getDefaultEnvironmentConfiguration().getTestStoreType())
             .useProtocol(protocol)
             .loadKeyMaterial(keyStore, storePass, keyPass)
             .loadTrustMaterial(trustStore, storePass)
             .build();
     return customSslContext;
   }
+
 }

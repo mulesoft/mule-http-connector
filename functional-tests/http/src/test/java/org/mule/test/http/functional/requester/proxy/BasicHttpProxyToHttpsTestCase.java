@@ -6,14 +6,17 @@
  */
 package org.mule.test.http.functional.requester.proxy;
 
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.getDefaultEnvironmentConfiguration;
 import static org.mule.test.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
 
 import static javax.servlet.http.HttpServletResponse.SC_OK;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.message.Message;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.requester.AbstractHttpRequestTestCase;
 
 import java.io.IOException;
@@ -26,9 +29,21 @@ import org.eclipse.jetty.proxy.ConnectHandler;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.junit.Rule;
 import org.junit.Test;
 
 public class BasicHttpProxyToHttpsTestCase extends AbstractHttpRequestTestCase {
+
+  @Rule
+  public SystemProperty trustStore =
+      new SystemProperty("tlsTrustStore", getDefaultEnvironmentConfiguration().getTestGenericTrustKeyStore());
+
+  @Rule
+  public SystemProperty tlsClientKeyStore =
+      new SystemProperty("tlsClientKeyStore", getDefaultEnvironmentConfiguration().getTestClientKeyStore());
+
+  @Rule
+  public SystemProperty storeType = new SystemProperty("storeType", getDefaultEnvironmentConfiguration().getTestStoreType());
 
   private static final String AUTHORIZED = "Authorized";
   private static final String PASSWORD = "dXNlcjpwYXNzd29yZA==";

@@ -46,7 +46,7 @@
         <munit.input.directory>src/test/munit</munit.input.directory>
         <munit.output.directory>${basedir}/target/test-mule/munit</munit.output.directory>
         <munit.extensions.maven.plugin.version>1.4.0-SNAPSHOT</munit.extensions.maven.plugin.version>
-        <munit.version>3.3.0-SNAPSHOT</munit.version>
+        <munit.version>3.3.1</munit.version>
         <mtf-tools.version>1.2.0</mtf-tools.version>
         <mavenResources.version>3.3.1</mavenResources.version>
         <!-- MUnit minMuleVersion is 4.3.0 -->
@@ -60,6 +60,16 @@
         <license.maven.plugin.version>4.2</license.maven.plugin.version>
         <licensePath>LICENSE_HEADER_CPAL.txt</licensePath>
         <licenseYear>2023</licenseYear>
+
+        <!-- fips testing -->
+        <bcprov-jdk15on.version>1.58</bcprov-jdk15on.version>
+        <bctls-fips.version>1.0.17</bctls-fips.version>
+        <bcpqc-addon-fips.version>1.0.1</bcpqc-addon-fips.version>
+        <bcpkix-fips.version>1.0.7</bcpkix-fips.version>
+        <bcpg-fips.version>1.0.7.1</bcpg-fips.version>
+        <bcmail-jdk15on.version>1.58</bcmail-jdk15on.version>
+        <bcmail-fips.version>1.0.4</bcmail-fips.version>
+        <bc-fips.version>1.0.2.5</bc-fips.version>
     </properties>
 
     <build>
@@ -391,6 +401,63 @@
             <version>${grizzlyVersion}</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- fips testing -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bc-fips</artifactId>
+            <version>${bc-fips.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcmail-fips</artifactId>
+            <version>${bcmail-fips.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcmail-jdk15on</artifactId>
+            <version>${bcmail-jdk15on.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpg-fips</artifactId>
+            <version>${bcpg-fips.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-fips</artifactId>
+            <version>${bcpkix-fips.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpqc-addon-fips</artifactId>
+            <version>${bcpqc-addon-fips.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bctls-fips</artifactId>
+            <version>${bctls-fips.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>${bcprov-jdk15on.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <distributionManagement>
@@ -432,4 +499,106 @@
             <url>https://repository.mulesoft.org/nexus/content/repositories/ci-releases</url>
         </pluginRepository>
     </pluginRepositories>
+
+    <profiles>
+        <profile>
+            <id>no-fips</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.mulesoft.munit</groupId>
+                        <artifactId>munit-extensions-maven-plugin</artifactId>
+                        <version>${munit.extensions.maven.plugin.version}</version>
+                        <configuration>
+                            <argLines>
+                                <argLine>
+                                    -XX:+IgnoreUnrecognizedVMOptions
+                                </argLine>
+                                <argLine>
+                                    --add-opens=java.base/java.lang=ALL-UNNAMED
+                                </argLine>
+                                <argLine>
+                                    -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${session.executionRootDirectory}/target/jacoco.exec
+                                </argLine>
+                            </argLines>
+
+                            <!-- For testing tracing capabilities-->
+                            <systemPropertyVariables>
+                                <!-- We keep the two OTEL properties for 4.5.0 and 4.6.0 -->
+                                <mule.openetelemetry.export.enabled>true</mule.openetelemetry.export.enabled>
+                                <mule.openTelemetry.tracer.exporter.enabled>true</mule.openTelemetry.tracer.exporter.enabled>
+                                <mule.enable.profiling.service>true</mule.enable.profiling.service>
+                                <sslTestCacerts>tls/ssltest-cacerts.jks</sslTestCacerts>
+                                <sslTestKeyStore>tls/ssltest-keystore.jks</sslTestKeyStore>
+                                <storeType>jks</storeType>
+                                <password>changeit</password>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>fips</id>
+                <activation>
+                    <!-- This profile cannot be activated based on the jdk because the jdk on which this has to be activated or not -->
+                    <!-- is the one used to run the tests, not the one used to run Maven. -->
+                    <property>
+                        <name>fips</name>
+                    </property>
+                </activation>
+                <build>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-surefire-plugin</artifactId>
+                            <configuration>
+                                <systemProperties>
+                                    <mule.fips.testing>true</mule.fips.testing>
+                                </systemProperties>
+                                    <properties>
+                                        <property>
+                                            <name>listener</name>
+                                            <value>org.mule.test.AllureJunit4</value>
+                                        </property>
+                                    </properties>
+                            </configuration>
+                        </plugin>
+                        <plugin>
+                            <groupId>com.mulesoft.munit</groupId>
+                            <artifactId>munit-extensions-maven-plugin</artifactId>
+                            <version>${munit.extensions.maven.plugin.version}</version>
+                            <configuration>
+                                <argLines>
+                                    <argLine>
+                                        -XX:+IgnoreUnrecognizedVMOptions
+                                    </argLine>
+                                    <argLine>
+                                        --add-opens=java.base/java.lang=ALL-UNNAMED
+                                    </argLine>
+                                    <argLine>
+                                        -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${session.executionRootDirectory}/target/jacoco.exec
+                                    </argLine>
+                                </argLines>
+
+                                <!-- For testing tracing capabilities-->
+                                <systemPropertyVariables>
+                                    <!-- We keep the two OTEL properties for 4.5.0 and 4.6.0 -->
+                                    <mule.openetelemetry.export.enabled>true</mule.openetelemetry.export.enabled>
+                                    <mule.openTelemetry.tracer.exporter.enabled>true</mule.openTelemetry.tracer.exporter.enabled>
+                                    <mule.enable.profiling.service>true</mule.enable.profiling.service>
+                                    <sslTestCacerts>tls/ssltest-cacerts-fips.bcfks</sslTestCacerts>
+                                    <sslTestKeyStore>tls/ssltest-keystore-fips.bcfks</sslTestKeyStore>
+                                    <storeType>bcfks</storeType>
+                                    <password>mulepassword</password>
+                                </systemPropertyVariables>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </build>
+        </profile>
+    </profiles>
 </project>

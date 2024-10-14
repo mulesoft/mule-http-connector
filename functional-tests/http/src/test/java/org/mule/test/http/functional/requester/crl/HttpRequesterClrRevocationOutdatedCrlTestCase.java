@@ -7,11 +7,10 @@
 package org.mule.test.http.functional.requester.crl;
 
 import static org.junit.Assert.fail;
-
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class HttpRequesterClrRevocationOutdatedCrlTestCase extends AbstractHttpRequesterClrTestCase {
+
 
   public HttpRequesterClrRevocationOutdatedCrlTestCase(String configFile) {
     super(configFile, OUTDATED_CRL_FILE_PATH, ENTITY_CERTIFIED_OUTDATED_CRL_SUB_PATH);

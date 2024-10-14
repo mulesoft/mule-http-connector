@@ -16,8 +16,8 @@
     <http:listener-config name="listenerConfigWithTrustStore">
         <http:listener-connection protocol="HTTPS" host="localhost" port="${port1}">
             <tls:context>
-                <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit"/>
-                <tls:key-store path="tls/serverKeystore" keyPassword="mulepassword" password="mulepassword"/>
+                <tls:trust-store path="${tlsTrustStore}" password="${password}" type="${storeType}"/>
+                <tls:key-store path="${tlsServerKeyStore}" keyPassword="mulepassword" password="mulepassword" type="${storeType}"/>
             </tls:context>
         </http:listener-connection>
     </http:listener-config>
@@ -33,7 +33,7 @@
     <http:listener-config name="listenerConfigWithoutTrustStore">
         <http:listener-connection protocol="HTTPS" host="localhost" port="${port2}">
             <tls:context>
-                <tls:key-store path="tls/serverKeystore" keyPassword="mulepassword" password="mulepassword"/>
+                <tls:key-store path="${tlsServerKeyStore}" keyPassword="mulepassword" password="mulepassword" type="${storeType}"/>
             </tls:context>
         </http:listener-connection>
     </http:listener-config>

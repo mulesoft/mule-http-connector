@@ -12,7 +12,7 @@
     <http:request-config name="requestConfig1">
         <http:request-connection  protocol="${protocol}" host="localhost" port="${port1}" >
             <tls:context enabledCipherSuites="TLS_DHE_RSA_WITH_AES_128_CBC_SHA256">
-                <tls:trust-store path="tls/trustStore" password="mulepassword"/>
+                <tls:trust-store path="${trustStore}" password="mulepassword" type="${storeType}"/>
             </tls:context>
         </http:request-connection>
     </http:request-config>
@@ -21,7 +21,7 @@
     <http:request-config name="requestConfig2">
         <http:request-connection protocol="HTTPS" host="localhost" port="${port2}">
             <tls:context enabledProtocols="TLSv1.1, TLSv1.2" enabledCipherSuites="TLS_DHE_RSA_WITH_AES_128_CBC_SHA256, ${cipherSuites}">
-                <tls:trust-store path="tls/trustStore" password="mulepassword"/>
+                <tls:trust-store path="${trustStore}" password="mulepassword" type="${storeType}"/>
             </tls:context>
         </http:request-connection>
     </http:request-config>
@@ -29,21 +29,21 @@
     <http:request-config name="requestConfig3">
         <http:request-connection protocol="HTTPS" host="localhost" port="${port3}">
             <tls:context enabledProtocols="TLSv1.1, TLSv1.2" enabledCipherSuites="TLS_DHE_RSA_WITH_AES_128_CBC_SHA256">
-                <tls:trust-store path="tls/trustStore" password="mulepassword"/>
+                <tls:trust-store path="${trustStore}" password="mulepassword" type="${storeType}"/>
             </tls:context>
         </http:request-connection>
     </http:request-config>
 
     <!--Uses JVM defaults because there is no tls-default.conf file-->
     <tls:context name="tlsServer2Context" enabledCipherSuites="default">
-        <tls:key-store path="tls/serverKeystore" keyPassword="mulepassword" password="mulepassword"/>
+        <tls:key-store path="${serverKeyStore}" keyPassword="mulepassword" password="mulepassword" type="${storeType}"/>
     </tls:context>
 
     <!--Forces TLSv1.1-->
     <http:listener-config name="listenerConfig1">
         <http:listener-connection protocol="${protocol}" host="localhost" port="${port1}">
             <tls:context enabledProtocols="TLSv1.1">
-                <tls:key-store path="tls/serverKeystore" keyPassword="mulepassword" password="mulepassword"/>
+                <tls:key-store path="${serverKeyStore}" keyPassword="mulepassword" password="mulepassword" type="${storeType}"/>
             </tls:context>
         </http:listener-connection>
     </http:listener-config>
@@ -55,7 +55,7 @@
     <http:listener-config name="listenerConfig3">
         <http:listener-connection protocol="HTTPS" host="localhost" port="${port3}">
             <tls:context enabledCipherSuites="${cipherSuites}">
-                <tls:key-store path="tls/serverKeystore" keyPassword="mulepassword" password="mulepassword"/>
+                <tls:key-store path="${serverKeyStore}" keyPassword="mulepassword" password="mulepassword" type="${storeType}"/>
             </tls:context>
         </http:listener-connection>
     </http:listener-config>

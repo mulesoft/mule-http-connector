@@ -12,11 +12,13 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.runtime.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
 import static org.mule.runtime.http.api.HttpHeaders.Values.KEEP_ALIVE;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.NTLM;
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.isFipsTesting;
 
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.apache.http.entity.ContentType.TEXT_PLAIN;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assume.assumeFalse;
 
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.runner.RunnerDelegateTo;
@@ -30,6 +32,7 @@ import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 import org.apache.http.entity.StringEntity;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
@@ -37,6 +40,12 @@ import org.junit.runners.Parameterized;
 @Story(NTLM)
 @RunnerDelegateTo(Parameterized.class)
 public class HttpStreamingRequestNtlmAuthTestCase extends AbstractNtlmTestCase {
+
+  @BeforeClass
+  public static void before() {
+    assumeFalse("Ntlm is based on MD5. So this should not run on FIPS",
+                isFipsTesting());
+  }
 
   @Rule
   public DynamicPort port = new DynamicPort("port");

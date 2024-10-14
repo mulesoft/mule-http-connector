@@ -7,12 +7,28 @@
 package org.mule.test.http.functional.requester;
 
 
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.getDefaultEnvironmentConfiguration;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
+import org.mule.tck.junit4.rule.SystemProperty;
+
+import org.junit.Rule;
 import org.junit.Test;
 
 public class HttpRequestCustomTlsConfigTestCase extends AbstractHttpRequestTestCase {
+
+  @Rule
+  public SystemProperty trustStoreFile =
+      new SystemProperty("trustStore", getDefaultEnvironmentConfiguration().getTestGenericTrustKeyStore());
+
+  @Rule
+  public SystemProperty clientKeystoreFile =
+      new SystemProperty("clientKeyStore", getDefaultEnvironmentConfiguration().getTestClientKeyStore());
+
+  @Rule
+  public SystemProperty storeType = new SystemProperty("storeType", getDefaultEnvironmentConfiguration().getTestStoreType());
 
   @Override
   protected String getConfigFile() {

@@ -7,6 +7,7 @@
 package org.mule.test.http.functional.tls;
 
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.getDefaultEnvironmentConfiguration;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -23,6 +24,7 @@ import org.junit.Test;
 
 public class HttpTlsContextCustomCiphersTestCase extends AbstractHttpTlsContextTestCase {
 
+  public static final String NO_USABLE_PROTOCOLS_ENABLED_MESSAGE = "No usable protocols enabled";
   @ClassRule
   public static DynamicPort httpsInternalPort1 = new DynamicPort("internal.port.1");
   @ClassRule
@@ -45,6 +47,26 @@ public class HttpTlsContextCustomCiphersTestCase extends AbstractHttpTlsContextT
   @Rule
   public ExpectedError expectedError = ExpectedError.none();
 
+  @ClassRule
+  public static SystemProperty sslCacerts =
+      new SystemProperty("sslCacerts", getDefaultEnvironmentConfiguration().getTestSslCaCerts());
+
+  @ClassRule
+  public static SystemProperty sslTestKeyStore =
+      new SystemProperty("sslKeyStore", getDefaultEnvironmentConfiguration().getTestSslKeyStore());
+
+  @ClassRule
+  public static SystemProperty password =
+      new SystemProperty("password", getDefaultEnvironmentConfiguration().resolveStorePassword("changeit"));
+
+  @ClassRule
+  public static SystemProperty storeType =
+      new SystemProperty("storeType", getDefaultEnvironmentConfiguration().getTestStoreType());
+
+  @ClassRule
+  public static SystemProperty cipherSuite =
+      new SystemProperty("cipherSuite", getDefaultEnvironmentConfiguration().getTestCipherSuite());
+
   @Override
   protected String getConfigFile() {
     return "http-tls-ciphers-config.xml";
@@ -65,7 +87,9 @@ public class HttpTlsContextCustomCiphersTestCase extends AbstractHttpTlsContextT
   @Test
   public void testValidProtocolInvalidCipher() throws Exception {
     expectedError.expectErrorType("HTTP", "CONNECTIVITY");
-    expectedError.expectMessage(anyOf(containsString(ERROR_RESPONSE), sslValidationError()));
+    expectedError.expectMessage(anyOf(containsString(ERROR_RESPONSE), sslValidationError(),
+                                      containsString(NO_USABLE_PROTOCOLS_ENABLED_MESSAGE)));
     flowRunner(validProtocolInvalidCipher).run();
   }
+
 }

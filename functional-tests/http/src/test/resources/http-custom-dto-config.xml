@@ -10,8 +10,8 @@
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <tls:context name="globalTlsContext">
-        <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit"/>
-        <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+        <tls:trust-store path="${trustStorePath}" password="${password}" type="${storeType}"/>
+        <tls:key-store path="${keyStorePath}" keyPassword="changeit" password="${password}" type="${storeType}"/>
     </tls:context>
 
 
