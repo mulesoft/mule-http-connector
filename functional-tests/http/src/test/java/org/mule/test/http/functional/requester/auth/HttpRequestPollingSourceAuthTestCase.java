@@ -9,12 +9,14 @@ package org.mule.test.http.functional.requester.auth;
 import static org.mule.runtime.core.api.util.FileUtils.getResourcePath;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.POLLING_SOURCE;
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.isFipsTesting;
 import static org.mule.test.http.functional.requester.auth.HttpRequestAuthUtils.createAuthHandler;
 
 import static java.lang.Thread.sleep;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assume.assumeFalse;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -55,6 +57,8 @@ public class HttpRequestPollingSourceAuthTestCase extends AbstractHttpRequestTes
   @Test
   @Description("Polling source should work correctly when digest auth is set correctly")
   public void correctDigestAuth() throws Exception {
+    assumeFalse("Digest authentication is based on MD5. So this should not run on FIPS",
+                isFipsTesting());
     startFlow("digestAuthRequest");
     digestAuthLatch.await();
     assertThat(DigestAuthProcessor.response, is(DEFAULT_RESPONSE));

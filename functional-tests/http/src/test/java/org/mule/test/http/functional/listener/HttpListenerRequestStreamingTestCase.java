@@ -6,12 +6,16 @@
  */
 package org.mule.test.http.functional.listener;
 
+import static org.mule.functional.api.component.FunctionalTestProcessor.getFromFlow;
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.getDefaultEnvironmentConfiguration;
+
 import static java.lang.String.format;
+
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.functional.api.component.FunctionalTestProcessor.getFromFlow;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
@@ -28,7 +32,9 @@ import org.mockito.Mockito;
 
 public class HttpListenerRequestStreamingTestCase extends AbstractHttpTestCase {
 
-  private static final String LARGE_MESSAGE = RandomStringUtils.randomAlphanumeric(100 * 1024);
+  private static final String LARGE_MESSAGE =
+      RandomStringUtils.randomAlphanumeric(getDefaultEnvironmentConfiguration().getRandomCount());
+
 
   @Rule
   public DynamicPort listenPort = new DynamicPort("port");

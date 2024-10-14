@@ -8,6 +8,7 @@ package org.mule.test.http.functional.listener;
 
 import static org.mule.runtime.http.api.HttpConstants.Method.POST;
 import static org.mule.tck.processor.FlowAssert.verify;
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.getDefaultEnvironmentConfiguration;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -35,6 +36,7 @@ import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
 import java.io.IOException;
@@ -53,6 +55,22 @@ public class HttpListenerValidateCertificateTestCase extends AbstractHttpTestCas
   @Rule
   public DynamicPort portWithoutValidation = new DynamicPort("port2");
 
+  @Rule
+  public SystemProperty tlsTrustStore =
+      new SystemProperty("tlsTrustStore", getDefaultEnvironmentConfiguration().getTestSslCaCerts());
+
+  @Rule
+  public SystemProperty tlsServerKeyStore =
+      new SystemProperty("tlsServerKeyStore", getDefaultEnvironmentConfiguration().getTestServerKeyStore());
+
+  @Rule
+  public SystemProperty password =
+      new SystemProperty("password", getDefaultEnvironmentConfiguration().resolveStorePassword("changeit"));
+
+  @Rule
+  public SystemProperty storeType = new SystemProperty("storeType", getDefaultEnvironmentConfiguration().getTestStoreType());
+
+
   // Uses a new HttpClient because it is needed to configure the TLS context per test
   public HttpClient httpClientWithCertificate;
 
@@ -67,7 +85,8 @@ public class HttpListenerValidateCertificateTestCase extends AbstractHttpTestCas
   @Before
   public void setup() {
     // Configure trust store in the client with the certificate of the server.
-    tlsContextFactoryBuilder.trustStorePath("tls/trustStore");
+    tlsContextFactoryBuilder.trustStorePath(getDefaultEnvironmentConfiguration().getTestGenericTrustKeyStore())
+        .trustStoreType(getDefaultEnvironmentConfiguration().getTestStoreType());
     tlsContextFactoryBuilder.trustStorePassword("mulepassword");
   }
 
@@ -139,8 +158,9 @@ public class HttpListenerValidateCertificateTestCase extends AbstractHttpTestCas
    * Configure key store for the client (the server contains this certificate in its trust store)
    */
   private void configureClientKeyStore() {
-    tlsContextFactoryBuilder.keyStorePath("tls/ssltest-keystore.jks");
-    tlsContextFactoryBuilder.keyStorePassword("changeit");
+    tlsContextFactoryBuilder.keyStorePath(getDefaultEnvironmentConfiguration().getTestSslKeyStore());
+    tlsContextFactoryBuilder.keyStoreType(getDefaultEnvironmentConfiguration().getTestStoreType());
+    tlsContextFactoryBuilder.keyStorePassword(getDefaultEnvironmentConfiguration().resolveStorePassword("changeit"));
     tlsContextFactoryBuilder.keyPassword("changeit");
   }
 
@@ -168,5 +188,4 @@ public class HttpListenerValidateCertificateTestCase extends AbstractHttpTestCas
       return event;
     }
   }
-
 }

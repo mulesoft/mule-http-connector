@@ -6,17 +6,20 @@
  */
 package org.mule.test.http.functional;
 
-import static java.lang.String.format;
-import static org.apache.http.impl.client.HttpClientBuilder.create;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.startsWith;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.util.ClassUtils.getClassPathRoot;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.NOT_FOUND;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.STATIC_RESOURCE_LOADER;
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.getDefaultEnvironmentConfiguration;
+
+import static java.lang.String.format;
+
+import static org.apache.http.impl.client.HttpClientBuilder.create;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.startsWith;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.api.tls.TlsContextFactory;
@@ -49,6 +52,13 @@ public class HttpListenerStaticResourcesTestCase extends AbstractHttpTestCase {
   @Rule
   public DynamicPort port3 = new DynamicPort("port3");
   @Rule
+  public SystemProperty serverKeyStoreFile = new SystemProperty("serverKeyStoreFile",
+                                                                getDefaultEnvironmentConfiguration().getTestServerKeyStore());
+
+  @Rule
+  public SystemProperty serverKeyStoreType = new SystemProperty("serverKeyStoreType",
+                                                                getDefaultEnvironmentConfiguration().getTestStoreType());
+  @Rule
   public SystemProperty testRoot = new SystemProperty(TESTING_ROOT_FOLDER_SYSTEM_PROPERTY,
                                                       getClassPathRoot(HttpListenerStaticResourcesTestCase.class).getPath());
   @Rule
@@ -68,7 +78,8 @@ public class HttpListenerStaticResourcesTestCase extends AbstractHttpTestCase {
   public void setup() throws CreateException {
     // Configure trust store in the client with the certificate of the server.
     tlsContextFactory = TlsContextFactory.builder()
-        .trustStorePath("tls/trustStore")
+        .trustStorePath(getDefaultEnvironmentConfiguration().getTestGenericTrustKeyStore())
+        .trustStoreType(getDefaultEnvironmentConfiguration().getTestStoreType())
         .trustStorePassword("mulepassword")
         .build();
   }

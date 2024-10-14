@@ -9,8 +9,8 @@
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <tls:context name="globalTlsContext" >
-        <tls:trust-store path="tls/trustStore" password="mulepassword"/>
-        <tls:key-store path="tls/clientKeystore" keyPassword="mulepassword" password="mulepassword"/>
+        <tls:trust-store path="${tlsTrustStore}" password="mulepassword" type="${storeType}"/>
+        <tls:key-store path="${tlsClientKeyStore}" keyPassword="mulepassword" password="mulepassword" type="${storeType}"/>
     </tls:context>
 
     <http:request-config name="ntlmProxy" basePath="basePath">

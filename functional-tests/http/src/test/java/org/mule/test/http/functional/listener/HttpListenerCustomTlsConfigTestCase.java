@@ -8,12 +8,14 @@ package org.mule.test.http.functional.listener;
 
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.HTTPS;
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.getDefaultEnvironmentConfiguration;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
 import io.qameta.allure.Story;
@@ -31,6 +33,20 @@ public class HttpListenerCustomTlsConfigTestCase extends AbstractHttpTestCase {
 
   @Rule
   public DynamicPort port3 = new DynamicPort("port3");
+
+  @Rule
+  public SystemProperty trustStorePath =
+      new SystemProperty("trustStorePath", getDefaultEnvironmentConfiguration().getTestSslCaCerts());
+
+  @Rule
+  public SystemProperty keyStorePath =
+      new SystemProperty("keyStorePath", getDefaultEnvironmentConfiguration().getTestSslKeyStore());
+
+  @Rule
+  public SystemProperty storeType = new SystemProperty("storeType", getDefaultEnvironmentConfiguration().getTestStoreType());
+
+  @Rule
+  public SystemProperty password = new SystemProperty("password", getDefaultEnvironmentConfiguration().getTestStorePassword());
 
   @Override
   protected String getConfigFile() {

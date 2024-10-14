@@ -8,8 +8,10 @@ package org.mule.test.http.functional.requester.ntlm;
 
 import static org.mule.runtime.http.api.HttpHeaders.Names.AUTHORIZATION;
 import static org.mule.runtime.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.isFipsTesting;
 
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
+import static org.junit.Assume.assumeFalse;
 
 import org.mule.test.runner.RunnerDelegateTo;
 
@@ -17,10 +19,17 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
 public class HttpRequestNtlmAuthTestCase extends AbstractAuthNtlmTestCase {
+
+  @BeforeClass
+  public static void before() {
+    assumeFalse("Ntlm is based on MD5. So this should not run on FIPS",
+                isFipsTesting());
+  }
 
   @Parameterized.Parameter(0)
   public String flowName;

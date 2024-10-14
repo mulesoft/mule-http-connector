@@ -6,6 +6,8 @@
  */
 package org.mule.test.http.functional.listener;
 
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.getDefaultEnvironmentConfiguration;
+
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.apache.http.client.fluent.Request.Get;
 import static org.apache.http.client.fluent.Request.Post;
@@ -46,7 +48,9 @@ public abstract class HttpListenerResponseStreamingTestCase extends AbstractHttp
   private static final int POOLING_TIMEOUT_MILLIS = 20000;
 
   @ClassRule
-  public static SystemProperty stringPayload = new SystemProperty("stringPayload", randomAlphabetic(100 * 1024));
+  public static SystemProperty stringPayload =
+      new SystemProperty("stringPayload", randomAlphabetic(getDefaultEnvironmentConfiguration().getRandomCount()));
+
 
   @ClassRule
   public static SystemProperty mapPayload = new SystemProperty("mapPayload", "one=1&two=2");

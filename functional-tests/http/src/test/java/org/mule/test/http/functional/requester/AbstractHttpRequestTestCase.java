@@ -6,6 +6,8 @@
  */
 package org.mule.test.http.functional.requester;
 
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.getDefaultEnvironmentConfiguration;
+
 import static com.google.common.collect.Multimaps.newMultimap;
 
 import org.mule.runtime.api.util.CaseInsensitiveMapWrapper;
@@ -84,13 +86,15 @@ public abstract class AbstractHttpRequestTestCase extends AbstractHttpTestCase {
     SslContextFactory sslContextFactory = new SslContextFactory.Server();
 
     try {
-      sslContextFactory.setKeyStorePath(FileUtils.getResourcePath("tls/serverKeystore", getClass()));
+      sslContextFactory
+          .setKeyStorePath(FileUtils.getResourcePath(getDefaultEnvironmentConfiguration().getTestServerKeyStore(), getClass()));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
 
     sslContextFactory.setKeyStorePassword("mulepassword");
     sslContextFactory.setKeyManagerPassword("mulepassword");
+    sslContextFactory.setKeyStoreType(getDefaultEnvironmentConfiguration().getTestStoreType());
 
     ServerConnector connector = new ServerConnector(server, sslContextFactory);
     connector.setPort(httpsPort.getNumber());

@@ -6,6 +6,8 @@
  */
 package org.mule.test.http.functional.tls;
 
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.getDefaultEnvironmentConfiguration;
+
 import static java.lang.Integer.parseInt;
 import static java.lang.System.getProperty;
 
@@ -46,6 +48,23 @@ public class HttpTlsContextClient12ToServer13TestCase extends AbstractHttpTlsCon
   @Rule
   public ExpectedError expectedError = ExpectedError.none();
 
+  @ClassRule
+  public static SystemProperty tls13TrustStore =
+      new SystemProperty("tls13TrustStore", getDefaultEnvironmentConfiguration().getTestTls13TrustStore());
+
+  @ClassRule
+  public static SystemProperty tls13KeyStore =
+      new SystemProperty("tls13KeyStore", getDefaultEnvironmentConfiguration().getTestTls13KeyStore());
+
+  @ClassRule
+  public static SystemProperty password =
+      new SystemProperty("password", getDefaultEnvironmentConfiguration().resolveStorePassword("123456"));
+
+  @ClassRule
+  public static SystemProperty storeType =
+      new SystemProperty("storeType", getDefaultEnvironmentConfiguration().getTestStoreType());
+
+
   @Override
   protected String getConfigFile() {
     return "http-client-tls-1.2-server-1.3-test.xml";
@@ -64,4 +83,5 @@ public class HttpTlsContextClient12ToServer13TestCase extends AbstractHttpTlsCon
     expectedError.expectMessage(containsString(ERROR_RESPONSE));
     flowRunner(client12).run();
   }
+
 }

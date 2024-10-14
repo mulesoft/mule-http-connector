@@ -6,12 +6,15 @@
  */
 package org.mule.test.http.functional.proxy;
 
+import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.PROXY;
+
+import static java.lang.Thread.currentThread;
+
 import static org.apache.http.entity.ContentType.DEFAULT_TEXT;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.PROXY;
 
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpExpectHeaderServerTestCase;
@@ -26,6 +29,10 @@ import org.junit.Test;
 
 @Story(PROXY)
 public class HttpProxyExpectHeaderTestCase extends AbstractHttpExpectHeaderServerTestCase {
+
+  public static boolean getThread() {
+    return currentThread().getName().startsWith("[MuleRuntime].io");
+  }
 
   @Rule
   public DynamicPort proxyPort = new DynamicPort("proxyPort");

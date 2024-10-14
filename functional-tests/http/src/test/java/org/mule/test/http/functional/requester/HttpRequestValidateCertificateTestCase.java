@@ -8,6 +8,7 @@ package org.mule.test.http.functional.requester;
 
 
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.HTTPS;
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.getDefaultEnvironmentConfiguration;
 
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -15,6 +16,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import io.qameta.allure.Story;
 import org.junit.Rule;
@@ -23,6 +25,15 @@ import org.junit.rules.ExpectedException;
 
 @Story(HTTPS)
 public class HttpRequestValidateCertificateTestCase extends AbstractHttpRequestTestCase {
+
+  @Rule
+  public SystemProperty trustStoreFile =
+      new SystemProperty("trustStore", getDefaultEnvironmentConfiguration().getTestGenericTrustKeyStore());
+
+  @Rule
+  public SystemProperty storeType = new SystemProperty("storeType",
+                                                       getDefaultEnvironmentConfiguration().getTestStoreType());
+
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -41,7 +52,8 @@ public class HttpRequestValidateCertificateTestCase extends AbstractHttpRequestT
   public void rejectsMissingCertificate() throws Exception {
     expectedException.expectMessage(anyOf(containsString(J8_262_SSL_ERROR_RESPONSE),
                                           containsString(J8_275_SSL_ERROR_RESPONSE),
-                                          containsString(J11_SSL_ERROR_RESPONSE)));
+                                          containsString(J11_SSL_ERROR_RESPONSE),
+                                          containsString(BOUNCY_CASTLE_CERTIFICATE_UNKNOWN_ERROR_MESSAGE)));
     flowRunner("missingCertFlow").withPayload(TEST_MESSAGE).run();
   }
 

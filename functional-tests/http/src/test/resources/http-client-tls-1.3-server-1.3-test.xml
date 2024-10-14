@@ -20,10 +20,10 @@ http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/
                                   host="0.0.0.0" port="${internal.port.2}">
             <tls:context enabledProtocols="TLSv1.3"
                          enabledCipherSuites="TLS_AES_128_GCM_SHA256">
-                <tls:trust-store path="tls13/myTruststore.jks"
-                                 password="123456"/>
-                <tls:key-store type="pkcs12" path="tls13/cert-localhost.p12"
-                               keyPassword="123456" password="123456"/>
+                <tls:trust-store path="${tls13TrustStore}"
+                                 password="${password}" type="${storeType}"/>
+                <tls:key-store type="${storeType}" path="${tls13KeyStore}"
+                               keyPassword="123456" password="${password}"/>
             </tls:context>
         </http:listener-connection>
     </http:listener-config>
@@ -35,10 +35,10 @@ http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/
                                  host="localhost" port="${internal.port.2}">
             <tls:context enabledProtocols="TLSv1.3"
                          enabledCipherSuites="TLS_AES_128_GCM_SHA256">
-                <tls:trust-store path="tls13/myTruststore.jks"
-                                 password="123456"/>
-                <tls:key-store type="pkcs12" path="tls13/cert-localhost.p12"
-                               keyPassword="123456" password="123456"/>
+                <tls:trust-store path="${tls13TrustStore}"
+                                 password="${password}" type="${storeType}"/>
+                <tls:key-store type="${storeType}" path="${tls13KeyStore}"
+                               keyPassword="123456" password="${password}"/>
             </tls:context>
         </http:request-connection>
     </http:request-config>
