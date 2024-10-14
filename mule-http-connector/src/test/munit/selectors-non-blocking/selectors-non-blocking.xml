@@ -15,6 +15,7 @@
     <munit:config name="selectors-non-blocking"/>
 
     <munit:dynamic-port propertyName="dynamic.port"/>
+    <munit:dynamic-port propertyName="slow.responder.port"/>
 
     <http:listener-config name="selectorsNonBlockingListenerConfig" doc:name="HTTP Listener config" >
         <http:listener-connection host="0.0.0.0" port="${dynamic.port}" />
@@ -22,6 +23,10 @@
 
     <http:request-config name="selectorsNonBlockingRequestConfig" >
         <http:request-connection host="localhost" port="${dynamic.port}"/>
+    </http:request-config>
+
+    <http:request-config name="requestToSlowResponderConfig" >
+        <http:request-connection host="localhost" port="${slow.responder.port}" streamResponse="true" />
     </http:request-config>
 
     <munit:test name="Some selector is available while handling slow requests" description="Test">
@@ -42,10 +47,55 @@
             <munit-tools:assert-equals doc:name="Assert (N+1)th request completed (some selector was available)" actual="#[vars.test_response]" expected='#["Test payload"]'/>
         </munit:validation>
     </munit:test>
+
+    <munit:test name="HTTP Listener doesn't use the selector if deferredResponse=true" description="HTTP Listener doesn't use the selector if deferredResponse=true">
+        <munit:enable-flow-sources >
+            <munit:enable-flow-source value="proxyFlow" />
+        </munit:enable-flow-sources>
+        <munit:execution >
+            <logger level="INFO" message="Starting server..." />
+            <java:invoke-static class="org.mule.test.SlowResponderServer" method="startServer(int)" >
+                <java:args><![CDATA[#[{arg0: ${slow.responder.port}}]]]></java:args>
+            </java:invoke-static>
+
+            <logger level="INFO" message="Spawn as many clients as listener selector threads with a delay time of 30 seconds..." />
+            <java:invoke-static class="org.mule.test.ParallelRequester" method="startRequests(int, int)" >
+                <java:args><![CDATA[#[{arg0: ${dynamic.port}, arg1: 30}]]]></java:args>
+            </java:invoke-static>
+
+            <logger level="INFO" message="Sending the request without delay..." />
+            <http:request method="GET" path="/proxy" config-ref="selectorsNonBlockingRequestConfig" responseTimeout="4000">
+                <http:query-params>
+                    #[{'sleep' : 0}]
+                </http:query-params>
+            </http:request>
+            <set-variable value="#[%dw 2.0 output application/java --- payload.^raw as String]" variableName="test_response"/>
+
+            <logger level="INFO" message="Making other responders to respond faster..." />
+            <java:invoke-static class="org.mule.test.SlowResponderServer" method="forceFinishAllResponders()" />
+
+            <logger level="INFO" message="Wait for all the requesters to finish..." />
+            <java:invoke-static class="org.mule.test.ParallelRequester" method="waitRequests()" />
+
+            <logger level="INFO" message="Stopping server..." />
+            <java:invoke-static class="org.mule.test.SlowResponderServer" method="stopServer()" />
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-equals doc:name="Assert (N+1)th request completed (some selector was available)" actual="#[vars.test_response]" expected='#["Test payload"]'/>
+        </munit:validation>
+    </munit:test>
     
     <flow name="TestFlow" >
         <http:listener doc:name="Test" path="/test" config-ref="selectorsNonBlockingListenerConfig" />
-        <logger />
         <set-payload value='#["Test payload"]' />
+    </flow>
+
+    <flow name="proxyFlow">
+        <http:listener path="/proxy" config-ref="selectorsNonBlockingListenerConfig" deferredResponse="true" />
+        <http:request method="GET" path="/slow-responder" config-ref="requestToSlowResponderConfig" responseTimeout="5000">
+            <http:query-params>
+                #[{'sleep' : attributes.queryParams.sleep}]
+            </http:query-params>
+        </http:request>
     </flow>
 </mule>
