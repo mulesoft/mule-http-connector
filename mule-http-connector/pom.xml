@@ -74,7 +74,7 @@
         <extensionsAnnotationProcessor>
             org.mule.runtime.ast.extension.api.loader.ASTExtensionResourcesGeneratorAnnotationProcessor
         </extensionsAnnotationProcessor>
-        <annotations.processor.mule.version>4.8.0</annotations.processor.mule.version>
+        <annotations.processor.mule.version>4.6.0</annotations.processor.mule.version>
         <mule.extensions.ast.loader.version>1.7.0</mule.extensions.ast.loader.version>
 
         <surefire.args>
