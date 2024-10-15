@@ -357,7 +357,6 @@
                                     <value>${mule.version}</value>
                                 </property>
                             </systemProperties>
-                            <jvm>${fips.java}</jvm>
                         </configuration>
                     </plugin>
                 </plugins>
