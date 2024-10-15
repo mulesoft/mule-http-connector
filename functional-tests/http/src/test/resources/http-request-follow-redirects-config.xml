@@ -23,8 +23,8 @@
     <http:request-config name="httpsConfig">
         <http:request-connection protocol="HTTPS" host="localhost" port="${httpsPort}">
             <tls:context>
-                <tls:trust-store path="tls/trustStore" password="mulepassword"/>
-                <tls:key-store path="tls/clientKeystore" keyPassword="mulepassword" password="mulepassword"/>
+                <tls:trust-store path="${tlsTrustStore}" password="mulepassword" type="${storeType}"/>
+                <tls:key-store path="${tlsClientStore}" keyPassword="mulepassword" password="mulepassword" type="${storeType}"/>
             </tls:context>
         </http:request-connection>
     </http:request-config>

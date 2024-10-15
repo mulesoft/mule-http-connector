@@ -6,6 +6,8 @@
  */
 package org.mule.test.http.functional.requester;
 
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.getDefaultEnvironmentConfiguration;
+
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.core.Is.is;
@@ -14,6 +16,7 @@ import static org.junit.Assume.assumeThat;
 
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
 import java.io.File;
@@ -55,6 +58,17 @@ public class HttpsRequesterSniTestCase extends AbstractHttpTestCase {
 
   @Rule
   public DynamicPort httpsPort = new DynamicPort("httpsPort");
+
+  @Rule
+  public SystemProperty password =
+      new SystemProperty("password", getDefaultEnvironmentConfiguration().resolveStorePassword("changeit"));
+
+  @Rule
+  public SystemProperty sniClientTruststore =
+      new SystemProperty("sniClientTruststore", getDefaultEnvironmentConfiguration().getTestSniClientTrustStore());
+
+  @Rule
+  public SystemProperty storeType = new SystemProperty("storeType", getDefaultEnvironmentConfiguration().getTestStoreType());
 
   private Server server;
 

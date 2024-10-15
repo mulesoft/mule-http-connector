@@ -9,20 +9,20 @@
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <tls:context name="globalTlsContextDefaultProtocols">
-        <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit"/>
-        <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+        <tls:trust-store path="${sslTestTrustStore}" password="${password}" type="${storeType}"/>
+        <tls:key-store path="${sslTestKeyStore}" keyPassword="changeit" password="${password}" type="${storeType}"/>
     </tls:context>
     <tls:context name="globalTlsContextTLSv1.1" enabledProtocols="TLSv1.1">
-        <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit"/>
-        <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+        <tls:trust-store path="${sslTestTrustStore}" password="${password}" type="${storeType}"/>
+        <tls:key-store path="${sslTestKeyStore}" keyPassword="changeit" password="${password}" type="${storeType}"/>
     </tls:context>
     <tls:context name="globalTlsContextAllTLS" enabledProtocols="TLSv1.1,TLSv1.2">
-        <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit" />
-        <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+        <tls:trust-store path="${sslTestTrustStore}" password="${password}" type="${storeType}"/>
+        <tls:key-store path="${sslTestKeyStore}" keyPassword="changeit" password="${password}" type="${storeType}"/>
     </tls:context>
     <tls:context name="globalTlsContextTLSv1.2" enabledProtocols="${enabledProtocols}">
-        <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit"/>
-        <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+        <tls:trust-store path="${sslTestTrustStore}" password="${password}" type="${storeType}"/>
+        <tls:key-store path="${sslTestKeyStore}" keyPassword="changeit" password="${password}" type="${storeType}"/>
     </tls:context>
 
     <http:listener-config name="mainListenerConfig" basePath="test">
@@ -45,40 +45,40 @@
     <http:request-config name="clientGlobalConfigDefaultPass">
         <http:request-connection host="localhost" port="${https.internal.default}" protocol="HTTPS">
             <tls:context enabledProtocols="TLSv1.1,TLSv1.2">
-                <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit"/>
-                <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+                <tls:trust-store path="${sslTestTrustStore}" password="${password}" type="${storeType}"/>
+                <tls:key-store path="${sslTestKeyStore}" keyPassword="changeit" password="${password}" type="${storeType}"/>
             </tls:context>
         </http:request-connection>
     </http:request-config>
     <http:request-config name="clientGlobalConfigDefaultFails">
         <http:request-connection host="localhost" port="${https.internal.default}" protocol="HTTPS">
             <tls:context enabledProtocols="TLSv1.1,TLSv1.2">
-                <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit"/>
-                <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+                <tls:trust-store path="${sslTestTrustStore}" password="${password}" type="${storeType}"/>
+                <tls:key-store path="${sslTestKeyStore}" keyPassword="changeit" password="${password}" type="${storeType}"/>
             </tls:context>
         </http:request-connection>
     </http:request-config>
     <http:request-config name="clientGlobalConfigTLSv1.1">
         <http:request-connection host="localhost" port="${https.internal.tlsv11}" protocol="HTTPS">
             <tls:context enabledProtocols="TLSv1.2">
-                <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit"/>
-                <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+                <tls:trust-store path="${sslTestTrustStore}" password="${password}" type="${storeType}"/>
+                <tls:key-store path="${sslTestKeyStore}" keyPassword="changeit" password="${password}" type="${storeType}"/>
             </tls:context>
         </http:request-connection>
     </http:request-config>
     <http:request-config name="clientGlobalConfigTLSv1">
         <http:request-connection host="localhost" port="${https.internal.alltls}" protocol="HTTPS">
             <tls:context enabledProtocols="TLSv1.1,TLSv1.2">
-                <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit"/>
-                <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+                <tls:trust-store path="${sslTestTrustStore}" password="${password}" type="${storeType}"/>
+                <tls:key-store path="${sslTestKeyStore}" keyPassword="changeit" password="${password}" type="${storeType}"/>
             </tls:context>
         </http:request-connection>
     </http:request-config>
     <http:request-config name="clientGlobalConfigProperty">
         <http:request-connection host="localhost" port="${https.internal.tlsv12}" protocol="HTTPS">
             <tls:context enabledProtocols="TLSv1.2">
-                <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit"/>
-                <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+                <tls:trust-store path="${sslTestTrustStore}" password="${password}" type="${storeType}"/>
+                <tls:key-store path="${sslTestKeyStore}" keyPassword="changeit" password="${password}" type="${storeType}"/>
             </tls:context>
         </http:request-connection>
     </http:request-config>

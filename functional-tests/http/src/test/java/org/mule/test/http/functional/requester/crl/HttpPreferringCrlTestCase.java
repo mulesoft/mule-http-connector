@@ -6,17 +6,20 @@
  */
 package org.mule.test.http.functional.requester.crl;
 
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.isFipsTesting;
+
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeFalse;
 
 import org.mule.test.http.functional.AbstractHttpTlsRevocationTestCase;
 
 import java.security.cert.CertPathValidatorException;
 
-import org.junit.Ignore;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class HttpPreferringCrlTestCase extends AbstractHttpTlsRevocationTestCase {
@@ -25,6 +28,12 @@ public class HttpPreferringCrlTestCase extends AbstractHttpTlsRevocationTestCase
 
   public HttpPreferringCrlTestCase() {
     super("http-requester-tls-crl-standard-config.xml", REVOKED_CRL_FILE_PATH, ENTITY_CERTIFIED_REVOCATION_SUB_PATH);
+  }
+
+  @BeforeClass
+  public static void before() {
+    assumeFalse("W-16968647: Check that this is not in fips where the standard revocation check does not work. Another of the documented options should be used",
+                isFipsTesting());
   }
 
   @Test

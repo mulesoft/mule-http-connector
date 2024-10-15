@@ -8,6 +8,7 @@ package org.mule.test.http.functional;
 
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.HTTPS;
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.getDefaultEnvironmentConfiguration;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
@@ -17,6 +18,7 @@ import static org.junit.Assert.fail;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,6 +47,18 @@ public class HttpRequesterTlsRestrictedProtocolsAndCiphersTestCase extends Abstr
 
   private static final String CLIENT_PROTOCOL_ENABLED = "TLSv1.2";
   private static final String CLIENT_PROTOCOL_DISABLED = "TLSv1";
+
+  @Rule
+  public SystemProperty serverKeyStoreType =
+      new SystemProperty("storeType", getDefaultEnvironmentConfiguration().getTestStoreType());
+
+  @Rule
+  public SystemProperty trustStoreFile =
+      new SystemProperty("trustStoreFile", getDefaultEnvironmentConfiguration().getTestGenericTrustKeyStore());
+
+  @Rule
+  public SystemProperty clientKeystoreFile =
+      new SystemProperty("clientKeyStoreFile", getDefaultEnvironmentConfiguration().getTestClientKeyStore());
 
   @Rule
   public DynamicPort httpsPort = new DynamicPort("httpsPort");
@@ -119,7 +133,9 @@ public class HttpRequesterTlsRestrictedProtocolsAndCiphersTestCase extends Abstr
    */
   private Server createTlsServer(String disabledCipherSuite, String disabledProtocol) throws Exception {
     SslContextFactory sslContextFactory = new SslContextFactory.Server();
-    sslContextFactory.setKeyStorePath(FileUtils.getResourcePath("tls/serverKeystore", getClass()));
+    sslContextFactory
+        .setKeyStorePath(FileUtils.getResourcePath(getDefaultEnvironmentConfiguration().getTestServerKeyStore(), getClass()));
+    sslContextFactory.setKeyStoreType(getDefaultEnvironmentConfiguration().getTestStoreType());
     sslContextFactory.setKeyStorePassword("mulepassword");
     sslContextFactory.setKeyManagerPassword("mulepassword");
     sslContextFactory.addExcludeCipherSuites(disabledCipherSuite);

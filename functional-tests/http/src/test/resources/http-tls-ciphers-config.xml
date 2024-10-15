@@ -9,9 +9,9 @@
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <!--Forces protocol because of the cipher suite being used-->
-    <tls:context name="tlsClientContext" enabledCipherSuites="TLS_RSA_WITH_AES_128_CBC_SHA">
-        <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit" insecure="true"/>
-        <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+    <tls:context name="tlsClientContext" enabledCipherSuites="${cipherSuite}">
+        <tls:trust-store path="${sslCacerts}" password="${password}" insecure="true" type="${storeType}"/>
+        <tls:key-store path="#{sslTrustStore}" keyPassword="changeit" password="${password}"  type="${storeType}"/>
     </tls:context>
 
     <http:request-config name="requestConfig1">
@@ -21,8 +21,8 @@
     <!-- Valid Protocol with a valid cipher -->
     <http:request-config name="requestConfig2">
         <http:request-connection protocol="HTTPS" host="localhost" port="${internal.port.2}">
-            <tls:context enabledProtocols="TLSv1.2" enabledCipherSuites="TLS_RSA_WITH_AES_128_CBC_SHA">
-                <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit"/>
+            <tls:context enabledProtocols="TLSv1.2" enabledCipherSuites="${cipherSuite}">
+                <tls:trust-store path="${sslCacerts}" password="${password}" type="${storeType}"/>
             </tls:context>
         </http:request-connection>
     </http:request-config>
@@ -30,8 +30,8 @@
     <!-- Valid Protocol with invalid cipher -->
     <http:request-config name="requestConfig3">
         <http:request-connection protocol="HTTPS" host="localhost" port="${internal.port.3}">
-            <tls:context enabledProtocols="TLSv1.1" enabledCipherSuites="TLS_RSA_WITH_AES_128_CBC_SHA">
-                <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit"/>
+            <tls:context enabledProtocols="TLSv1.1" enabledCipherSuites="${cipherSuite}">
+                <tls:trust-store path="${sslCacerts}" password="${password}" type="${storeType}"/>
             </tls:context>
         </http:request-connection>
     </http:request-config>
@@ -40,14 +40,14 @@
     <http:listener-config name="listenerConfig1">
         <http:listener-connection protocol="HTTPS" host="localhost" port="${internal.port.1}">
             <tls:context enabledCipherSuites="default">
-                <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit" insecure="true"/>
-                <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+                <tls:trust-store path="${sslCacerts}" password="${password}" type="${storeType}" insecure="true"/>
+                <tls:key-store path="${sslKeyStore}" keyPassword="changeit" password="${password}" type="${storeType}"/>
             </tls:context>
         </http:listener-connection>
     </http:listener-config>
 
     <tls:context name="tlsServer2Context" enabledCipherSuites="default">
-        <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+        <tls:key-store path="${sslKeyStore}" keyPassword="changeit" password="${password}" type="${storeType}"/>
     </tls:context>
 
     <http:listener-config name="listenerConfig2">
@@ -58,14 +58,14 @@
     <http:listener-config name="listenerConfig3" >
         <http:listener-connection protocol="HTTPS" host="localhost" port="${internal.port.3}">
             <tls:context enabledCipherSuites="${cipherSuites}">
-                <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+                <tls:key-store path="${sslKeyStore}" keyPassword="changeit" password="${password}" type="${storeType}"/>
             </tls:context>
         </http:listener-connection>
     </http:listener-config>
 
     <tls:context name="globalTlsContextDefaultProtocols">
-        <tls:trust-store path="tls/ssltest-cacerts.jks" password="changeit"/>
-        <tls:key-store path="tls/ssltest-keystore.jks" keyPassword="changeit" password="changeit"/>
+        <tls:trust-store path="${sslCacerts}" password="${password}" type="${storeType}" />
+        <tls:key-store path="${sslKeyStore}" keyPassword="changeit" password="${password}" type="${storeType}"/>
     </tls:context>
 
     <flow name="bothProtocolsOneCipher">

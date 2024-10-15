@@ -8,6 +8,8 @@ package org.mule.test.http.functional.requester;
 
 import static org.mule.runtime.http.api.HttpConstants.Method.POST;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.HTTPS;
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.getDefaultEnvironmentConfiguration;
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.isFipsTesting;
 
 import static java.lang.String.format;
 
@@ -32,11 +34,10 @@ import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;
+import org.mule.test.http.functional.fips.DefaultTestConfiguration;
 
 import io.qameta.allure.Story;
 import io.qameta.allure.junit4.DisplayName;
-import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -60,6 +61,15 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
   @Rule
   public ExpectedError expectedError = ExpectedError.none();
 
+  @Rule
+  public SystemProperty trustStoreFile = new SystemProperty("trustStore", getStorePath());
+
+  @Rule
+  public SystemProperty storeType = new SystemProperty("storeType", getDefaultEnvironmentConfiguration().getTestStoreType());
+
+  @Rule
+  public SystemProperty serverKeyStore = new SystemProperty("serverKeyStore", getServerKeyStore());
+
   // Uses a new HttpClient because it is needed to configure the TLS context per test
   public HttpClient httpClientWithCertificate;
 
@@ -73,8 +83,9 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
 
   @Before
   public void setUp() {
-    tlsContextFactoryBuilder.trustStorePath("tls/trustStore");
+    tlsContextFactoryBuilder.trustStorePath(getStorePath());
     tlsContextFactoryBuilder.trustStorePassword("mulepassword");
+    tlsContextFactoryBuilder.trustStoreType(getDefaultEnvironmentConfiguration().getTestStoreType());
   }
 
   @After
@@ -137,5 +148,20 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
     expectedError.expectCause(instanceOf(HttpRequestFailedException.class));
     expectedError.expectMessage(anyOf(containsString("Remotely closed"), sslValidationError()));
     flowRunner("12CipherClient1CipherServer").withPayload(TEST_PAYLOAD).run();
+  }
+
+  private static String getStorePath() {
+    if (isFipsTesting()) {
+      return "tls/trustStoreFips";
+    }
+
+    return "tls/trustStore";
+  }
+
+  private static String getServerKeyStore() {
+    if (DefaultTestConfiguration.isFipsTesting()) {
+      return "tls/serverKeystoreFips";
+    }
+    return "tls/serverKeystore";
   }
 }

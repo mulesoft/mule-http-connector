@@ -7,6 +7,7 @@
 package org.mule.test.http.functional.tls;
 
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.getDefaultEnvironmentConfiguration;
 
 import static java.lang.Integer.parseInt;
 import static java.lang.System.getProperty;
@@ -43,6 +44,22 @@ public class HttpTlsContextClient13ToServer13TestCase extends AbstractHttpTlsCon
 
   @ClassRule
   public static SystemProperty verboseExceptions = new SystemProperty("mule.verbose.exceptions", "true");
+
+  @ClassRule
+  public static SystemProperty storeType =
+      new SystemProperty("storeType", getDefaultEnvironmentConfiguration().getTestStoreType());
+
+  @ClassRule
+  public static SystemProperty password =
+      new SystemProperty("password", getDefaultEnvironmentConfiguration().resolveStorePassword("123456"));
+
+  @ClassRule
+  public static SystemProperty tls13TrustStore =
+      new SystemProperty("tls13TrustStore", getDefaultEnvironmentConfiguration().getTestTls13TrustStore());
+
+  @ClassRule
+  public static SystemProperty tls13KeyStore =
+      new SystemProperty("tls13KeyStore", getDefaultEnvironmentConfiguration().getTestTls13KeyStore());
 
   @Override
   protected String getConfigFile() {

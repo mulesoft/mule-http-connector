@@ -4,16 +4,21 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.http.functional.listener;
+
+import static org.mule.test.http.functional.fips.DefaultTestConfiguration.getDefaultEnvironmentConfiguration;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
+
 import org.mule.functional.api.exception.ExpectedError;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
 import java.io.IOException;
@@ -32,6 +37,25 @@ public class HttpListenerTlsInsecureTestCase extends AbstractHttpTestCase {
 
   @Rule
   public DynamicPort port2 = new DynamicPort("port2");
+
+  @Rule
+  public SystemProperty sslCacerts = new SystemProperty("sslCacerts", getDefaultEnvironmentConfiguration().getTestSslCaCerts());
+
+  @Rule
+  public SystemProperty sslTestKeyStore =
+      new SystemProperty("sslTestKeyStore", getDefaultEnvironmentConfiguration().getTestSslKeyStore());
+
+  @Rule
+  public SystemProperty serverKeyStore =
+      new SystemProperty("serverKeyStore", getDefaultEnvironmentConfiguration().getTestServerKeyStore());
+
+  @Rule
+  public SystemProperty password =
+      new SystemProperty("password", getDefaultEnvironmentConfiguration().resolveStorePassword("changeit"));
+
+  @Rule
+  public SystemProperty storeType = new SystemProperty("storeType", getDefaultEnvironmentConfiguration().getTestStoreType());
+
 
   @Rule
   public ExpectedError expectedError = ExpectedError.none();

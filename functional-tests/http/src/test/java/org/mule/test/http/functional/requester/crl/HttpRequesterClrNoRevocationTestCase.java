@@ -6,7 +6,6 @@
  */
 package org.mule.test.http.functional.requester.crl;
 
-
 import org.junit.Test;
 
 public class HttpRequesterClrNoRevocationTestCase extends AbstractHttpRequesterClrTestCase {
