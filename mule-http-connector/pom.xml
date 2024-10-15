@@ -225,6 +225,64 @@
                     </dependency>
                 </dependencies>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+                <configuration>
+                    <encoding>ISO-8859-1</encoding>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <release>8</release>
+                    <proc>none</proc>
+                    <parameters>true</parameters>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.bsc.maven</groupId>
+                <artifactId>maven-processor-plugin</artifactId>
+                <version>2.2.4</version>
+
+                <executions>
+                    <execution>
+                        <id>process</id>
+                        <goals>
+                            <goal>process</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <outputDirectory>target/classes/META-INF</outputDirectory>
+                            <processors>
+                                <processor>
+                                    org.mule.runtime.ast.extension.api.loader.ASTExtensionResourcesGeneratorAnnotationProcessor
+                                </processor>
+                            </processors>
+                            <options>
+                                <extension.version>${project.version}</extension.version>
+                            </options>
+                        </configuration>
+
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.mule.runtime</groupId>
+                        <artifactId>mule-extension-ast-loader</artifactId>
+                        <version>1.7.0</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.mule.runtime</groupId>
+                        <artifactId>mule-module-extensions-spring-support</artifactId>
+                        <version>4.6.0</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.mule.runtime</groupId>
+                        <artifactId>mule-module-extensions-soap-support</artifactId>
+                        <version>4.6.0</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
         </plugins>
     </build>
 
