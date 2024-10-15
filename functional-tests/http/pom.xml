@@ -317,16 +317,6 @@
 
     <repositories>
         <repository>
-            <id>mule</id>
-            <name>Mule Repository</name>
-            <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
-        </repository>
-        <repository>
-            <id>mule-ci-releases</id>
-            <name>Mule CI Release Repository</name>
-            <url>https://repository.mulesoft.org/nexus/content/repositories/ci-releases</url>
-        </repository>
-        <repository>
             <id>mule-releases</id>
             <name>Nexus Public Releases</name>
             <url>https://repository-master.mulesoft.org/nexus/content/repositories/releases/</url>
