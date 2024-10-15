@@ -180,8 +180,8 @@
                         <!-- Versions with support and snapshots -->
                         <discoverRuntimes>
                             <product>EE</product>
-                            <minMuleVersion>4.8.0</minMuleVersion>
-                            <includeSnapshots>false</includeSnapshots>
+                            <minMuleVersion>${munitMinMuleVersion}</minMuleVersion>
+                            <includeSnapshots>true</includeSnapshots>
                             <latestPatches>true</latestPatches>
                         </discoverRuntimes>
                     </runtimeConfiguration>
