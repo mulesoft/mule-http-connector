@@ -72,7 +72,7 @@
         <bc-fips.version>1.0.2.5</bc-fips.version>
 
         <extensionsAnnotationProcessor>
-            org.mule.runtime.ast.extension.api.loader.ASTExtensionResourcesGeneratorAnnotationProcessor
+            org.mule.runtime.ast.internal.extension.loader.ASTExtensionResourcesGeneratorAnnotationProcessor
         </extensionsAnnotationProcessor>
 
         <surefire.args>
@@ -286,6 +286,22 @@
                         <version>${muleSdkApiVersion}</version>
                     </dependency>
                 </dependencies>
+                <executions>
+                    <!-- Do just the annotation processing part, but with access to the compiled classes -->
+                    <execution>
+                        <phase>compile</phase>
+                        <id>post-compile-annotaiton-processing</id>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <proc>only</proc>
+                            <compilerArgs combine.children="append">
+                                <arg>-Aextension.classes=${project.build.outputDirectory}</arg>
+                            </compilerArgs>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
