@@ -296,6 +296,8 @@
         </profile>
     </profiles>
 
+    <!-- This is to avoid an error indicating that a remote repository ID is unavailable in current
+    context for the fips compliance job -->
     <repositories>
         <repository>
             <id>mule-releases</id>
