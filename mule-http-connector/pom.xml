@@ -62,12 +62,10 @@
         <licenseYear>2023</licenseYear>
 
         <!-- fips testing -->
-        <bcprov-jdk15on.version>1.58</bcprov-jdk15on.version>
         <bctls-fips.version>1.0.19</bctls-fips.version>
         <bcpqc-addon-fips.version>1.0.1</bcpqc-addon-fips.version>
         <bcpkix-fips.version>1.0.7</bcpkix-fips.version>
         <bcpg-fips.version>1.0.7.1</bcpg-fips.version>
-        <bcmail-jdk15on.version>1.58</bcmail-jdk15on.version>
         <bcmail-fips.version>1.0.4</bcmail-fips.version>
         <bc-fips.version>1.0.2.5</bc-fips.version>
 
@@ -418,13 +416,6 @@
 
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcmail-jdk15on</artifactId>
-            <version>${bcmail-jdk15on.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
             <artifactId>bcpg-fips</artifactId>
             <version>${bcpg-fips.version}</version>
             <scope>test</scope>
@@ -448,13 +439,6 @@
             <groupId>org.bouncycastle</groupId>
             <artifactId>bctls-fips</artifactId>
             <version>${bctls-fips.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15on</artifactId>
-            <version>${bcprov-jdk15on.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
