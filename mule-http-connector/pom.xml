@@ -180,8 +180,8 @@
                         <!-- Versions with support and snapshots -->
                         <discoverRuntimes>
                             <product>EE</product>
-                            <minMuleVersion>4.8.0</minMuleVersion>
-                            <includeSnapshots>false</includeSnapshots>
+                            <minMuleVersion>${munitMinMuleVersion}</minMuleVersion>
+                            <includeSnapshots>true</includeSnapshots>
                             <latestPatches>true</latestPatches>
                         </discoverRuntimes>
                     </runtimeConfiguration>
@@ -556,7 +556,6 @@
                             <artifactId>maven-surefire-plugin</artifactId>
                             <configuration>
                                 <argLine>${surefire.args}</argLine>
-                                <jvm>${surefire.fips.java}</jvm>
                                 <systemProperties>
                                     <mule.fips.testing>true</mule.fips.testing>
                                 </systemProperties>
@@ -573,7 +572,6 @@
                             <artifactId>munit-extensions-maven-plugin</artifactId>
                             <version>${munit.extensions.maven.plugin.version}</version>
                             <configuration>
-                                <jvm>${munit.fips.java}</jvm>
                                 <argLines>
                                     <argLine>
                                         -XX:+IgnoreUnrecognizedVMOptions

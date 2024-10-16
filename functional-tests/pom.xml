@@ -52,7 +52,7 @@
 
         <!-- fips testing -->
         <bcprov-jdk15on.version>1.58</bcprov-jdk15on.version>
-        <bctls-fips.version>1.0.17</bctls-fips.version>
+        <bctls-fips.version>1.0.19</bctls-fips.version>
         <bcpqc-addon-fips.version>1.0.1</bcpqc-addon-fips.version>
         <bcpkix-fips.version>1.0.7</bcpkix-fips.version>
         <bcpg-fips.version>1.0.7.1</bcpg-fips.version>
@@ -357,7 +357,6 @@
                                     <value>${mule.version}</value>
                                 </property>
                             </systemProperties>
-                            <jvm>${fips.java}</jvm>
                         </configuration>
                     </plugin>
                 </plugins>
