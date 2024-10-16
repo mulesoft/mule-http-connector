@@ -295,4 +295,14 @@
             </build>
         </profile>
     </profiles>
+
+    <!-- This is to avoid an error indicating that a remote repository ID is unavailable in current
+    context for the fips compliance job -->
+    <repositories>
+        <repository>
+            <id>mule-releases</id>
+            <name>Nexus Public Releases</name>
+            <url>https://repository-master.mulesoft.org/nexus/content/repositories/releases/</url>
+        </repository>
+    </repositories>
 </project>
