@@ -1,6 +1,6 @@
 projectType: extension
 mavenTool: "3.9.5"
-mavenAdditionalArgs: -DskipMunitTests -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE -Dmule.module.tweaking.validation.skip=true
+mavenAdditionalArgs: -DskipMunitTests
 additionalTestConfigs:
   testsJava17:
     testJdkTool: OPEN-JDK17
