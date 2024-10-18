@@ -48,7 +48,7 @@
         <muleDependenciesVersion>1.x-SNAPSHOT</muleDependenciesVersion>
         <mule.version>4.9.0-SNAPSHOT</mule.version>
         <muleBomVersion>${mule.version}</muleBomVersion>
-        <muleApiVersion>1.9.0-SNAPSHOT</muleApiVersion>
+        <muleApiVersion>1.9.0-20240920</muleApiVersion>
         <httpConnectorVersion>${project.version}</httpConnectorVersion>
 
         <!-- fips testing -->
