@@ -54,7 +54,7 @@
 
         <muleObjectStoreConnectorTestVersion>1.2.2</muleObjectStoreConnectorTestVersion>
 
-        <springVersion>5.3.34</springVersion>
+        <springVersion>5.3.39</springVersion>
 
         <mulesoftLicenseVersion>1.4.0</mulesoftLicenseVersion>
         <license.maven.plugin.version>4.2</license.maven.plugin.version>
@@ -237,6 +237,28 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            
+            <!-- These override the version obtained transitively from a dependency declared in the parent pom. -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-beans</artifactId>
+                <version>${springVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context</artifactId>
+                <version>${springVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context-support</artifactId>
+                <version>${springVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-core</artifactId>
+                <version>${springVersion}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -311,47 +333,6 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>${commonsLang3Version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-beans</artifactId>
-            <version>${springVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>${springVersion}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>aopalliance</groupId>
-                    <artifactId>aopalliance</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.aopalliance</groupId>
-                    <artifactId>com.springsource.org.aopalliance</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context-support</artifactId>
-            <version>${springVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-            <version>${springVersion}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>aopalliance</groupId>
-                    <artifactId>aopalliance</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.aopalliance</groupId>
-                    <artifactId>com.springsource.org.aopalliance</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
