@@ -55,7 +55,7 @@ described in the Source Code notice required by Exhibit A as Original Code, and
 which, at the time of its release under this License is not already Covered Code
 governed by this License.
 
-1.10.2-SNAPSHOT "Patent Claims" means any patent claim(s), now owned or hereafter
+1.10.1 "Patent Claims" means any patent claim(s), now owned or hereafter
 acquired, including without limitation, method, process, and apparatus claims,
 in any patent Licensable by grantor.
 
