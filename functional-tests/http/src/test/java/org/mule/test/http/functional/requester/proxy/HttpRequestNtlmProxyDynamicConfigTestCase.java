@@ -11,17 +11,18 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.PROXY_AUTHORIZATION;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.NTLM;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.PROXY;
 import static org.mule.test.http.functional.fips.DefaultTestConfiguration.isFipsTesting;
-import static org.mule.test.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
 
-import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_PROXY_AUTHENTICATION_REQUIRED;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assume.assumeFalse;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.test.http.functional.requester.ntlm.AbstractAuthNtlmTestCase;
+import org.mule.test.http.functional.requester.ntlm.AbstractNtlmTestCase;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Stories;
@@ -32,6 +33,9 @@ import org.junit.BeforeClass;
 
 @Stories({@Story(PROXY), @Story(NTLM)})
 public class HttpRequestNtlmProxyDynamicConfigTestCase extends AbstractAuthNtlmTestCase {
+
+  private static final String PROXY_AUTHENTICATION_REQUIRED = "Proxy Authentication Required";
+
 
   @BeforeClass
   public static void before() {
@@ -52,10 +56,13 @@ public class HttpRequestNtlmProxyDynamicConfigTestCase extends AbstractAuthNtlmT
   @Description("Verifies that NTLM Auth is successfully performed using dynamic configs.")
   public void validNtlmAuth()
       throws Exception {
-    Message response = runFlow("ntlmFlowWithCorrectPassword").getMessage();
-    assertThat((HttpResponseAttributes) response.getAttributes().getValue(), hasStatusCode(SC_OK));
-    Message unauthorizedResponse = runFlow("ntlmFlowWithWrongPassword").getMessage();
-    assertThat((HttpResponseAttributes) unauthorizedResponse.getAttributes().getValue(),
-               hasStatusCode(SC_PROXY_AUTHENTICATION_REQUIRED));
+    CoreEvent response = flowRunner("ntlmFlowWithCorrectPassword").withVariable("ntlmPassword", "Beeblebrox").run();
+    assertThat(response.getMessage().getPayload().getValue(), equalTo(AbstractNtlmTestCase.AUTHORIZED));
+
+    CoreEvent unauthorizedResponse = flowRunner("ntlmFlowWithWrongPassword").withVariable("ntlmPassword", "wrongPassword").run();
+    HttpResponseAttributes httpResponseAttributes =
+        (HttpResponseAttributes) unauthorizedResponse.getMessage().getAttributes().getValue();
+    assertThat(httpResponseAttributes.getStatusCode(), is(SC_PROXY_AUTHENTICATION_REQUIRED));
+    assertThat(httpResponseAttributes.getReasonPhrase(), is(PROXY_AUTHENTICATION_REQUIRED));
   }
 }
