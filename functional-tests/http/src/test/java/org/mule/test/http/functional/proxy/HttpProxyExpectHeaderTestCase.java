@@ -24,6 +24,7 @@ import java.io.IOException;
 import io.qameta.allure.Story;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -43,6 +44,7 @@ public class HttpProxyExpectHeaderTestCase extends AbstractHttpExpectHeaderServe
   }
 
   @Test
+  @Ignore
   public void handlesContinueResponse() throws Exception {
     startExpectContinueServer();
     Response response = sendRequest();

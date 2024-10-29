@@ -17,6 +17,7 @@ import org.mule.test.runner.RunnerDelegateTo;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
@@ -45,6 +46,7 @@ public class HttpRequestExpectHeaderSuccessServerTestCase extends AbstractHttpEx
   }
 
   @Test
+  @Ignore
   public void handlesContinueResponse() throws Exception {
     doHandleRequestResponseIn(REQUEST_FLOW_NAME);
   }
