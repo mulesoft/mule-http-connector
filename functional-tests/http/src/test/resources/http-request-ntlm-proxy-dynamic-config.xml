@@ -14,13 +14,11 @@
     </http:request-config>
 
     <flow name="ntlmFlowWithCorrectPassword">
-<!--        <set-variable variableName="ntlmPassword" value="Beeblebrox"/>-->
         <http:request config-ref="ntlmProxyConfig" path="requestPath"/>
         <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
     <flow name="ntlmFlowWithWrongPassword">
-<!--        <set-variable variableName="ntlmPassword" value="wrongPassword"/>-->
         <http:request config-ref="ntlmProxyConfig" path="requestPath">
             <http:response-validator>
                 <http:success-status-code-validator values="0..599"/>
