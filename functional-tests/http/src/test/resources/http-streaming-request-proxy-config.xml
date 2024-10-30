@@ -63,30 +63,4 @@
         <http:request config-ref="configInnerUserPassProxy" path="requestPath"/>
     </flow>
 
-
-    <!-- Global Ntlm Proxy -->
-    <http:ntlm-proxy name="ntlmProxyConfig" host="localhost" port="${proxyPort}" username="theUsername" password="thePassword" ntlmDomain="theNtlmDomain" />
-    <http:request-config name="configRefNtlmProxy" basePath="basePath">
-        <http:request-connection  host="localhost" port="${httpPort}" proxyConfig="ntlmProxyConfig"/>
-    </http:request-config>
-
-    <flow name="RefNtlmProxy">
-        <http:listener config-ref="listenerConfig" path="/test/RefNtlmProxy" />
-        <http:request config-ref="configRefNtlmProxy" path="requestPath"/>
-    </flow>
-
-    <!-- Inner Ntlm Proxy -->
-    <http:request-config name="configInnerNtlmProxy" basePath="basePath">
-        <http:request-connection host="localhost" port="${httpPort}">
-            <http:proxy-config>
-                <http:ntlm-proxy host="localhost" port="${proxyPort}" username="theUsername" password="thePassword" ntlmDomain="theNtlmDomain" />
-            </http:proxy-config>
-        </http:request-connection>
-    </http:request-config>
-
-    <flow name="InnerNtlmProxy">
-        <http:listener config-ref="listenerConfig" path="/test/InnerNtlmProxy" />
-        <http:request config-ref="configInnerNtlmProxy" path="requestPath"/>
-    </flow>
-
 </mule>

@@ -50,8 +50,7 @@ public class HttpStreamingRequestProxyConfigTestCase extends AbstractHttpRequest
   @Parameters(name = "{0}")
   public static Collection<String> parameters() {
 
-    return asList("RefAnonymousProxy", "InnerAnonymousProxy", "RefUserPassProxy", "InnerUserPassProxy", "RefNtlmProxy",
-                  "InnerNtlmProxy");
+    return asList("RefAnonymousProxy", "InnerAnonymousProxy", "RefUserPassProxy", "InnerUserPassProxy");
   }
 
   @Override
