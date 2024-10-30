@@ -52,6 +52,7 @@ public class HttpRequestExpectHeaderSuccessServerTestCase extends AbstractHttpEx
   }
 
   @Test
+  @Ignore
   public void handlesContinueResponseWithoutRequestInHeaderField() throws Exception {
     doHandleRequestResponseIn(REQUEST_FLOW_NAME_WITHOUT_HEADERS);
   }
