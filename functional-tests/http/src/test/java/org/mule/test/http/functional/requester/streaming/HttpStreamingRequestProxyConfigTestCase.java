@@ -4,10 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.http.functional.requester.proxy;
+package org.mule.test.http.functional.requester.streaming;
 
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.PROXY;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.STREAMING;
 
 import static java.util.Arrays.asList;
 
@@ -23,6 +24,7 @@ import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Collection;
 
+import io.qameta.allure.Stories;
 import io.qameta.allure.Story;
 import org.junit.After;
 import org.junit.Before;
@@ -32,7 +34,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
-@Story(PROXY)
+@Stories({@Story(PROXY), @Story(STREAMING)})
 @RunnerDelegateTo(Parameterized.class)
 public class HttpStreamingRequestProxyConfigTestCase extends AbstractHttpRequestTestCase {
 
