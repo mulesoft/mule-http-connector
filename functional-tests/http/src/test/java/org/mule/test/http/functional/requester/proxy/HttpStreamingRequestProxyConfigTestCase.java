@@ -72,8 +72,6 @@ public class HttpStreamingRequestProxyConfigTestCase extends AbstractHttpRequest
 
   @Test
   public void testProxy() throws Exception {
-    System.out.println("the port is " + port.getNumber());
-    System.out.println("the proxyPort is " + proxyPort.getNumber());
 
     ensureRequestGoesThroughProxy(flowName);
   }
