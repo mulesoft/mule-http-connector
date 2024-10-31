@@ -42,17 +42,10 @@
             <classifier>mule-plugin</classifier>
             <version>${httpConnectorVersion}</version>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.mule.connectors</groupId>
-                    <artifactId>mule-sockets-connector</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mule.connectors</groupId>
             <artifactId>mule-sockets-connector</artifactId>
-            <version>1.2.4</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -68,12 +61,6 @@
             <version>${httpConnectorVersion}</version>
             <type>test-jar</type>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.mule.connectors</groupId>
-                    <artifactId>mule-sockets-connector</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <!-- Connectors used in tests -->

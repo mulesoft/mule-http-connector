@@ -158,12 +158,6 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <dependency>
-                <groupId>org.mule.connectors</groupId>
-                <artifactId>mule-sockets-connector</artifactId>
-                <version>1.2.4</version>
-                <scope>test</scope>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 

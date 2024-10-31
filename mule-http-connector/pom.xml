@@ -32,7 +32,7 @@
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
 
         <muleJavaEeBomVersion>4.7.2</muleJavaEeBomVersion>
-        <muleSocketsConnectorVersion>1.2.4</muleSocketsConnectorVersion>
+        <muleSocketsConnectorVersion>1.2.5</muleSocketsConnectorVersion>
         <muleCorsKernelVersion>1.1.2</muleCorsKernelVersion>
 
         <!-- This dependencies must be explicitly defined as long as HTTP supports runtimes prior to 4.1.2 -->

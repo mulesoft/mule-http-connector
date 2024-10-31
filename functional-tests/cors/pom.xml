@@ -15,8 +15,6 @@
     <packaging>jar</packaging>
 
     <properties>
-        <muleDependenciesVersion>1.x-SNAPSHOT</muleDependenciesVersion>
-
         <javaModuleName>org.mule.test.integration.mule.http.connector.cors.tests</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
@@ -29,17 +27,10 @@
             <classifier>mule-plugin</classifier>
             <version>${httpConnectorVersion}</version>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.mule.connectors</groupId>
-                    <artifactId>mule-sockets-connector</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mule.connectors</groupId>
             <artifactId>mule-sockets-connector</artifactId>
-            <version>1.2.4</version>
             <scope>test</scope>
         </dependency>
         <dependency>
