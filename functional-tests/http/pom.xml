@@ -44,11 +44,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule.connectors</groupId>
-            <artifactId>mule-sockets-connector</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.mule.module</groupId>
             <artifactId>mule-java-module</artifactId>
             <version>${mule-java-module.version}</version>
