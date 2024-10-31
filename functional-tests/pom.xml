@@ -48,7 +48,6 @@
         <muleBomVersion>${mule.version}</muleBomVersion>
         <muleApiVersion>1.7.2</muleApiVersion>
         <httpConnectorVersion>${project.version}</httpConnectorVersion>
-        <muleSocketsConnectorVersion>1.2.5</muleSocketsConnectorVersion>
     </properties>
 
     <modules>
@@ -89,12 +88,6 @@
                 <version>${muleBomVersion}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.mule.connectors</groupId>
-                <artifactId>mule-sockets-connector</artifactId>
-                <version>${muleSocketsConnectorVersion}</version>
-                <classifier>mule-plugin</classifier>
             </dependency>
         </dependencies>
     </dependencyManagement>
