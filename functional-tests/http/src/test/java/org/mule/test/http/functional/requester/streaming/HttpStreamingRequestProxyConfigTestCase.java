@@ -46,10 +46,10 @@ public class HttpStreamingRequestProxyConfigTestCase extends AbstractHttpRequest
 
   private final TestProxyServer proxyServer = new TestProxyServer(proxyPort.getNumber(), httpPort.getNumber(), false);
 
-  @Parameter()
+  @Parameter
   public String flowName;
 
-  @Parameters()
+  @Parameters
   public static Collection<String> parameters() {
     return asList("RefAnonymousProxy", "InnerAnonymousProxy", "RefUserPassProxy", "InnerUserPassProxy");
   }
