@@ -31,6 +31,7 @@
             --add-opens=java.base/sun.security.provider=ALL-UNNAMED
         </surefire.args>
 
+        <maven.dependency.plugin.version>3.8.1</maven.dependency.plugin.version>
         <javaVersion>1.8</javaVersion>
         <mulesoftLicenseVersion>1.4.0</mulesoftLicenseVersion>
         <license.maven.plugin.version>4.2</license.maven.plugin.version>
