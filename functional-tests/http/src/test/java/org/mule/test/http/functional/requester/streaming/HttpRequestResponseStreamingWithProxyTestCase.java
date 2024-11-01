@@ -29,7 +29,6 @@ public class HttpRequestResponseStreamingWithProxyTestCase extends AbstractHttpR
 
   @Before
   public void startMockProxy() throws Exception {
-
     proxyServer.start();
   }
 

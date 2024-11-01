@@ -49,9 +49,8 @@ public class HttpStreamingRequestProxyConfigTestCase extends AbstractHttpRequest
   @Parameter()
   public String flowName;
 
-  @Parameters(name = "{0}")
+  @Parameters()
   public static Collection<String> parameters() {
-
     return asList("RefAnonymousProxy", "InnerAnonymousProxy", "RefUserPassProxy", "InnerUserPassProxy");
   }
 
@@ -62,7 +61,6 @@ public class HttpStreamingRequestProxyConfigTestCase extends AbstractHttpRequest
 
   @Before
   public void startMockProxy() throws Exception {
-
     proxyServer.start();
   }
 
@@ -73,12 +71,10 @@ public class HttpStreamingRequestProxyConfigTestCase extends AbstractHttpRequest
 
   @Test
   public void testProxy() throws Exception {
-
     ensureRequestGoesThroughProxy(flowName);
   }
 
   private void ensureRequestGoesThroughProxy(String flowName) throws Exception {
-    // Request should go through the proxy.
     CoreEvent event = flowRunner(flowName).withPayload(TEST_MESSAGE).keepStreamsOpen().run();
 
     assertThat(event.getMessage(), hasPayload(equalTo(DEFAULT_RESPONSE)));
