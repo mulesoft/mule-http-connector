@@ -36,7 +36,6 @@
         <http:request config-ref="configInnerAnonymousProxy" path="requestPath"/>
     </flow>
 
-
     <!-- Global Username/Password Proxy -->
     <http:proxy name="userPassProxyConfig" host="localhost" port="${proxyPort}" username="theUsername" password="thePassword" />
     <http:request-config name="configRefUserPassProxy" basePath="basePath">
@@ -62,5 +61,4 @@
         <http:listener config-ref="listenerConfig" path="/test/InnerUserPassProxy" />
         <http:request config-ref="configInnerUserPassProxy" path="requestPath"/>
     </flow>
-
 </mule>

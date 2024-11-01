@@ -21,5 +21,4 @@
         <http:listener config-ref="listenerConfig" path="/test" />
         <http:request config-ref="ntlmProxy" path="requestPath"/>
     </flow>
-
 </mule>
