@@ -32,10 +32,10 @@
             --add-opens=java.base/sun.security.provider=ALL-UNNAMED
         </surefire.args>
 
-        <maven.dependency.plugin.version>3.8.0</maven.dependency.plugin.version>
+        <maven.dependency.plugin.version>3.8.1</maven.dependency.plugin.version>
         <javaVersion>1.8</javaVersion>
         <mulesoftLicenseVersion>1.4.0</mulesoftLicenseVersion>
-        <license.maven.plugin.version>4.2</license.maven.plugin.version>
+        <license.maven.plugin.version>4.6</license.maven.plugin.version>
         <licensePath>LICENSE_HEADER_CPAL.txt</licensePath>
         <licenseYear>2023</licenseYear>
         <javaFormatter.plugin.version>2.14.0</javaFormatter.plugin.version>
@@ -52,12 +52,12 @@
         <httpConnectorVersion>${project.version}</httpConnectorVersion>
 
         <!-- fips testing -->
-        <bcprov-jdk15on.version>1.58</bcprov-jdk15on.version>
+        <bcprov-jdk15on.version>1.70</bcprov-jdk15on.version>
         <bctls-fips.version>1.0.19</bctls-fips.version>
         <bcpqc-addon-fips.version>1.0.1</bcpqc-addon-fips.version>
         <bcpkix-fips.version>1.0.7</bcpkix-fips.version>
         <bcpg-fips.version>1.0.7.1</bcpg-fips.version>
-        <bcmail-jdk15on.version>1.58</bcmail-jdk15on.version>
+        <bcmail-jdk15on.version>1.70</bcmail-jdk15on.version>
         <bcmail-fips.version>1.0.4</bcmail-fips.version>
         <bc-fips.version>1.0.2.5</bc-fips.version>
     </properties>
@@ -157,12 +157,6 @@
                 <version>${muleBomVersion}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.mule.connectors</groupId>
-                <artifactId>mule-sockets-connector</artifactId>
-                <version>1.2.4</version>
-                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -22,13 +22,13 @@
         <javax.servlet.api.version>3.1.0</javax.servlet.api.version>
 
         <grizzly.version>2.3.36-MULE-026</grizzly.version>
-        <grizzly.ahc.version>1.14-MULE-024</grizzly.ahc.version>
+        <grizzly.ahc.version>1.14-MULE-026</grizzly.ahc.version>
         <apacheAsyncClientVersion>4.1.5</apacheAsyncClientVersion>
-        <jettyVersion>9.4.55.v20240627</jettyVersion>
+        <jettyVersion>9.4.56.v20240826</jettyVersion>
         <httpMimeVersion>4.5.14</httpMimeVersion>
         <apacheHttpCoreVersion>4.4.16</apacheHttpCoreVersion>
         <apacheHttpClientVersion>4.5.14</apacheHttpClientVersion>
-        <groovyVersionBuild>4.0.21</groovyVersionBuild>
+        <groovyVersionBuild>4.0.23</groovyVersionBuild>
 
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
         <mule-java-module.version>1.3.0-SNAPSHOT</mule-java-module.version>
@@ -41,18 +41,6 @@
             <artifactId>mule-http-connector</artifactId>
             <classifier>mule-plugin</classifier>
             <version>${httpConnectorVersion}</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.mule.connectors</groupId>
-                    <artifactId>mule-sockets-connector</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.connectors</groupId>
-            <artifactId>mule-sockets-connector</artifactId>
-            <version>1.2.4</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -68,12 +56,6 @@
             <version>${httpConnectorVersion}</version>
             <type>test-jar</type>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.mule.connectors</groupId>
-                    <artifactId>mule-sockets-connector</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <!-- Connectors used in tests -->
