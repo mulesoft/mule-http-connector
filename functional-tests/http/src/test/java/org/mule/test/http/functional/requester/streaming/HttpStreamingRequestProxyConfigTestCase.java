@@ -24,6 +24,7 @@ import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Collection;
 
+import io.qameta.allure.Issue;
 import io.qameta.allure.Stories;
 import io.qameta.allure.Story;
 import org.junit.After;
@@ -34,6 +35,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
+@Issue("W-16606364")
 @Stories({@Story(PROXY), @Story(STREAMING)})
 @RunnerDelegateTo(Parameterized.class)
 public class HttpStreamingRequestProxyConfigTestCase extends AbstractHttpRequestTestCase {

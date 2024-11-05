@@ -27,6 +27,7 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.requester.ntlm.AbstractAuthNtlmTestCase;
 
 import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Stories;
 import io.qameta.allure.Story;
 import org.apache.http.client.fluent.Request;
@@ -37,6 +38,7 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 
 
+@Issue("W-16606364")
 @Stories({@Story(PROXY), @Story(NTLM), @Story(STREAMING)})
 public class HttpStreamingRequestNtlmProxyConfigTestCase
     extends AbstractAuthNtlmTestCase {
@@ -62,6 +64,8 @@ public class HttpStreamingRequestNtlmProxyConfigTestCase
   @Override
   @Description("Verifies a flow involving a NTLM Auth via proxy config does not close the stream when kept alive ")
   public void validNtlmAuth() throws Exception {
+    // The server that is working as a "proxy" (and executing the authentication) here is the one we usually use as the "target",
+    // but it works for the test purposes.
     Response response =
         Request.Post("http://localhost:" + port.getNumber() + "/test").body(new StringEntity(TEST_MESSAGE, TEXT_PLAIN))
             .addHeader(CONNECTION, KEEP_ALIVE).execute();

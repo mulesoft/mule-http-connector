@@ -6,18 +6,26 @@
  */
 package org.mule.test.http.functional.requester.streaming;
 
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.PROXY;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.STREAMING;
+
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import org.mule.tck.http.TestProxyServer;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
+import io.qameta.allure.Issue;
+import io.qameta.allure.Stories;
+import io.qameta.allure.Story;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpRequestResponseStreamingWithProxyTestCase extends AbstractHttpRequestResponseStreamingTestCase {
+@Issue("W-16606364")
+@Stories({@Story(PROXY), @Story(STREAMING)})
+public class HttpResponseStreamingWithProxyTestCase extends AbstractHttpRequestResponseStreamingTestCase {
 
   @Rule
   public DynamicPort proxyPort = new DynamicPort("proxyPort");
@@ -39,7 +47,7 @@ public class HttpRequestResponseStreamingWithProxyTestCase extends AbstractHttpR
 
   @Override
   protected String getConfigFile() {
-    return "http-request-response-streaming-proxy-config.xml";
+    return "http-response-streaming-proxy-config.xml";
   }
 
   @Test
