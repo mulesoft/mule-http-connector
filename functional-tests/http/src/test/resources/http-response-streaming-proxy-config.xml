@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <object name="statusProcessor" class="org.mule.test.http.functional.requester.streaming.AbstractHttpRequestResponseStreamingTestCase$StatusProcessor"/>
+    <object name="fillAndWaitInputStreamProcessor" class="org.mule.test.http.functional.requester.streaming.AbstractHttpRequestResponseStreamingTestCase$FillAndWaitInputStreamProcessor"/>
+
+    <http:listener-config name="listenerConfig">
+        <http:listener-connection host="localhost" port="${httpPort}"/>
+    </http:listener-config>
+
+    <http:proxy name="proxyConfig" host="localhost" port="${proxyPort}" />
+    <http:request-config name="requestConfig">
+        <http:request-connection host="localhost" port="${httpPort}" streamResponse="${streaming}" proxyConfig="proxyConfig"/>
+    </http:request-config>
+
+    <flow name="client">
+        <http:request config-ref="requestConfig" method="GET" path="/"/>
+        <flow-ref name="statusProcessor"/>
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
+    </flow>
+
+    <flow name="server">
+        <http:listener path="/" config-ref="listenerConfig"/>
+        <flow-ref name="fillAndWaitInputStreamProcessor"/>
+    </flow>
+</mule>
