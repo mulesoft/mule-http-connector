@@ -57,7 +57,7 @@
         <bcpqc-addon-fips.version>1.0.1</bcpqc-addon-fips.version>
         <bcpkix-fips.version>1.0.7</bcpkix-fips.version>
         <bcpg-fips.version>1.0.7.1</bcpg-fips.version>
-        <bcmail-jdk15on.version>1.58</bcmail-jdk15on.version>
+        <bcmail-jdk15on.version>1.70</bcmail-jdk15on.version>
         <bcmail-fips.version>1.0.4</bcmail-fips.version>
         <bc-fips.version>1.0.2.5</bc-fips.version>
     </properties>
