@@ -65,7 +65,9 @@ public class HttpStreamingRequestNtlmProxyConfigTestCase
   @Description("Verifies a flow involving a NTLM Auth via proxy config does not close the stream when kept alive ")
   public void validNtlmAuth() throws Exception {
     // The server that is working as a "proxy" (and executing the authentication) here is the one we usually use as the "target",
-    // but it works for the test purposes.
+    // but it works for the test purposes. The Mule flow listens for HTTP requests at /test on localhost and forwards them through
+    // an NTLM-authenticated proxy to another server.
+    // The proxy connection uses the provided NTLM credentials for authentication
     Response response =
         Request.Post("http://localhost:" + port.getNumber() + "/test").body(new StringEntity(TEST_MESSAGE, TEXT_PLAIN))
             .addHeader(CONNECTION, KEEP_ALIVE).execute();
