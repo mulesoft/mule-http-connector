@@ -13,7 +13,7 @@
 
     <properties>
         <jdk.version>1.8</jdk.version>
-        <mavenCompilerVersion>3.11.0</mavenCompilerVersion>
+        <mavenCompilerVersion>3.13.0</mavenCompilerVersion>
 
         <jacoco.version>0.8.12</jacoco.version>
         <aspectjVersion>1.9.22.1</aspectjVersion>
