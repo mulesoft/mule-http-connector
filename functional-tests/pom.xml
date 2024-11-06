@@ -43,7 +43,7 @@
         <formatterGoal>validate</formatterGoal>
         <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
 
-        <maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
+        <maven.surefire.plugin.version>3.5.2</maven.surefire.plugin.version>
 
         <muleDependenciesVersion>1.x-SNAPSHOT</muleDependenciesVersion>
         <mule.version>4.9.0-SNAPSHOT</mule.version>
