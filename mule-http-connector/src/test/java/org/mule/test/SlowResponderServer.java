@@ -41,8 +41,10 @@ public class SlowResponderServer {
   public static void stopServer() {
     try {
       acceptorThread.closeAcceptor();
-      for (SlowResponderThread thread : responderThreads) {
-        thread.join();
+      synchronized (responderThreads) {
+        for (SlowResponderThread thread : responderThreads) {
+          thread.join();
+        }
       }
       acceptorThread.join();
     } catch (InterruptedException e) {
@@ -51,8 +53,11 @@ public class SlowResponderServer {
   }
 
   public static void forceFinishAllResponders() {
-    for (SlowResponderThread thread : responderThreads) {
-      thread.wakeUpAndFinishResponse();
+    synchronized (responderThreads) {
+      for (SlowResponderThread thread : responderThreads) {
+        thread.wakeUpAndFinishResponse();
+      }
+      responderThreads.clear();
     }
   }
 
@@ -74,7 +79,9 @@ public class SlowResponderServer {
           Socket accepted = acceptor.accept();
           SlowResponderThread responderThread = new SlowResponderThread(accepted);
           responderThread.start();
-          responderThreads.add(responderThread);
+          synchronized (responderThreads) {
+            responderThreads.add(responderThread);
+          }
         }
       } catch (IOException e) {
         // expected on close
