@@ -28,7 +28,7 @@
         <httpMimeVersion>4.5.14</httpMimeVersion>
         <apacheHttpCoreVersion>4.4.16</apacheHttpCoreVersion>
         <apacheHttpClientVersion>4.5.14</apacheHttpClientVersion>
-        <groovyVersionBuild>4.0.23</groovyVersionBuild>
+        <groovyVersionBuild>4.0.24</groovyVersionBuild>
 
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
         <mule-java-module.version>1.2.13</mule-java-module.version>
