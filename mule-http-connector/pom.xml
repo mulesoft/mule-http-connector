@@ -31,6 +31,8 @@
         <commonsLang3Version>3.12.0</commonsLang3Version>
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
 
+        <jakarta.activation.version>2.0.1</jakarta.activation.version>
+
         <muleJavaEeBomVersion>4.7.2</muleJavaEeBomVersion>
         <muleSocketsConnectorVersion>1.2.5</muleSocketsConnectorVersion>
         <muleCorsKernelVersion>1.1.2</muleCorsKernelVersion>
@@ -319,6 +321,7 @@
         <dependency>
             <groupId>com.sun.activation</groupId>
             <artifactId>jakarta.activation</artifactId>
+            <version>${jakarta.activation.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
