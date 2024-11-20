@@ -31,7 +31,7 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import jakarta.activation.MimetypesFileTypeMap;
+import javax.activation.MimetypesFileTypeMap;
 
 import org.slf4j.Logger;
 
