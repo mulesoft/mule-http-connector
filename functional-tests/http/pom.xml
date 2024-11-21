@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.connectors</groupId>
         <artifactId>mule-http-connector-functional-tests</artifactId>
-        <version>1.11.0-beta1</version>
+        <version>1.11.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
