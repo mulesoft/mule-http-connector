@@ -15,7 +15,7 @@
     <groupId>org.mule.connectors</groupId>
     <artifactId>mule-http-connector</artifactId>
     <packaging>mule-extension</packaging>
-    <version>1.11.0-SNAPSHOT</version>
+    <version>1.11.0-beta1</version>
 
     <name>HTTP Connector</name>
     <description>A Mule extension that provides HTTP server and client functionality</description>
@@ -51,6 +51,8 @@
         <mavenResources.version>3.3.1</mavenResources.version>
         <!-- MUnit minMuleVersion is 4.3.0 -->
         <munitMinMuleVersion>4.3.0</munitMinMuleVersion>
+
+        <mule-java-module.version>1.2.13</mule-java-module.version>
 
         <muleObjectStoreConnectorTestVersion>1.2.2</muleObjectStoreConnectorTestVersion>
 
@@ -206,7 +208,7 @@
                     <dependency>
                         <groupId>org.mule.module</groupId>
                         <artifactId>mule-java-module</artifactId>
-                        <version>1.3.0-SNAPSHOT</version>
+                        <version>${mule-java-module.version}</version>
                         <classifier>mule-plugin</classifier>
                     </dependency>
                 </dependencies>
