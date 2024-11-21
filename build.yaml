@@ -1,7 +1,8 @@
 projectType: extension
 mavenTool: "3.9.5"
 
-mavenAdditionalArgs: -pl .,mule-http-connector install
+mavenAdditionalArgs: -pl .,mule-http-connector
+mavenCompileAdditionalArgs: " install"
 enableMavenTestStage: false
 enableSonarQubeStage: false
 devBranchesRegex: "release-1.11.0-beta1"
