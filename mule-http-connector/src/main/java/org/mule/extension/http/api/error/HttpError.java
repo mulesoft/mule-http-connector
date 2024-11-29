@@ -31,7 +31,7 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
 
   PARSING,
 
-  TIMEOUT,
+  REQUEST_TIMEOUT,
 
   SECURITY(MuleErrors.SECURITY),
 
@@ -86,7 +86,7 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
     final Set<ErrorTypeDefinition> errors = new HashSet<>();
 
     errors.add(PARSING);
-    errors.add(TIMEOUT);
+    errors.add(REQUEST_TIMEOUT);
     errors.add(SECURITY);
     errors.add(CLIENT_SECURITY);
     errors.add(CONNECTIVITY);

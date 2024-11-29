@@ -6,7 +6,7 @@
  */
 package org.mule.test.http.functional.requester.redirect;
 
-import static org.mule.extension.http.api.error.HttpError.TIMEOUT;
+import static org.mule.extension.http.api.error.HttpError.REQUEST_TIMEOUT;
 import static org.mule.extension.http.internal.listener.HttpListener.HTTP_NAMESPACE;
 
 import static org.hamcrest.CoreMatchers.isA;
@@ -36,7 +36,7 @@ public class HttpRedirectExceededTimeoutTestCase extends AbstractHttpRedirectTim
   @Test
   public void testRedirectTimeout() throws Exception {
     expectedError.expectCause(isA(HttpRequestFailedException.class));
-    expectedError.expectErrorType(HTTP_NAMESPACE.toUpperCase(), TIMEOUT.getType());
+    expectedError.expectErrorType(HTTP_NAMESPACE.toUpperCase(), REQUEST_TIMEOUT.getType());
     expectedException.reportMissingExceptionWithMessage("Timeout exception must be triggered");
     runFlow("requestFlow");
   }
