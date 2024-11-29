@@ -14,7 +14,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
 import static org.mule.extension.http.api.error.HttpError.CONNECTIVITY;
-import static org.mule.extension.http.api.error.HttpError.TIMEOUT;
+import static org.mule.extension.http.api.error.HttpError.REQUEST_TIMEOUT;
 import static org.mule.extension.http.api.notification.HttpNotificationAction.REQUEST_COMPLETE;
 import static org.mule.extension.http.api.notification.HttpNotificationAction.REQUEST_START;
 import static org.mule.extension.http.internal.HttpConnectorConstants.DEFAULT_RETRY_ATTEMPTS;
@@ -262,7 +262,7 @@ public class HttpRequester {
             }
 
             logger.error(getErrorMessage(httpRequest));
-            HttpError error = exception instanceof TimeoutException ? TIMEOUT : CONNECTIVITY;
+            HttpError error = exception instanceof TimeoutException ? REQUEST_TIMEOUT : CONNECTIVITY;
             callback.error(new HttpRequestFailedException(createStaticMessage(httpErrorMessageGenerator
                 .createFrom(httpRequest,
                             getExceptionMessage(exception))),
