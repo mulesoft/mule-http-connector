@@ -68,13 +68,6 @@
         <bcpg-fips.version>1.0.7.1</bcpg-fips.version>
         <bcmail-fips.version>1.0.4</bcmail-fips.version>
         <bc-fips.version>1.0.2.5</bc-fips.version>
-
-        <surefire.args>
-            --add-opens=java.base/java.lang=ALL-UNNAMED
-            --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
-            --add-opens=java.base/java.lang.invoke=ALL-UNNAMED
-            --add-opens=java.base/sun.security.provider=ALL-UNNAMED
-        </surefire.args>
     </properties>
 
     <build>
