@@ -152,7 +152,7 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
     HttpStatus status = getStatusByCode(statusCode);
     if (status != null) {
       error = stream(HttpError.values())
-          .filter(httpError -> httpError.name().contains(status.name()))
+          .filter(httpError -> status.name().contains(httpError.name()))
           .findFirst()
           .orElse(null);
     }
