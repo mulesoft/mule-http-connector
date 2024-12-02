@@ -33,8 +33,6 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
 
   TIMEOUT,
 
-  REQUEST_TIMEOUT,
-
   SECURITY(MuleErrors.SECURITY),
 
   CLIENT_SECURITY(MuleErrors.CLIENT_SECURITY),
@@ -88,7 +86,6 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
     final Set<ErrorTypeDefinition> errors = new HashSet<>();
 
     errors.add(PARSING);
-    errors.add(REQUEST_TIMEOUT);
     errors.add(TIMEOUT);
     errors.add(SECURITY);
     errors.add(CLIENT_SECURITY);
@@ -155,7 +152,7 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
     HttpStatus status = getStatusByCode(statusCode);
     if (status != null) {
       error = stream(HttpError.values())
-          .filter(httpError -> httpError.name().equals(status.name()))
+          .filter(httpError -> httpError.name().contains(status.name()))
           .findFirst()
           .orElse(null);
     }
