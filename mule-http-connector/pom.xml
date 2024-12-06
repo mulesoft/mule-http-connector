@@ -31,7 +31,8 @@
         <commonsLang3Version>3.12.0</commonsLang3Version>
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
 
-        <muleJavaEeBomVersion>4.7.2</muleJavaEeBomVersion>
+        <jakarta.activation.version>2.0.1</jakarta.activation.version>
+
         <muleSocketsConnectorVersion>1.2.5</muleSocketsConnectorVersion>
         <muleCorsKernelVersion>1.1.2</muleCorsKernelVersion>
 
@@ -221,14 +222,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>org.mule</groupId>
-                <artifactId>mule-javaee-runtime-bom</artifactId>
-                <version>${muleJavaEeBomVersion}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            
             <!-- These override the version obtained transitively from a dependency declared in the parent pom. -->
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -319,6 +312,7 @@
         <dependency>
             <groupId>com.sun.activation</groupId>
             <artifactId>jakarta.activation</artifactId>
+            <version>${jakarta.activation.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
