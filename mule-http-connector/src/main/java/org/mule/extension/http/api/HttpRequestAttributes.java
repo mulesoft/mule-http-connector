@@ -6,7 +6,10 @@
  */
 package org.mule.extension.http.api;
 
+import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
+
 import static java.lang.System.lineSeparator;
+import static java.util.Collections.emptyMap;
 
 import org.mule.extension.http.api.certificate.CertificateData;
 import org.mule.extension.http.internal.certificate.CertificateProvider;
@@ -16,6 +19,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.security.cert.Certificate;
+import java.util.Collections;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -145,6 +149,14 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
     this(headers, listenerPath, relativePath, null, version, scheme, method, requestPath, "", requestUri, "", queryString,
          queryParams,
          uriParams, "", remoteAddress, () -> clientCertificate);
+  }
+
+  @Deprecated
+  public HttpRequestAttributes() {
+    this(emptyMultiMap(), "/", null, "HTTP/1.1",
+         "http", "GET", "/", null, "",
+         emptyMultiMap(), emptyMap(), "/",
+         null);
   }
 
   HttpRequestAttributes(MultiMap<String, String> headers, String listenerPath, String relativePath, String maskedRequestPath,
