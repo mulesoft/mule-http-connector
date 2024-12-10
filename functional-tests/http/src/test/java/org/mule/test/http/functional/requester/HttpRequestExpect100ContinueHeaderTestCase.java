@@ -6,9 +6,12 @@
  */
 package org.mule.test.http.functional.requester;
 
+import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.mock;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
@@ -17,7 +20,9 @@ import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
+import io.qameta.allure.Issue;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
@@ -60,7 +65,6 @@ public class HttpRequestExpect100ContinueHeaderTestCase
     doHandleRequestResponseIn(REQUEST_FLOW_NAME_WITHOUT_HEADERS);
   }
 
-
   private void doHandleRequestResponseIn(String flow) throws Exception {
     startExpectContinueServer(persistentConnection);
     final HttpRequestAttributes reqAttributes = mock(HttpRequestAttributes.class);
@@ -72,17 +76,19 @@ public class HttpRequestExpect100ContinueHeaderTestCase
   }
 
   @Test
+  @Issue("W-17282518")
   public void testExpectContinueWhenServerTimesOut() throws Exception {
     startExpectContinueTimeoutServer(persistentConnection);
     final HttpRequestAttributes reqAttributes = mock(HttpRequestAttributes.class);
 
-    try {
-      flowRunner(REQUEST_FLOW_NAME_WITH_TIMEOUT).withAttributes(reqAttributes).withPayload(TEST_MESSAGE).run();
-    } catch (Exception e) {
-      assertThat(e.getMessage(), containsString("Timeout exceeded"));
-    }
+    Exception exception = assertThrows(Exception.class, () -> {
+      flowRunner(REQUEST_FLOW_NAME_WITH_TIMEOUT)
+          .withAttributes(reqAttributes)
+          .withPayload(TEST_MESSAGE)
+          .run();
+    });
+
+    assertThat(exception.getMessage(), containsString("Timeout exceeded"));
     stopServer();
-
   }
-
 }
