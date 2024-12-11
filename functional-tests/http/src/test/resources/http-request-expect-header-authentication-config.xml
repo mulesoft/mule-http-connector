@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <http:request-config name="basicConfig">
+        <http:request-connection host="localhost" port="${httpPort}">
+            <http:authentication>
+                <http:basic-authentication username="#[vars.user]" password="#[vars.password]" />
+            </http:authentication>
+        </http:request-connection>
+    </http:request-config>
+
+    <flow name="basicAuthRequest">
+        <http:request config-ref="basicConfig" method="POST" path="/" responseTimeout="20000">
+            <http:headers>
+                #[{'Expect' : '100-continue'}]
+            </http:headers>
+            <http:response-validator>
+                <http:success-status-code-validator values="0..399" />
+            </http:response-validator>
+        </http:request>
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
+    </flow>
+
+    <http:request-config name="digestConfig">
+        <http:request-connection host="localhost" port="${httpPort}">
+            <http:authentication>
+                <http:digest-authentication username="#[vars.user]" password="#[vars.password]" />
+            </http:authentication>
+        </http:request-connection>
+    </http:request-config>
+
+    <flow name="digestAuthRequest">
+
+        <http:request config-ref="digestConfig" method="POST" path="/digest" responseTimeout="20000">
+            <http:headers>
+                #[{'Expect' : '100-continue'}]
+            </http:headers>
+            <http:response-validator>
+                <http:success-status-code-validator values="0..399" />
+            </http:response-validator>
+        </http:request>
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
+    </flow>
+
+</mule>
