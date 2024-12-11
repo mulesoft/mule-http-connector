@@ -6,10 +6,9 @@
  */
 package org.mule.test.http.functional.requester;
 
-import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
+
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.mock;
@@ -20,7 +19,6 @@ import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.TimeoutException;
 
 import io.qameta.allure.Issue;
 import org.junit.Test;

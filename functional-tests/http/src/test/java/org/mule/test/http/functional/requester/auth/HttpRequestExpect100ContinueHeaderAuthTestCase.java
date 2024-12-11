@@ -20,7 +20,7 @@ import org.mule.test.http.functional.requester.AbstractHttpRequestTestCase;
 import io.qameta.allure.Issue;
 import org.junit.Test;
 
-public class HttpRequestExpect100ContinueHeaderBasicAuthTestCase extends AbstractHttpRequestTestCase {
+public class HttpRequestExpect100ContinueHeaderAuthTestCase extends AbstractHttpRequestTestCase {
 
   @Override
   protected String getConfigFile() {
