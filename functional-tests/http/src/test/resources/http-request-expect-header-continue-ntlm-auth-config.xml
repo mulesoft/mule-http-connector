@@ -20,7 +20,7 @@
                 #[{'Expect' : '100-continue'}]
             </http:headers>
             <http:response-validator>
-                <http:success-status-code-validator values="0..599" />
+                <http:success-status-code-validator values="0..399" />
             </http:response-validator>
         </http:request>
         <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
@@ -40,7 +40,7 @@
                 #[{'Expect' : '100-continue'}]
             </http:headers>
             <http:response-validator>
-                <http:success-status-code-validator values="0..599" />
+                <http:success-status-code-validator values="0..399" />
             </http:response-validator>
         </http:request>
         <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
@@ -60,7 +60,7 @@
                 #[{'Expect' : '100-continue'}]
             </http:headers>
             <http:response-validator>
-                <http:success-status-code-validator values="0..599" />
+                <http:success-status-code-validator values="0..399" />
             </http:response-validator>
         </http:request>
         <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>

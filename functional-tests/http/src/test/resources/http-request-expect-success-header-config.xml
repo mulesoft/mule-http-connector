@@ -18,7 +18,7 @@
                 #[{'Expect' : '100-continue'}]
             </http:headers>
             <http:response-validator>
-                <http:success-status-code-validator values="0..599" />
+                <http:success-status-code-validator values="0..399" />
             </http:response-validator>
         </http:request>
     </flow>
@@ -26,7 +26,7 @@
     <flow name="requestFlowNoHeaders">
         <http:request config-ref="requestConfig" method="POST" path="/" responseTimeout="20000">
             <http:response-validator>
-                <http:success-status-code-validator values="0..599" />
+                <http:success-status-code-validator values="0..399" />
             </http:response-validator>
         </http:request>
     </flow>
