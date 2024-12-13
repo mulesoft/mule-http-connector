@@ -45,9 +45,6 @@ public abstract class AbstractHttpExpectHeaderServerTestCase extends AbstractHtt
 
   private AbstractMockServer timeoutServer;
 
-  private AbstractMockServer streamingServer;
-
-
   protected AbstractHttpExpectHeaderServerTestCase() {}
 
   protected AbstractHttpExpectHeaderServerTestCase(boolean persistentConnection) {

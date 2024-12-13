@@ -24,6 +24,7 @@ import io.qameta.allure.Issue;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
+//TODO W-17430471 Migrate 100 continue test to Munit
 @RunnerDelegateTo(Parameterized.class)
 public class HttpRequestExpect100ContinueHeaderTestCase
     extends AbstractHttpExpectHeaderServerTestCase {

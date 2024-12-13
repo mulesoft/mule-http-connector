@@ -29,6 +29,7 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
 import org.mule.test.runner.RunnerDelegateTo;
 
 @Issue("W-17282518")
+// TODO W-17430471 Migrate 100 continue test to Munit
 @RunnerDelegateTo(Parameterized.class)
 public class HttpRequestExpect100ContinueHeaderNtlmAuthTestCase extends AbstractAuthNtlmTestCase {
 
