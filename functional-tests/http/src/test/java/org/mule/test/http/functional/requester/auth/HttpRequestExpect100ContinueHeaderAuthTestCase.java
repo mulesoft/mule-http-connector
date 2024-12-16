@@ -20,7 +20,6 @@ import org.mule.test.http.functional.requester.AbstractHttpRequestTestCase;
 import io.qameta.allure.Issue;
 import org.junit.Test;
 
-@Issue("W-17282518")
 // TODO W-17430471 Migrate 100 continue test to Munit
 public class HttpRequestExpect100ContinueHeaderAuthTestCase extends AbstractHttpRequestTestCase {
 
