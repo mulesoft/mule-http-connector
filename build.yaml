@@ -15,5 +15,5 @@ additionalTestConfigs:
   jdk21:
     testJdkTool: TEMURIN-JDK21
   netty-jdk17:
-    mavenAdditionalArgs: -Dmule.http.service.implementation=NETTY
+    mavenAdditionalArgs: -Dmule.http.service.implementation=NETTY -DmunitMinMuleVersion=4.9.0
 
