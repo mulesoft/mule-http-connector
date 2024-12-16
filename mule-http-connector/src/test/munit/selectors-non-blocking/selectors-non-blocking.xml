@@ -29,7 +29,8 @@
         <http:request-connection host="localhost" port="${slow.responder.port}" streamResponse="true" />
     </http:request-config>
 
-    <munit:test name="Some selector is available while handling slow requests" description="Test">
+    <!-- TODO (W-17444122): Un-ignore this test for Netty -->
+    <munit:test name="Some selector is available while handling slow requests" description="Test" ignore="#[p('mule.http.service.implementation') == 'NETTY']">
         <munit:enable-flow-sources >
             <munit:enable-flow-source value="TestFlow" />
         </munit:enable-flow-sources>

@@ -29,12 +29,13 @@ public final class TestUtils {
     boolean endOfStream = false;
     while (!patternFound && !endOfStream) {
       int bytesNum = inputStream.read(inBuf);
-      requestAsText.append(new String(inBuf, 0, bytesNum));
-      if (requestAsText.toString().contains(pattern)) {
-        patternFound = true;
-      }
       if (bytesNum == -1) {
         endOfStream = true;
+      } else {
+        requestAsText.append(new String(inBuf, 0, bytesNum));
+        if (requestAsText.toString().contains(pattern)) {
+          patternFound = true;
+        }
       }
     }
     return requestAsText.toString();
