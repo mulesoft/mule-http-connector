@@ -12,6 +12,7 @@ import static java.lang.Integer.parseInt;
 import static java.lang.System.getProperty;
 
 import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
+import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assume.assumeTrue;
 
@@ -80,7 +81,9 @@ public class HttpTlsContextClient12ToServer13TestCase extends AbstractHttpTlsCon
   @Test
   public void testClient12ToServer13() throws Exception {
     expectedError.expectErrorType("HTTP", "CONNECTIVITY");
-    expectedError.expectMessage(containsString(ERROR_RESPONSE));
+    expectedError.expectMessage(anyOf(
+                                      containsString(ERROR_RESPONSE),
+                                      containsString("Received fatal alert: protocol_version")));
     flowRunner(client12).run();
   }
 
