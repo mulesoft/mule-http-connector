@@ -21,6 +21,7 @@ import io.qameta.allure.Issue;
 import org.junit.Test;
 
 // TODO W-17430471 Migrate 100 continue test to Munit
+@Issue("W-17282518")
 public class HttpRequestExpect100ContinueHeaderAuthTestCase extends AbstractHttpRequestTestCase {
 
   @Override
@@ -29,13 +30,11 @@ public class HttpRequestExpect100ContinueHeaderAuthTestCase extends AbstractHttp
   }
 
   @Test
-  @Issue("W-17282518")
   public void validBasicAuthentication() throws Exception {
     assertValidRequest("basicAuthRequest", "user", "password");
   }
 
   @Test
-  @Issue("W-17282518")
   public void validDigestAuth() throws Exception {
     assumeFalse("Digest authentication is based on MD5. So this should not run on FIPS",
                 isFipsTesting());
