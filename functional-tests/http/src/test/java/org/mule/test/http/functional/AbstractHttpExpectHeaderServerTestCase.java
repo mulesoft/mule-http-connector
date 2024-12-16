@@ -43,6 +43,8 @@ public abstract class AbstractHttpExpectHeaderServerTestCase extends AbstractHtt
 
   private AbstractMockServer server;
 
+  private AbstractMockServer timeoutServer;
+
   protected AbstractHttpExpectHeaderServerTestCase() {}
 
   protected AbstractHttpExpectHeaderServerTestCase(boolean persistentConnection) {
@@ -67,8 +69,18 @@ public abstract class AbstractHttpExpectHeaderServerTestCase extends AbstractHtt
     server.start();
   }
 
+  protected void startExpectContinueTimeoutServer(boolean persistent) {
+    timeoutServer = new ExpectContinueTimeoutMockServer(persistent);
+    timeoutServer.start();
+  }
+
   protected void stopServer() {
-    server.stop();
+    if (server != null) {
+      server.stop();
+    }
+    if (timeoutServer != null) {
+      timeoutServer.stop();
+    }
   }
 
   private abstract class AbstractMockServer implements Runnable {
@@ -165,6 +177,22 @@ public abstract class AbstractHttpExpectHeaderServerTestCase extends AbstractHtt
     protected void process(BufferedReader reader, BufferedWriter writer) throws IOException {
       writer.write(EXPECTATION_FAILED_RESPONSE);
       writer.flush();
+    }
+  }
+
+  private class ExpectContinueTimeoutMockServer extends AbstractMockServer {
+
+    public ExpectContinueTimeoutMockServer(boolean persistent) {
+      super(persistent);
+    }
+
+    @Override
+    protected void process(BufferedReader reader, BufferedWriter writer) {
+      try {
+        Thread.sleep(10_000);
+      } catch (InterruptedException e) {
+        throw new RuntimeException("Server interrupted during timeout simulation", e);
+      }
     }
   }
 }

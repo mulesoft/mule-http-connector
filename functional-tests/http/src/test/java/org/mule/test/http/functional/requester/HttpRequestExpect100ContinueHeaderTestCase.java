@@ -7,7 +7,10 @@
 package org.mule.test.http.functional.requester;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.Matchers.containsString;
+
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.mock;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
@@ -17,31 +20,38 @@ import org.mule.test.runner.RunnerDelegateTo;
 import java.util.Arrays;
 import java.util.List;
 
+import io.qameta.allure.Issue;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
+//TODO W-17430471 Migrate 100 continue test to Munit
 @RunnerDelegateTo(Parameterized.class)
-public class HttpRequestExpectHeaderSuccessServerTestCase extends AbstractHttpExpectHeaderServerTestCase {
+public class HttpRequestExpect100ContinueHeaderTestCase
+    extends AbstractHttpExpectHeaderServerTestCase {
 
   private static final String REQUEST_FLOW_NAME = "requestFlow";
 
   private static final String REQUEST_FLOW_NAME_WITHOUT_HEADERS = "requestFlowNoHeaders";
 
-  private boolean persistentConnection;
+  private static final String REQUEST_FLOW_NAME_WITH_TIMEOUT = "requestFlowWithLowTimeout";
 
-  public HttpRequestExpectHeaderSuccessServerTestCase(boolean persistentConnection) {
+
+
+  private final boolean persistentConnection;
+
+  public HttpRequestExpect100ContinueHeaderTestCase(boolean persistentConnection) {
     super(persistentConnection);
     this.persistentConnection = persistentConnection;
-  }
-
-  @Override
-  protected String getConfigFile() {
-    return "http-request-expect-success-header-config.xml";
   }
 
   @Parameterized.Parameters
   public static List<Object> getParameters() {
     return Arrays.asList(new Object[] {true, false});
+  }
+
+  @Override
+  protected String getConfigFile() {
+    return "http-request-expect-success-header-config.xml";
   }
 
   @Test
@@ -54,7 +64,6 @@ public class HttpRequestExpectHeaderSuccessServerTestCase extends AbstractHttpEx
     doHandleRequestResponseIn(REQUEST_FLOW_NAME_WITHOUT_HEADERS);
   }
 
-
   private void doHandleRequestResponseIn(String flow) throws Exception {
     startExpectContinueServer(persistentConnection);
     final HttpRequestAttributes reqAttributes = mock(HttpRequestAttributes.class);
@@ -65,4 +74,20 @@ public class HttpRequestExpectHeaderSuccessServerTestCase extends AbstractHttpEx
     stopServer();
   }
 
+  @Test
+  @Issue("W-17282518")
+  public void testExpectContinueWhenServerTimesOut() throws Exception {
+    startExpectContinueTimeoutServer(persistentConnection);
+    final HttpRequestAttributes reqAttributes = mock(HttpRequestAttributes.class);
+
+    Exception exception = assertThrows(Exception.class, () -> {
+      flowRunner(REQUEST_FLOW_NAME_WITH_TIMEOUT)
+          .withAttributes(reqAttributes)
+          .withPayload(TEST_MESSAGE)
+          .run();
+    });
+
+    assertThat(exception.getMessage(), containsString("Timeout exceeded"));
+    stopServer();
+  }
 }
