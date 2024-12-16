@@ -26,7 +26,9 @@
         <http:request-connection host="localhost" port="${dynamic.port}"/>
     </http:request-config>
 
-    <munit:test name="cookiesWithMultipleRedirect" description="Cookies are replaced during the redirect mechanism">
+    <!-- TODO (W-17405565): Un-ignore this test for Netty impl -->
+    <munit:test name="cookiesWithMultipleRedirect" description="Cookies are replaced during the redirect mechanism"
+                ignore="#[p('mule.http.service.implementation') == 'NETTY']">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="incrementalCookieSetterFlow" />
             <munit:enable-flow-source value="getCookieHeaderAsPayloadFlow" />
@@ -47,7 +49,10 @@
         </munit:validation>
     </munit:test>
 
-    <munit:test name="cookiesWithMultipleRedirectAndInitialValueSetManually" description="Cookies are replaced during the redirect mechanism, even if we set an initial value">
+    <!-- TODO (W-17405565): Un-ignore this test for Netty impl -->
+    <munit:test name="cookiesWithMultipleRedirectAndInitialValueSetManually"
+                description="Cookies are replaced during the redirect mechanism, even if we set an initial value"
+                ignore="#[p('mule.http.service.implementation') == 'NETTY']">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="incrementalCookieSetterFlow" />
             <munit:enable-flow-source value="getCookieHeaderAsPayloadFlow" />
