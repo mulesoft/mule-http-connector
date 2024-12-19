@@ -21,7 +21,7 @@
         <AsyncLogger name="org.mule" level="WARN"/>
         <AsyncLogger name="com.mulesoft" level="WARN"/>
 
-        <AsyncLogger name="org.mule.service.http" level="WARN"/>
+        <AsyncLogger name="org.mule.service.http" level="DEBUG"/>
         <AsyncLogger name="org.mule.extension.http" level="WARN"/>
 
         <AsyncRoot level="INFO">
