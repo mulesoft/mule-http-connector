@@ -6,26 +6,26 @@
  */
 package org.mule.test.http.functional.listener;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.errorReadingStream;
 import static org.mule.runtime.core.api.util.IOUtils.copyLarge;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 
-import org.apache.http.client.fluent.Request;
-import org.apache.http.client.fluent.Response;
-import org.apache.http.entity.ContentType;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runners.Parameterized;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
+
 import org.mule.functional.api.component.TestConnectorQueueHandler;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transformer.AbstractTransformer;
+import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.StringMessageUtils;
+import org.mule.runtime.core.internal.transformer.ExtendedTransformationService;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 import org.mule.test.runner.RunnerDelegateTo;
@@ -36,6 +36,14 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collection;
+
+import org.apache.http.client.fluent.Request;
+import org.apache.http.client.fluent.Response;
+import org.apache.http.entity.ContentType;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
 public class HttpListenerEncodingTestCase extends AbstractHttpTestCase {
@@ -88,11 +96,26 @@ public class HttpListenerEncodingTestCase extends AbstractHttpTestCase {
     assertThat(message.getPayload().getDataType().getMediaType().getCharset().get(), is(charset));
   }
 
-  public static class ObjectToStringProcessor extends AbstractTransformer {
+  public static class ObjectToStringProcessor extends AbstractTransformer implements Processor {
 
     public ObjectToStringProcessor() {
       registerSourceType(DataType.CURSOR_STREAM_PROVIDER);
       setReturnDataType(DataType.STRING);
+    }
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      if (event != null && event.getMessage() != null) {
+        try {
+          return CoreEvent.builder(event)
+              .message(((ExtendedTransformationService) muleContext.getTransformationService())
+                  .applyTransformers(event.getMessage(), event, this))
+              .build();
+        } catch (Exception e) {
+          throw new MessageTransformerException(this, e, event.getMessage());
+        }
+      }
+      return event;
     }
 
     @Override
