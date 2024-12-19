@@ -38,6 +38,8 @@ public class BaseHttpRequestAttributes extends HttpAttributes {
   @Parameter
   protected String requestPath;
 
+  public BaseHttpRequestAttributes() {}
+
   public BaseHttpRequestAttributes(MultiMap<String, String> headers, MultiMap<String, String> queryParams,
                                    Map<String, String> uriParams, String requestPath) {
     super(headers);

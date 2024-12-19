@@ -36,7 +36,7 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
    * Full path where the request was received. Former 'http.listener.path'.
    */
   @Parameter
-  private final String listenerPath;
+  private String listenerPath;
 
   /**
    * Full path requested, encoded as received.
@@ -50,7 +50,7 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
    * Path where the request was received, without considering the base path. Former 'http.relative.path'.
    */
   @Parameter
-  private final String relativePath;
+  private String relativePath;
 
   /**
    * Path computed from masking the {@code rawRequestPath} with the {@code listenerPath} and taking the difference. Note that this
@@ -59,31 +59,31 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
    * @since 1.4.0
    */
   @Parameter
-  private final String maskedRequestPath;
+  private String maskedRequestPath;
 
   /**
    * HTTP version of the request. Former 'http.version'.
    */
   @Parameter
-  private final String version;
+  private String version;
 
   /**
    * HTTP scheme of the request. Former 'http.scheme'.
    */
   @Parameter
-  private final String scheme;
+  private String scheme;
 
   /**
    * HTTP method of the request. Former 'http.method'.
    */
   @Parameter
-  private final String method;
+  private String method;
 
   /**
    * Full URI of the request. Former 'http.request.uri'.
    */
   @Parameter
-  private final String requestUri;
+  private String requestUri;
 
   /**
    * Full URI of the request, encoded as received.
@@ -91,25 +91,25 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
    * @since 1.5.0
    */
   @Parameter
-  private final String rawRequestUri;
+  private String rawRequestUri;
 
   /**
    * Query string of the request. Former 'http.query.string'.
    */
   @Parameter
-  private final String queryString;
+  private String queryString;
 
   /**
    * Local host address from the server.
    */
   @Parameter
-  private final String localAddress;
+  private String localAddress;
 
   /**
    * Remote host address from the sender. Former 'http.remote.address'.
    */
   @Parameter
-  private final String remoteAddress;
+  private String remoteAddress;
 
   /**
    * Client certificate (if 2 way TLS is enabled). Former 'http.client.cert'.
@@ -132,7 +132,7 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
    * If found in that situation, a workaround is to call {@link HttpRequestAttributes#getClientCertificate()} before
    * serialization. That way, the certificate will be resolved and serialization will work.
    */
-  private final CertificateProvider lazyClientCertificateProvider;
+  private CertificateProvider lazyClientCertificateProvider;
 
   /**
    * @deprecated use {@link HttpRequestAttributesBuilder} instead
@@ -146,6 +146,8 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
          queryParams,
          uriParams, "", remoteAddress, () -> clientCertificate);
   }
+
+  public HttpRequestAttributes() {}
 
   HttpRequestAttributes(MultiMap<String, String> headers, String listenerPath, String relativePath, String maskedRequestPath,
                         String version, String scheme, String method, String requestPath, String rawRequestPath,
