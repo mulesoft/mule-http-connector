@@ -6,10 +6,14 @@
  */
 package org.mule.test.http.functional.listener;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.runtime.http.api.HttpHeaders.Values.KEEP_ALIVE;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
@@ -122,7 +126,11 @@ public abstract class HttpListenerPersistentConnectionsTestCase extends Abstract
   }
 
   private void assertResponse(String response, boolean shouldBeValid) {
-    assertThat(StringUtils.isEmpty(response), is(!shouldBeValid));
+    if (shouldBeValid) {
+      assertThat(response, not(emptyOrNullString()));
+    } else {
+      assertThat(response, emptyOrNullString());
+    }
   }
 
   private void sendRequest(Socket socket, HttpVersion httpVersion) throws IOException {
