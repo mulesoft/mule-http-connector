@@ -28,8 +28,8 @@ public class CompatibilityCertificateProvider implements CertificateProvider {
   private transient LazyValue<CertificateData> certificateLazyValue;
 
   /**
-   * Returns a new {@link CompatibilityCertificateProvider}.
-   * Constructor is package private to only allow {@link CertificateProviderFactory} to create instances.
+   * Returns a new {@link CompatibilityCertificateProvider}. Constructor is package private to only allow
+   * {@link CertificateProviderFactory} to create instances.
    *
    * @param certificateSupplier actual supplier that returns the {@link Certificate}
    */

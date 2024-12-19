@@ -95,9 +95,9 @@ public class HttpRequestFactory {
   /**
    * Creates an {@HttpRequest}.
    *
-   * @param httpRequestCreator The generic {@link RequestCreator} from the request component that should be used to
-   *                       create the {@link HttpRequest}.
-   * @param authentication The {@link HttpRequestAuthentication} that should be used to create the {@link HttpRequest}.
+   * @param httpRequestCreator The generic {@link RequestCreator} from the request component that should be used to create the
+   *                           {@link HttpRequest}.
+   * @param authentication     The {@link HttpRequestAuthentication} that should be used to create the {@link HttpRequest}.
    * @return an {@HttpRequest} configured based on the parameters.
    * @throws MuleException if the request creation fails.
    */
@@ -176,9 +176,9 @@ public class HttpRequestFactory {
       List<String> cookies = config.getCookieManager().get(builder.getUri(), emptyMap()).get(COOKIE);
       if (cookies != null && cookies.size() > 0) {
         // The RFC-6265, section 5.4 says:
-        //   If the user agent does attach a Cookie header field to an HTTP
-        //   request, the user agent MUST send the cookie-string (defined below)
-        //   as the value of the header field.
+        // If the user agent does attach a Cookie header field to an HTTP
+        // request, the user agent MUST send the cookie-string (defined below)
+        // as the value of the header field.
         //
         // So we should concatenate the cookies
 

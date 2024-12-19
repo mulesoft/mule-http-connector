@@ -74,11 +74,12 @@ public class HttpRequesterConnectionManager implements Disposable {
   }
 
   /**
-   * Searches for an already existing {@link ShareableHttpClient} associated with the desired configuration name.
-   * If there isn't a {@link ShareableHttpClient} present, it creates an {@link ShareableHttpClient}.
+   * Searches for an already existing {@link ShareableHttpClient} associated with the desired configuration name. If there isn't a
+   * {@link ShareableHttpClient} present, it creates an {@link ShareableHttpClient}.
    *
-   * @param configName the name of the client to look for.
-   * @param configSupplier a supplier from {@link HttpClientConfiguration}. It's only utilised if a new {@link ShareableHttpClient} is created.
+   * @param configName     the name of the client to look for.
+   * @param configSupplier a supplier from {@link HttpClientConfiguration}. It's only utilised if a new
+   *                       {@link ShareableHttpClient} is created.
    * @return the corresponding {@link ShareableHttpClient} if found or a new {@link ShareableHttpClient} otherwise.
    */
   public synchronized ShareableHttpClient lookupOrCreate(String configName,

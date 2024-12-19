@@ -144,8 +144,7 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
   }
 
   /**
-   * @deprecated
-   * use {@link HttpRequesterRequestBuilder#toHttpRequestBuilder} instead
+   * @deprecated use {@link HttpRequesterRequestBuilder#toHttpRequestBuilder} instead
    */
   @Deprecated
   public HttpRequestBuilder configure(HttpRequesterConfig config) {

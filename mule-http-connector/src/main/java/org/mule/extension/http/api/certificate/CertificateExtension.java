@@ -9,10 +9,11 @@ package org.mule.extension.http.api.certificate;
 import java.io.Serializable;
 
 /**
- * A custom Data Transfer Object (DTO) to replace the certificate extension class from the {@link java.security.cert.X509Extension} package.
+ * A custom Data Transfer Object (DTO) to replace the certificate extension class from the
+ * {@link java.security.cert.X509Extension} package.
  * <p>
- * This class encapsulates details of a certificate extension, including its OID, value, criticality,
- * and an optional subject alternative name. It implements {@link java.io.Serializable} to allow its instances to be serialized.
+ * This class encapsulates details of a certificate extension, including its OID, value, criticality, and an optional subject
+ * alternative name. It implements {@link java.io.Serializable} to allow its instances to be serialized.
  * </p>
  */
 public class CertificateExtension implements Serializable {
@@ -25,10 +26,10 @@ public class CertificateExtension implements Serializable {
   /**
    * Constructs a new {@code CertificateExtension} instance with the specified attributes.
    *
-   * @param oid                     the OID of the extension
-   * @param criticality             the criticality of the extension
-   * @param value                   the value of the extension
-   * @param subjectAlternativeName  the subject alternative name (if applicable)
+   * @param oid                    the OID of the extension
+   * @param criticality            the criticality of the extension
+   * @param value                  the value of the extension
+   * @param subjectAlternativeName the subject alternative name (if applicable)
    */
   public CertificateExtension(String oid, boolean criticality, byte[] value, String subjectAlternativeName) {
     this.oid = oid;

@@ -197,9 +197,8 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   private HttpStreamingType responseStreamingMode;
 
   /**
-   * Defines if the response should be sent in the same thread where the listener's
-   * callback is notified, or scheduled to another {@link Scheduler}.
-   * This is useful when the user knows that the payload to send is generated slowly.
+   * Defines if the response should be sent in the same thread where the listener's callback is notified, or scheduled to another
+   * {@link Scheduler}. This is useful when the user knows that the payload to send is generated slowly.
    *
    * @since 1.11.0
    */

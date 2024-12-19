@@ -16,9 +16,8 @@ import org.mule.runtime.api.util.MultiMap;
 import java.io.Serializable;
 
 /**
- * Representation of an HTTP response message attributes that can be created through
- * the expression language to modify the response parameters of the http:listener
- * using policies.
+ * Representation of an HTTP response message attributes that can be created through the expression language to modify the
+ * response parameters of the http:listener using policies.
  *
  * @since 1.0
  */

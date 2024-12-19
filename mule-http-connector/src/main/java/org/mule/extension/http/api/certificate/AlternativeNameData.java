@@ -11,8 +11,8 @@ import java.io.Serializable;
 /**
  * A custom Data Transfer Object (DTO) to replace the {@link java.security.cert.X509Certificate} AlternativeName class.
  * <p>
- * This class is a simple representation of an alternative name with two attributes: type and name.
- * It implements {@link java.io.Serializable} to allow its instances to be serialized.
+ * This class is a simple representation of an alternative name with two attributes: type and name. It implements
+ * {@link java.io.Serializable} to allow its instances to be serialized.
  * </p>
  */
 public class AlternativeNameData implements Serializable {

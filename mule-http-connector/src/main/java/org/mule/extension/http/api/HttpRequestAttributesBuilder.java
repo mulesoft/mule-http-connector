@@ -194,7 +194,7 @@ public class HttpRequestAttributesBuilder {
   }
 
   private String maskRequestPath() {
-    //Avoid resolution if not a valid listenerPath mask
+    // Avoid resolution if not a valid listenerPath mask
     if (!listenerPath.endsWith(WILDCARD)) {
       return null;
     }
@@ -205,12 +205,12 @@ public class HttpRequestAttributesBuilder {
     try {
       while (listenerPathCurrentSlashIndex < listenerPath.length() - 1) {
         listenerPathCurrentSlashIndex = iterateUntilNextSlash(listenerPath, listenerPathCurrentSlashIndex);
-        //Using the raw path means the masking will be done against the actual client data (a must for proxies)
+        // Using the raw path means the masking will be done against the actual client data (a must for proxies)
         requestPathCurrentSlashIndex = iterateUntilNextSlash(rawRequestPath, requestPathCurrentSlashIndex);
       }
     } catch (StringIndexOutOfBoundsException e) {
-      //If here it means that the number of slashes in the requestPath is not the same as in the listenerPath.
-      //That can only happen if the requestPath is equal to the listenerPath without considering the *.
+      // If here it means that the number of slashes in the requestPath is not the same as in the listenerPath.
+      // That can only happen if the requestPath is equal to the listenerPath without considering the *.
       return valueOf(SLASH);
     }
 
