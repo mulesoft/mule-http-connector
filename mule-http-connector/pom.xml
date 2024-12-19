@@ -7,7 +7,7 @@
         <artifactId>mule-core-modules-parent</artifactId>
         <!-- TODO MULE-15249 if this is upgraded, change the Map to Set in HttpResponseHeaderBuilder -->
         <!-- TODO MULE-15803 if this is upgraded, change HttpRequestAttributes#lazyClientCertificate-->
-        <version>1.1.11</version>
+        <version>1.9.0-rc1</version>
         <relativePath/>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -21,6 +21,8 @@
     <description>A Mule extension that provides HTTP server and client functionality</description>
 
     <properties>
+        <java.release.version>8</java.release.version>
+
         <jacoco.version>0.8.11</jacoco.version>
         <aspectjVersion>1.9.22.1</aspectjVersion>
 
@@ -31,6 +33,11 @@
         <commonsLang3Version>3.12.0</commonsLang3Version>
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
 
+<!--        <mule.version>4.1.1</mule.version>-->
+<!--        <muleBomVersion>4.9.0-rc1</muleBomVersion>-->
+
+        <muleSchedulerServiceVersion>1.1.11</muleSchedulerServiceVersion>
+        <muleHttpServiceVersion>1.1.1</muleHttpServiceVersion>
         <muleJavaEeBomVersion>4.7.2</muleJavaEeBomVersion>
         <muleSocketsConnectorVersion>1.2.5</muleSocketsConnectorVersion>
         <muleCorsKernelVersion>1.1.2</muleCorsKernelVersion>
@@ -110,6 +117,7 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>
                     <execution>
+                    	<id>default-jar</id>
                         <goals>
                             <goal>jar</goal>
                             <goal>test-jar</goal>
@@ -471,12 +479,6 @@
                         <version>${munit.extensions.maven.plugin.version}</version>
                         <configuration>
                             <argLines>
-                                <argLine>
-                                    -XX:+IgnoreUnrecognizedVMOptions
-                                </argLine>
-                                <argLine>
-                                    --add-opens=java.base/java.lang=ALL-UNNAMED
-                                </argLine>
                                 <argLine>
                                     -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${session.executionRootDirectory}/target/jacoco.exec
                                 </argLine>
