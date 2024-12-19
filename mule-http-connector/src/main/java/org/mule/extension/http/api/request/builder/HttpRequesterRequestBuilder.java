@@ -6,11 +6,12 @@
  */
 package org.mule.extension.http.api.request.builder;
 
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.unmodifiableMap;
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 import static org.mule.runtime.extension.api.runtime.parameter.OutboundCorrelationStrategy.AUTO;
 import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
+
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.unmodifiableMap;
 
 import org.mule.extension.http.api.HttpMessageBuilder;
 import org.mule.extension.http.internal.request.HttpRequesterConfig;
