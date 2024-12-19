@@ -107,7 +107,7 @@ public class HttpResponseToResult {
   /**
    *
    * @param contentTypeValue
-   * @param defaultCharset the encoding to use if the given {@code contentTypeValue} doesn't have a {@code charset} parameter.
+   * @param defaultCharset   the encoding to use if the given {@code contentTypeValue} doesn't have a {@code charset} parameter.
    * @return
    */
   private MediaType getMediaType(final String contentTypeValue, Charset defaultCharset) {

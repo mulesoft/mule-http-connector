@@ -121,16 +121,16 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
   /**
    * Actual {@link Certificate} to use, avoid any processing until it's actually needed.
    * </p>
-   * In order to avoid updating this module's minMuleVersion and maintain both the lazy and serializable properties, {@link CertificateProvider}
-   * was created.
-   * Implementations of {@link CertificateProvider} will change according to the available classes provided by the version of mule-api at runtime.
-   * For versions prior to 1.1.5(4.1.5), the required classes to fully support this functionality will not be present.
-   * As a consequence, {@link HttpRequestAttributes} serialization may not behave as required.
+   * In order to avoid updating this module's minMuleVersion and maintain both the lazy and serializable properties,
+   * {@link CertificateProvider} was created. Implementations of {@link CertificateProvider} will change according to the
+   * available classes provided by the version of mule-api at runtime. For versions prior to 1.1.5(4.1.5), the required classes to
+   * fully support this functionality will not be present. As a consequence, {@link HttpRequestAttributes} serialization may not
+   * behave as required.
    * </p>
-   * Specifically, and only in this case, if running in an EE runtime prior to 4.1.5 and using a Kryo serializer,
-   * the client certificate value will be lost after serialization and {@link HttpRequestAttributes#getClientCertificate()} will return null.
-   * If found in that situation, a workaround is to call {@link HttpRequestAttributes#getClientCertificate()} before serialization.
-   * That way, the certificate will be resolved and serialization will work.
+   * Specifically, and only in this case, if running in an EE runtime prior to 4.1.5 and using a Kryo serializer, the client
+   * certificate value will be lost after serialization and {@link HttpRequestAttributes#getClientCertificate()} will return null.
+   * If found in that situation, a workaround is to call {@link HttpRequestAttributes#getClientCertificate()} before
+   * serialization. That way, the certificate will be resolved and serialization will work.
    */
   private final CertificateProvider lazyClientCertificateProvider;
 
