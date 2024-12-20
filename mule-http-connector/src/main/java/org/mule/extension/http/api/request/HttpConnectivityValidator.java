@@ -6,15 +6,15 @@
  */
 package org.mule.extension.http.api.request;
 
-import static java.util.Collections.emptyList;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-
 import static org.mule.extension.http.api.request.HttpSendBodyMode.AUTO;
 import static org.mule.extension.http.internal.request.KeyValuePairUtils.toMultiMap;
 import static org.mule.extension.http.internal.request.UriUtils.replaceUriParams;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+
+import static java.util.Collections.emptyList;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
@@ -47,11 +47,13 @@ import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 
-import javax.inject.Inject;
 import java.net.CookieManager;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
 
 /**
  * Requester connectivity validator. It validates the connections created by the {@link HttpRequesterProvider}.
@@ -258,4 +260,36 @@ public class HttpConnectivityValidator implements Initialisable {
       return null;
     }
   }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(followRedirects, requestBody, requestBuilder, requestHeaders, requestMethod, requestPath,
+                        requestQueryParams, requestUriParams, responseTimeout, responseTimeoutUnit, responseValidator);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    HttpConnectivityValidator other = (HttpConnectivityValidator) obj;
+    return followRedirects == other.followRedirects
+        && Objects.equals(requestBody, other.requestBody)
+        && Objects.equals(requestBuilder, other.requestBuilder)
+        && Objects.equals(requestHeaders, other.requestHeaders)
+        && Objects.equals(requestMethod, other.requestMethod)
+        && Objects.equals(requestPath, other.requestPath)
+        && Objects.equals(requestQueryParams, other.requestQueryParams)
+        && Objects.equals(requestUriParams, other.requestUriParams)
+        && Objects.equals(responseTimeout, other.responseTimeout)
+        && responseTimeoutUnit == other.responseTimeoutUnit
+        && Objects.equals(responseValidator, other.responseValidator);
+  }
+
 }

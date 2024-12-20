@@ -6,16 +6,19 @@
  */
 package org.mule.test.http.api;
 
+import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
+
 import static java.lang.System.lineSeparator;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.util.MultiMap;
 
-import io.qameta.allure.Feature;
 import org.junit.Test;
+
+import io.qameta.allure.Feature;
 
 @Feature(HTTP_EXTENSION)
 public class HttpResponseAttributesTestCase extends AbstractHttpAttributesTestCase {
@@ -25,8 +28,8 @@ public class HttpResponseAttributesTestCase extends AbstractHttpAttributesTestCa
       "   Status Code=401" + lineSeparator() +
       "   Reason Phrase=Some Reason Phrase" + lineSeparator() +
       "   Headers=[" + lineSeparator() +
-      "      header2=headerValue2" + lineSeparator() +
       "      header1=headerValue1" + lineSeparator() +
+      "      header2=headerValue2" + lineSeparator() +
       "   ]" + lineSeparator() +
       "}";
 
@@ -43,8 +46,8 @@ public class HttpResponseAttributesTestCase extends AbstractHttpAttributesTestCa
           "   Status Code=401" + lineSeparator() +
           "   Reason Phrase=null" + lineSeparator() +
           "   Headers=[" + lineSeparator() +
-          "      header2=headerValue2" + lineSeparator() +
           "      header1=headerValue1" + lineSeparator() +
+          "      header2=headerValue2" + lineSeparator() +
           "   ]" + lineSeparator() +
           "}";
 
@@ -53,10 +56,10 @@ public class HttpResponseAttributesTestCase extends AbstractHttpAttributesTestCa
       "   Status Code=401" + lineSeparator() +
       "   Reason Phrase=Unauthorised" + lineSeparator() +
       "   Headers=[" + lineSeparator() +
-      "      authorization=****" + lineSeparator() +
       "      password=****" + lineSeparator() +
       "      pass=****" + lineSeparator() +
       "      client_secret=****" + lineSeparator() +
+      "      authorization=****" + lineSeparator() +
       "      regular=show me" + lineSeparator() +
       "   ]" + lineSeparator() +
       "}";

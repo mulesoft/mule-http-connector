@@ -6,36 +6,30 @@
  */
 package org.mule.test.http.functional.listener;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.api.config.i18n.CoreMessages.errorReadingStream;
-import static org.mule.runtime.core.api.util.IOUtils.copyLarge;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 
-import org.apache.http.client.fluent.Request;
-import org.apache.http.client.fluent.Response;
-import org.apache.http.entity.ContentType;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runners.Parameterized;
+import static java.util.Arrays.asList;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
+
 import org.mule.functional.api.component.TestConnectorQueueHandler;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
-import org.mule.runtime.core.api.transformer.AbstractTransformer;
-import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.api.util.StringMessageUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 import org.mule.test.runner.RunnerDelegateTo;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.Collection;
+
+import org.apache.http.client.fluent.Request;
+import org.apache.http.client.fluent.Response;
+import org.apache.http.entity.ContentType;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
 public class HttpListenerEncodingTestCase extends AbstractHttpTestCase {
@@ -58,9 +52,15 @@ public class HttpListenerEncodingTestCase extends AbstractHttpTestCase {
 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> parameters() {
-    return Arrays.asList(new Object[][] {{"EUC-JP", JAPANESE_MESSAGE}, {"Windows-31J", JAPANESE_MESSAGE},
-        {"ISO-2022-JP", JAPANESE_MESSAGE}, {"UTF-8", JAPANESE_MESSAGE}, {"Arabic", ARABIC_MESSAGE},
-        {"Windows-1256", ARABIC_MESSAGE}, {"Windows-1251", CYRILLIC_MESSAGE}, {"Cyrillic", CYRILLIC_MESSAGE},
+    return asList(new Object[][] {
+        {"EUC-JP", JAPANESE_MESSAGE},
+        {"Windows-31J", JAPANESE_MESSAGE},
+        {"ISO-2022-JP", JAPANESE_MESSAGE},
+        {"UTF-8", JAPANESE_MESSAGE},
+        {"Arabic", ARABIC_MESSAGE},
+        {"Windows-1256", ARABIC_MESSAGE},
+        {"Windows-1251", CYRILLIC_MESSAGE},
+        {"Cyrillic", CYRILLIC_MESSAGE},
         {"US-ASCII", SIMPLE_MESSAGE}});
   }
 
@@ -86,40 +86,6 @@ public class HttpListenerEncodingTestCase extends AbstractHttpTestCase {
     Message message = queueHandler.read("out", 2000).getMessage();
     assertThat(getPayloadAsString(message), is(testMessage));
     assertThat(message.getPayload().getDataType().getMediaType().getCharset().get(), is(charset));
-  }
-
-  public static class ObjectToStringProcessor extends AbstractTransformer {
-
-    public ObjectToStringProcessor() {
-      registerSourceType(DataType.CURSOR_STREAM_PROVIDER);
-      setReturnDataType(DataType.STRING);
-    }
-
-    @Override
-    public Object doTransform(Object src, Charset outputEncoding) throws TransformerException {
-      if (src instanceof CursorStreamProvider) {
-        return createStringFromInputStream(((CursorStreamProvider) src).openCursor(), outputEncoding);
-      } else {
-        return StringMessageUtils.toString(src);
-      }
-    }
-
-    protected String createStringFromInputStream(InputStream input, Charset outputEncoding)
-        throws TransformerException {
-      try {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        copyLarge(input, outputStream);
-        return outputStream.toString(outputEncoding.name());
-      } catch (IOException e) {
-        throw new TransformerException(errorReadingStream(), e);
-      } finally {
-        try {
-          input.close();
-        } catch (IOException e) {
-          logger.warn("Could not close stream", e);
-        }
-      }
-    }
   }
 
 }

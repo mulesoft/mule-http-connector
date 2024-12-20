@@ -5,9 +5,7 @@
     <parent>
         <groupId>org.mule.extensions</groupId>
         <artifactId>mule-core-modules-parent</artifactId>
-        <!-- TODO MULE-15249 if this is upgraded, change the Map to Set in HttpResponseHeaderBuilder -->
-        <!-- TODO MULE-15803 if this is upgraded, change HttpRequestAttributes#lazyClientCertificate-->
-        <version>1.1.11</version>
+        <version>1.9.0-rc1</version>
         <relativePath/>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -21,6 +19,8 @@
     <description>A Mule extension that provides HTTP server and client functionality</description>
 
     <properties>
+        <java.release.version>8</java.release.version>
+
         <jacoco.version>0.8.11</jacoco.version>
         <aspectjVersion>1.9.22.1</aspectjVersion>
 
@@ -31,6 +31,8 @@
         <commonsLang3Version>3.12.0</commonsLang3Version>
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
 
+        <muleSchedulerServiceVersion>1.1.11</muleSchedulerServiceVersion>
+        <muleHttpServiceVersion>1.1.1</muleHttpServiceVersion>
         <muleJavaEeBomVersion>4.7.2</muleJavaEeBomVersion>
         <muleSocketsConnectorVersion>1.2.5</muleSocketsConnectorVersion>
         <muleCorsKernelVersion>1.1.2</muleCorsKernelVersion>
@@ -110,6 +112,7 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>
                     <execution>
+                    	<id>default-jar</id>
                         <goals>
                             <goal>jar</goal>
                             <goal>test-jar</goal>
@@ -514,15 +517,15 @@
                             <artifactId>maven-surefire-plugin</artifactId>
                             <configuration>
                                 <argLine>${surefire.args}</argLine>
-                                <systemProperties>
+                                <systemPropertyVariables>
                                     <mule.fips.testing>true</mule.fips.testing>
-                                </systemProperties>
-                                    <properties>
-                                        <property>
-                                            <name>listener</name>
-                                            <value>org.mule.test.AllureJunit4</value>
-                                        </property>
-                                    </properties>
+                                </systemPropertyVariables>
+                                <properties>
+                                    <property>
+                                        <name>listener</name>
+                                        <value>org.mule.test.AllureJunit4</value>
+                                    </property>
+                                </properties>
                             </configuration>
                         </plugin>
                         <plugin>

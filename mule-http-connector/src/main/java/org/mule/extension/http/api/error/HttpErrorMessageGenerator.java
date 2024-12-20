@@ -35,7 +35,7 @@ public class HttpErrorMessageGenerator {
    * follow the following pattern: "HTTP GET on resource http://host:port/path failed", adding a custom message for known errors
    * and the received status code for all errors.
    *
-   * @param request the {@link HttpRequest} that resulted in the failure response
+   * @param request    the {@link HttpRequest} that resulted in the failure response
    * @param statusCode the status code received as a response
    * @return the message to be used on exceptions
    */

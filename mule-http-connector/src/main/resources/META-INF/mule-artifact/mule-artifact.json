@@ -1,0 +1,5 @@
+{
+  // TODO MULE-15249 if this is upgraded, change the Map to Set in HttpResponseHeaderBuilder
+  // TODO MULE-15803 if this is upgraded, change HttpRequestAttributes#lazyClientCertificate
+  "minMuleVersion": "4.1.1"
+}
