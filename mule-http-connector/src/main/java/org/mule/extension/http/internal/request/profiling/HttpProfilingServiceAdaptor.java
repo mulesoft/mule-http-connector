@@ -15,8 +15,9 @@ import javax.inject.Inject;
 
 /**
  * Adaptor for {@link ProfilingService} to obtain a {@link HttpRequestResponseProfilingDataProducerAdaptor} for generating
- * profiling related HTTP requests. This is implemented so that no need to change the min mule version is needed in the HTTP
- * connector.
+ * profiling related HTTP requests.
+ * <p>
+ * This is implemented so that no need to change the min mule version is needed in the HTTP connector.
  *
  * @see HttpRequestOperations#initialise()
  */

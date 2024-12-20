@@ -13,8 +13,9 @@ import java.util.regex.Pattern;
 /**
  * A custom Data Transfer Object (DTO) to replace the {@link java.security.Principal} class.
  * <p>
- * This class is a simple representation of a principal with a single attribute, the name. It implements
- * {@link java.io.Serializable} to allow its instances to be serialized.
+ * This class is a simple representation of a principal with a single attribute, the name.
+ * <p>
+ * It implements {@link Serializable} to allow its instances to be serialized.
  * </p>
  */
 public class PrincipalData implements Serializable {
