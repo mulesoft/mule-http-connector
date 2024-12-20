@@ -1,15 +1,11 @@
 projectType: extension
 mavenTool: "3.9.9"
 
-mavenAdditionalArgs: -pl .,mule-http-connector
+jdkTool: OPEN-JDK17
+testJdkTool: OPEN-JDK17
+mavenAdditionalArgs: -DmunitMinMuleVersion=4.6.0 -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE -Dmule.module.tweaking.validation.skip=true
 
 additionalTestConfigs:
-  functionalTests:
-    jdkTool: OPEN-JDK17
-    mavenAdditionalArgs: -pl functional-tests,functional-tests/http,functional-tests/cors -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE -Dmule.module.tweaking.validation.skip=true
-  munitTests:
-    testJdkTool: OPEN-JDK17
-    mavenAdditionalArgs: -pl mule-http-connector -DmunitMinMuleVersion=4.6.0 -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE -Dmule.module.tweaking.validation.skip=true
   netty-functionalTests:
     jdkTool: OPEN-JDK17
     mavenAdditionalArgs: -pl functional-tests,functional-tests/http,functional-tests/cors -Dmule.http.service.implementation=NETTY -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE -Dmule.module.tweaking.validation.skip=true
