@@ -8,7 +8,11 @@ package org.mule.test.http.functional.requester;
 
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.EXPECTATION_FAILED;
 
-import static org.junit.Assert.assertThat;
+import static java.lang.System.getProperty;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assume.assumeThat;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -31,6 +35,9 @@ public class HttpRequestExpectHeaderFailTestCase extends AbstractHttpExpectHeade
 
   @Test
   public void handlesExpectationFailedResponse() throws Exception {
+    // TODO (W-15666548): Enable this for NETTY too.
+    assumeThat(getProperty("mule.http.service.implementation", "GRIZZLY"), is("GRIZZLY"));
+
     startExpectFailedServer();
 
     // Set a payload that will fail when consumed. As the server rejects the request after processing
@@ -48,5 +55,4 @@ public class HttpRequestExpectHeaderFailTestCase extends AbstractHttpExpectHeade
 
     stopServer();
   }
-
 }
