@@ -6,10 +6,6 @@
  */
 package org.mule.extension.http.internal.request;
 
-import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 import static org.mule.extension.http.internal.request.HttpPollingSource.ATTRIBUTES_PLACEHOLDER;
 import static org.mule.extension.http.internal.request.HttpPollingSource.ITEM_PLACEHOLDER;
 import static org.mule.extension.http.internal.request.HttpPollingSource.PAYLOAD_PLACEHOLDER;
@@ -21,6 +17,11 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
+
+import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.request.builder.KeyValuePair;
@@ -35,13 +36,11 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.extension.api.runtime.parameter.Literal;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -81,17 +80,18 @@ public final class HttpPollingSourceUtils {
   }
 
   /**
-   * Returns the items withing the payload (and/or attributes) of the response, considering the itemExpression. application/java
-   * is not an accepted {@link MediaType}
+   * Returns the items withing the payload (and/or attributes) of the response, considering the itemExpression.
+   * <p>
+   * {@code application/java} is not an accepted {@link MediaType}
    *
    * @param payload
    * @param attributes
    * @param currentWatermark
    * @param itemsExpression
    * @param expressionLanguage
-   * @return A {@link Stream} of {@link Result}s, after being splitted given the itemExpression. If there is no itemExpression
-   *         (i.e. empty {@link Optional}), the result will just contain the current payload. If there is an expression, it will
-   *         use the {@link ExpressionLanguage} to use it to split the payload and return a stream of {@link Result}s.
+   * @return A {@link Stream} of {@link Result}s, after being split given the itemExpression. If there is no itemExpression (i.e.
+   *         empty {@link Optional}), the result will just contain the current payload. If there is an expression, it will use the
+   *         {@link ExpressionLanguage} to use it to split the payload and return a stream of {@link Result}s.
    */
   public static Stream<Result<TypedValue<?>, HttpResponseAttributes>> getItems(TypedValue<String> payload,
                                                                                HttpResponseAttributes attributes,

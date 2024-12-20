@@ -257,10 +257,10 @@
             <classifier>mule-service</classifier>
             <scope>provided</scope>
             <exclusions>
-            	<exclusion>
-            		<groupId>*</groupId>
-            		<artifactId>*</artifactId>
-            	</exclusion>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -269,10 +269,10 @@
             <classifier>mule-service</classifier>
             <scope>provided</scope>
             <exclusions>
-            	<exclusion>
-            		<groupId>*</groupId>
-            		<artifactId>*</artifactId>
-            	</exclusion>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -286,10 +286,10 @@
             <classifier>mule-service</classifier>
             <scope>provided</scope>
             <exclusions>
-            	<exclusion>
-            		<groupId>*</groupId>
-            		<artifactId>*</artifactId>
-            	</exclusion>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -298,10 +298,10 @@
             <scope>test</scope>
             <type>test-jar</type>
             <exclusions>
-            	<exclusion>
-            		<groupId>*</groupId>
-            		<artifactId>*</artifactId>
-            	</exclusion>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
     </dependencies>

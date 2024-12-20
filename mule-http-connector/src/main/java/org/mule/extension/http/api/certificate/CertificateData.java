@@ -27,8 +27,9 @@ import java.util.Set;
  * <p>
  * This class provides a comprehensive representation of a certificate with various attributes such as type, encoded form,
  * version, subject and issuer distinguished names, serial number, validity period, public key, signature algorithm details, and
- * extensions. It implements {@link java.io.Serializable} to allow its instances to be serialized.
- * </p>
+ * extensions.
+ * <p>
+ * It implements {@link Serializable} to allow its instances to be serialized.
  */
 public class CertificateData implements Serializable {
 

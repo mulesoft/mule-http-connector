@@ -14,7 +14,7 @@
     <flow name="encodingTest">
         <http:listener path="test" config-ref="listenerConfig"/>
         <test:queue name="out">
-        	<test:content>#[payload as String]</test:content>
+            <test:content>#[payload as String]</test:content>
         </test:queue>
     </flow>
 
