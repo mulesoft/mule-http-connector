@@ -516,15 +516,15 @@
                             <artifactId>maven-surefire-plugin</artifactId>
                             <configuration>
                                 <argLine>${surefire.args}</argLine>
-                                <systemProperties>
+                                <systemPropertyVariables>
                                     <mule.fips.testing>true</mule.fips.testing>
-                                </systemProperties>
-                                    <properties>
-                                        <property>
-                                            <name>listener</name>
-                                            <value>org.mule.test.AllureJunit4</value>
-                                        </property>
-                                    </properties>
+                                </systemPropertyVariables>
+                                <properties>
+                                    <property>
+                                        <name>listener</name>
+                                        <value>org.mule.test.AllureJunit4</value>
+                                    </property>
+                                </properties>
                             </configuration>
                         </plugin>
                         <plugin>

@@ -249,12 +249,6 @@
             <version>${mule.version}</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-javaee</artifactId>
-            <version>${mule.version}</version>
-            <scope>provided</scope>
-        </dependency>
 
         <!-- Mule Services -->
         <dependency>
@@ -262,18 +256,28 @@
             <artifactId>mule-service-scheduler</artifactId>
             <classifier>mule-service</classifier>
             <scope>provided</scope>
+            <exclusions>
+            	<exclusion>
+            		<groupId>*</groupId>
+            		<artifactId>*</artifactId>
+            	</exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mule.services</groupId>
             <artifactId>mule-service-weave</artifactId>
             <classifier>mule-service</classifier>
-            <version>2.7.2</version>
             <scope>provided</scope>
+            <exclusions>
+            	<exclusion>
+            		<groupId>*</groupId>
+            		<artifactId>*</artifactId>
+            	</exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-dwb-api</artifactId>
-            <version>2.9.0-20241028</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -281,12 +285,11 @@
             <artifactId>mule-service-http</artifactId>
             <classifier>mule-service</classifier>
             <scope>provided</scope>
-            <!-- Exclusion: this is needed for registering the secure random for fips testing. The bouncy castle is sealed so the packages can only be registered once -->
             <exclusions>
-                <exclusion>
-                    <groupId>org.bouncycastle</groupId>
-                    <artifactId>bcprov-jdk18on</artifactId>
-                </exclusion>
+            	<exclusion>
+            		<groupId>*</groupId>
+            		<artifactId>*</artifactId>
+            	</exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -294,6 +297,12 @@
             <artifactId>mule-service-http</artifactId>
             <scope>test</scope>
             <type>test-jar</type>
+            <exclusions>
+            	<exclusion>
+            		<groupId>*</groupId>
+            		<artifactId>*</artifactId>
+            	</exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 </project>
