@@ -11,10 +11,13 @@ import static java.lang.Boolean.getBoolean;
 import static org.bouncycastle.crypto.CryptoServicesRegistrar.setSecureRandom;
 
 import org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider;
+
 import org.junit.runner.notification.RunListener;
 
 /**
- * Done to avoid the use of md5 by allure. This will only be present in fips testing.
+ * Done to avoid the use of md5 by allure.
+ * <p>
+ * This will only be present in fips testing.
  */
 public class AllureJunit4 extends RunListener {
 

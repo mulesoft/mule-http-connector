@@ -5,8 +5,6 @@
     <parent>
         <groupId>org.mule.extensions</groupId>
         <artifactId>mule-core-modules-parent</artifactId>
-        <!-- TODO MULE-15249 if this is upgraded, change the Map to Set in HttpResponseHeaderBuilder -->
-        <!-- TODO MULE-15803 if this is upgraded, change HttpRequestAttributes#lazyClientCertificate-->
         <version>1.9.0-rc1</version>
         <relativePath/>
     </parent>
@@ -32,9 +30,6 @@
 
         <commonsLang3Version>3.12.0</commonsLang3Version>
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
-
-<!--        <mule.version>4.1.1</mule.version>-->
-<!--        <muleBomVersion>4.9.0-rc1</muleBomVersion>-->
 
         <muleSchedulerServiceVersion>1.1.11</muleSchedulerServiceVersion>
         <muleHttpServiceVersion>1.1.1</muleHttpServiceVersion>
@@ -479,6 +474,12 @@
                         <version>${munit.extensions.maven.plugin.version}</version>
                         <configuration>
                             <argLines>
+                                <argLine>
+                                    -XX:+IgnoreUnrecognizedVMOptions
+                                </argLine>
+                                <argLine>
+                                    --add-opens=java.base/java.lang=ALL-UNNAMED
+                                </argLine>
                                 <argLine>
                                     -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${session.executionRootDirectory}/target/jacoco.exec
                                 </argLine>

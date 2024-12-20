@@ -255,7 +255,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven.surefire.plugin.version}</version>
                 <configuration>
-                    <argLine>${surefire.args} -Djava.security.debug=ocsp,certpath</argLine>
+                    <argLine>${surefire.args}</argLine>
                     <systemPropertyVariables>
                         <maven.projectVersion>${mule.version}</maven.projectVersion>
                     </systemPropertyVariables>
