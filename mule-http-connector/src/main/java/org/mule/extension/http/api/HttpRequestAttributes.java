@@ -177,8 +177,16 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
     return listenerPath;
   }
 
+  public void setListenerPath(String listenerPath) {
+    this.listenerPath = listenerPath;
+  }
+
   public String getRelativePath() {
     return relativePath;
+  }
+
+  public void setRelativePath(String relativePath) {
+    this.relativePath = relativePath;
   }
 
   public String getRawRequestPath() {
@@ -189,20 +197,40 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
     return maskedRequestPath;
   }
 
+  public void setMaskedRequestPath(String maskedRequestPath) {
+    this.maskedRequestPath = maskedRequestPath;
+  }
+
   public String getVersion() {
     return version;
+  }
+
+  public void setVersion(String version) {
+    this.version = version;
   }
 
   public String getScheme() {
     return scheme;
   }
 
+  public void setScheme(String scheme) {
+    this.scheme = scheme;
+  }
+
   public String getMethod() {
     return method;
   }
 
+  public void setMethod(String method) {
+    this.method = method;
+  }
+
   public String getRequestUri() {
     return requestUri;
+  }
+
+  public void setRequestUri(String requestUri) {
+    this.requestUri = requestUri;
   }
 
   public String getRawRequestUri() {
@@ -213,12 +241,24 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
     return queryString;
   }
 
+  public void setQueryString(String queryString) {
+    this.queryString = queryString;
+  }
+
   public String getLocalAddress() {
     return localAddress;
   }
 
+  public void setLocalAddress(String localAddress) {
+    this.localAddress = localAddress;
+  }
+
   public String getRemoteAddress() {
     return remoteAddress;
+  }
+
+  public void setRemoteAddress(String remoteAddress) {
+    this.remoteAddress = remoteAddress;
   }
 
   public CertificateData getClientCertificate() {
