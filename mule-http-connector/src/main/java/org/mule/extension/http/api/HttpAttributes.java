@@ -47,6 +47,10 @@ public abstract class HttpAttributes implements Serializable {
     return headers;
   }
 
+  public void setHeaders(MultiMap<String, String> headers) {
+    this.headers = headers;
+  }
+
   @Override
   public String toString() {
     return ReflectionToStringBuilder.toString(this, SHORT_PREFIX_STYLE);
