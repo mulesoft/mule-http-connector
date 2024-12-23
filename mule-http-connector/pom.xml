@@ -51,8 +51,8 @@
         <munit.version>3.3.1</munit.version>
         <mtf-tools.version>1.2.0</mtf-tools.version>
         <mavenResources.version>3.3.1</mavenResources.version>
-        <!-- MUnit minMuleVersion is 4.3.0 -->
-        <munitMinMuleVersion>4.6.0</munitMinMuleVersion>
+        <!-- MUnit minMuleVersion is 4.8.3-S, previous versions are configured via `additionalProducts` -->
+        <munitMinMuleVersion>4.8.3-SNAPSHOT</munitMinMuleVersion>
 
         <muleObjectStoreConnectorTestVersion>1.2.2</muleObjectStoreConnectorTestVersion>
 
@@ -70,6 +70,8 @@
         <bcpg-fips.version>1.0.7.1</bcpg-fips.version>
         <bcmail-fips.version>1.0.4</bcmail-fips.version>
         <bc-fips.version>1.0.2.5</bc-fips.version>
+        
+        <skipUnitTests>false</skipUnitTests>
     </properties>
 
     <build>
@@ -77,7 +79,6 @@
             <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
-                <version>${license.maven.plugin.version}</version>
                 <dependencies>
                     <dependency>
                         <groupId>com.mulesoft.license</groupId>
@@ -123,7 +124,6 @@
 
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>${mavenResources.version}</version>
                 <executions>
                     <execution>
                         <id>copy-munit-resources</id>
@@ -147,7 +147,6 @@
             <plugin>
                 <groupId>com.mulesoft.munit</groupId>
                 <artifactId>munit-extensions-maven-plugin</artifactId>
-                <version>${munit.extensions.maven.plugin.version}</version>
                 <executions>
                     <execution>
                         <goals>
@@ -178,6 +177,10 @@
                             <includeSnapshots>true</includeSnapshots>
                             <latestPatches>true</latestPatches>
                         </discoverRuntimes>
+                        <additionalRuntimes>
+                            <additionalRuntime>MULE_EE:4.6.11-SNAPSHOT</additionalRuntime>
+                            <additionalRuntime>MULE_EE:4.4.1-SNAPSHOT</additionalRuntime>
+                        </additionalRuntimes>
                     </runtimeConfiguration>
                 </configuration>
                 <dependencies>
@@ -211,6 +214,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                	<skipTests>${skipUnitTests}</skipTests>
+                </configuration>
                 <dependencies>
                     <dependency>
                         <groupId>org.aspectj</groupId>
@@ -471,7 +477,6 @@
                     <plugin>
                         <groupId>com.mulesoft.munit</groupId>
                         <artifactId>munit-extensions-maven-plugin</artifactId>
-                        <version>${munit.extensions.maven.plugin.version}</version>
                         <configuration>
                             <argLines>
                                 <argLine>
@@ -531,7 +536,6 @@
                         <plugin>
                             <groupId>com.mulesoft.munit</groupId>
                             <artifactId>munit-extensions-maven-plugin</artifactId>
-                            <version>${munit.extensions.maven.plugin.version}</version>
                             <configuration>
                                 <argLines>
                                     <argLine>
