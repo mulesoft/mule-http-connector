@@ -21,10 +21,10 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Handles one request per accepted socket. It expects a GET with a query parameter named "sleep", which time-unit is
- * SECONDS. After receiving such request, it will start a chunked response, sending the first chunk immediately, and
- * starts waiting the specified number of seconds. After that timeout, it will send a second chunk and a zero-len third
- * chunk, finishing the response.
+ * Handles one request per accepted socket. It expects a GET with a query parameter named "sleep", which time-unit is SECONDS.
+ * After receiving such request, it will start a chunked response, sending the first chunk immediately, and starts waiting the
+ * specified number of seconds. After that timeout, it will send a second chunk and a zero-len third chunk, finishing the
+ * response.
  * <p>
  * User can shortcut the timeout by calling forceFinishAllResponders().
  */

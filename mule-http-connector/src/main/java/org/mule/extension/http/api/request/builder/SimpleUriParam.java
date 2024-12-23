@@ -30,8 +30,8 @@ public class SimpleUriParam implements KeyValuePair {
   private String key;
 
   /**
-   * Represents the Value of this HTTP URI Parameter, that could be an expression depending on a watermarking value
-   * that would be then resolved
+   * Represents the Value of this HTTP URI Parameter, that could be an expression depending on a watermarking value that would be
+   * then resolved
    */
   @Parameter
   private Literal<String> value;

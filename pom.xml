@@ -15,6 +15,8 @@
         <jdk.version>1.8</jdk.version>
         <mavenCompilerVersion>3.13.0</mavenCompilerVersion>
 
+        <junit.version>4.13.2</junit.version>
+
         <jacoco.version>0.8.12</jacoco.version>
         <aspectjVersion>1.9.22.1</aspectjVersion>
     </properties>
@@ -63,4 +65,20 @@
             </plugins>
         </pluginManagement>
     </build>
+    
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.hamcrest</groupId>
+                        <artifactId>hamcrest-core</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>

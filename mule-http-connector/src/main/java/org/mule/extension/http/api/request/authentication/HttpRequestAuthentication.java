@@ -59,8 +59,8 @@ public interface HttpRequestAuthentication {
    * {@code notRetryCallback} will be called instead.
    *
    * @param firstAttemptResult The result with the response of the request.
-   * @param retryCallback the callback that performs the retry of the request.
-   * @param notRetryCallback the callback that performs any necessary steps for not retrying the request.
+   * @param retryCallback      the callback that performs the retry of the request.
+   * @param notRetryCallback   the callback that performs any necessary steps for not retrying the request.
    */
   default void retryIfShould(Result<Object, HttpResponseAttributes> firstAttemptResult, Runnable retryCallback,
                              Runnable notRetryCallback) {
@@ -78,6 +78,7 @@ public interface HttpRequestAuthentication {
 
   /**
    * Indicates if the response body may be read in the process of determining the result of the authenticated request
+   * 
    * @return Whether the response body may be read or not
    * @since 1.6, 1.5.20
    */
