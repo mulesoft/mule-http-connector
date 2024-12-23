@@ -215,7 +215,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                	<skipTests>${skipUnitTests}</skipTests>
+                    <skipTests>${skipUnitTests}</skipTests>
                 </configuration>
                 <dependencies>
                     <dependency>
