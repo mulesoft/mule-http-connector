@@ -61,9 +61,9 @@
         <maven.surefire.plugin.version>3.5.2</maven.surefire.plugin.version>
 
         <muleDependenciesVersion>1.x-SNAPSHOT</muleDependenciesVersion>
-        <mule.version>4.9.0-SNAPSHOT</mule.version>
+        <mule.version>4.10.0-SNAPSHOT</mule.version>
         <muleBomVersion>${mule.version}</muleBomVersion>
-        <muleApiVersion>1.9.0-SNAPSHOT</muleApiVersion>
+        <muleApiVersion>1.10.0-SNAPSHOT</muleApiVersion>
         <httpConnectorVersion>${project.version}</httpConnectorVersion>
 
         <!-- fips testing -->
@@ -96,7 +96,7 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-dwb-api</artifactId>
-            <version>2.9.0-20241028</version>
+            <version>2.10.0-SNAPSHOT</version>
         </dependency>
 
         <!-- fips testing -->
