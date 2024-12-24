@@ -24,9 +24,9 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
  */
 public class HttpRequestResponseProfilingDataProducerAdaptor {
 
-  ProfilingDataProducer<ExtensionProfilingEventContext> profilingDataProducer;
+  ProfilingDataProducer profilingDataProducer;
 
-  public HttpRequestResponseProfilingDataProducerAdaptor(ProfilingDataProducer<ExtensionProfilingEventContext> profilingDataProducer) {
+  public HttpRequestResponseProfilingDataProducerAdaptor(ProfilingDataProducer profilingDataProducer) {
     this.profilingDataProducer = profilingDataProducer;
   }
 
