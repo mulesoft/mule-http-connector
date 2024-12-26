@@ -3,7 +3,7 @@ projectType: extension
 mavenTool: "3.9.9"
 jdkTool: OPEN-JDK17
 testJdkTool: OPEN-JDK17
-mavenAdditionalArgs: -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE -Dmule.module.tweaking.validation.skip=true
+mavenAdditionalArgs: -Dmule.jvm.version.extension.enforcement=LOOSE -Dmule.module.tweaking.validation.skip=true
 additionalTestConfigs:
   mtf-jdk8:
     testJdkTool: OPEN-JDK8
@@ -15,5 +15,5 @@ additionalTestConfigs:
   jdk21:
     testJdkTool: TEMURIN-JDK21
   netty-jdk17:
-    mavenAdditionalArgs: -Dmule.http.service.implementation=NETTY -DmunitMinMuleVersion=4.9.0
+    mavenAdditionalArgs: -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE -Dmule.module.tweaking.validation.skip=true -Dmule.http.service.implementation=NETTY -DmunitMinMuleVersion=4.9.0
 
