@@ -6,12 +6,6 @@
  */
 package org.mule.extension.http.internal.listener;
 
-import static java.lang.Boolean.FALSE;
-import static java.lang.String.format;
-import static java.lang.Thread.currentThread;
-import static java.util.Arrays.asList;
-import static java.util.Optional.ofNullable;
-import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 import static org.mule.extension.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.extension.http.api.error.HttpError.BASIC_AUTHENTICATION;
 import static org.mule.extension.http.api.error.HttpError.NOT_FOUND;
@@ -36,6 +30,14 @@ import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.getReasonPhraseForStatusCode;
 import static org.mule.runtime.http.api.HttpHeaders.Names.X_CORRELATION_ID;
+
+import static java.lang.Boolean.FALSE;
+import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
+import static java.util.Arrays.asList;
+import static java.util.Optional.ofNullable;
+
+import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
@@ -61,7 +63,6 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.api.util.MultiMap;
@@ -106,6 +107,8 @@ import org.mule.runtime.http.api.server.RequestHandler;
 import org.mule.runtime.http.api.server.RequestHandlerManager;
 import org.mule.runtime.http.api.server.async.HttpResponseReadyCallback;
 import org.mule.runtime.http.api.server.async.ResponseStatusCallback;
+import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
+import org.mule.sdk.compatibility.api.utils.ForwardCompatibilityHelper;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -113,9 +116,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.inject.Inject;
-
-import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
-import org.mule.sdk.compatibility.api.utils.ForwardCompatibilityHelper;
 
 import org.slf4j.Logger;
 
@@ -197,8 +197,9 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   private HttpStreamingType responseStreamingMode;
 
   /**
-   * Defines if the response should be sent in the same thread where the listener's
-   * callback is notified, or scheduled to another {@link Scheduler}.
+   * Defines if the response should be sent in the same thread where the listener's callback is notified, or scheduled to another
+   * {@link Scheduler}.
+   * <p>
    * This is useful when the user knows that the payload to send is generated slowly.
    *
    * @since 1.11.0
@@ -580,6 +581,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
         }
       }
 
+      @Override
       public ClassLoader getContextClassLoader() {
         return appRegionClassLoader;
       }
@@ -666,6 +668,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
       }
     }
 
+    @Override
     public void onErrorSendingResponse(Throwable throwable) {
       if (completionCallback != null) {
         completionCallback.error(throwable);

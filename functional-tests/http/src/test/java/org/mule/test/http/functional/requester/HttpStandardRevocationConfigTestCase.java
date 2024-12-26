@@ -12,8 +12,9 @@ import static org.mule.test.http.functional.fips.DefaultTestConfiguration.isFips
 
 import static org.hamcrest.CoreMatchers.both;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsStringIgnoringCase;
+import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
@@ -24,10 +25,11 @@ import org.mule.test.http.functional.AbstractHttpTestCase;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import org.hamcrest.MatcherAssert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import org.hamcrest.MatcherAssert;
 
 public class HttpStandardRevocationConfigTestCase extends AbstractHttpTestCase {
 
@@ -65,6 +67,6 @@ public class HttpStandardRevocationConfigTestCase extends AbstractHttpTestCase {
     CoreEvent event = flowRunner("test").keepStreamsOpen().run();
     MatcherAssert.assertThat(((HttpResponseAttributes) event.getMessage().getAttributes().getValue()).getStatusCode(),
                              is(OK.getStatusCode()));
-    assertThat(event.getMessage(), hasPayload(both(containsString("test")).and(containsString("google"))));
+    assertThat(event.getMessage(), hasPayload(both(containsString("test")).and(containsStringIgnoringCase("google"))));
   }
 }

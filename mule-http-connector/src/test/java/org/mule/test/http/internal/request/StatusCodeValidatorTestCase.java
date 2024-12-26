@@ -24,8 +24,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 /**
- * Validates the behavior of the different status code validators in use and the inner parsing of the values, hence
- * the spaces in some of them.
+ * Validates the behavior of the different status code validators in use and the inner parsing of the values, hence the spaces in
+ * some of them.
  */
 public class StatusCodeValidatorTestCase extends AbstractMuleTestCase {
 

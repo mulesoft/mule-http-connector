@@ -9,17 +9,13 @@ package org.mule.test.http.functional.requester.crl;
 import static org.mule.test.http.functional.fips.DefaultTestConfiguration.isFipsTesting;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptySet;
-import static java.util.Collections.singleton;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeFalse;
 
-import org.mule.extension.http.internal.temporary.HttpConnector;
-import org.mule.extension.socket.api.SocketsExtension;
 import org.mule.functional.junit4.AbstractConfigurationFailuresTestCase;
 import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -52,11 +48,10 @@ public class HttpInvalidCrlAlgorithmTestCase extends AbstractConfigurationFailur
     }
   }
 
+  @Override
   protected List<ExtensionModel> getRequiredExtensions() {
     ExtensionModel mule = MuleExtensionModelProvider.getExtensionModel();
     ExtensionModel tls = MuleExtensionModelProvider.getTlsExtensionModel();
-    ExtensionModel sockets = loadExtension(SocketsExtension.class, emptySet());
-    ExtensionModel http = loadExtension(HttpConnector.class, singleton(sockets));
-    return asList(mule, tls, http, sockets);
+    return asList(mule, tls);
   }
 }

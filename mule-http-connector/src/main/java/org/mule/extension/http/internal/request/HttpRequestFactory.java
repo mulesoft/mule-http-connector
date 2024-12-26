@@ -6,12 +6,6 @@
  */
 package org.mule.extension.http.internal.request;
 
-import static java.lang.String.valueOf;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.unmodifiableSet;
-import static java.util.Optional.ofNullable;
 import static org.mule.extension.http.api.error.HttpError.SECURITY;
 import static org.mule.extension.http.api.error.HttpError.TRANSFORMATION;
 import static org.mule.extension.http.api.streaming.HttpStreamingType.ALWAYS;
@@ -28,6 +22,13 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.COOKIE;
 import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpHeaders.Names.X_CORRELATION_ID;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
+
+import static java.lang.String.valueOf;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.unmodifiableSet;
+import static java.util.Optional.ofNullable;
 
 import org.mule.extension.http.api.request.HttpSendBodyMode;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
@@ -95,9 +96,9 @@ public class HttpRequestFactory {
   /**
    * Creates an {@HttpRequest}.
    *
-   * @param httpRequestCreator The generic {@link RequestCreator} from the request component that should be used to
-   *                       create the {@link HttpRequest}.
-   * @param authentication The {@link HttpRequestAuthentication} that should be used to create the {@link HttpRequest}.
+   * @param httpRequestCreator The generic {@link RequestCreator} from the request component that should be used to create the
+   *                           {@link HttpRequest}.
+   * @param authentication     The {@link HttpRequestAuthentication} that should be used to create the {@link HttpRequest}.
    * @return an {@HttpRequest} configured based on the parameters.
    * @throws MuleException if the request creation fails.
    */
@@ -175,12 +176,14 @@ public class HttpRequestFactory {
     try {
       List<String> cookies = config.getCookieManager().get(builder.getUri(), emptyMap()).get(COOKIE);
       if (cookies != null && cookies.size() > 0) {
-        // The RFC-6265, section 5.4 says:
-        //   If the user agent does attach a Cookie header field to an HTTP
-        //   request, the user agent MUST send the cookie-string (defined below)
-        //   as the value of the header field.
-        //
-        // So we should concatenate the cookies
+        /*
+         * The RFC-6265, section 5.4 says:
+         * 
+         * "If the user agent does attach a Cookie header field to an HTTP request, the user agent MUST send the cookie-string
+         * (defined below) as the value of the header field."
+         *
+         * So we should concatenate the cookies
+         */
 
         int totalHeaderLength = COOKIES_SEPARATOR.length() * (cookies.size() - 1);
         for (String cookie : cookies) {
@@ -274,7 +277,7 @@ public class HttpRequestFactory {
         if (contentLength.isPresent() && transferEncoding.isPresent()) {
           sanitizeForContentLength(requestBuilder, transferEncoding, BOTH_TRANSFER_HEADERS_SET_MESSAGE);
         }
-        entity = new InputStreamHttpEntity(new ByteArrayInputStream(payloadAsBytes), (long) payloadAsBytes.length);
+        entity = new InputStreamHttpEntity(new ByteArrayInputStream(payloadAsBytes), payloadAsBytes.length);
       }
     }
 
