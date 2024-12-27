@@ -277,7 +277,7 @@ public class HttpRequestFactory {
         if (contentLength.isPresent() && transferEncoding.isPresent()) {
           sanitizeForContentLength(requestBuilder, transferEncoding, BOTH_TRANSFER_HEADERS_SET_MESSAGE);
         }
-        entity = new InputStreamHttpEntity(new ByteArrayInputStream(payloadAsBytes), payloadAsBytes.length);
+        entity = new InputStreamHttpEntity(new ByteArrayInputStream(payloadAsBytes), (long) payloadAsBytes.length);
       }
     }
 
