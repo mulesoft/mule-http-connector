@@ -28,8 +28,8 @@ public class HttpResponseAttributesTestCase extends AbstractHttpAttributesTestCa
       "   Status Code=401" + lineSeparator() +
       "   Reason Phrase=Some Reason Phrase" + lineSeparator() +
       "   Headers=[" + lineSeparator() +
-      "      header1=headerValue1" + lineSeparator() +
       "      header2=headerValue2" + lineSeparator() +
+      "      header1=headerValue1" + lineSeparator() +
       "   ]" + lineSeparator() +
       "}";
 
@@ -46,8 +46,8 @@ public class HttpResponseAttributesTestCase extends AbstractHttpAttributesTestCa
           "   Status Code=401" + lineSeparator() +
           "   Reason Phrase=null" + lineSeparator() +
           "   Headers=[" + lineSeparator() +
-          "      header1=headerValue1" + lineSeparator() +
           "      header2=headerValue2" + lineSeparator() +
+          "      header1=headerValue1" + lineSeparator() +
           "   ]" + lineSeparator() +
           "}";
 
@@ -56,10 +56,10 @@ public class HttpResponseAttributesTestCase extends AbstractHttpAttributesTestCa
       "   Status Code=401" + lineSeparator() +
       "   Reason Phrase=Unauthorised" + lineSeparator() +
       "   Headers=[" + lineSeparator() +
+      "      authorization=****" + lineSeparator() +
       "      password=****" + lineSeparator() +
       "      pass=****" + lineSeparator() +
       "      client_secret=****" + lineSeparator() +
-      "      authorization=****" + lineSeparator() +
       "      regular=show me" + lineSeparator() +
       "   ]" + lineSeparator() +
       "}";

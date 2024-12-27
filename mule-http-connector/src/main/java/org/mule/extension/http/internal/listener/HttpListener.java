@@ -581,7 +581,6 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
         }
       }
 
-      @Override
       public ClassLoader getContextClassLoader() {
         return appRegionClassLoader;
       }
@@ -668,7 +667,6 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
       }
     }
 
-    @Override
     public void onErrorSendingResponse(Throwable throwable) {
       if (completionCallback != null) {
         completionCallback.error(throwable);
