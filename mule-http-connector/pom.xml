@@ -237,7 +237,7 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            
+
             <!-- These override the version obtained transitively from a dependency declared in the parent pom. -->
             <dependency>
                 <groupId>org.springframework</groupId>

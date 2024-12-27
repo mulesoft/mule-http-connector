@@ -11,7 +11,8 @@
 
     <Loggers>
 
-        <AsyncLogger name="org.mule.service.http.impl.service.HttpMessageLogger" level="DEBUG" />
+        <AsyncLogger name="org.mule.service.http.impl.service.HttpMessageLogger" level="INFO" />
+        <AsyncLogger name="org.mule.service.http.netty.impl.client" level="WARN" />
 
         <AsyncLogger name="org.mule.runtime.core.internal.processor.LoggerMessageProcessor" level="INFO"/>
         <AsyncLogger name="com.mulesoft.agent" level="INFO"/>

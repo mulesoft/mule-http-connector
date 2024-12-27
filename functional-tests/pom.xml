@@ -91,7 +91,6 @@
             <groupId>org.mule.services</groupId>
             <artifactId>mule-service-weave</artifactId>
             <classifier>mule-service</classifier>
-            <version>2.7.2</version>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>

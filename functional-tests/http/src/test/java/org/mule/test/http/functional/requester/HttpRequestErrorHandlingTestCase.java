@@ -32,9 +32,10 @@ import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStor
 
 import static java.lang.String.format;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.error.HttpError;
@@ -53,7 +54,6 @@ import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Stories;
 import io.qameta.allure.Story;
-import org.apache.commons.lang3.SystemUtils;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -157,17 +157,10 @@ public class HttpRequestErrorHandlingTestCase extends AbstractHttpRequestTestCas
 
   @Test
   public void connectivity() throws Exception {
-
-    String customMessage = ": Connection refused";
-    if (SystemUtils.IS_OS_WINDOWS) {
-      customMessage = customMessage.concat(": no further information");
-    }
-
     CoreEvent result = getFlowRunner("handled", unusedPort.getNumber()).run();
-    assertThat(result.getMessage(),
-               hasPayload(equalTo(getErrorMessage(customMessage, unusedPort)
-                   + " connectivity")));
 
+    // The exact message depends on the OS and the underlying framework, but all contain "Connection refused".
+    assertThat(result.getMessage(), hasPayload(containsString("Connection refused")));
   }
 
   @Test
