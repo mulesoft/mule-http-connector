@@ -1,19 +1,18 @@
 projectType: extension
+mavenTool: "3.9.5"
 
-mavenTool: "3.9.9"
-jdkTool: OPEN-JDK17
-testJdkTool: OPEN-JDK17
-mavenAdditionalArgs: -Dmule.jvm.version.extension.enforcement=LOOSE -Dmule.module.tweaking.validation.skip=true
+mavenAdditionalArgs: -pl .,mule-http-connector
+
 additionalTestConfigs:
-  mtf-jdk8:
-    testJdkTool: OPEN-JDK8
-    mavenAdditionalArgs: -pl mule-http-connector -DskipUnitTests=true
-# TODO W-17496009
-#  mtf-jdk11:
-#    testJdkTool: OPEN-JDK11
-#    mavenAdditionalArgs: -pl mule-http-connector -DskipUnitTests=true
-  jdk21:
-    testJdkTool: TEMURIN-JDK21
-  netty-jdk17:
-    mavenAdditionalArgs: -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE -Dmule.module.tweaking.validation.skip=true -Dmule.http.service.implementation=NETTY -DmunitMinMuleVersion=4.9.0
-
+  functionalTests:
+    jdkTool: OPEN-JDK17
+    mavenAdditionalArgs: -pl functional-tests,functional-tests/http,functional-tests/cors -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE -Dmule.module.tweaking.validation.skip=true
+  munitTests:
+    testJdkTool: OPEN-JDK17
+    mavenAdditionalArgs: -pl mule-http-connector -DmunitMinMuleVersion=4.6.0 -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE -Dmule.module.tweaking.validation.skip=true
+  netty-functionalTests:
+    jdkTool: OPEN-JDK17
+    mavenAdditionalArgs: -pl functional-tests,functional-tests/http,functional-tests/cors -Dmule.http.service.implementation=NETTY -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE -Dmule.module.tweaking.validation.skip=true
+  netty-munitTests:
+    testJdkTool: OPEN-JDK17
+    mavenAdditionalArgs: -pl mule-http-connector -Dmule.http.service.implementation=NETTY -DmunitMinMuleVersion=4.9.0 -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE -Dmule.module.tweaking.validation.skip=true

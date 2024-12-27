@@ -14,8 +14,7 @@ import java.util.regex.Pattern;
  * A custom Data Transfer Object (DTO) to replace the {@link java.security.Principal} class.
  * <p>
  * This class is a simple representation of a principal with a single attribute, the name.
- * <p>
- * It implements {@link Serializable} to allow its instances to be serialized.
+ * It implements {@link java.io.Serializable} to allow its instances to be serialized.
  * </p>
  */
 public class PrincipalData implements Serializable {
@@ -43,8 +42,9 @@ public class PrincipalData implements Serializable {
   /**
    * Extracts and returns the common name (CN) from the principal's name.
    * <p>
-   * This method assumes that the name is a distinguished name (DN) string, and attempts to find and return the value of the CN
-   * attribute. If the CN attribute is not found, the method returns an empty string.
+   * This method assumes that the name is a distinguished name (DN) string,
+   * and attempts to find and return the value of the CN attribute.
+   * If the CN attribute is not found, the method returns an empty string.
    * </p>
    *
    * @return the common name (CN) if found, otherwise an empty string

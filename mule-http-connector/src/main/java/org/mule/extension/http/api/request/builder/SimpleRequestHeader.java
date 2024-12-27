@@ -30,8 +30,8 @@ public class SimpleRequestHeader implements KeyValuePair {
   private String key;
 
   /**
-   * Represents the Value of this HTTP Header, that could be an expression depending on a watermarking value that would be then
-   * resolved
+   * Represents the Value of this HTTP Header, that could be an expression depending on a watermarking value
+   * that would be then resolved
    */
   @Parameter
   private Literal<String> value;

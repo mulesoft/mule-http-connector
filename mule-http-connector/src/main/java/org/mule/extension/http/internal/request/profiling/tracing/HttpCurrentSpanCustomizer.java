@@ -31,8 +31,7 @@ public abstract class HttpCurrentSpanCustomizer {
   /**
    * Customize the current span using the {@link DistributedTraceContextManager}
    *
-   * @param distributedTraceContextManager the {@link DistributedTraceContextManager} used for adding attributes and setting the
-   *                                       name.
+   * @param distributedTraceContextManager the {@link DistributedTraceContextManager} used for adding attributes and setting the name.
    */
   public void customizeSpan(DistributedTraceContextManager distributedTraceContextManager) {
     try {

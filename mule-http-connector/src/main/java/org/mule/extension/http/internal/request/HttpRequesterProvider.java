@@ -6,6 +6,8 @@
  */
 package org.mule.extension.http.internal.request;
 
+import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
 import static org.mule.extension.http.internal.HttpConnectorConstants.AUTHENTICATION;
 import static org.mule.extension.http.internal.HttpConnectorConstants.TLS_CONFIGURATION;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
@@ -17,10 +19,6 @@ import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CON
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.SECURITY_TAB;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTP;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
-
-import static java.lang.String.format;
-import static java.lang.Thread.currentThread;
-
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.extension.http.api.request.HttpConnectivityValidator;
@@ -53,13 +51,10 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.http.api.HttpConstants;
 import org.mule.runtime.http.api.client.HttpClientConfiguration;
 import org.mule.runtime.http.api.client.proxy.ProxyConfig;
-
-import java.util.Objects;
-import java.util.concurrent.ExecutionException;
+import org.slf4j.Logger;
 
 import javax.inject.Inject;
-
-import org.slf4j.Logger;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Connection provider for a HTTP request, handles the creation of {@link HttpExtensionClient} instances.
@@ -264,33 +259,5 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
   public HttpRequestAuthentication getAuthentication() {
     return authentication;
   }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(authentication, configName, connectionManager, connectionParams, connectivityTest, proxyConfig,
-                        tlsContext);
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    if (getClass() != obj.getClass()) {
-      return false;
-    }
-    HttpRequesterProvider other = (HttpRequesterProvider) obj;
-    return Objects.equals(authentication, other.authentication)
-        && Objects.equals(configName, other.configName)
-        && Objects.equals(connectionManager, other.connectionManager)
-        && Objects.equals(connectionParams, other.connectionParams)
-        && Objects.equals(connectivityTest, other.connectivityTest)
-        && Objects.equals(proxyConfig, other.proxyConfig)
-        && Objects.equals(tlsContext, other.tlsContext);
-  }
-
 
 }

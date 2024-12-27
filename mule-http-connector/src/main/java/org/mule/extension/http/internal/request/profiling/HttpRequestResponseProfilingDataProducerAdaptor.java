@@ -16,11 +16,8 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 
 /**
  * An adaptor for {@link ProfilingDataProducer} to produce data related to HTTP requests.
- * <p>
  * This is implemented so that no need to change the min mule version is needed in the HTTP connector.
- * <p>
  * In some environments {@link ProfilingDataProducer} class is not available.
- * <p>
  * This class will only be loaded if it is available according to the mule runtime version.
  *
  * @see HttpRequestOperations#initialise()
@@ -35,7 +32,6 @@ public class HttpRequestResponseProfilingDataProducerAdaptor {
 
   /**
    * Triggers a profiling event indicating that an HTTP Request Response was received
-   * 
    * @param result the result to construct the {@link org.mule.runtime.api.profiling.ProfilingEventContext}.
    */
   public void triggerProfilingEvent(Result<Object, HttpResponseAttributes> result, String correlationId) {

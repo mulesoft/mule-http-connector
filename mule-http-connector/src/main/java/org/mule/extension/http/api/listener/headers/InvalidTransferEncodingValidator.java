@@ -47,9 +47,9 @@ public class InvalidTransferEncodingValidator implements HttpHeadersValidator {
   private final AtomicInteger errorsFound = new AtomicInteger();
 
   /**
-   * @param throwException if {@code true}, the errors will be reported as an exception. Otherwise, the errors will be logged. One
-   *                       of each {@link ERRORS_LIMIT_TO_PRINT_WARNING} errors will be printed as a WARN log, and the others as
-   *                       TRACE, in order to avoid log flooding.
+   * @param throwException if {@code true}, the errors will be reported as an exception. Otherwise, the errors will be
+   *                       logged. One of each {@link ERRORS_LIMIT_TO_PRINT_WARNING} errors will be printed as a WARN log,
+   *                       and the others as TRACE, in order to avoid log flooding.
    */
   public InvalidTransferEncodingValidator(boolean throwException) {
     this.throwException = throwException;

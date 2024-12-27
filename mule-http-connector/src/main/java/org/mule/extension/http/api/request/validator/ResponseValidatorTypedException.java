@@ -34,8 +34,8 @@ public class ResponseValidatorTypedException extends ModuleException implements 
   /**
    *
    * @param message the exception message
-   * @param error   the {@link HttpError} to raise
-   * @param result  the rejected data
+   * @param error the {@link HttpError} to raise
+   * @param result the rejected data
    * @deprecated use {{@link #ResponseValidatorTypedException(String, HttpError, Message)}} instead
    */
   @Deprecated
@@ -50,8 +50,8 @@ public class ResponseValidatorTypedException extends ModuleException implements 
 
   /**
    *
-   * @param message      the exception message
-   * @param error        the {@link HttpError} to raise
+   * @param message the exception message
+   * @param error the {@link HttpError} to raise
    * @param errorMessage
    */
   public ResponseValidatorTypedException(String message, HttpError error, Message errorMessage) {

@@ -36,7 +36,7 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
    * Full path where the request was received. Former 'http.listener.path'.
    */
   @Parameter
-  private String listenerPath;
+  private final String listenerPath;
 
   /**
    * Full path requested, encoded as received.
@@ -50,7 +50,7 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
    * Path where the request was received, without considering the base path. Former 'http.relative.path'.
    */
   @Parameter
-  private String relativePath;
+  private final String relativePath;
 
   /**
    * Path computed from masking the {@code rawRequestPath} with the {@code listenerPath} and taking the difference. Note that this
@@ -59,31 +59,31 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
    * @since 1.4.0
    */
   @Parameter
-  private String maskedRequestPath;
+  private final String maskedRequestPath;
 
   /**
    * HTTP version of the request. Former 'http.version'.
    */
   @Parameter
-  private String version;
+  private final String version;
 
   /**
    * HTTP scheme of the request. Former 'http.scheme'.
    */
   @Parameter
-  private String scheme;
+  private final String scheme;
 
   /**
    * HTTP method of the request. Former 'http.method'.
    */
   @Parameter
-  private String method;
+  private final String method;
 
   /**
    * Full URI of the request. Former 'http.request.uri'.
    */
   @Parameter
-  private String requestUri;
+  private final String requestUri;
 
   /**
    * Full URI of the request, encoded as received.
@@ -91,25 +91,25 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
    * @since 1.5.0
    */
   @Parameter
-  private String rawRequestUri;
+  private final String rawRequestUri;
 
   /**
    * Query string of the request. Former 'http.query.string'.
    */
   @Parameter
-  private String queryString;
+  private final String queryString;
 
   /**
    * Local host address from the server.
    */
   @Parameter
-  private String localAddress;
+  private final String localAddress;
 
   /**
    * Remote host address from the sender. Former 'http.remote.address'.
    */
   @Parameter
-  private String remoteAddress;
+  private final String remoteAddress;
 
   /**
    * Client certificate (if 2 way TLS is enabled). Former 'http.client.cert'.
@@ -120,22 +120,19 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
 
   /**
    * Actual {@link Certificate} to use, avoid any processing until it's actually needed.
-   * <p>
-   * In order to avoid updating this module's minMuleVersion and maintain both the lazy and serializable properties,
-   * {@link CertificateProvider} was created.
-   * <p>
-   * Implementations of {@link CertificateProvider} will change according to the available classes provided by the version of
-   * mule-api at runtime.
-   * <p>
-   * For versions prior to 1.1.5(4.1.5), the required classes to fully support this functionality will not be present. As a
-   * consequence, {@link HttpRequestAttributes} serialization may not behave as required.
-   * <p>
-   * Specifically, and only in this case, if running in an EE runtime prior to 4.1.5 and using a Kryo serializer, the client
-   * certificate value will be lost after serialization and {@link HttpRequestAttributes#getClientCertificate()} will return null.
-   * If found in that situation, a workaround is to call {@link HttpRequestAttributes#getClientCertificate()} before
-   * serialization. That way, the certificate will be resolved and serialization will work.
+   * </p>
+   * In order to avoid updating this module's minMuleVersion and maintain both the lazy and serializable properties, {@link CertificateProvider}
+   * was created.
+   * Implementations of {@link CertificateProvider} will change according to the available classes provided by the version of mule-api at runtime.
+   * For versions prior to 1.1.5(4.1.5), the required classes to fully support this functionality will not be present.
+   * As a consequence, {@link HttpRequestAttributes} serialization may not behave as required.
+   * </p>
+   * Specifically, and only in this case, if running in an EE runtime prior to 4.1.5 and using a Kryo serializer,
+   * the client certificate value will be lost after serialization and {@link HttpRequestAttributes#getClientCertificate()} will return null.
+   * If found in that situation, a workaround is to call {@link HttpRequestAttributes#getClientCertificate()} before serialization.
+   * That way, the certificate will be resolved and serialization will work.
    */
-  private CertificateProvider lazyClientCertificateProvider;
+  private final CertificateProvider lazyClientCertificateProvider;
 
   /**
    * @deprecated use {@link HttpRequestAttributesBuilder} instead
@@ -149,8 +146,6 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
          queryParams,
          uriParams, "", remoteAddress, () -> clientCertificate);
   }
-
-  public HttpRequestAttributes() {}
 
   HttpRequestAttributes(MultiMap<String, String> headers, String listenerPath, String relativePath, String maskedRequestPath,
                         String version, String scheme, String method, String requestPath, String rawRequestPath,
@@ -177,16 +172,8 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
     return listenerPath;
   }
 
-  public void setListenerPath(String listenerPath) {
-    this.listenerPath = listenerPath;
-  }
-
   public String getRelativePath() {
     return relativePath;
-  }
-
-  public void setRelativePath(String relativePath) {
-    this.relativePath = relativePath;
   }
 
   public String getRawRequestPath() {
@@ -197,40 +184,20 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
     return maskedRequestPath;
   }
 
-  public void setMaskedRequestPath(String maskedRequestPath) {
-    this.maskedRequestPath = maskedRequestPath;
-  }
-
   public String getVersion() {
     return version;
-  }
-
-  public void setVersion(String version) {
-    this.version = version;
   }
 
   public String getScheme() {
     return scheme;
   }
 
-  public void setScheme(String scheme) {
-    this.scheme = scheme;
-  }
-
   public String getMethod() {
     return method;
   }
 
-  public void setMethod(String method) {
-    this.method = method;
-  }
-
   public String getRequestUri() {
     return requestUri;
-  }
-
-  public void setRequestUri(String requestUri) {
-    this.requestUri = requestUri;
   }
 
   public String getRawRequestUri() {
@@ -241,24 +208,12 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
     return queryString;
   }
 
-  public void setQueryString(String queryString) {
-    this.queryString = queryString;
-  }
-
   public String getLocalAddress() {
     return localAddress;
   }
 
-  public void setLocalAddress(String localAddress) {
-    this.localAddress = localAddress;
-  }
-
   public String getRemoteAddress() {
     return remoteAddress;
-  }
-
-  public void setRemoteAddress(String remoteAddress) {
-    this.remoteAddress = remoteAddress;
   }
 
   public CertificateData getClientCertificate() {
