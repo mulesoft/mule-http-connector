@@ -7,7 +7,6 @@
 package org.mule.extension.http.api;
 
 import static java.lang.System.lineSeparator;
-
 import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
 import org.mule.runtime.api.util.MultiMap;
@@ -37,18 +36,12 @@ public abstract class HttpAttributes implements Serializable {
   @Parameter
   protected MultiMap<String, String> headers;
 
-  public HttpAttributes() {}
-
   public HttpAttributes(MultiMap<String, String> headers) {
     this.headers = headers.toImmutableMultiMap();
   }
 
   public MultiMap<String, String> getHeaders() {
     return headers;
-  }
-
-  public void setHeaders(MultiMap<String, String> headers) {
-    this.headers = headers;
   }
 
   @Override

@@ -21,8 +21,8 @@ import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import java.io.InputStream;
 
 /**
- * HTTP {@link OutputTypeResolver} implementation for the basic operations that always return an {@link AnyType}, since HTTP may
- * return any object type like an XML, Json, Multipart, etc.
+ * HTTP {@link OutputTypeResolver} implementation for the basic operations that always return an {@link AnyType}, since HTTP
+ * may return any object type like an XML, Json, Multipart, etc.
  *
  * @since 1.0
  */

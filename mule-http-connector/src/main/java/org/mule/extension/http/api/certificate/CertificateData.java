@@ -25,11 +25,11 @@ import java.util.Set;
  * A custom Data Transfer Object (DTO) to replace {@link java.security.cert.Certificate},
  * {@link java.security.cert.X509Certificate}, and related classes.
  * <p>
- * This class provides a comprehensive representation of a certificate with various attributes such as type, encoded form,
- * version, subject and issuer distinguished names, serial number, validity period, public key, signature algorithm details, and
- * extensions.
- * <p>
- * It implements {@link Serializable} to allow its instances to be serialized.
+ * This class provides a comprehensive representation of a certificate with various attributes
+ * such as type, encoded form, version, subject and issuer distinguished names, serial number,
+ * validity period, public key, signature algorithm details, and extensions.
+ * It implements {@link java.io.Serializable} to allow its instances to be serialized.
+ * </p>
  */
 public class CertificateData implements Serializable {
 
@@ -73,28 +73,28 @@ public class CertificateData implements Serializable {
   /**
    * Constructs a new {@code CertificateData} instance with detailed attributes.
    *
-   * @param type                             the type of the certificate
-   * @param encoded                          the encoded form of the certificate
-   * @param version                          the version of the certificate
-   * @param subjectDN                        the subject distinguished name
-   * @param issuerDN                         the issuer distinguished name
-   * @param serialNumber                     the serial number of the certificate
-   * @param notBefore                        the start date of the validity period
-   * @param notAfter                         the end date of the validity period
-   * @param publicKey                        the public key of the certificate
-   * @param sigAlgName                       the signature algorithm name
-   * @param sigAlgOID                        the signature algorithm OID
-   * @param sigAlgParams                     the signature algorithm parameters
-   * @param signature                        the signature
-   * @param basicConstraints                 the basic constraints
-   * @param extendedKeyUsage                 the extended key usage
-   * @param keyUsage                         the key usage
-   * @param issuerUniqueID                   the issuer unique ID
-   * @param subjectAlternativeNames          the subject alternative names
-   * @param issuerAlternativeNames           the issuer alternative names
-   * @param extensions                       the certificate extensions
-   * @param criticalOids                     the critical OIDs
-   * @param nonCriticalOids                  the non-critical OIDs
+   * @param type                        the type of the certificate
+   * @param encoded                     the encoded form of the certificate
+   * @param version                     the version of the certificate
+   * @param subjectDN                   the subject distinguished name
+   * @param issuerDN                    the issuer distinguished name
+   * @param serialNumber                the serial number of the certificate
+   * @param notBefore                   the start date of the validity period
+   * @param notAfter                    the end date of the validity period
+   * @param publicKey                   the public key of the certificate
+   * @param sigAlgName                  the signature algorithm name
+   * @param sigAlgOID                   the signature algorithm OID
+   * @param sigAlgParams                the signature algorithm parameters
+   * @param signature                   the signature
+   * @param basicConstraints            the basic constraints
+   * @param extendedKeyUsage            the extended key usage
+   * @param keyUsage                    the key usage
+   * @param issuerUniqueID              the issuer unique ID
+   * @param subjectAlternativeNames     the subject alternative names
+   * @param issuerAlternativeNames      the issuer alternative names
+   * @param extensions                  the certificate extensions
+   * @param criticalOids                the critical OIDs
+   * @param nonCriticalOids             the non-critical OIDs
    * @param hasUnsupportedCriticalExtensions whether the certificate has unsupported critical extensions
    */
   public CertificateData(String type, byte[] encoded, int version, PrincipalData subjectDN, PrincipalData issuerDN,
@@ -384,7 +384,7 @@ public class CertificateData implements Serializable {
   /**
    * Checks if the certificate is currently valid.
    *
-   * @throws CertificateExpiredException     if the certificate has expired
+   * @throws CertificateExpiredException   if the certificate has expired
    * @throws CertificateNotYetValidException if the certificate is not yet valid
    */
   public void checkValidity() throws CertificateExpiredException, CertificateNotYetValidException {
@@ -396,7 +396,7 @@ public class CertificateData implements Serializable {
    * Checks if the certificate is valid at the specified date.
    *
    * @param date the date to check the validity against
-   * @throws CertificateExpiredException     if the certificate has expired
+   * @throws CertificateExpiredException   if the certificate has expired
    * @throws CertificateNotYetValidException if the certificate is not yet valid
    */
   public void checkValidity(Date date) throws CertificateExpiredException, CertificateNotYetValidException {

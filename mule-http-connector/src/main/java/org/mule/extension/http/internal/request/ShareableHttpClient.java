@@ -15,8 +15,8 @@ import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Wrapper implementation of an {@link HttpClient} that allows being shared by only configuring the client when first required and
- * only disabling it when last required.
+ * Wrapper implementation of an {@link HttpClient} that allows being shared by only configuring the client when first required
+ * and only disabling it when last required.
  */
 public class ShareableHttpClient {
 

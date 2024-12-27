@@ -6,6 +6,10 @@
  */
 package org.mule.extension.http.internal.request;
 
+import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static org.mule.extension.http.internal.request.HttpPollingSource.ATTRIBUTES_PLACEHOLDER;
 import static org.mule.extension.http.internal.request.HttpPollingSource.ITEM_PLACEHOLDER;
 import static org.mule.extension.http.internal.request.HttpPollingSource.PAYLOAD_PLACEHOLDER;
@@ -17,11 +21,6 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
-
-import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.request.builder.KeyValuePair;
@@ -36,17 +35,18 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.parameter.Literal;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 /**
  * Utils to be used for resolution of expressions of the {@link HttpPollingSource}
- * 
  * @since 1.8
  */
 public final class HttpPollingSourceUtils {
@@ -81,17 +81,17 @@ public final class HttpPollingSourceUtils {
 
   /**
    * Returns the items withing the payload (and/or attributes) of the response, considering the itemExpression.
-   * <p>
-   * {@code application/java} is not an accepted {@link MediaType}
+   * application/java is not an accepted {@link MediaType}
    *
    * @param payload
    * @param attributes
    * @param currentWatermark
    * @param itemsExpression
    * @param expressionLanguage
-   * @return A {@link Stream} of {@link Result}s, after being split given the itemExpression. If there is no itemExpression (i.e.
-   *         empty {@link Optional}), the result will just contain the current payload. If there is an expression, it will use the
-   *         {@link ExpressionLanguage} to use it to split the payload and return a stream of {@link Result}s.
+   * @return A {@link Stream} of {@link Result}s, after being splitted given the itemExpression. If there is no
+   * itemExpression (i.e. empty {@link Optional}), the result will just contain the current payload. If there is
+   * an expression, it will use the {@link ExpressionLanguage} to use it to split the payload and return a stream of
+   * {@link Result}s.
    */
   public static Stream<Result<TypedValue<?>, HttpResponseAttributes>> getItems(TypedValue<String> payload,
                                                                                HttpResponseAttributes attributes,
@@ -119,8 +119,8 @@ public final class HttpPollingSourceUtils {
    * @param currentWatermark
    * @param item
    * @param expressionLanguage
-   * @return Given a payload, current watermark, and current item (payload and attributes of the response), uses the watermark
-   *         expression to extract the new watermark value from the payload, item and or attributes.
+   * @return Given a payload, current watermark, and current item (payload and attributes of the response), uses the
+   * watermark expression to extract the new watermark value from the payload, item and or attributes.
    */
   public static Serializable getItemWatermark(TypedValue<String> payload, String watermarkExpression,
                                               Serializable currentWatermark, Result<TypedValue<?>, HttpResponseAttributes> item,
@@ -134,8 +134,8 @@ public final class HttpPollingSourceUtils {
    * @param currentWatermark
    * @param item
    * @param expressionLanguage
-   * @return Given a payload, current watermark, and current item (payload and attributes of the response), uses the id expression
-   *         to extract the item's id value from the item (and potentially payload and/or attributes).
+   * @return Given a payload, current watermark, and current item (payload and attributes of the response), uses the
+   * id expression to extract the item's id value from the item (and potentially payload and/or attributes).
    */
   public static String getItemId(TypedValue<String> payload, String idExpression, Serializable currentWatermark,
                                  Result<TypedValue<?>, HttpResponseAttributes> item, ExpressionLanguage expressionLanguage) {
@@ -155,8 +155,8 @@ public final class HttpPollingSourceUtils {
    * @param bodyExpression
    * @param currentWatermark
    * @param expressionLanguage
-   * @return the resolution of the expression, that can depend on the watermark's current value. If it's not an expression,
-   *         returns the raw body without evaluating it
+   * @return the resolution of the expression, that can depend on the watermark's current value. If it's not an
+   * expression, returns the raw body without evaluating it
    */
   public static TypedValue<?> resolveBody(String bodyExpression, Serializable currentWatermark,
                                           ExpressionLanguage expressionLanguage) {
@@ -170,8 +170,8 @@ public final class HttpPollingSourceUtils {
    * @param headers
    * @param currentWatermark
    * @param expressionLanguage
-   * @return the resolution of the expression for each header, that can depend on the watermark's current value. the headers that
-   *         are not expressions will be left as are
+   * @return the resolution of the expression for each header, that can depend on the watermark's current value.
+   * the headers that are not expressions will be left as are
    */
   public static MultiMap<String, String> resolveHeaders(List<SimpleRequestHeader> headers, Serializable currentWatermark,
                                                         ExpressionLanguage expressionLanguage) {
@@ -185,8 +185,8 @@ public final class HttpPollingSourceUtils {
    * @param queryParams
    * @param currentWatermark
    * @param expressionLanguage
-   * @return the resolution of the expression for each query parameter, that can depend on the watermark's current value. the
-   *         query parameters that are not expressions will be left as are
+   * @return the resolution of the expression for each query parameter, that can depend on the watermark's current value.
+   * the query parameters that are not expressions will be left as are
    */
   public static MultiMap<String, String> resolveQueryParams(List<SimpleQueryParam> queryParams, Serializable currentWatermark,
                                                             ExpressionLanguage expressionLanguage) {
@@ -200,8 +200,8 @@ public final class HttpPollingSourceUtils {
    * @param uriParams
    * @param currentWatermark
    * @param expressionLanguage
-   * @return the resolution of the expression for each uri parameter, that can depend on the watermark's current value. the uri
-   *         parameters that are not expressions will be left as are
+   * @return the resolution of the expression for each uri parameter, that can depend on the watermark's current value.
+   * the uri parameters that are not expressions will be left as are
    */
   public static Map<String, String> resolveUriParams(List<SimpleUriParam> uriParams, Serializable currentWatermark,
                                                      ExpressionLanguage expressionLanguage) {

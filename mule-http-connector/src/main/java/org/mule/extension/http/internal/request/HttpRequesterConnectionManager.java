@@ -6,18 +6,21 @@
  */
 package org.mule.extension.http.internal.request;
 
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
-
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
-
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.http.api.HttpService;
+import org.mule.runtime.http.api.client.HttpClient;
 import org.mule.runtime.http.api.client.HttpClientConfiguration;
+import org.mule.runtime.http.api.client.auth.HttpAuthentication;
+import org.mule.runtime.http.api.domain.message.request.HttpRequest;
+import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 import javax.inject.Inject;
@@ -72,12 +75,10 @@ public class HttpRequesterConnectionManager implements Disposable {
 
   /**
    * Searches for an already existing {@link ShareableHttpClient} associated with the desired configuration name.
-   * <p>
    * If there isn't a {@link ShareableHttpClient} present, it creates an {@link ShareableHttpClient}.
    *
-   * @param configName     the name of the client to look for.
-   * @param configSupplier a supplier from {@link HttpClientConfiguration}. It's only utilised if a new
-   *                       {@link ShareableHttpClient} is created.
+   * @param configName the name of the client to look for.
+   * @param configSupplier a supplier from {@link HttpClientConfiguration}. It's only utilised if a new {@link ShareableHttpClient} is created.
    * @return the corresponding {@link ShareableHttpClient} if found or a new {@link ShareableHttpClient} otherwise.
    */
   public synchronized ShareableHttpClient lookupOrCreate(String configName,

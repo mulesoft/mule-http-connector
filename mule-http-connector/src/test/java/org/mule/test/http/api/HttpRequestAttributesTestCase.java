@@ -7,10 +7,8 @@
 package org.mule.test.http.api;
 
 import static java.lang.System.lineSeparator;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-
 import org.mule.extension.http.api.HttpRequestAttributesBuilder;
 import org.mule.runtime.api.util.MultiMap;
 
@@ -36,8 +34,8 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
       "   Scheme=scheme" + lineSeparator() +
       "   Version=1.0" + lineSeparator() +
       "   Headers=[" + lineSeparator() +
-      "      header1=headerValue1" + lineSeparator() +
       "      header2=headerValue2" + lineSeparator() +
+      "      header1=headerValue1" + lineSeparator() +
       "   ]" + lineSeparator() +
       "   Query Parameters=[" + lineSeparator() +
       "      queryParam1=queryParamValue1" + lineSeparator() +
@@ -152,10 +150,10 @@ public class HttpRequestAttributesTestCase extends AbstractHttpAttributesTestCas
       "   Scheme=scheme" + lineSeparator() +
       "   Version=1.0" + lineSeparator() +
       "   Headers=[" + lineSeparator() +
+      "      authorization=****" + lineSeparator() +
       "      password=****" + lineSeparator() +
       "      pass=****" + lineSeparator() +
       "      client_secret=****" + lineSeparator() +
-      "      authorization=****" + lineSeparator() +
       "      regular=show me" + lineSeparator() +
       "   ]" + lineSeparator() +
       "   Query Parameters=[" + lineSeparator() +

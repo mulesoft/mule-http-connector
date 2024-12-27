@@ -19,7 +19,8 @@ import java.security.cert.Certificate;
 import java.util.function.Supplier;
 
 /**
- * {@link CertificateProvider} that makes use of "SerializableLazyValue" if present in the classpath to store it's values.
+ * {@link CertificateProvider} that makes use of "SerializableLazyValue" if present in the classpath to store it's
+ * values.
  *
  * @since 1.4.0
  */
@@ -47,8 +48,8 @@ public class DefaultCertificateProvider implements CertificateProvider {
   }
 
   /**
-   * Returns a new {@link DefaultCertificateProvider}. Constructor is package private to only allow
-   * {@link CertificateProviderFactory} to create instances.
+   * Returns a new {@link DefaultCertificateProvider}.
+   * Constructor is package private to only allow {@link CertificateProviderFactory} to create instances.
    *
    * @param certificateSupplier actual supplier that returns the {@link Certificate}
    */
