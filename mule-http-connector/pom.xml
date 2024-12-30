@@ -50,7 +50,7 @@
         <mtf-tools.version>1.2.0</mtf-tools.version>
         <mavenResources.version>3.3.1</mavenResources.version>
         <!-- MUnit minMuleVersion is 4.3.0 -->
-        <munitMinMuleVersion>4.3.0</munitMinMuleVersion>
+        <munitMinMuleVersion>4.6.0</munitMinMuleVersion>
 
         <muleObjectStoreConnectorTestVersion>1.2.2</muleObjectStoreConnectorTestVersion>
 
