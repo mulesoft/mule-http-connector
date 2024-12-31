@@ -50,6 +50,7 @@ import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import javax.inject.Inject;
 import java.net.CookieManager;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -257,5 +258,29 @@ public class HttpConnectivityValidator implements Initialisable {
     } else {
       return null;
     }
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (null == o || getClass() != o.getClass())
+      return false;
+    HttpConnectivityValidator that = (HttpConnectivityValidator) o;
+    return followRedirects == that.followRedirects && Objects.equals(requestPath, that.requestPath)
+        && Objects.equals(requestMethod, that.requestMethod) && Objects.equals(responseTimeout, that.responseTimeout)
+        && responseTimeoutUnit == that.responseTimeoutUnit && Objects.equals(requestBody, that.requestBody)
+        && Objects.equals(requestHeaders, that.requestHeaders) && Objects.equals(requestQueryParams, that.requestQueryParams)
+        && Objects.equals(requestUriParams, that.requestUriParams) && Objects.equals(responseValidator, that.responseValidator)
+        && Objects.equals(expressionManager, that.expressionManager) && Objects.equals(requestBuilder, that.requestBuilder)
+        && Objects.equals(defaultStatusCodeValidator, that.defaultStatusCodeValidator)
+        && Objects.equals(muleContext, that.muleContext);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(requestPath, requestMethod, followRedirects, responseTimeout, responseTimeoutUnit, requestBody,
+                        requestHeaders, requestQueryParams, requestUriParams, responseValidator, expressionManager,
+                        requestBuilder, defaultStatusCodeValidator, muleContext);
   }
 }
