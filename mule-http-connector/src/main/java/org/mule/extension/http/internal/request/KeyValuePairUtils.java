@@ -18,6 +18,7 @@ public final class KeyValuePairUtils {
 
   /**
    * Returns a MultiMap representation of an iterable (e.g. a List) of KeyValuePairs
+   * 
    * @param iterable
    * @return
    */

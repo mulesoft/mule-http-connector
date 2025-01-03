@@ -45,7 +45,7 @@ public class HttpListenerPolicyParametersTransformerTestCase extends AbstractMul
   private static final String EXPECTED_PAYLOAD = "{'message': 'this is the payload'}";
   private static final MediaType EXPECTED_MEDIA_TYPE = MediaType.APPLICATION_JSON;
 
-  //HttpRequestAttributes parameters
+  // HttpRequestAttributes parameters
   private static final MultiMap<String, String> HEADERS = new MultiMap<>();
   private static final String LISTENER_PATH = "/test";
   private static final String RELATIVE_PATH = "/";

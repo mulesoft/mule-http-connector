@@ -29,6 +29,7 @@ public class CompatibilityCertificateProvider implements CertificateProvider {
 
   /**
    * Returns a new {@link CompatibilityCertificateProvider}.
+   * <p>
    * Constructor is package private to only allow {@link CertificateProviderFactory} to create instances.
    *
    * @param certificateSupplier actual supplier that returns the {@link Certificate}
