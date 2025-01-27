@@ -27,6 +27,7 @@
         <fluentHcVersion>4.5.13</fluentHcVersion>
         <grizzlyVersion>2.3.36-MULE-026</grizzlyVersion>
         <mockitoVersion>4.11.0</mockitoVersion>
+        <equalsverifierVersion>3.18.1</equalsverifierVersion>
 
         <commonsLang3Version>3.12.0</commonsLang3Version>
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
@@ -372,6 +373,12 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-inline</artifactId>
             <version>${mockitoVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>nl.jqno.equalsverifier</groupId>
+            <artifactId>equalsverifier</artifactId>
+            <version>${equalsverifierVersion}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
