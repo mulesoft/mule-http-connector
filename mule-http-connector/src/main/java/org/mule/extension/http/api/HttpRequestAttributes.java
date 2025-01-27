@@ -17,6 +17,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.security.cert.Certificate;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
@@ -254,4 +255,43 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
     }
     return this.queryString;
   }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result =
+        prime * result + Objects.hash(clientCertificate, listenerPath, localAddress, maskedRequestPath, method, queryString,
+                                      rawRequestPath, rawRequestUri, relativePath, remoteAddress, requestUri, scheme, version);
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    HttpRequestAttributes other = (HttpRequestAttributes) obj;
+    return Objects.equals(clientCertificate, other.clientCertificate)
+        && Objects.equals(listenerPath, other.listenerPath)
+        && Objects.equals(localAddress, other.localAddress)
+        && Objects.equals(maskedRequestPath, other.maskedRequestPath)
+        && Objects.equals(method, other.method)
+        && Objects.equals(queryString, other.queryString)
+        && Objects.equals(rawRequestPath, other.rawRequestPath)
+        && Objects.equals(rawRequestUri, other.rawRequestUri)
+        && Objects.equals(relativePath, other.relativePath)
+        && Objects.equals(remoteAddress, other.remoteAddress)
+        && Objects.equals(requestUri, other.requestUri)
+        && Objects.equals(scheme, other.scheme)
+        && Objects.equals(version, other.version);
+  }
+
+
 }
