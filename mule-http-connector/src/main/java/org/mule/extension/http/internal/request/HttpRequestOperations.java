@@ -159,7 +159,8 @@ public class HttpRequestOperations implements Initialisable, Disposable {
 
       @Override
       public HttpRequestBuilder createRequestBuilder(HttpRequesterConfig config) {
-        return builder.toHttpRequestBuilder(config);
+        // return builder.toHttpRequestBuilder(config);
+        return HttpConfigConverter.createRequestBuilder(builder, config);
       }
 
       @Override
