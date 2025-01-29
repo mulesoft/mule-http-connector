@@ -15,11 +15,12 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.eclipse.jetty.server.Request;
+
 import org.junit.Test;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class HttpRequestStatusCodesTestCase extends AbstractHttpRequestTestCase {
 

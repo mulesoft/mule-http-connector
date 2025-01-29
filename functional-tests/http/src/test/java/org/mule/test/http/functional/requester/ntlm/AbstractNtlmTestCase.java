@@ -11,10 +11,10 @@ import org.mule.test.http.functional.requester.TestAuthorizer;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.eclipse.jetty.server.Request;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public abstract class AbstractNtlmTestCase extends AbstractHttpRequestTestCase {
 
