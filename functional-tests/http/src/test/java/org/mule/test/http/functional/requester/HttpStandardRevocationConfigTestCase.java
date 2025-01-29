@@ -10,11 +10,11 @@ import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.test.http.functional.fips.DefaultTestConfiguration.isFipsTesting;
 
-import static org.hamcrest.CoreMatchers.both;
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsStringIgnoringCase;
+import static org.hamcrest.core.CombinableMatcher.both;
+import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.StringContains.containsString;
+import static org.hamcrest.core.StringContains.containsStringIgnoringCase;
 import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
