@@ -10,9 +10,8 @@ import static org.mule.test.http.functional.fips.DefaultTestConfiguration.getDef
 import static org.mule.test.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
 
 import static javax.servlet.http.HttpServletResponse.SC_OK;
-
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.message.Message;
@@ -21,16 +20,17 @@ import org.mule.test.http.functional.requester.AbstractHttpRequestTestCase;
 
 import java.io.IOException;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.eclipse.jetty.proxy.ConnectHandler;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+
 import org.junit.Rule;
 import org.junit.Test;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class BasicHttpProxyToHttpsTestCase extends AbstractHttpRequestTestCase {
 

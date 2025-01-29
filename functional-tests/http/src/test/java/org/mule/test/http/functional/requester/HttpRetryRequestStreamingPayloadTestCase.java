@@ -11,24 +11,26 @@ import static org.mule.extension.http.internal.HttpConnectorConstants.RETRY_ATTE
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.RETRY_POLICY;
 
 import static org.eclipse.jetty.server.HttpConnection.getCurrentConnection;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import io.qameta.allure.Story;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.server.Request;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
+import io.qameta.allure.Story;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Story(RETRY_POLICY)
 public class HttpRetryRequestStreamingPayloadTestCase extends AbstractHttpRequestTestCase {

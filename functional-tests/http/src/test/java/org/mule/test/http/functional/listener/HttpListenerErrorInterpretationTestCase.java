@@ -32,10 +32,10 @@ import static org.mule.test.http.functional.matcher.HttpResponseStatusCodeMatche
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import static org.apache.http.client.fluent.Request.Get;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
 
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.functional.junit4.rules.HttpServerRule;
@@ -52,14 +52,17 @@ import org.mule.test.http.functional.AbstractHttpTestCase;
 
 import java.io.IOException;
 
-import io.qameta.allure.Stories;
-import io.qameta.allure.Story;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Response;
-import org.hamcrest.Matcher;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
+import org.hamcrest.Matcher;
+
+import io.qameta.allure.Stories;
+import io.qameta.allure.Story;
 
 @Stories({@Story(ERROR_HANDLING), @Story(ERRORS)})
 public class HttpListenerErrorInterpretationTestCase extends AbstractHttpTestCase {
