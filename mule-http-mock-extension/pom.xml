@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.mule.test.extensions</groupId>
+    <artifactId>mule-http-mock-extension</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <packaging>mule-extension</packaging>
+    <name>HTTP Mock Extension</name>
+
+    <parent>
+        <groupId>org.mule.extensions</groupId>
+        <artifactId>mule-modules-parent</artifactId>
+        <version>1.6.10</version>
+    </parent>
+
+    <properties>
+        <jacoco.version>0.8.12</jacoco.version>
+
+        <munit.extensions.maven.plugin.version>1.4.0</munit.extensions.maven.plugin.version>
+        <munit.version>3.3.1</munit.version>
+        <mtf-tools.version>1.2.0</mtf-tools.version>
+
+        <!-- Older supported Mule version is 4.6.0 -->
+        <munitMinMuleVersion>4.6.0</munitMinMuleVersion>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.mulesoft.munit</groupId>
+                <artifactId>munit-extensions-maven-plugin</artifactId>
+                <version>${munit.extensions.maven.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <phase>integration-test</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <argLines>
+                        <argLine>
+                            -XX:+IgnoreUnrecognizedVMOptions
+                        </argLine>
+                        <argLine>
+                            --add-opens=java.base/java.lang=ALL-UNNAMED
+                        </argLine>
+                        <argLine>
+                            -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${session.executionRootDirectory}/target/jacoco.exec
+                        </argLine>
+                    </argLines>
+
+                    <!-- Configuration for local builds, in Jenkins we configure this via command line arguments -->
+                    <runtimeConfiguration>
+                        <!-- Versions with support and snapshots -->
+                        <discoverRuntimes>
+                            <product>EE</product>
+                            <minMuleVersion>${munitMinMuleVersion}</minMuleVersion>
+                            <includeSnapshots>true</includeSnapshots>
+                            <latestPatches>true</latestPatches>
+                        </discoverRuntimes>
+                    </runtimeConfiguration>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.mulesoft.munit</groupId>
+                        <artifactId>munit-runner</artifactId>
+                        <version>${munit.version}</version>
+                        <classifier>mule-plugin</classifier>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.mulesoft.munit</groupId>
+                        <artifactId>munit-tools</artifactId>
+                        <version>${munit.version}</version>
+                        <classifier>mule-plugin</classifier>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.mulesoft.munit</groupId>
+                        <artifactId>mtf-tools</artifactId>
+                        <version>${mtf-tools.version}</version>
+                        <classifier>mule-plugin</classifier>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.mule.connectors</groupId>
+                        <artifactId>mule-http-connector</artifactId>
+                        <classifier>mule-plugin</classifier>
+                        <version>1.11.0-SNAPSHOT</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.wiremock</groupId>
+            <artifactId>wiremock</artifactId>
+            <version>3.10.0</version>
+        </dependency>
+    </dependencies>
+
+</project>

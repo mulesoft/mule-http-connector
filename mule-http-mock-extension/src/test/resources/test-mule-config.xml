@@ -1,0 +1,19 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http-mock="http://www.mulesoft.org/schema/mule/http-mock"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+          http://www.mulesoft.org/schema/mule/http-mock http://www.mulesoft.org/schema/mule/http-mock/current/mule-http-mock.xsd">
+
+    <http-mock:config name="config" configId="configId">
+        <http-mock:connection requiredParameter="aValue" />
+    </http-mock:config>
+
+    <flow name="sayHiFlow">
+        <http-mock:say-hi person="Mariano Gonzalez"/>
+    </flow>
+
+    <flow name="retrieveInfoFlow">
+        <http-mock:retrieve-info config-ref="config"/>
+    </flow>
+
+</mule>
