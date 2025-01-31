@@ -31,17 +31,17 @@
     </flow>
 
     <!-- Test configuration -->
-    <http:request-config name="all-interfaces-RequestConfig">
+    <http:request-config name="testRequestConfig">
         <http:request-connection host="localhost" port="${mock.dynamic.port}" />
     </http:request-config>
 
     <!-- Test case -->
-    <munit:test name="listeningToAllInterfaces" >
+    <munit:test name="testTheMockEndpoint" >
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="mockFlow" />
         </munit:enable-flow-sources>
         <munit:execution>
-            <http:request method="POST" config-ref="all-interfaces-RequestConfig" path="/mock" responseTimeout="2000000" >
+            <http:request method="POST" config-ref="testRequestConfig" path="/mock" >
                 <http:body>#["Requester's payload"]</http:body>
             </http:request>
         </munit:execution>
