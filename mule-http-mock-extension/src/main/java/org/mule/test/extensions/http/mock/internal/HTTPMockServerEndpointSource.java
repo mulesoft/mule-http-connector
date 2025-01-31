@@ -44,17 +44,17 @@ public class HTTPMockServerEndpointSource extends Source<InputStream, HTTPMockRe
     private String path;
 
     private HTTPMockServer mockServer;
-    private Runnable removeHandlerCallback;
+    private HTTPMockServer.StubRemover removeStubCallback;
 
     @Override
     public void onStart(SourceCallback sourceCallback) throws MuleException {
         mockServer = serverProvider.connect();
-        removeHandlerCallback = mockServer.addHandlerFor(path, sourceCallback);
+        removeStubCallback = mockServer.addHandlerFor(path, sourceCallback);
     }
 
     @Override
     public void onStop() {
-        removeHandlerCallback.run();
+        removeStubCallback.removeStub();
         serverProvider.disconnect(mockServer);
     }
 
