@@ -37,7 +37,8 @@ public final class HTTPMockServer {
   }
 
   public StubRemover addHandlerFor(String path, SourceCallback<?, ?> sourceCallback) {
-    StubMapping stubMapping = wireMockServer.stubFor(WireMock.any(urlPathTemplate(path)).willReturn(aResponse().withTransformer(TRANSFORMER_NAME, SOURCE_CALLBACK_WIREMOCK_PARAMETER, sourceCallback)));
+    StubMapping stubMapping = wireMockServer.stubFor(WireMock.any(urlPathTemplate(path))
+        .willReturn(aResponse().withTransformer(TRANSFORMER_NAME, SOURCE_CALLBACK_WIREMOCK_PARAMETER, sourceCallback)));
     return new StubRemover(stubMapping, wireMockServer);
   }
 

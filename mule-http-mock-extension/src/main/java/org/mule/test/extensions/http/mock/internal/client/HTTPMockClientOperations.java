@@ -28,37 +28,39 @@ import okhttp3.Response;
  */
 public class HTTPMockClientOperations {
 
-    @MediaType(value = ANY, strict = false)
-    public void doGet(@Connection HTTPMockClient client, String url,
-                        CompletionCallback<InputStream, HttpClientResponseAttributes> callback) throws IOException {
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
+  @MediaType(value = ANY, strict = false)
+  public void doGet(@Connection HTTPMockClient client, String url,
+                    CompletionCallback<InputStream, HttpClientResponseAttributes> callback)
+      throws IOException {
+    Request request = new Request.Builder()
+        .url(url)
+        .build();
 
-        client.mock().newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                callback.error(e);
-            }
+    client.mock().newCall(request).enqueue(new Callback() {
 
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                HttpClientResponseAttributes attrs = new HttpClientResponseAttributes();
-                attrs.setStatusCode(response.code());
-                attrs.setReasonPhrase(response.message());
-                MultiMap<String, String> headers = new MultiMap<>();
-                response.headers().forEach(pair -> headers.put(pair.getFirst(), pair.getSecond()));
-                attrs.setHeaders(headers);
+      @Override
+      public void onFailure(Call call, IOException e) {
+        callback.error(e);
+      }
 
-                InputStream body = Objects.requireNonNull(response.body()).byteStream();
+      @Override
+      public void onResponse(Call call, Response response) throws IOException {
+        HttpClientResponseAttributes attrs = new HttpClientResponseAttributes();
+        attrs.setStatusCode(response.code());
+        attrs.setReasonPhrase(response.message());
+        MultiMap<String, String> headers = new MultiMap<>();
+        response.headers().forEach(pair -> headers.put(pair.getFirst(), pair.getSecond()));
+        attrs.setHeaders(headers);
 
-                Result<InputStream, HttpClientResponseAttributes> result = Result.<InputStream, HttpClientResponseAttributes>builder()
-                        .attributes(attrs)
-                        .output(body)
-                        .build();
+        InputStream body = Objects.requireNonNull(response.body()).byteStream();
 
-                callback.success(result);
-            }
-        });
-    }
+        Result<InputStream, HttpClientResponseAttributes> result = Result.<InputStream, HttpClientResponseAttributes>builder()
+            .attributes(attrs)
+            .output(body)
+            .build();
+
+        callback.success(result);
+      }
+    });
+  }
 }

@@ -29,62 +29,63 @@ import org.slf4j.Logger;
  */
 public class DelegateToFlowTransformer implements ResponseDefinitionTransformerV2 {
 
-    public static final String TRANSFORMER_NAME = "delegate-to-flow-transformer";
-    public static final String SOURCE_CALLBACK_WIREMOCK_PARAMETER = "source-callback";
-    public static final String RESPONSE_FUTURE_PARAMETER = "response-future";
+  public static final String TRANSFORMER_NAME = "delegate-to-flow-transformer";
+  public static final String SOURCE_CALLBACK_WIREMOCK_PARAMETER = "source-callback";
+  public static final String RESPONSE_FUTURE_PARAMETER = "response-future";
 
-    private static final Logger LOGGER = getLogger(DelegateToFlowTransformer.class);
+  private static final Logger LOGGER = getLogger(DelegateToFlowTransformer.class);
 
-    @Override
-    public ResponseDefinition transform(ServeEvent serveEvent) {
-        LOGGER.debug("transform() called");
-        Parameters parameters = serveEvent.getTransformerParameters();
-        SourceCallback<InputStream, HTTPMockRequestAttributes> sourceCallback = (SourceCallback) parameters.get(SOURCE_CALLBACK_WIREMOCK_PARAMETER);
-        SourceCallbackContext sourceContext = sourceCallback.createContext();
+  @Override
+  public ResponseDefinition transform(ServeEvent serveEvent) {
+    LOGGER.debug("transform() called");
+    Parameters parameters = serveEvent.getTransformerParameters();
+    SourceCallback<InputStream, HTTPMockRequestAttributes> sourceCallback =
+        (SourceCallback) parameters.get(SOURCE_CALLBACK_WIREMOCK_PARAMETER);
+    SourceCallbackContext sourceContext = sourceCallback.createContext();
 
-        CompletableFuture<ResponseDefinition> responseFuture = new CompletableFuture<>();
-        sourceContext.addVariable(RESPONSE_FUTURE_PARAMETER, responseFuture);
+    CompletableFuture<ResponseDefinition> responseFuture = new CompletableFuture<>();
+    sourceContext.addVariable(RESPONSE_FUTURE_PARAMETER, responseFuture);
 
-        sourceCallback.handle(Result.<InputStream, HTTPMockRequestAttributes>builder()
-                .output(getBodyAsInputStream(serveEvent))
-                .attributes(getRequestAttributes(serveEvent))
-                .build(), sourceContext);
+    sourceCallback.handle(Result.<InputStream, HTTPMockRequestAttributes>builder()
+        .output(getBodyAsInputStream(serveEvent))
+        .attributes(getRequestAttributes(serveEvent))
+        .build(), sourceContext);
 
-        try {
-            return responseFuture.get();
-        } catch (InterruptedException e) {
-            LOGGER.error("Error occurred while waiting for flow to finish", e);
-            Thread.currentThread().interrupt();
-        } catch (ExecutionException e) {
-            LOGGER.error("Error occurred while waiting for flow to finish", e);
-        }
-
-        return new ResponseDefinitionBuilder()
-                .withStatus(500)
-                .withBody("Error while waiting for flow to finish")
-                .build();
+    try {
+      return responseFuture.get();
+    } catch (InterruptedException e) {
+      LOGGER.error("Error occurred while waiting for flow to finish", e);
+      Thread.currentThread().interrupt();
+    } catch (ExecutionException e) {
+      LOGGER.error("Error occurred while waiting for flow to finish", e);
     }
 
-    @Override
-    public String getName() {
-        return TRANSFORMER_NAME;
-    }
+    return new ResponseDefinitionBuilder()
+        .withStatus(500)
+        .withBody("Error while waiting for flow to finish")
+        .build();
+  }
 
-    @Override
-    public boolean applyGlobally() {
-        return false;
-    }
+  @Override
+  public String getName() {
+    return TRANSFORMER_NAME;
+  }
 
-    private static ByteArrayInputStream getBodyAsInputStream(ServeEvent serveEvent) {
-        byte[] bodyBytes = serveEvent.getRequest().getBody();
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Received body as String: {}", new String(bodyBytes));
-        }
-        return new ByteArrayInputStream(bodyBytes);
-    }
+  @Override
+  public boolean applyGlobally() {
+    return false;
+  }
 
-    // TODO: Implement!
-    private static HTTPMockRequestAttributes getRequestAttributes(ServeEvent serveEvent) {
-        return new HTTPMockRequestAttributes();
+  private static ByteArrayInputStream getBodyAsInputStream(ServeEvent serveEvent) {
+    byte[] bodyBytes = serveEvent.getRequest().getBody();
+    if (LOGGER.isInfoEnabled()) {
+      LOGGER.info("Received body as String: {}", new String(bodyBytes));
     }
+    return new ByteArrayInputStream(bodyBytes);
+  }
+
+  // TODO: Implement!
+  private static HTTPMockRequestAttributes getRequestAttributes(ServeEvent serveEvent) {
+    return new HTTPMockRequestAttributes();
+  }
 }

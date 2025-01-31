@@ -19,6 +19,10 @@
     <properties>
         <jacoco.version>0.8.12</jacoco.version>
 
+        <formatterConfigPath>../formatter.xml</formatterConfigPath>
+        <javaFormatter.plugin.version>2.14.0</javaFormatter.plugin.version>
+        <formatterGoal>validate</formatterGoal>
+
         <munit.extensions.maven.plugin.version>1.4.0</munit.extensions.maven.plugin.version>
         <munit.version>3.3.1</munit.version>
         <mtf-tools.version>1.2.0</mtf-tools.version>
@@ -29,6 +33,35 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>net.revelc.code.formatter</groupId>
+                <artifactId>formatter-maven-plugin</artifactId>
+                <version>${javaFormatter.plugin.version}</version>
+                <configuration>
+                    <compilerCompliance>${javaVersion}</compilerCompliance>
+                    <compilerSource>${javaVersion}</compilerSource>
+                    <compilerTargetPlatform>${javaVersion}</compilerTargetPlatform>
+                    <configFile>${basedir}/${formatterConfigPath}</configFile>
+                    <configJsFile>${basedir}/${formatterConfigPath}</configJsFile>
+                    <aggregator>false</aggregator>
+                    <executionRoot>true</executionRoot>
+                    <directories>
+                        <directory>${project.build.sourceDirectory}</directory>
+                        <directory>${project.build.testSourceDirectory}</directory>
+                    </directories>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>${formatterGoal}</goal>
+                        </goals>
+                        <configuration>
+                            <skipFormatting>${skipVerifications}</skipFormatting>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>

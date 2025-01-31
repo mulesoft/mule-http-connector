@@ -41,50 +41,54 @@ import org.slf4j.Logger;
 @Alias("server-endpoint")
 public class HTTPMockServerEndpointSource extends Source<InputStream, HTTPMockRequestAttributes> {
 
-    private static final Logger LOGGER = getLogger(HTTPMockServerEndpointSource.class);
+  private static final Logger LOGGER = getLogger(HTTPMockServerEndpointSource.class);
 
-    @Config
-    private HTTPMockServerConfiguration config;
+  @Config
+  private HTTPMockServerConfiguration config;
 
-    @Connection
-    private ConnectionProvider<HTTPMockServer> serverProvider;
+  @Connection
+  private ConnectionProvider<HTTPMockServer> serverProvider;
 
-    @Parameter
-    private String path;
+  @Parameter
+  private String path;
 
-    private HTTPMockServer mockServer;
-    private HTTPMockServer.StubRemover removeStubCallback;
+  private HTTPMockServer mockServer;
+  private HTTPMockServer.StubRemover removeStubCallback;
 
-    @Override
-    public void onStart(SourceCallback sourceCallback) throws MuleException {
-        mockServer = serverProvider.connect();
-        removeStubCallback = mockServer.addHandlerFor(path, sourceCallback);
-    }
+  @Override
+  public void onStart(SourceCallback sourceCallback) throws MuleException {
+    mockServer = serverProvider.connect();
+    removeStubCallback = mockServer.addHandlerFor(path, sourceCallback);
+  }
 
-    @Override
-    public void onStop() {
-        removeStubCallback.removeStub();
-        serverProvider.disconnect(mockServer);
-    }
+  @Override
+  public void onStop() {
+    removeStubCallback.removeStub();
+    serverProvider.disconnect(mockServer);
+  }
 
-    @OnTerminate
-    public void onTerminate() {
-        // TODO: What if...
-        LOGGER.warn("TERMINATE CALLED, BUT NOT IMPLEMENTED");
-    }
+  @OnTerminate
+  public void onTerminate() {
+    // TODO: What if...
+    LOGGER.warn("TERMINATE CALLED, BUT NOT IMPLEMENTED");
+  }
 
-    @OnSuccess
-    public void completeResponse(@ParameterGroup(name = "response", showInDsl = true) HTTPMockServerResponse response, SourceCallbackContext callbackContext) {
-        LOGGER.info("Generating response...");
+  @OnSuccess
+  public void completeResponse(@ParameterGroup(name = "response", showInDsl = true) HTTPMockServerResponse response,
+                               SourceCallbackContext callbackContext) {
+    LOGGER.info("Generating response...");
 
-        ResponseDefinitionBuilder builder = new ResponseDefinitionBuilder();
-        builder.withStatus(response.getStatusCode());
-        builder.withStatusMessage(response.getReasonPhrase());
-        response.getHeaders().forEach(builder::withHeader);
-        builder.withBody(IOUtils.toString(response.getBody().getValue()));
-        ResponseDefinition responseDefinition = builder.build();
+    ResponseDefinitionBuilder builder = new ResponseDefinitionBuilder();
+    builder.withStatus(response.getStatusCode());
+    builder.withStatusMessage(response.getReasonPhrase());
+    response.getHeaders().forEach(builder::withHeader);
+    builder.withBody(IOUtils.toString(response.getBody().getValue()));
+    ResponseDefinition responseDefinition = builder.build();
 
-        Optional<CompletableFuture<ResponseDefinition>> responseFutureOptional = callbackContext.getVariable(RESPONSE_FUTURE_PARAMETER);
-        responseFutureOptional.orElseThrow(() -> new IllegalStateException("Source callback context doesn't have the response future")).complete(responseDefinition);
-    }
+    Optional<CompletableFuture<ResponseDefinition>> responseFutureOptional =
+        callbackContext.getVariable(RESPONSE_FUTURE_PARAMETER);
+    responseFutureOptional
+        .orElseThrow(() -> new IllegalStateException("Source callback context doesn't have the response future"))
+        .complete(responseDefinition);
+  }
 }

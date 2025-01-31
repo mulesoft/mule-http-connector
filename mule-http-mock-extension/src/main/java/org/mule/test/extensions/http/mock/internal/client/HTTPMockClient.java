@@ -13,13 +13,13 @@ import okhttp3.OkHttpClient;
  */
 public class HTTPMockClient {
 
-    private final OkHttpClient client;
+  private final OkHttpClient client;
 
-    public HTTPMockClient() {
-        client = new OkHttpClient();
-    }
+  public HTTPMockClient() {
+    client = new OkHttpClient();
+  }
 
-    public OkHttpClient mock() {
-        return client;
-    }
+  public OkHttpClient mock() {
+    return client;
+  }
 }
