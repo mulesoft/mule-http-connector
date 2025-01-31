@@ -39,9 +39,8 @@
             <munit:enable-flow-source value="mockFlow" />
         </munit:enable-flow-sources>
         <munit:execution>
-            <http-mock:do-get config-ref="testClientConfig" url="localhost:${mock.dynamic.port}/mock" >
-<!--                <http:body>#["Requester's payload"]</http:body>-->
-            </http-mock:do-get>
+            <http-mock:do-get config-ref="testClientConfig" url="http://localhost:${mock.dynamic.port}/mock" />
+            <logger />
         </munit:execution>
         <munit:validation>
             <munit-tools:assert-that expression="#[%dw 2.0 output application/java --- payload.^raw as String]" is="#[MunitTools::containsString('Mocked response body')]" />
