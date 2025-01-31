@@ -2,9 +2,9 @@ package org.mule.test.extensions.http.mock.internal;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.sdk.api.runtime.operation.Result;
-import org.mule.sdk.api.runtime.source.SourceCallback;
-import org.mule.sdk.api.runtime.source.SourceCallbackContext;
+import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.source.SourceCallback;
+import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

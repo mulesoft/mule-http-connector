@@ -6,9 +6,9 @@
  */
 package org.mule.test.extensions.http.mock.internal;
 
-import org.mule.sdk.api.annotation.Configuration;
-import org.mule.sdk.api.annotation.Sources;
-import org.mule.sdk.api.annotation.connectivity.ConnectionProviders;
+import org.mule.runtime.extension.api.annotation.Configuration;
+import org.mule.runtime.extension.api.annotation.Sources;
+import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 
 /**
  * This class represents an extension configuration, values set in this class are commonly used across multiple

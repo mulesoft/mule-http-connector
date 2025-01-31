@@ -6,11 +6,11 @@
  */
 package org.mule.test.extensions.http.mock.internal;
 
-import static org.mule.sdk.api.annotation.param.MediaType.ANY;
+import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 
-import org.mule.sdk.api.annotation.param.MediaType;
-import org.mule.sdk.api.annotation.param.Config;
-import org.mule.sdk.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
 
 
 /**

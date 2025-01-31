@@ -8,10 +8,10 @@ package org.mule.test.extensions.http.mock.internal;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.sdk.api.connectivity.CachedConnectionProvider;
-import org.mule.sdk.api.connectivity.ConnectionValidationResult;
-import org.mule.sdk.api.annotation.Alias;
-import org.mule.sdk.api.annotation.param.Parameter;
+import org.mule.runtime.api.connection.CachedConnectionProvider;
+import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import org.slf4j.Logger;
 

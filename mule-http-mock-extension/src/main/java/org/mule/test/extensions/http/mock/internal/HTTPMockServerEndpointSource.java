@@ -1,23 +1,23 @@
 package org.mule.test.extensions.http.mock.internal;
 
-import static org.mule.sdk.api.annotation.param.MediaType.ANY;
+import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.sdk.api.annotation.Alias;
-import org.mule.sdk.api.annotation.execution.OnSuccess;
-import org.mule.sdk.api.annotation.execution.OnTerminate;
-import org.mule.sdk.api.annotation.param.Config;
-import org.mule.sdk.api.annotation.param.Connection;
-import org.mule.sdk.api.annotation.param.MediaType;
-import org.mule.sdk.api.annotation.param.Parameter;
-import org.mule.sdk.api.connectivity.ConnectionProvider;
-import org.mule.sdk.api.runtime.source.Source;
-import org.mule.sdk.api.runtime.source.SourceCallback;
-import org.mule.sdk.api.runtime.source.SourceCallbackContext;
+import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
+import org.mule.runtime.extension.api.annotation.execution.OnTerminate;
+import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.runtime.source.Source;
+import org.mule.runtime.extension.api.runtime.source.SourceCallback;
+import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 
 import java.io.InputStream;
 import java.util.Optional;
