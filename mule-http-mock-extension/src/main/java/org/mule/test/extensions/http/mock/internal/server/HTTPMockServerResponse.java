@@ -1,4 +1,4 @@
-package org.mule.test.extensions.http.mock.internal;
+package org.mule.test.extensions.http.mock.internal.server;
 
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 

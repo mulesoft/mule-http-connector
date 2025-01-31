@@ -31,9 +31,7 @@
     </flow>
 
     <!-- Test configuration -->
-    <http:request-config name="testRequestConfig">
-        <http:request-connection host="localhost" port="${mock.dynamic.port}" />
-    </http:request-config>
+    <http-mock:client-config name="testClientConfig" />
 
     <!-- Test case -->
     <munit:test name="testTheMockEndpoint" >
@@ -41,9 +39,9 @@
             <munit:enable-flow-source value="mockFlow" />
         </munit:enable-flow-sources>
         <munit:execution>
-            <http:request method="POST" config-ref="testRequestConfig" path="/mock" >
-                <http:body>#["Requester's payload"]</http:body>
-            </http:request>
+            <http-mock:do-get config-ref="testClientConfig" url="localhost:${mock.dynamic.port}/mock" >
+<!--                <http:body>#["Requester's payload"]</http:body>-->
+            </http-mock:do-get>
         </munit:execution>
         <munit:validation>
             <munit-tools:assert-that expression="#[%dw 2.0 output application/java --- payload.^raw as String]" is="#[MunitTools::containsString('Mocked response body')]" />

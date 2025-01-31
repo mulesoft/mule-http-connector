@@ -1,7 +1,7 @@
-package org.mule.test.extensions.http.mock.internal;
+package org.mule.test.extensions.http.mock.internal.server;
 
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
-import static org.mule.test.extensions.http.mock.internal.DelegateToFlowTransformer.RESPONSE_FUTURE_PARAMETER;
+import static org.mule.test.extensions.http.mock.internal.server.DelegateToFlowTransformer.RESPONSE_FUTURE_PARAMETER;
 
 import static org.slf4j.LoggerFactory.getLogger;
 

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.extensions.http.mock.internal;
+package org.mule.test.extensions.http.mock.internal.server;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
