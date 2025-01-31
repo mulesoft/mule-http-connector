@@ -84,12 +84,6 @@
                         <version>${mtf-tools.version}</version>
                         <classifier>mule-plugin</classifier>
                     </dependency>
-                    <dependency>
-                        <groupId>org.mule.connectors</groupId>
-                        <artifactId>mule-http-connector</artifactId>
-                        <classifier>mule-plugin</classifier>
-                        <version>1.11.0-SNAPSHOT</version>
-                    </dependency>
                 </dependencies>
             </plugin>
         </plugins>
