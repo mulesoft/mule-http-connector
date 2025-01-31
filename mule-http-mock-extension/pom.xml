@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.mule.test.extensions</groupId>
+    <artifactId>mule-http-mock-extension</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <packaging>mule-extension</packaging>
+    <name>HTTP Mock Extension</name>
+
+    <parent>
+        <groupId>org.mule.extensions</groupId>
+        <artifactId>mule-modules-parent</artifactId>
+        <version>1.6.10</version>
+    </parent>
+
+    <properties>
+        <jacoco.version>0.8.12</jacoco.version>
+
+        <formatterConfigPath>../formatter.xml</formatterConfigPath>
+        <javaFormatter.plugin.version>2.14.0</javaFormatter.plugin.version>
+        <formatterGoal>validate</formatterGoal>
+
+        <munit.extensions.maven.plugin.version>1.4.0</munit.extensions.maven.plugin.version>
+        <munit.version>3.3.1</munit.version>
+        <mtf-tools.version>1.2.0</mtf-tools.version>
+
+        <!-- Older supported Mule version is 4.6.0 -->
+        <munitMinMuleVersion>4.6.0</munitMinMuleVersion>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>net.revelc.code.formatter</groupId>
+                <artifactId>formatter-maven-plugin</artifactId>
+                <version>${javaFormatter.plugin.version}</version>
+                <configuration>
+                    <compilerCompliance>${javaVersion}</compilerCompliance>
+                    <compilerSource>${javaVersion}</compilerSource>
+                    <compilerTargetPlatform>${javaVersion}</compilerTargetPlatform>
+                    <configFile>${basedir}/${formatterConfigPath}</configFile>
+                    <configJsFile>${basedir}/${formatterConfigPath}</configJsFile>
+                    <aggregator>false</aggregator>
+                    <executionRoot>true</executionRoot>
+                    <directories>
+                        <directory>${project.build.sourceDirectory}</directory>
+                        <directory>${project.build.testSourceDirectory}</directory>
+                    </directories>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>${formatterGoal}</goal>
+                        </goals>
+                        <configuration>
+                            <skipFormatting>${skipVerifications}</skipFormatting>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>${license.maven.plugin.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.mulesoft.license</groupId>
+                        <artifactId>license</artifactId>
+                        <version>${mulesoftLicenseVersion}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <header>${licensePath}</header>
+                    <properties>
+                        <year>${licenseYear}</year>
+                    </properties>
+                    <includes>
+                        <include>**/*.java</include>
+                    </includes>
+                    <mapping>
+                        <java>SLASHSTAR_STYLE</java>
+                    </mapping>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>com.mulesoft.munit</groupId>
+                <artifactId>munit-extensions-maven-plugin</artifactId>
+                <version>${munit.extensions.maven.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <phase>integration-test</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <argLines>
+                        <argLine>
+                            -XX:+IgnoreUnrecognizedVMOptions
+                        </argLine>
+                        <argLine>
+                            --add-opens=java.base/java.lang=ALL-UNNAMED
+                        </argLine>
+                        <argLine>
+                            -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${session.executionRootDirectory}/target/jacoco.exec
+                        </argLine>
+                    </argLines>
+
+                    <!-- Configuration for local builds, in Jenkins we configure this via command line arguments -->
+                    <runtimeConfiguration>
+                        <!-- Versions with support and snapshots -->
+                        <discoverRuntimes>
+                            <product>EE</product>
+                            <minMuleVersion>${munitMinMuleVersion}</minMuleVersion>
+                            <includeSnapshots>true</includeSnapshots>
+                            <latestPatches>true</latestPatches>
+                        </discoverRuntimes>
+                    </runtimeConfiguration>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.mulesoft.munit</groupId>
+                        <artifactId>munit-runner</artifactId>
+                        <version>${munit.version}</version>
+                        <classifier>mule-plugin</classifier>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.mulesoft.munit</groupId>
+                        <artifactId>munit-tools</artifactId>
+                        <version>${munit.version}</version>
+                        <classifier>mule-plugin</classifier>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.mulesoft.munit</groupId>
+                        <artifactId>mtf-tools</artifactId>
+                        <version>${mtf-tools.version}</version>
+                        <classifier>mule-plugin</classifier>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.wiremock</groupId>
+            <artifactId>wiremock</artifactId>
+            <version>3.10.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>4.12.0</version>
+        </dependency>
+    </dependencies>
+
+</project>
