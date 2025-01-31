@@ -1,0 +1,63 @@
+package org.mule.test.extensions.http.mock.internal;
+
+import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
+
+import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.extension.api.annotation.param.Content;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+
+import java.io.InputStream;
+
+public class HTTPMockServerResponse {
+
+    @Parameter
+    @Optional(defaultValue = "200")
+    private Integer statusCode;
+
+    @Parameter
+    @Optional(defaultValue = "OK")
+    private String reasonPhrase;
+
+    @Parameter
+    @Content(primary = true)
+    private TypedValue<InputStream> body;
+
+    @Parameter
+    @Optional
+    @Content
+    private MultiMap<String, String> headers = emptyMultiMap();
+
+    public Integer getStatusCode() {
+        return statusCode;
+    }
+
+    public String getReasonPhrase() {
+        return reasonPhrase;
+    }
+
+    public MultiMap<String, String> getHeaders() {
+        return headers;
+    }
+
+    public TypedValue<InputStream> getBody() {
+        return body;
+    }
+
+    public void setBody(TypedValue<InputStream> body) {
+        this.body = body;
+    }
+
+    public void setHeaders(MultiMap<String, String> headers) {
+        this.headers = headers;
+    }
+
+    public void setStatusCode(Integer statusCode) {
+        this.statusCode = statusCode;
+    }
+
+    public void setReasonPhrase(String reasonPhrase) {
+        this.reasonPhrase = reasonPhrase;
+    }
+}

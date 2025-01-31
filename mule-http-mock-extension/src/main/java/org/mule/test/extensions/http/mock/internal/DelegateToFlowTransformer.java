@@ -20,17 +20,21 @@ import org.slf4j.Logger;
 
 public class DelegateToFlowTransformer implements ResponseDefinitionTransformerV2 {
 
+    public static final String TRANSFORMER_NAME = "delegate-to-flow-transformer";
+    public static final String SOURCE_CALLBACK_WIREMOCK_PARAMETER = "source-callback";
+    public static final String RESPONSE_FUTURE_PARAMETER = "response-future";
+
     private static final Logger LOGGER = getLogger(DelegateToFlowTransformer.class);
 
     @Override
     public ResponseDefinition transform(ServeEvent serveEvent) {
         LOGGER.debug("transform() called");
         Parameters parameters = serveEvent.getTransformerParameters();
-        SourceCallback<InputStream, HTTPMockRequestAttributes> sourceCallback = (SourceCallback) parameters.get("source-callback");
+        SourceCallback<InputStream, HTTPMockRequestAttributes> sourceCallback = (SourceCallback) parameters.get(SOURCE_CALLBACK_WIREMOCK_PARAMETER);
         SourceCallbackContext sourceContext = sourceCallback.createContext();
 
         CompletableFuture<ResponseDefinition> responseFuture = new CompletableFuture<>();
-        sourceContext.addVariable("response-future", responseFuture);
+        sourceContext.addVariable(RESPONSE_FUTURE_PARAMETER, responseFuture);
 
         sourceCallback.handle(Result.<InputStream, HTTPMockRequestAttributes>builder()
                 .output(getBodyAsInputStream(serveEvent))
@@ -54,7 +58,7 @@ public class DelegateToFlowTransformer implements ResponseDefinitionTransformerV
 
     @Override
     public String getName() {
-        return "delegate-to-flow-transformer";
+        return TRANSFORMER_NAME;
     }
 
     @Override
@@ -62,9 +66,12 @@ public class DelegateToFlowTransformer implements ResponseDefinitionTransformerV
         return false;
     }
 
-    // TODO: Implement!
     private static ByteArrayInputStream getBodyAsInputStream(ServeEvent serveEvent) {
-        return new ByteArrayInputStream("Hello World".getBytes());
+        byte[] bodyBytes = serveEvent.getRequest().getBody();
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Received body as String: {}", new String(bodyBytes));
+        }
+        return new ByteArrayInputStream(bodyBytes);
     }
 
     // TODO: Implement!
