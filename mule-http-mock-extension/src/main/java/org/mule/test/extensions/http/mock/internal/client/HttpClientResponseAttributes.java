@@ -4,6 +4,9 @@ import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 
 import org.mule.runtime.api.util.MultiMap;
 
+/**
+ * Attributes of the response received by an HTTP Client operation, which are defined in {@link HTTPMockClientOperations}.
+ */
 public class HttpClientResponseAttributes {
 
     private int statusCode;

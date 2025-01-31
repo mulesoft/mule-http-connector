@@ -15,6 +15,9 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import org.slf4j.Logger;
 
+/**
+ * A connection provider that creates {@link HTTPMockServer} instances. It's a {@link CachedConnectionProvider}.
+ */
 @Alias("server")
 public class HTTPMockServerConnectionProvider implements CachedConnectionProvider<HTTPMockServer> {
 

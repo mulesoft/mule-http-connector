@@ -4,6 +4,9 @@ import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 
+/**
+ * Connection provider that creates instances of {@link HTTPMockClient} instances. It's a {@link CachedConnectionProvider}.
+ */
 public class HTTPMockClientConnectionProvider implements CachedConnectionProvider<HTTPMockClient> {
 
     @Override

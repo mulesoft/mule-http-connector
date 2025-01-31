@@ -20,11 +20,13 @@ import org.mule.test.extensions.http.mock.internal.client.HTTPMockClientOperatio
 import org.mule.test.extensions.http.mock.internal.server.HTTPMockServerConfiguration;
 
 
+/**
+ * HTTP Extension based on WireMock and OkHttp. It's intended to be used for testing only.
+ */
 @Xml(prefix = "http-mock")
 @Extension(name = "HTTP Mock")
 @Configurations({HTTPMockServerConfiguration.class, HTTPMockClientConfiguration.class})
 @Operations(HTTPMockClientOperations.class)
 @JavaVersionSupport({JAVA_8, JAVA_11, JAVA_17})
 public class HTTPMockExtension {
-
 }

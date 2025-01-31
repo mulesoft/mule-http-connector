@@ -18,6 +18,9 @@ import com.github.tomakehurst.wiremock.http.ResponseDefinition;
 import com.github.tomakehurst.wiremock.stubbing.ServeEvent;
 import org.slf4j.Logger;
 
+/**
+ * WireMock transformer used to delegate the request received in the server-endpoint source to the rest of the flow.
+ */
 public class DelegateToFlowTransformer implements ResponseDefinitionTransformerV2 {
 
     public static final String TRANSFORMER_NAME = "delegate-to-flow-transformer";

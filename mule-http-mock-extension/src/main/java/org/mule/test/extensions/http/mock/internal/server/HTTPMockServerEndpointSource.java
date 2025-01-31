@@ -28,6 +28,9 @@ import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.http.ResponseDefinition;
 import org.slf4j.Logger;
 
+/**
+ * Source that receives HTTP requests to a certain endpoint, and forwards them to the rest of the flow.
+ */
 @MediaType(value = ANY, strict = false)
 @Alias("server-endpoint")
 public class HTTPMockServerEndpointSource extends Source<InputStream, HTTPMockRequestAttributes> {

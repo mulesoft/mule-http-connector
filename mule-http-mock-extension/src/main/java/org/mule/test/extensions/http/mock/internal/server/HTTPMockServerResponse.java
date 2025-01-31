@@ -10,6 +10,9 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.io.InputStream;
 
+/**
+ * Response representation in the server side. The server-endpoint source can configure the parameters defined here.
+ */
 public class HTTPMockServerResponse {
 
     @Parameter
