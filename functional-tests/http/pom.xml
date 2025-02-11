@@ -21,8 +21,8 @@
 
         <javax.servlet.api.version>3.1.0</javax.servlet.api.version>
 
-        <grizzly.version>2.3.36-MULE-026</grizzly.version>
-        <grizzly.ahc.version>1.14-MULE-026</grizzly.ahc.version>
+        <grizzly.version>2.3.36-MULE-028</grizzly.version>
+        <grizzly.ahc.version>1.14-MULE-029</grizzly.ahc.version>
         <apacheAsyncClientVersion>4.1.5</apacheAsyncClientVersion>
         <jettyVersion>11.0.24</jettyVersion>
         <httpMimeVersion>4.5.14</httpMimeVersion>
