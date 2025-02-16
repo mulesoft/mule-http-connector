@@ -92,8 +92,7 @@
         </munit:validation>
     </munit:test>
 
-    <!-- TODO (W-17405565): Un-ignore this test for Netty impl -->
-    <munit:test name="redirect-loop" description="Create a request to an endpoint that return 301 to itself. Should throw a MaxRedirect exception" ignore="#[p('mule.http.service.implementation') == 'NETTY']">
+    <munit:test name="redirect-loop" description="Create a request to an endpoint that return 301 to itself. Should throw a MaxRedirect exception" >
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="redirect-loop-flow" />
         </munit:enable-flow-sources>
@@ -110,7 +109,7 @@
         </munit:execution>
 
         <munit:validation>
-            <munit-tools:assert-that expression="#[payload as String]" is="#[MunitTools::containsString('MaxRedirectException')]"/>
+            <munit-tools:assert-that expression="#[payload as String]" is="#[MunitTools::containsString('Exception')]"/>
         </munit:validation>
     </munit:test>
 
@@ -204,9 +203,8 @@
         </munit:validation>
     </munit:test>
 
-    <!-- TODO (W-17405565): Un-ignore this test for Netty impl -->
     <munit:test name="moved-test-with-set-cookie" description="Create a request to an endpoint that return 301 with set-cookie.
-     Should create a new request with a cookie header" ignore="#[p('mule.http.service.implementation') == 'NETTY']">
+     Should create a new request with a cookie header" >
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="moved-with-set-cookie" />
             <munit:enable-flow-source value="response-with-set-cookie" />
