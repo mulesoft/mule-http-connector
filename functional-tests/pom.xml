@@ -63,7 +63,7 @@
         <muleDependenciesVersion>1.x-SNAPSHOT</muleDependenciesVersion>
         <mule.version>4.10.0-SNAPSHOT</mule.version>
         <muleBomVersion>${mule.version}</muleBomVersion>
-        <muleApiVersion>1.10.0-SNAPSHOT</muleApiVersion>
+        <muleApiVersion>1.10.0-W-17899337-fix-2-SNAPSHOT</muleApiVersion>
         <httpConnectorVersion>${project.version}</httpConnectorVersion>
 
         <!-- fips testing -->
