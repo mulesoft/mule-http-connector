@@ -50,6 +50,7 @@ import org.mule.runtime.http.api.server.HttpServer;
 import org.mule.runtime.http.api.server.HttpServerConfiguration;
 import org.mule.runtime.http.api.server.ServerAddress;
 import org.mule.runtime.http.api.server.ServerCreationException;
+import org.mule.sdk.api.http.HttpServiceApi;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
