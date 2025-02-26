@@ -63,7 +63,7 @@ public class TestConnectorMessageNotificationListener
 
   /**
    * Gets the list of notifications for the action name.
-   * 
+   *
    * @param actionName
    * @return The notifications sent for the given action.
    */

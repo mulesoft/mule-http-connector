@@ -20,6 +20,7 @@ public interface CertificateProvider extends Serializable {
 
   /**
    * Compute the logic for obtaining the {@link Certificate} and return it.
+   *
    * @return a {@link Certificate}
    */
   CertificateData getCertificate();

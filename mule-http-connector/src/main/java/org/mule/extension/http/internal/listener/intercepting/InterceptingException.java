@@ -27,7 +27,7 @@ public abstract class InterceptingException extends RuntimeException {
 
   /**
    * Suggested status code
-   * 
+   *
    * @return status code
    */
   public HttpStatus status() {
@@ -36,7 +36,7 @@ public abstract class InterceptingException extends RuntimeException {
 
   /**
    * Suggested response headers
-   * 
+   *
    * @return response headers
    */
   public MultiMap<String, String> headers() {

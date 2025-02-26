@@ -13,7 +13,7 @@ import java.util.Objects;
 
 /**
  * Represents an HTTP Query Parameter
- * 
+ *
  * @since 1.1
  */
 public class QueryParam implements KeyValuePair {
