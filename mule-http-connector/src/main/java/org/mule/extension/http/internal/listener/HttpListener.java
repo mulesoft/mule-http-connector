@@ -197,9 +197,8 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   private HttpStreamingType responseStreamingMode;
 
   /**
-   * Defines if the response should be sent in the same thread where the listener's
-   * callback is notified, or scheduled to another {@link Scheduler}.
-   * This is useful when the user knows that the payload to send is generated slowly.
+   * Defines if the response should be sent in the same thread where the listener's callback is notified, or scheduled to another
+   * {@link Scheduler}. This is useful when the user knows that the payload to send is generated slowly.
    *
    * @since 1.11.0
    */
@@ -268,7 +267,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
         .getSourceCallbackContext()
         .getVariable(RESPONSE_SEND_ATTEMPT)
         .orElse(FALSE))
-            .booleanValue()) {
+        .booleanValue()) {
       sourceResult
           .getInvocationError()
           .ifPresent(error -> sendErrorResponse(new HttpListenerErrorResponseBuilder(),
@@ -476,7 +475,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
             distributedTraceContextManager.setRemoteTraceContextMap(headers);
             getHttpListenerCurrentSpanCustomizer(result.getAttributes().get(), server.getServerAddress().getIp(),
                                                  server.getServerAddress().getPort())
-                                                     .customizeSpan(distributedTraceContextManager);
+                .customizeSpan(distributedTraceContextManager);
           }
 
           sourceCallback.handle(result, context);

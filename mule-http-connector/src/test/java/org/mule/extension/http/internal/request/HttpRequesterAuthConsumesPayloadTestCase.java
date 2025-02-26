@@ -174,7 +174,7 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     Map<String, List<String>> injectedHeaders = new HashMap<>();
     when(httpRequestFactory.create(config, uri, "dummyMethod", null, null, null, authentication, injectedHeaders, requestCreator,
                                    getDistributedTraceContextManager()))
-                                       .thenReturn(httpRequest);
+        .thenReturn(httpRequest);
 
     // When
     boolean checkRetry = true;
@@ -211,7 +211,7 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     Map<String, List<String>> injectedHeaders = new HashMap<>();
     when(httpRequestFactory.create(config, uri, "dummyMethod", null, null, null, authentication, injectedHeaders, requestCreator,
                                    getDistributedTraceContextManager()))
-                                       .thenReturn(httpRequest);
+        .thenReturn(httpRequest);
 
     boolean checkRetry = true;
 
@@ -242,7 +242,7 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     Map<String, List<String>> injectedHeaders = new HashMap<>();
     when(httpRequestFactory.create(config, uri, "dummyMethod", null, null, null, authentication, injectedHeaders, requestCreator,
                                    getDistributedTraceContextManager()))
-                                       .thenReturn(httpRequest);
+        .thenReturn(httpRequest);
 
     boolean checkRetry = true;
 
@@ -278,7 +278,7 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     Map<String, List<String>> injectedHeaders = new HashMap<>();
     when(httpRequestFactory.create(config, uri, "dummyMethod", null, null, null, authentication, injectedHeaders, requestCreator,
                                    getDistributedTraceContextManager()))
-                                       .thenReturn(httpRequest);
+        .thenReturn(httpRequest);
 
     boolean checkRetry = true;
 
@@ -315,7 +315,7 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     Map<String, List<String>> injectedHeaders = new HashMap<>();
     when(httpRequestFactory.create(config, uri, "dummyMethod", null, null, null, authentication, injectedHeaders, requestCreator,
                                    getDistributedTraceContextManager()))
-                                       .thenReturn(httpRequest);
+        .thenReturn(httpRequest);
 
     boolean checkRetry = true;
 

@@ -30,8 +30,8 @@ public class HttpSpanUtils {
    * Adds the status code attribute.
    *
    * @param distributedTraceContextManager the {@link DistributedTraceContextManager} to use.
-   * @param statusCode the status code.
-   * @param logger the LOGGER to use.
+   * @param statusCode                     the status code.
+   * @param logger                         the LOGGER to use.
    */
   public static void addStatusCodeAttribute(DistributedTraceContextManager distributedTraceContextManager,
                                             int statusCode,
@@ -49,8 +49,8 @@ public class HttpSpanUtils {
    * Update the server span status through the addition of an attribute
    *
    * @param distributedTraceContextManager the {@link DistributedTraceContextManager} to use.
-   * @param statusCode the status code.
-   * @param logger the LOGGER to use.
+   * @param statusCode                     the status code.
+   * @param logger                         the LOGGER to use.
    */
   public static void updateServerSpanStatus(DistributedTraceContextManager distributedTraceContextManager,
                                             int statusCode,
@@ -72,8 +72,8 @@ public class HttpSpanUtils {
    * Update the client span status through the addition of an attribute
    *
    * @param distributedTraceContextManager the {@link DistributedTraceContextManager} to use.
-   * @param statusCode the status code.
-   * @param logger the LOGGER to use.
+   * @param statusCode                     the status code.
+   * @param logger                         the LOGGER to use.
    */
   public static void updateClientSpanStatus(DistributedTraceContextManager distributedTraceContextManager,
                                             int statusCode,
