@@ -31,7 +31,7 @@
 
         <commonsLang3Version>3.12.0</commonsLang3Version>
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
-        <javaFormatter.plugin.version>2.25.0</javaFormatter.plugin.version>
+        <javaFormatter.plugin.version>2.16.0</javaFormatter.plugin.version>
 
         <muleJavaEeBomVersion>4.7.2</muleJavaEeBomVersion>
         <muleSocketsConnectorVersion>1.2.5</muleSocketsConnectorVersion>

@@ -267,7 +267,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
         .getSourceCallbackContext()
         .getVariable(RESPONSE_SEND_ATTEMPT)
         .orElse(FALSE))
-        .booleanValue()) {
+            .booleanValue()) {
       sourceResult
           .getInvocationError()
           .ifPresent(error -> sendErrorResponse(new HttpListenerErrorResponseBuilder(),
@@ -475,7 +475,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
             distributedTraceContextManager.setRemoteTraceContextMap(headers);
             getHttpListenerCurrentSpanCustomizer(result.getAttributes().get(), server.getServerAddress().getIp(),
                                                  server.getServerAddress().getPort())
-                .customizeSpan(distributedTraceContextManager);
+                                                     .customizeSpan(distributedTraceContextManager);
           }
 
           sourceCallback.handle(result, context);
