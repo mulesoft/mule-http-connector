@@ -187,6 +187,9 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
   @Inject
   private NotificationListenerRegistry notificationListenerRegistry;
 
+  @Inject
+  private java.util.Optional<HttpServiceApi> serviceApi;
+
   private MuleContextStopWatcher muleContextStopWatcher;
   private HttpServer server;
 
