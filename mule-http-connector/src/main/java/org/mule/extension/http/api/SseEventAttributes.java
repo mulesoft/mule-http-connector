@@ -12,10 +12,12 @@ public class SseEventAttributes {
 
   private final String eventName;
   private final String eventId;
+  private final Long retryDelay;
 
   public SseEventAttributes(ServerSentEvent event) {
     eventName = event.getEventName();
-    eventId = event.getId();
+    eventId = event.getId().orElse(null);
+    retryDelay = event.getRetryDelay().isPresent() ? event.getRetryDelay().getAsLong() : null;
   }
 
   public String getEventName() {
@@ -24,5 +26,9 @@ public class SseEventAttributes {
 
   public String getId() {
     return eventId;
+  }
+
+  public Long getRetryDelay() {
+    return retryDelay;
   }
 }
