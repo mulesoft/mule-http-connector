@@ -22,6 +22,7 @@ import static java.lang.String.format;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.extension.http.internal.delegate.HttpServiceApiProxy;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -45,12 +46,10 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.http.api.HttpConstants;
-import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.http.api.server.HttpServer;
 import org.mule.runtime.http.api.server.HttpServerConfiguration;
 import org.mule.runtime.http.api.server.ServerAddress;
 import org.mule.runtime.http.api.server.ServerCreationException;
-import org.mule.sdk.api.http.HttpServiceApi;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -177,7 +176,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
   private TlsContextFactory tlsContext;
 
   @Inject
-  private HttpService httpService;
+  private HttpServiceApiProxy httpService;
 
   @Inject
   protected MuleContext muleContext;
@@ -187,9 +186,6 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
 
   @Inject
   private NotificationListenerRegistry notificationListenerRegistry;
-
-  @Inject
-  private java.util.Optional<HttpServiceApi> serviceApi;
 
   private MuleContextStopWatcher muleContextStopWatcher;
   private HttpServer server;
