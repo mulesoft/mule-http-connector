@@ -12,6 +12,7 @@ import org.mule.extension.http.api.request.HttpSendBodyMode;
 import org.mule.extension.http.api.request.builder.QueryParam;
 import org.mule.extension.http.api.request.builder.RequestHeader;
 import org.mule.extension.http.api.streaming.HttpStreamingType;
+import org.mule.extension.http.internal.sse.SseSource;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
@@ -35,7 +36,7 @@ import javax.inject.Inject;
 @Configuration(name = "requestConfig")
 @ConnectionProviders(HttpRequesterProvider.class)
 @Operations({HttpRequestOperations.class})
-@Sources(HttpPollingSource.class)
+@Sources({HttpPollingSource.class, SseSource.class})
 public class HttpRequesterConfig implements Initialisable, HttpRequesterCookieConfig {
 
   @ParameterGroup(name = URL_CONFIGURATION)
