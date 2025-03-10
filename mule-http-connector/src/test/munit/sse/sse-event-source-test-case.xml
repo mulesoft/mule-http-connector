@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <munit:config name="sse-event-source-test-case"/>
+
+    <http:listener-config name="sseListenerConfig">
+        <http:listener-connection host="localhost" port="8081"/>
+    </http:listener-config>
+
+    <http:request-config name="sseRequestConfig">
+        <http:request-connection host="localhost" port="8081"/>
+    </http:request-config>
+
+    <munit:test name="SSE Source Test" description="SSE Source Test">
+        <munit:enable-flow-sources >
+            <munit:enable-flow-source value="SseEventProducer" />
+            <munit:enable-flow-source value="SseFlowThatEnqueuesReceivedEvents_name1" />
+            <munit:enable-flow-source value="SseFlowThatEnqueuesReceivedEvents_fallback" />
+        </munit:enable-flow-sources>
+        <munit:validation>
+            <foreach collection="#[0 to 9]">
+                <munit-tools:dequeue timeout="20" timeoutUnit="SECONDS" queueName="name1_events_queue" target="event"/>
+                <munit-tools:assert-equals actual="#[vars.event as String]" expected='#["Hello " ++ payload]'/>
+            </foreach>
+            <foreach collection="#[0 to 9]">
+                <munit-tools:dequeue timeout="20" timeoutUnit="SECONDS" queueName="fallback_events_queue" target="event"/>
+                <munit-tools:assert-equals actual="#[vars.event as String]" expected='#["Hello " ++ payload]'/>
+            </foreach>
+        </munit:validation>
+    </munit:test>
+
+    <flow name="SseEventProducer">
+        <http:sse-endpoint config-ref="sseListenerConfig" path="/sse" />
+        <logger message="#['Welcome, SSE client #' ++ attributes.clientId]" />
+        <set-variable variableName="clientId" value="#[attributes.clientId]" />
+
+        <foreach collection="#[0 to 9]"> <set-variable variableName="index" value="#[payload]" />
+            <http:send-sse-event clientId="#[vars.clientId]" eventName="name1" data="#['Hello ' ++ vars.index]" />
+            <http:send-sse-event clientId="#[vars.clientId]" eventName="name2" data="#['Hello ' ++ vars.index]" />
+        </foreach>
+    </flow>
+
+    <flow name="SseFlowThatEnqueuesReceivedEvents_name1" >
+        <http:sse-source config-ref="sseRequestConfig" path="/sse" eventName="name1" />
+        <logger message="#['Received event for topic (name1): ' ++ payload]" />
+        <munit-tools:queue queueName="name1_events_queue">
+            <munit-tools:value>#[payload]</munit-tools:value>
+        </munit-tools:queue>
+    </flow>
+
+    <flow name="SseFlowThatEnqueuesReceivedEvents_fallback" >
+        <http:sse-source config-ref="sseRequestConfig" path="/sse" />
+        <logger message="#['Received event for fallback: ' ++ payload]" />
+        <munit-tools:queue queueName="fallback_events_queue">
+            <munit-tools:value>#[payload]</munit-tools:value>
+        </munit-tools:queue>
+    </flow>
+    
+</mule>
