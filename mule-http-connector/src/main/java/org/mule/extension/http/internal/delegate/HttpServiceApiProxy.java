@@ -12,7 +12,7 @@ import org.mule.runtime.http.api.client.HttpClientConfiguration;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
-import org.mule.runtime.http.api.server.HttpServerFactory;
+import org.mule.sdk.api.http.HttpServerFactory;
 import org.mule.sdk.api.http.HttpClientFactory;
 import org.mule.sdk.api.http.HttpRequestOptions;
 import org.mule.sdk.api.http.HttpRequestOptionsBuilder;
@@ -49,7 +49,7 @@ public class HttpServiceApiProxy implements
       return ((HttpServiceApi<HttpClientFactory<HttpClientConfiguration, HttpRequest, HttpRequestOptions<HttpAuthentication, HttpProxyConfig>, HttpResponse>, HttpServerFactory, HttpAuthentication, HttpProxyConfig>) forwardCompatibilityApi
           .get()).getServerFactory();
     } else {
-      return legacyApi.getServerFactory();
+      return new HttpServerFactoryWrapper(legacyApi.getServerFactory());
     }
   }
 

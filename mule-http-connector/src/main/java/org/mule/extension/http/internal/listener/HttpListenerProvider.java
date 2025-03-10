@@ -46,10 +46,8 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.http.api.HttpConstants;
-import org.mule.runtime.http.api.server.HttpServer;
 import org.mule.runtime.http.api.server.HttpServerConfiguration;
-import org.mule.runtime.http.api.server.ServerAddress;
-import org.mule.runtime.http.api.server.ServerCreationException;
+import org.mule.sdk.api.http.HttpServer;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -222,7 +220,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
 
     try {
       server = httpService.getServerFactory().create(serverConfiguration);
-    } catch (ServerCreationException e) {
+    } catch (Exception e) {
       throw new InitialisationException(createStaticMessage(buildFailureMessage("create", e)), e, this);
     }
 
@@ -326,8 +324,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
   @Override
   public ConnectionValidationResult validate(HttpServer server) {
     if (server.isStopped() || server.isStopping()) {
-      ServerAddress serverAddress = server.getServerAddress();
-      return failure(format("Server on host %s and port %s is stopped.", serverAddress.getIp(), serverAddress.getPort()),
+      return failure(format("Server on host %s and port %s is stopped.", server.getHost(), server.getPort()),
                      new ConnectionException("Server stopped."));
     } else {
       return ConnectionValidationResult.success();

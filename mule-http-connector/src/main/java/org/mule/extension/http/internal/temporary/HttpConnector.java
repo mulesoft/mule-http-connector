@@ -29,6 +29,7 @@ import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.request.validator.SuccessStatusCodeValidator;
 import org.mule.extension.http.internal.HttpOperations;
 import org.mule.extension.http.internal.request.HttpRequesterConfig;
+import org.mule.extension.http.internal.sse.SseOperations;
 import org.mule.extension.socket.api.socket.tcp.TcpClientSocketProperties;
 import org.mule.extension.socket.api.socket.tcp.TcpServerSocketProperties;
 import org.mule.modules.cors.api.configuration.origin.EveryOrigin;
@@ -56,7 +57,7 @@ import org.mule.sdk.api.annotation.JavaVersionSupport;
 @Extension(name = "HTTP")
 @JavaVersionSupport({JAVA_8, JAVA_11, JAVA_17})
 @Configurations({HttpListenerConfig.class, HttpRequesterConfig.class})
-@Operations(HttpOperations.class)
+@Operations({HttpOperations.class, SseOperations.class})
 @SubTypeMapping(baseType = HttpRequestAuthentication.class,
     subTypes = {BasicAuthentication.class, DigestAuthentication.class, NtlmAuthentication.class})
 @SubTypeMapping(baseType = HttpProxyConfig.class, subTypes = {DefaultProxyConfig.class, DefaultNtlmProxyConfig.class})
