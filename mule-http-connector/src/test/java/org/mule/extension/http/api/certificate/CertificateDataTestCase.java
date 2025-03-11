@@ -11,12 +11,10 @@ import static java.math.BigInteger.valueOf;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.Matchers.isEmptyString;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 
 import java.math.BigInteger;
 import java.security.cert.CertificateEncodingException;
@@ -44,14 +42,14 @@ public class CertificateDataTestCase {
   @Test
   public void testAlternativeNameData() {
     AlternativeNameData data = new AlternativeNameData(1, "testName");
-    assertEquals(1, data.getType());
-    assertEquals("testName", data.getName());
+    assertThat(data.getType(), is(1));
+    assertThat(data.getName(), is("testName"));
   }
 
   @Test
   public void alternativeNameDataToString() {
     AlternativeNameData data = new AlternativeNameData(2, "anotherName");
-    assertEquals("2: anotherName", data.toString());
+    assertThat(data.toString(), is("2: anotherName"));
   }
 
   // tests for SerialNumberData
@@ -59,7 +57,7 @@ public class CertificateDataTestCase {
   public void testSerialNumberData() {
     BigInteger serialNumber = new BigInteger("12345678901234567890");
     SerialNumberData serialNumberData = new SerialNumberData(serialNumber);
-    assertEquals(serialNumber, serialNumberData.getSerialNumber());
+    assertThat(serialNumberData.getSerialNumber(), is(serialNumber));
   }
 
   // tests for PublicKeyData
@@ -69,11 +67,11 @@ public class CertificateDataTestCase {
     byte[] encoded = {1, 2, 3};
     PublicKeyData publicKeyData = new PublicKeyData(algorithm, encoded);
 
-    assertEquals(algorithm, publicKeyData.getAlgorithm());
+    assertThat(publicKeyData.getAlgorithm(), is(algorithm));
     assertThat(publicKeyData.getEncoded(), is(encoded));
-    assertNull(publicKeyData.getParams());
-    assertNull(publicKeyData.getModulus());
-    assertNull(publicKeyData.getPublicKey());
+    assertThat(publicKeyData.getParams(), nullValue());
+    assertThat(publicKeyData.getModulus(), nullValue());
+    assertThat(publicKeyData.getPublicKey(), nullValue());
   }
 
   @Test
@@ -86,11 +84,11 @@ public class CertificateDataTestCase {
 
     PublicKeyData publicKeyData = new PublicKeyData(publicKey, modulus, params, algorithm, encoded);
 
-    assertEquals(algorithm, publicKeyData.getAlgorithm());
+    assertThat(publicKeyData.getAlgorithm(), is(algorithm));
     assertThat(publicKeyData.getEncoded(), is(encoded));
-    assertEquals(params, publicKeyData.getParams());
-    assertEquals(modulus, publicKeyData.getModulus());
-    assertEquals(publicKey, publicKeyData.getPublicKey());
+    assertThat(publicKeyData.getModulus(), is(modulus));
+    assertThat(publicKeyData.getParams(), is(params));
+    assertThat(publicKeyData.getPublicKey(), is(publicKey));
   }
 
   // tests for PrincipalData
@@ -98,7 +96,7 @@ public class CertificateDataTestCase {
   public void testGetCommonNameWithCN() {
     String name = "CN=Test Name, OU=Test Unit, O=Test Org";
     PrincipalData principalData = new PrincipalData(name);
-    assertEquals("Test Name", principalData.getCommonName());
+    assertThat(principalData.getCommonName(), is("Test Name"));
   }
 
   // tests for PrincipalData
@@ -106,21 +104,21 @@ public class CertificateDataTestCase {
   public void testGetCommonNameWithoutCN() {
     String name = "OU=Test Unit, O=Test Org";
     PrincipalData principalData = new PrincipalData(name);
-    assertEquals("", principalData.getCommonName());
+    assertThat(principalData.getCommonName(), isEmptyString());
   }
 
   @Test
   public void testGetCommonNameWithMultipleCN() {
     String name = "CN=Test Name, OU=Test Unit, CN=Another Name, O=Test Org";
     PrincipalData principalData = new PrincipalData(name);
-    assertEquals("Test Name", principalData.getCommonName());
+    assertThat(principalData.getCommonName(), is("Test Name"));
   }
 
   @Test
   public void testPrincipalDataToString() {
     String name = "CN=Test Name, OU=Test Unit, O=Test Org";
     PrincipalData principalData = new PrincipalData(name);
-    assertEquals(name, principalData.toString());
+    assertThat(principalData.toString(), is(name));
   }
 
   @Test
@@ -129,14 +127,14 @@ public class CertificateDataTestCase {
     // NPE expected here
     String commonName = principalData.getCommonName();
     // exception was handled and an empty string was returned
-    assertEquals("", commonName);
+    assertThat(commonName, isEmptyString());
   }
 
   @Test
   public void testX500PrincipalData() {
     String name = "CN=Test Name, OU=Test Unit, O=Test Org";
     X500PrincipalData x500PrincipalData = new X500PrincipalData(name);
-    assertEquals(name, x500PrincipalData.getName());
+    assertThat(x500PrincipalData.getName(), is(name));
   }
 
   @Test
@@ -144,14 +142,14 @@ public class CertificateDataTestCase {
     String name = "CN=Test Name, OU=Test Unit, O=Test Org";
     PrincipalData principalData = new PrincipalData(name);
     X500PrincipalData x500PrincipalData = new X500PrincipalData(principalData);
-    assertEquals(name, x500PrincipalData.getName());
+    assertThat(x500PrincipalData.getName(), is(name));
   }
 
   @Test
   public void testX500PrincipalDataToString() {
     String name = "CN=Test Name, OU=Test Unit, O=Test Org";
     X500PrincipalData x500PrincipalData = new X500PrincipalData(name);
-    assertEquals("X500PrincipalData{name='" + name + "'}", x500PrincipalData.toString());
+    assertThat(x500PrincipalData.toString(), is("X500PrincipalData{name='" + name + "'}"));
   }
 
   @Test
@@ -160,42 +158,41 @@ public class CertificateDataTestCase {
     X500PrincipalData x500PrincipalData2 = new X500PrincipalData("CN=Test Name");
     X500PrincipalData x500PrincipalData3 = new X500PrincipalData("CN=Different Name");
 
-    assertEquals(x500PrincipalData1, x500PrincipalData2);
-    assertNotEquals(x500PrincipalData1, x500PrincipalData3);
-
-    assertEquals(x500PrincipalData1.hashCode(), x500PrincipalData2.hashCode());
-    assertNotEquals(x500PrincipalData1.hashCode(), x500PrincipalData3.hashCode());
+    assertThat(x500PrincipalData1, is(x500PrincipalData2));
+    assertThat(x500PrincipalData1, not(x500PrincipalData3));
+    assertThat(x500PrincipalData1.hashCode(), is(x500PrincipalData2.hashCode()));
+    assertThat(x500PrincipalData1.hashCode(), not(x500PrincipalData3.hashCode()));
   }
 
   @Test
   public void testX500PrincipalDataEqualsWithNull() {
     X500PrincipalData x500PrincipalData = new X500PrincipalData("CN=Test Name");
-    assertNotEquals(null, x500PrincipalData);
+    assertThat(x500PrincipalData, notNullValue());
   }
 
   @Test
   public void testX500PrincipalDataEqualsWithDifferentClass() {
     X500PrincipalData x500PrincipalData = new X500PrincipalData("CN=Test Name");
-    assertNotEquals("String Object", x500PrincipalData);
+    assertThat(x500PrincipalData, not("String Object"));
   }
 
   @Test
   public void testX500PrincipalDataWithEmptyString() {
     X500PrincipalData x500PrincipalData = new X500PrincipalData("");
-    assertEquals("", x500PrincipalData.getName());
+    assertThat(x500PrincipalData.getName(), isEmptyString());
   }
 
   @Test
   public void testX500PrincipalDataWithNullName() {
     X500PrincipalData x500PrincipalData = new X500PrincipalData((String) null);
-    assertNull(x500PrincipalData.getName());
+    assertThat(x500PrincipalData.getName(), nullValue());
   }
 
   @Test
   public void testX500PrincipalDataEqualsWithSameObject() {
     X500PrincipalData x500PrincipalData = new X500PrincipalData("CN=Test Name");
     X500PrincipalData x500PrincipalData2 = new X500PrincipalData("CN=Test Name");
-    assertEquals(x500PrincipalData, x500PrincipalData2);
+    assertThat(x500PrincipalData, is(x500PrincipalData2));
   }
 
   // tests for CertificateExtension
@@ -208,8 +205,8 @@ public class CertificateDataTestCase {
 
     CertificateExtension extension = new CertificateExtension(oid, criticality, value, subjectAlternativeName);
 
-    assertEquals(oid, extension.getOid());
-    assertEquals(criticality, extension.getCriticality());
+    assertThat(extension.getOid(), is(oid));
+    assertThat(extension.getCriticality(), is(criticality));
     assertThat(extension.getValue(), is(value));
   }
 
@@ -226,7 +223,7 @@ public class CertificateDataTestCase {
         "SubjectAlternativeName [\n" +
         "DNS:example.com]\n";
 
-    assertEquals(expected, extension.toString());
+    assertThat(extension.toString(), is(expected));
   }
 
   @Test
@@ -234,14 +231,13 @@ public class CertificateDataTestCase {
     String oid = "1.2.3.4";
     boolean criticality = true;
     byte[] value = {1, 2, 3};
-    String subjectAlternativeName = null;
 
-    CertificateExtension extension = new CertificateExtension(oid, criticality, value, subjectAlternativeName);
+    CertificateExtension extension = new CertificateExtension(oid, criticality, value, null);
 
     String expected = "ObjectId: 1.2.3.4 Criticality=true\n" +
         "Unknown Extension Type\n";
 
-    assertEquals(expected, extension.toString());
+    assertThat(extension.toString(), is(expected));
   }
 
   @Test
@@ -251,7 +247,7 @@ public class CertificateDataTestCase {
 
     String expected = "0000: 48 65 6C 6C 6F 20 57 6F   72 6C 64 21 00 01 02 03  Hello World!....\n" +
         "0010: 04                                                 .\n";
-    assertEquals(expected, formatted);
+    assertThat(formatted, is(expected));
   }
 
   @Test
@@ -259,9 +255,8 @@ public class CertificateDataTestCase {
     String oid = "2.5.29.14";
     boolean criticality = false;
     byte[] value = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10};
-    String subjectAlternativeName = null;
 
-    CertificateExtension extension = new CertificateExtension(oid, criticality, value, subjectAlternativeName);
+    CertificateExtension extension = new CertificateExtension(oid, criticality, value, null);
 
     String expected = "ObjectId: 2.5.29.14 Criticality=false\n" +
         "SubjectKeyIdentifier [\n" +
@@ -269,18 +264,18 @@ public class CertificateDataTestCase {
         "0000: 01 02 03 04 05 06 07 08   09 0A 0B 0C 0D 0E 0F 10  ................\n" + // Hex and ASCII representation
         "]\n" +
         "]\n\n]";
-    assertEquals(expected, extension.toString());
+    assertThat(extension.toString(), is(expected));
   }
 
   // tests for CertificateData
   @Test
-  public void testCertificateDataWithTypeAndEncoded() throws CertificateEncodingException {
+  public void testCertificateDataWithTypeAndEncoded() {
     String type = "X.509";
     byte[] encoded = {1, 2, 3};
 
     CertificateData data = new CertificateData(type, encoded);
 
-    assertEquals(type, data.getType());
+    assertThat(data.getType(), is(type));
   }
 
   @Test
@@ -288,7 +283,7 @@ public class CertificateDataTestCase {
     PrincipalData subjectDN = new PrincipalData("CN=Test Subject");
     CertificateData data = new CertificateData("X.509", new byte[] {1, 2, 3}, 1, subjectDN, null, null, null, null, null, null,
                                                null, null, null, 0, null, null, null, null, null, null, null, null, false);
-    assertEquals("CN=Test Subject", data.getName());
+    assertThat(data.getName(), is("CN=Test Subject"));
   }
 
   @Test
@@ -297,7 +292,7 @@ public class CertificateDataTestCase {
     CertificateData data = new CertificateData("X.509", new byte[] {1, 2, 3}, 1, subjectDN, null, null, null, null, null, null,
                                                null, null, null, 0, null, null, null, null, null, null, null, null, false);
     X500PrincipalData x500 = data.getSubjectX500Principal();
-    assertEquals("CN=Test Subject", x500.getName());
+    assertThat(x500.getName(), is("CN=Test Subject"));
   }
 
   @Test
@@ -306,7 +301,7 @@ public class CertificateDataTestCase {
     CertificateData data = new CertificateData("X.509", new byte[] {1, 2, 3}, 1, null, issuerDN, null, null, null, null,
                                                null, null, null, null, 0, null, null, null, null, null, null, null, null, false);
     X500PrincipalData x500 = data.getIssuerX500Principal();
-    assertEquals("CN=Test Issuer", x500.getName());
+    assertThat(x500.getName(), is("CN=Test Issuer"));
   }
 
   @Test
@@ -315,7 +310,7 @@ public class CertificateDataTestCase {
     CertificateData data = new CertificateData("X.509", new byte[] {1, 2, 3}, 1, null, null, serialNumber, null, null, null, null,
                                                null, null, null, 0, null, null, null, null, null, null, null, null, false);
     SerialNumberData serialData = data.getSerialNumberObject();
-    assertEquals(serialNumber, serialData.getSerialNumber());
+    assertThat(serialData.getSerialNumber(), is(serialNumber));
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -363,7 +358,7 @@ public class CertificateDataTestCase {
 
     String expected = "0000: 01 02 03 04 05 06 07 08   09 0A 0B 0C 0D 0E 0F 10  ................\n" +
         "0010: 11 12 13                                          ...\n";
-    assertEquals(expected, formatted);
+    assertThat(formatted, is(expected));
   }
 
   @Test
@@ -398,20 +393,20 @@ public class CertificateDataTestCase {
 
     String actualOutput = data.toString();
 
-    assertTrue(actualOutput.contains("Version: V1"));
-    assertTrue(actualOutput.contains("Subject: CN=Test Subject"));
-    assertTrue(actualOutput.contains("Key:  public key string"));
-    assertFalse(data.hasUnsupportedCriticalExtension());
+    assertThat(actualOutput.contains("Version: V1"), is(true));
+    assertThat(actualOutput.contains("Subject: CN=Test Subject"), is(true));
+    assertThat(actualOutput.contains("Key:  public key string"), is(true));
+    assertThat(data.hasUnsupportedCriticalExtension(), is(false));
 
-    assertEquals(sigAlgName, data.getSigAlgName());
-    assertEquals(sigAlgOID, data.getSigAlgOID());
-    assertEquals(signature, data.getSignature());
-    assertEquals(notAfter, data.getNotAfter());
-    assertEquals(notBefore, data.getNotBefore());
+    assertThat(data.getSigAlgName(), is(sigAlgName));
+    assertThat(data.getSigAlgOID(), is(sigAlgOID));
+    assertThat(data.getSignature(), is(signature));
+    assertThat(data.getNotAfter(), is(notAfter));
+    assertThat(data.getNotBefore(), is(notBefore));
 
-    assertNotNull(data.getEncoded());
-    assertNotNull(data.getExtensionValue(oid));
-    assertNull(data.getIssuerUniqueID());
-    assertNull(data.getSigAlgParams());
+    assertThat(data.getEncoded(), notNullValue());
+    assertThat(data.getExtensionValue(oid), notNullValue());
+    assertThat(data.getIssuerUniqueID(), nullValue());
+    assertThat(data.getSigAlgParams(), nullValue());
   }
 }
