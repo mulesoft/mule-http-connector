@@ -9,7 +9,8 @@ package org.mule.extension.http.api.certificate;
 import static java.lang.System.currentTimeMillis;
 import static java.math.BigInteger.valueOf;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -25,9 +26,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import io.qameta.allure.Issue;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.Test;
 
+@Issue("W-15895906")
 public class CertificateDataTestCase {
 
   @Test
@@ -67,7 +70,7 @@ public class CertificateDataTestCase {
     PublicKeyData publicKeyData = new PublicKeyData(algorithm, encoded);
 
     assertEquals(algorithm, publicKeyData.getAlgorithm());
-    assertArrayEquals(encoded, publicKeyData.getEncoded());
+    assertThat(publicKeyData.getEncoded(), is(encoded));
     assertNull(publicKeyData.getParams());
     assertNull(publicKeyData.getModulus());
     assertNull(publicKeyData.getPublicKey());
@@ -84,7 +87,7 @@ public class CertificateDataTestCase {
     PublicKeyData publicKeyData = new PublicKeyData(publicKey, modulus, params, algorithm, encoded);
 
     assertEquals(algorithm, publicKeyData.getAlgorithm());
-    assertArrayEquals(encoded, publicKeyData.getEncoded());
+    assertThat(publicKeyData.getEncoded(), is(encoded));
     assertEquals(params, publicKeyData.getParams());
     assertEquals(modulus, publicKeyData.getModulus());
     assertEquals(publicKey, publicKeyData.getPublicKey());
@@ -207,7 +210,7 @@ public class CertificateDataTestCase {
 
     assertEquals(oid, extension.getOid());
     assertEquals(criticality, extension.getCriticality());
-    assertArrayEquals(value, extension.getValue());
+    assertThat(extension.getValue(), is(value));
   }
 
   @Test
@@ -364,7 +367,7 @@ public class CertificateDataTestCase {
   }
 
   @Test
-  public void testCertificateDataToString() {
+  public void testCertificateDataToString() throws CertificateEncodingException {
     Date notBefore = new Date(currentTimeMillis() - 10000);
     Date notAfter = new Date(currentTimeMillis() + 10000);
     PrincipalData subjectDN = new PrincipalData("CN=Test Subject");
@@ -406,6 +409,7 @@ public class CertificateDataTestCase {
     assertEquals(notAfter, data.getNotAfter());
     assertEquals(notBefore, data.getNotBefore());
 
+    assertNotNull(data.getEncoded());
     assertNotNull(data.getExtensionValue(oid));
     assertNull(data.getIssuerUniqueID());
     assertNull(data.getSigAlgParams());

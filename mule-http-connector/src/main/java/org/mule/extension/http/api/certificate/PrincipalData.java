@@ -6,12 +6,13 @@
  */
 package org.mule.extension.http.api.certificate;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A custom Data Transfer Object (DTO) to replace the {@link java.security.Principal} class.
@@ -22,7 +23,7 @@ import org.slf4j.LoggerFactory;
  */
 public class PrincipalData implements Serializable {
 
-  private static final Logger logger = LoggerFactory.getLogger(PrincipalData.class);
+  private static final Logger LOGGER = getLogger(PrincipalData.class);
   private String name;
 
   /**
@@ -67,7 +68,7 @@ public class PrincipalData implements Serializable {
         return "";
       }
     } catch (Exception e) {
-      logger.warn(e.getMessage());
+      LOGGER.warn(e.getMessage());
       return "";
     }
   }
