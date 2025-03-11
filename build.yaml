@@ -1,9 +1,12 @@
 projectType: extension
 mavenTool: "3.9.9"
 
-mavenAdditionalArgs: -pl .,mule-http-connector
+mavenAdditionalArgs: -pl .,mule-http-connector,mule-http-mock-extension
 
 additionalTestConfigs:
+  muleHttpMockExtensionBuild:
+    jdkTool: OPEN-JDK17
+    mavenAdditionalArgs: -pl mule-http-mock-extension -am -Drevapi.skip -Dmaven.javadoc.skip=true
   functionalTests:
     jdkTool: OPEN-JDK17
     mavenAdditionalArgs: -pl functional-tests,functional-tests/http,functional-tests/cors -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE -Dmule.module.tweaking.validation.skip=true
