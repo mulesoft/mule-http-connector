@@ -10,6 +10,9 @@ import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * A custom Data Transfer Object (DTO) to replace the {@link java.security.Principal} class.
  * <p>
@@ -19,6 +22,7 @@ import java.util.regex.Pattern;
  */
 public class PrincipalData implements Serializable {
 
+  private static final Logger logger = LoggerFactory.getLogger(PrincipalData.class);
   private String name;
 
   /**
@@ -63,7 +67,7 @@ public class PrincipalData implements Serializable {
         return "";
       }
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.warn(e.getMessage());
       return "";
     }
   }
