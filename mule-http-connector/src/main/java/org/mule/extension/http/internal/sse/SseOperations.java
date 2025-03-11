@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 
 public class SseOperations {
 
-  private final Logger LOGGER = getLogger(SseOperations.class);
+  private static final Logger LOGGER = getLogger(SseOperations.class);
 
   @Inject
   @Named("_sseClientsRepository")

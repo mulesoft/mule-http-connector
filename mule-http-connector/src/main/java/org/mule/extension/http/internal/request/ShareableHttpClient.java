@@ -11,6 +11,9 @@ import org.mule.runtime.http.api.client.HttpClient;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
+import org.mule.sdk.api.http.sse.ClientWithSse;
+import org.mule.sdk.api.http.sse.ServerSentEventSource;
+import org.mule.sdk.api.http.sse.SseRetryConfig;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -18,7 +21,7 @@ import java.util.concurrent.CompletableFuture;
  * Wrapper implementation of an {@link HttpClient} that allows being shared by only configuring the client when first required and
  * only disabling it when last required.
  */
-public class ShareableHttpClient {
+public class ShareableHttpClient implements ClientWithSse {
 
   private HttpClient delegate;
   private Integer usageCount = new Integer(0);
@@ -53,7 +56,12 @@ public class ShareableHttpClient {
     return HttpClientReflection.sendAsync(delegate, request, responseTimeout, followRedirects, authentication, sendBodyMode);
   }
 
-  public HttpClient getDelegate() {
-    return delegate;
+  @Override
+  public ServerSentEventSource sseSource(String url, SseRetryConfig retryConfig) {
+    if (delegate instanceof ClientWithSse) {
+      return ((ClientWithSse) delegate).sseSource(url, retryConfig);
+    } else {
+      throw new UnsupportedOperationException("SSE is not supported");
+    }
   }
 }

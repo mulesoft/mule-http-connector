@@ -24,6 +24,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
+import org.mule.sdk.api.http.sse.ClientWithSse;
 import org.mule.sdk.api.http.sse.ServerSentEventSource;
 
 import javax.inject.Inject;
@@ -60,7 +61,7 @@ public class SseSource extends Source<String, SseEventAttributes> {
   @Override
   public void onStart(SourceCallback<String, SseEventAttributes> sourceCallback) throws MuleException {
     HttpExtensionClient client = clientProvider.connect();
-    serverSentEventSource = httpService.sseSource(client.getDelegate(), path, DEFAULT);
+    serverSentEventSource = httpService.sseSource(client, path, DEFAULT);
     if ("*".equals(eventName)) {
       serverSentEventSource.register(new PassEventToFlow(sourceCallback));
     } else {

@@ -9,7 +9,9 @@ package org.mule.extension.http.internal.delegate;
 import org.mule.runtime.http.api.client.HttpClient;
 import org.mule.runtime.http.api.server.HttpServer;
 import org.mule.sdk.api.http.HttpServiceApi;
+import org.mule.sdk.api.http.sse.ClientWithSse;
 import org.mule.sdk.api.http.sse.ServerSentEventSource;
+import org.mule.sdk.api.http.sse.ServerWithSse;
 import org.mule.sdk.api.http.sse.SseClient;
 import org.mule.sdk.api.http.sse.SseEndpointManager;
 import org.mule.sdk.api.http.sse.SseRetryConfig;
@@ -20,16 +22,16 @@ import java.util.function.Consumer;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-public class HttpServiceApiProxy implements HttpServiceApi<HttpClient, HttpServer> {
+public class HttpServiceApiProxy implements HttpServiceApi {
 
   @Inject
   @Named("_httpServiceApi")
-  private Optional<HttpServiceApi<HttpClient, HttpServer>> forwardCompatibilityApi;
+  private Optional<HttpServiceApi> forwardCompatibilityApi;
 
   @Override
-  public SseEndpointManager sseEndpoint(HttpServer httpServer, String ssePath, Consumer<SseClient> sseClientHandler) {
+  public SseEndpointManager sseEndpoint(ServerWithSse httpServer, String ssePath, Consumer<SseClient> sseClientHandler) {
     if (forwardCompatibilityApi.isPresent()) {
-      HttpServiceApi<HttpClient, HttpServer> httpServiceApi = forwardCompatibilityApi.get();
+      HttpServiceApi httpServiceApi = forwardCompatibilityApi.get();
       return httpServiceApi.sseEndpoint(httpServer, ssePath, sseClientHandler);
     } else {
       throw new IllegalStateException("Feature not implemented in this Mule Version");
@@ -37,9 +39,9 @@ public class HttpServiceApiProxy implements HttpServiceApi<HttpClient, HttpServe
   }
 
   @Override
-  public ServerSentEventSource sseSource(HttpClient httpClient, String url, SseRetryConfig retryConfig) {
+  public ServerSentEventSource sseSource(ClientWithSse httpClient, String url, SseRetryConfig retryConfig) {
     if (forwardCompatibilityApi.isPresent()) {
-      HttpServiceApi<HttpClient, HttpServer> httpServiceApi = forwardCompatibilityApi.get();
+      HttpServiceApi httpServiceApi = forwardCompatibilityApi.get();
       return httpServiceApi.sseSource(httpClient, url, retryConfig);
     } else {
       throw new IllegalStateException("Feature not implemented in this Mule Version");

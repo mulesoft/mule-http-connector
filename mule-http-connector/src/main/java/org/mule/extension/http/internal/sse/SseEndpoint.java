@@ -23,6 +23,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.http.api.server.HttpServer;
+import org.mule.sdk.api.http.sse.ServerWithSse;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -54,7 +55,11 @@ public class SseEndpoint extends Source<Void, SseClientAttributes> {
   @Override
   public void onStart(SourceCallback<Void, SseClientAttributes> sourceCallback) throws MuleException {
     HttpServer server = serverProvider.connect();
-    httpService.sseEndpoint(server, path, new PassClientToFlow(sourceCallback, sseClientsRepository));
+    if (server instanceof ServerWithSse) {
+      httpService.sseEndpoint((ServerWithSse) server, path, new PassClientToFlow(sourceCallback, sseClientsRepository));
+    } else {
+      throw new IllegalStateException("Server is not an instance of ServerWithSse");
+    }
   }
 
   @Override
