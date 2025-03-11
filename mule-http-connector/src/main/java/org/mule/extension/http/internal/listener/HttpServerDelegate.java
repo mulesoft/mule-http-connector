@@ -6,12 +6,14 @@
  */
 package org.mule.extension.http.internal.listener;
 
-import org.mule.sdk.api.http.HttpServer;
-import org.mule.sdk.api.http.sse.SseClient;
-import org.mule.sdk.api.http.sse.SseHandlerManager;
+import org.mule.runtime.http.api.HttpConstants;
+import org.mule.runtime.http.api.server.HttpServer;
+import org.mule.runtime.http.api.server.RequestHandler;
+import org.mule.runtime.http.api.server.RequestHandlerManager;
+import org.mule.runtime.http.api.server.ServerAddress;
 
 import java.io.IOException;
-import java.util.function.Consumer;
+import java.util.Collection;
 
 /**
  * Base class for applying the delegate design pattern around an {@link HttpServer}
@@ -42,8 +44,13 @@ public class HttpServerDelegate implements HttpServer {
   }
 
   @Override
-  public boolean isStopped() {
-    return delegate.isStopped();
+  public ServerAddress getServerAddress() {
+    return delegate.getServerAddress();
+  }
+
+  @Override
+  public HttpConstants.Protocol getProtocol() {
+    return delegate.getProtocol();
   }
 
   @Override
@@ -52,17 +59,21 @@ public class HttpServerDelegate implements HttpServer {
   }
 
   @Override
-  public String getHost() {
-    return delegate.getHost();
+  public boolean isStopped() {
+    return delegate.isStopped();
   }
 
   @Override
-  public int getPort() {
-    return delegate.getPort();
+  public RequestHandlerManager addRequestHandler(Collection<String> methods, String path, RequestHandler requestHandler) {
+    return delegate.addRequestHandler(methods, path, requestHandler);
   }
 
   @Override
-  public SseHandlerManager sse(String path, Consumer<SseClient> clientHandler) {
-    return delegate.sse(path, clientHandler);
+  public RequestHandlerManager addRequestHandler(String path, RequestHandler requestHandler) {
+    return delegate.addRequestHandler(path, requestHandler);
+  }
+
+  protected HttpServer getDelegate() {
+    return delegate;
   }
 }

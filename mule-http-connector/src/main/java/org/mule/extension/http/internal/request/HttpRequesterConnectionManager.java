@@ -9,14 +9,18 @@ package org.mule.extension.http.internal.request;
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-
-import org.mule.extension.http.internal.delegate.HttpServiceApiProxy;
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.http.api.HttpService;
+import org.mule.runtime.http.api.client.HttpClient;
 import org.mule.runtime.http.api.client.HttpClientConfiguration;
+import org.mule.runtime.http.api.client.auth.HttpAuthentication;
+import org.mule.runtime.http.api.domain.message.request.HttpRequest;
+import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 import javax.inject.Inject;
@@ -30,13 +34,13 @@ import javax.inject.Inject;
 public class HttpRequesterConnectionManager implements Disposable {
 
   @Inject
-  private HttpServiceApiProxy httpService;
+  private HttpService httpService;
 
-  private final Map<String, ShareableHttpClient> clients = new HashMap<>();
+  private Map<String, ShareableHttpClient> clients = new HashMap<>();
 
   public HttpRequesterConnectionManager() {}
 
-  public HttpRequesterConnectionManager(HttpServiceApiProxy httpService) {
+  public HttpRequesterConnectionManager(HttpService httpService) {
     this.httpService = httpService;
   }
 
@@ -64,7 +68,7 @@ public class HttpRequesterConnectionManager implements Disposable {
   @Deprecated
   public synchronized ShareableHttpClient create(String configName, HttpClientConfiguration clientConfiguration) {
     checkArgument(!clients.containsKey(configName), format("There's an HttpClient available for %s already.", configName));
-    ShareableHttpClient client = new ShareableHttpClient(httpService.getClientFactory().create(clientConfiguration), httpService);
+    ShareableHttpClient client = new ShareableHttpClient(httpService.getClientFactory().create(clientConfiguration));
     clients.put(configName, client);
     return client;
   }
@@ -81,8 +85,7 @@ public class HttpRequesterConnectionManager implements Disposable {
   public synchronized ShareableHttpClient lookupOrCreate(String configName,
                                                          Supplier<? extends HttpClientConfiguration> configSupplier) {
     return clients.computeIfAbsent(configName,
-                                   name -> new ShareableHttpClient(httpService.getClientFactory().create(configSupplier.get()),
-                                                                   httpService));
+                                   name -> new ShareableHttpClient(httpService.getClientFactory().create(configSupplier.get())));
   }
 
   @Override

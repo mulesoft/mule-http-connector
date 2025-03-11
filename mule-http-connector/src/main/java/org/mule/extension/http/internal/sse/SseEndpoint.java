@@ -11,6 +11,7 @@ import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.extension.http.api.SseClientAttributes;
+import org.mule.extension.http.internal.delegate.HttpServiceApiProxy;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -21,7 +22,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
-import org.mule.sdk.api.http.HttpServer;
+import org.mule.runtime.http.api.server.HttpServer;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -33,6 +34,9 @@ import org.slf4j.Logger;
 public class SseEndpoint extends Source<Void, SseClientAttributes> {
 
   private static final Logger LOGGER = getLogger(SseEndpoint.class);
+
+  @Inject
+  private HttpServiceApiProxy httpService;
 
   @Connection
   private ConnectionProvider<HttpServer> serverProvider;
@@ -50,7 +54,7 @@ public class SseEndpoint extends Source<Void, SseClientAttributes> {
   @Override
   public void onStart(SourceCallback<Void, SseClientAttributes> sourceCallback) throws MuleException {
     HttpServer server = serverProvider.connect();
-    server.sse(path, new PassClientToFlow(sourceCallback, sseClientsRepository));
+    httpService.sseEndpoint(server, path, new PassClientToFlow(sourceCallback, sseClientsRepository));
   }
 
   @Override

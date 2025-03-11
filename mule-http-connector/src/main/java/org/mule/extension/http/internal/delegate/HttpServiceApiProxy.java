@@ -6,60 +6,43 @@
  */
 package org.mule.extension.http.internal.delegate;
 
-import org.mule.extension.http.api.request.proxy.HttpProxyConfig;
-import org.mule.runtime.http.api.HttpService;
-import org.mule.runtime.http.api.client.HttpClientConfiguration;
-import org.mule.runtime.http.api.client.auth.HttpAuthentication;
-import org.mule.runtime.http.api.domain.message.request.HttpRequest;
-import org.mule.runtime.http.api.domain.message.response.HttpResponse;
-import org.mule.sdk.api.http.HttpServerFactory;
-import org.mule.sdk.api.http.HttpClientFactory;
-import org.mule.sdk.api.http.HttpRequestOptions;
-import org.mule.sdk.api.http.HttpRequestOptionsBuilder;
+import org.mule.runtime.http.api.client.HttpClient;
+import org.mule.runtime.http.api.server.HttpServer;
 import org.mule.sdk.api.http.HttpServiceApi;
+import org.mule.sdk.api.http.sse.ServerSentEventSource;
+import org.mule.sdk.api.http.sse.SseClient;
+import org.mule.sdk.api.http.sse.SseEndpointManager;
+import org.mule.sdk.api.http.sse.SseRetryConfig;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-public class HttpServiceApiProxy implements
-    HttpServiceApi<HttpClientFactory<HttpClientConfiguration, HttpRequest, HttpRequestOptions<HttpAuthentication, HttpProxyConfig>, HttpResponse>, HttpServerFactory, HttpAuthentication, HttpProxyConfig> {
-
-  @Inject
-  private HttpService legacyApi;
+public class HttpServiceApiProxy implements HttpServiceApi<HttpClient, HttpServer> {
 
   @Inject
   @Named("_httpServiceApi")
-  private Optional<HttpServiceApi> forwardCompatibilityApi;
+  private Optional<HttpServiceApi<HttpClient, HttpServer>> forwardCompatibilityApi;
 
   @Override
-  public HttpClientFactory<HttpClientConfiguration, HttpRequest, HttpRequestOptions<HttpAuthentication, HttpProxyConfig>, HttpResponse> getClientFactory() {
+  public SseEndpointManager sseEndpoint(HttpServer httpServer, String ssePath, Consumer<SseClient> sseClientHandler) {
     if (forwardCompatibilityApi.isPresent()) {
-      return ((HttpServiceApi<HttpClientFactory<HttpClientConfiguration, HttpRequest, HttpRequestOptions<HttpAuthentication, HttpProxyConfig>, HttpResponse>, HttpServerFactory, HttpAuthentication, HttpProxyConfig>) forwardCompatibilityApi
-          .get()).getClientFactory();
+      HttpServiceApi<HttpClient, HttpServer> httpServiceApi = forwardCompatibilityApi.get();
+      return httpServiceApi.sseEndpoint(httpServer, ssePath, sseClientHandler);
     } else {
-      return new HttpClientFactoryWrapper(legacyApi.getClientFactory());
+      throw new IllegalStateException("Feature not implemented in this Mule Version");
     }
   }
 
   @Override
-  public HttpServerFactory getServerFactory() {
+  public ServerSentEventSource sseSource(HttpClient httpClient, String url, SseRetryConfig retryConfig) {
     if (forwardCompatibilityApi.isPresent()) {
-      return ((HttpServiceApi<HttpClientFactory<HttpClientConfiguration, HttpRequest, HttpRequestOptions<HttpAuthentication, HttpProxyConfig>, HttpResponse>, HttpServerFactory, HttpAuthentication, HttpProxyConfig>) forwardCompatibilityApi
-          .get()).getServerFactory();
+      HttpServiceApi<HttpClient, HttpServer> httpServiceApi = forwardCompatibilityApi.get();
+      return httpServiceApi.sseSource(httpClient, url, retryConfig);
     } else {
-      return new HttpServerFactoryWrapper(legacyApi.getServerFactory());
-    }
-  }
-
-  @Override
-  public HttpRequestOptionsBuilder<HttpAuthentication, HttpProxyConfig> requestOptionsBuilder() {
-    if (forwardCompatibilityApi.isPresent()) {
-      return ((HttpServiceApi<HttpClientFactory<HttpClientConfiguration, HttpRequest, HttpRequestOptions<HttpAuthentication, HttpProxyConfig>, HttpResponse>, HttpServerFactory, HttpAuthentication, HttpProxyConfig>) forwardCompatibilityApi
-          .get()).requestOptionsBuilder();
-    } else {
-      return new HttpRequestOptionsBuilderWrapper();
+      throw new IllegalStateException("Feature not implemented in this Mule Version");
     }
   }
 }

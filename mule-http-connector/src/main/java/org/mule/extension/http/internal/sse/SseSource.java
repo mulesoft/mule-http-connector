@@ -12,6 +12,7 @@ import static org.mule.sdk.api.http.sse.SseRetryConfig.DEFAULT;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.extension.http.api.SseEventAttributes;
+import org.mule.extension.http.internal.delegate.HttpServiceApiProxy;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
@@ -25,6 +26,8 @@ import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.sdk.api.http.sse.ServerSentEventSource;
 
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 
 @Alias("sseSource")
@@ -35,6 +38,9 @@ public class SseSource extends Source<String, SseEventAttributes> {
 
   @Connection
   private ConnectionProvider<HttpExtensionClient> clientProvider;
+
+  @Inject
+  private HttpServiceApiProxy httpService;
 
   @Parameter
   @Placement(order = 1)
@@ -54,7 +60,7 @@ public class SseSource extends Source<String, SseEventAttributes> {
   @Override
   public void onStart(SourceCallback<String, SseEventAttributes> sourceCallback) throws MuleException {
     HttpExtensionClient client = clientProvider.connect();
-    serverSentEventSource = client.sseSource(path, DEFAULT);
+    serverSentEventSource = httpService.sseSource(client.getDelegate(), path, DEFAULT);
     if ("*".equals(eventName)) {
       serverSentEventSource.register(new PassEventToFlow(sourceCallback));
     } else {
