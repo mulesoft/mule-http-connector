@@ -21,6 +21,7 @@ import java.util.Objects;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 /**
@@ -36,6 +37,60 @@ public class HTTPMockClientOperations {
         .url(url)
         .build();
 
+    client.mock().newCall(request).enqueue(new Callback() {
+
+      @Override
+      public void onFailure(Call call, IOException e) {
+        callback.error(e);
+      }
+
+      @Override
+      public void onResponse(Call call, Response response) throws IOException {
+        HttpClientResponseAttributes attrs = new HttpClientResponseAttributes();
+        attrs.setStatusCode(response.code());
+        attrs.setReasonPhrase(response.message());
+        MultiMap<String, String> headers = new MultiMap<>();
+        response.headers().forEach(pair -> headers.put(pair.getFirst(), pair.getSecond()));
+        attrs.setHeaders(headers);
+
+        InputStream body = Objects.requireNonNull(response.body()).byteStream();
+
+        Result<InputStream, HttpClientResponseAttributes> result = Result.<InputStream, HttpClientResponseAttributes>builder()
+            .attributes(attrs)
+            .output(body)
+            .build();
+
+        callback.success(result);
+      }
+    });
+  }
+
+
+  /**
+   * Executes an HTTP POST request asynchronously.
+   *
+   * @param client         the HTTP mock client connection
+   * @param url            the target URL for the POST request
+   * @param payload        the payload to send (assumed to be a JSON string)
+   * @param callback       the callback to be invoked on completion
+   * @param requestHeaders custom headers to be added to the POST request
+   * @throws IOException if an I/O error occurs
+   */
+  @MediaType(value = ANY, strict = false)
+  public void doPost(@Connection HTTPMockClient client, String url, String payload, MultiMap<String, String> requestHeaders,
+                     CompletionCallback<InputStream, HttpClientResponseAttributes> callback)
+      throws IOException {
+
+    RequestBody requestBody = RequestBody.create(payload, okhttp3.MediaType.parse("application/json"));
+
+    Request.Builder requestBuilder = new Request.Builder()
+        .url(url)
+        .post(requestBody);
+
+    if (requestHeaders != null) {
+      requestHeaders.forEach(requestBuilder::addHeader);
+    }
+    Request request = requestBuilder.build();
     client.mock().newCall(request).enqueue(new Callback() {
 
       @Override
