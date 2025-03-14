@@ -10,6 +10,7 @@
       				http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
       						http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
     <munit:config name="expect-100-continue-test-case.xml"/>
+
     <!-- Mock server config -->
     <munit:dynamic-port propertyName="mock.dynamic.port"/>
     <http-mock:server-config name="expectContinueServerConfig">
@@ -84,19 +85,16 @@
         </http-mock:server-endpoint>
         <logger />
     </flow>
-
     <munit:test name="testInvalidExpectHeader">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="mockInvalidExpectFlow" />
         </munit:enable-flow-sources>
-
         <munit:execution>
             <http-mock:do-post config-ref="expectContinueClientConfig"
                                url="http://localhost:${mock.dynamic.port}/mock"
                                requestHeaders="#[{'Expect' : 'invalid-expect'}]"
                                payload="#['payload with invalid expect']" />
         </munit:execution>
-
         <munit:validation>
             <munit-tools:assert-that expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(417)]" />
             <munit-tools:assert-that
@@ -104,7 +102,4 @@
                     is="#[MunitTools::containsString('Bad Message 417')]" />
         </munit:validation>
     </munit:test>
-
-
-
 </mule>
