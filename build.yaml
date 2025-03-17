@@ -9,22 +9,22 @@ additionalTestConfigs:
     mavenAdditionalArgs: -pl functional-tests,functional-tests/http,functional-tests/cors -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE -Dmule.module.tweaking.validation.skip=true
   munitTests:
     testJdkTool: OPEN-JDK17
-    mavenAdditionalArgs: -pl mule-http-connector -DmunitMinMuleVersion=4.6.0 -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE -Dmule.module.tweaking.validation.skip=true
+    mavenAdditionalArgs: -pl mule-http-connector,mule-http-mock-extension -DmunitMinMuleVersion=4.6.0 -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE -Dmule.module.tweaking.validation.skip=true
   netty-functionalTests:
     jdkTool: OPEN-JDK17
     mavenAdditionalArgs: -pl functional-tests,functional-tests/http,functional-tests/cors -Dmule.http.service.implementation=NETTY -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE -Dmule.module.tweaking.validation.skip=true
   netty-munitTests:
     testJdkTool: OPEN-JDK17
-    mavenAdditionalArgs: -pl mule-http-connector -Dmule.http.service.implementation=NETTY -DmunitMinMuleVersion=4.9.0 -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE -Dmule.module.tweaking.validation.skip=true
+    mavenAdditionalArgs: -pl mule-http-connector,mule-http-mock-extension -Dmule.http.service.implementation=NETTY -DmunitMinMuleVersion=4.9.0 -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE -Dmule.module.tweaking.validation.skip=true
   functionalTestsJava21:
     jdkTool: TEMURIN-JDK21
     mavenAdditionalArgs: -pl functional-tests,functional-tests/http,functional-tests/cors -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE -Dmule.module.tweaking.validation.skip=true
   munitTestsJava21:
     testJdkTool: TEMURIN-JDK21
-    mavenAdditionalArgs: -pl mule-http-connector -DmunitMinMuleVersion=4.6.0 -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE -Dmule.module.tweaking.validation.skip=true
+    mavenAdditionalArgs: -pl mule-http-connector,mule-http-mock-extension -DmunitMinMuleVersion=4.6.0 -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE -Dmule.module.tweaking.validation.skip=true
   netty-functionalTestsJava21:
     jdkTool: TEMURIN-JDK21
     mavenAdditionalArgs: -pl functional-tests,functional-tests/http,functional-tests/cors -Dmule.http.service.implementation=NETTY -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE -Dmule.module.tweaking.validation.skip=true
   netty-munitTestsJava21:
     testJdkTool: TEMURIN-JDK21
-    mavenAdditionalArgs: -pl mule-http-connector -Dmule.http.service.implementation=NETTY -DmunitMinMuleVersion=4.9.0 -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE -Dmule.module.tweaking.validation.skip=true
+    mavenAdditionalArgs: -pl mule-http-connector,mule-http-mock-extension -Dmule.http.service.implementation=NETTY -DmunitMinMuleVersion=4.9.0 -Drevapi.skip -DexportedPackagesValidator.skip -Dmaven.javadoc.skip=true -Dmule.jvm.version.extension.enforcement=LOOSE -Dmule.module.tweaking.validation.skip=true
