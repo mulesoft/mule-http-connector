@@ -27,11 +27,7 @@ public class NonFipsTestConfiguration implements TestConfiguration {
 
   public static final String NON_FIPS_TLS_SSLTEST_KEYSTORE_WITH_TEST_HOSTNAME = "tls/ssltest-keystore-with-test-hostname.jks";
 
-  private static final String NON_FIPS_KEY_STORE_PK12_TYPE = "pkcs12";
-
   private static final String NON_FIPS_TLS_SNI_CLIENT_TRUSTSTORE = "tls/sni-client-truststore.jks";
-
-  private static final String NON_FIPS_TRUST_STORE_JCEKS_TYPE = "jceks";
 
   private static final String NON_FIPS_TLS_SSLTEST_TRUSTORE_WITH_TEST_HOSTNAME = "tls/ssltest-truststore-with-test-hostname.jks";
 
