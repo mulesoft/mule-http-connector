@@ -78,7 +78,34 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
 
   SEE_OTHER,
 
-  NOT_MODIFIED;
+  NOT_MODIFIED,
+
+  PAYMENT_REQUIRED,
+
+  PROXY_AUTHENTICATION_REQUIRED,
+
+  REQUEST_TIMEOUT,
+  CONFLICT,
+
+  GONE,
+
+  LENGTH_REQUIRED,
+
+  PRECONDITION_FAILED,
+
+  REQUEST_TOO_LONG,
+
+  REQUEST_URI_TOO_LONG,
+
+  REQUESTED_RANGE_NOT_SATISFIABLE,
+
+  EXPECTATION_FAILED,
+
+  UNPROCESSABLE_ENTITY,
+
+  NOT_IMPLEMENTED,
+
+  HTTP_VERSION_NOT_SUPPORTED;
 
   private static Set<ErrorTypeDefinition> httpRequestOperationErrors;
 
@@ -107,6 +134,20 @@ public enum HttpError implements ErrorTypeDefinition<HttpError> {
     errors.add(MOVED_TEMPORARILY);
     errors.add(SEE_OTHER);
     errors.add(NOT_MODIFIED);
+    errors.add(PAYMENT_REQUIRED);
+    errors.add(PROXY_AUTHENTICATION_REQUIRED);
+    errors.add(REQUEST_TIMEOUT);
+    errors.add(CONFLICT);
+    errors.add(GONE);
+    errors.add(LENGTH_REQUIRED);
+    errors.add(PRECONDITION_FAILED);
+    errors.add(REQUEST_TOO_LONG);
+    errors.add(REQUEST_URI_TOO_LONG);
+    errors.add(REQUESTED_RANGE_NOT_SATISFIABLE);
+    errors.add(EXPECTATION_FAILED);
+    errors.add(UNPROCESSABLE_ENTITY);
+    errors.add(NOT_IMPLEMENTED);
+    errors.add(HTTP_VERSION_NOT_SUPPORTED);
 
     httpRequestOperationErrors = unmodifiableSet(errors);
   }
