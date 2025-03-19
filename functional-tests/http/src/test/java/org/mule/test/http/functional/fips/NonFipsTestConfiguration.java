@@ -27,14 +27,7 @@ public class NonFipsTestConfiguration implements TestConfiguration {
 
   public static final String NON_FIPS_TLS_SSLTEST_KEYSTORE_WITH_TEST_HOSTNAME = "tls/ssltest-keystore-with-test-hostname.jks";
 
-  private static final String NON_FIPS_KEY_STORE_PK12_TYPE = "pkcs12";
-
   private static final String NON_FIPS_TLS_SNI_CLIENT_TRUSTSTORE = "tls/sni-client-truststore.jks";
-
-  private static final String NON_FIPS_TRUST_STORE_JCEKS_TYPE = "jceks";
-
-  private static final String NON_FIPS_CERTIFICATE_AUTHORITY_ENTITY = "tls/crl/certificate-authority-entity.p12";
-  private static final String NON_FIPS_TRUST_FILE_FOR_CRL = "tls/crl/trustFile.jceks";
 
   private static final String NON_FIPS_TLS_SSLTEST_TRUSTORE_WITH_TEST_HOSTNAME = "tls/ssltest-truststore-with-test-hostname.jks";
 
@@ -92,26 +85,6 @@ public class NonFipsTestConfiguration implements TestConfiguration {
   @Override
   public int getRandomCount() {
     return 100 * 1024;
-  }
-
-  @Override
-  public String getKeyStorePKS12Type() {
-    return NON_FIPS_KEY_STORE_PK12_TYPE;
-  }
-
-  @Override
-  public String getTrustStoreJCEKSType() {
-    return NON_FIPS_TRUST_STORE_JCEKS_TYPE;
-  }
-
-  @Override
-  public String getCertificateAuthorityEntity() {
-    return NON_FIPS_CERTIFICATE_AUTHORITY_ENTITY;
-  }
-
-  @Override
-  public String getTrustFileForCrl() {
-    return NON_FIPS_TRUST_FILE_FOR_CRL;
   }
 
   @Override
