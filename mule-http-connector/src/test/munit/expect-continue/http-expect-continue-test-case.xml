@@ -56,4 +56,51 @@
         </http-mock:server-endpoint>
         <logger />
     </flow>
+
+    <munit:test name="expect100ContinueTestWithErrorResponse"
+                description="Send an HTTP POST with Expect 100 and server responds with an error (417 Expectation Failed)"
+               >
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="expect100ContinueTestWithErrorResponseFlow"/>
+        </munit:enable-flow-sources>
+
+        <munit:execution>
+            <try>
+                <http:request method="POST"
+                              config-ref="HTTP_Request_configuration"
+                              path="/continue-error">
+                    <http:body>
+                        <![CDATA[#['some very large response to server']]]>
+                    </http:body>
+                    <http:headers>
+                        <![CDATA[#[{
+                'Expect': '100-continue',
+                'Content-Type': 'application/json'
+            }]]]>
+                    </http:headers>
+                </http:request>
+                <set-variable value="#[payload as String]" variableName="successPayload"/>
+                <error-handler >
+                    <on-error-continue enableNotifications="true" logException="true">
+                        <set-variable value="#[error.description]" variableName="errorMessage"/>
+                    </on-error-continue>
+                </error-handler>
+            </try>
+
+        </munit:execution>
+
+        <munit:validation>
+            <munit-tools:assert-that is="#[MunitTools::containsString('failed with status code 417.')]" expression="#[vars.errorMessage]"/>
+        </munit:validation>
+    </munit:test>
+    <flow name="expect100ContinueTestWithErrorResponseFlow">
+        <http-mock:server-endpoint config-ref="serverConfig" path="/continue-error">
+            <http-mock:response statusCode="417" reasonPhrase="Expectation Failed">
+                <http-mock:body>
+                    <![CDATA[#['Expectation Failed']]]>
+                </http-mock:body>
+            </http-mock:response>
+        </http-mock:server-endpoint>
+        <logger />
+    </flow>
 </mule>
