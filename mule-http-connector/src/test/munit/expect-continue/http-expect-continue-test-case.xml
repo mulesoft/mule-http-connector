@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:http-mock="http://www.mulesoft.org/schema/mule/http-mock"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/http-mock http://www.mulesoft.org/schema/mule/http-mock/current/mule-http-mock.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		       http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+
+    <!-- Need to replace the netty server here with the wiremock server -->
+
+    <munit:config name="http-expect-continue-test-case"/>
+    <!-- Mock server config -->
+<!--    <munit:dynamic-port propertyName="dynamic.port"/>-->
+<!--    <http-mock:server-config name="serverConfig">-->
+<!--        <http-mock:server-connection port="${dynamic.port}"/>-->
+<!--    </http-mock:server-config>-->
+
+    <http:listener-config name="HTTP_Listener_config">
+        <http:listener-connection host="0.0.0.0" port="${dynamic.port}" usePersistentConnections="false"/>
+    </http:listener-config>
+    <http:request-config name="HTTP_Request_configuration" enableCookies="true">
+        <http:request-connection host="localhost" port="${dynamic.port}"/>
+    </http:request-config>
+    <munit:test name="expect100ContinueTestWithValidResponse"
+                description="Send a Http POST with Expect 100 and server responds correctly">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="expect100ContinueTestWithValidResponseFlow"/>
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <http:request method="POST" config-ref="HTTP_Request_configuration" path="/continue">
+                <http:body>
+                    <![CDATA[#['some very large response to server']]]>
+                </http:body>
+                <http:headers>
+                    <![CDATA[#[{
+                'Expect': '100-continue',
+                'Content-Type': 'application/json',
+                'Content-Length': '160'
+                }]]]>
+                </http:headers>
+            </http:request>
+            <set-variable value="#[payload as String]" variableName="response"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-equals actual="#[vars.response]" expected='#["blah blah"]'/>
+        </munit:validation>
+    </munit:test>
+    <flow name="expect100ContinueTestWithValidResponseFlow">
+        <http:listener config-ref="HTTP_Listener_config" path="/continue">
+            <http:response statusCode="200"/>
+        </http:listener>
+        <set-payload value="#['blah blah']"/>
+    </flow>
+</mule>
