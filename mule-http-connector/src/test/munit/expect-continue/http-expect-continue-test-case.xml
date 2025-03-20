@@ -13,18 +13,13 @@
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
 
-    <!-- Need to replace the netty server here with the wiremock server -->
-
     <munit:config name="http-expect-continue-test-case"/>
     <!-- Mock server config -->
-<!--    <munit:dynamic-port propertyName="dynamic.port"/>-->
-<!--    <http-mock:server-config name="serverConfig">-->
-<!--        <http-mock:server-connection port="${dynamic.port}"/>-->
-<!--    </http-mock:server-config>-->
+    <munit:dynamic-port propertyName="dynamic.port"/>
+    <http-mock:server-config name="serverConfig">
+        <http-mock:server-connection port="${dynamic.port}"/>
+    </http-mock:server-config>
 
-    <http:listener-config name="HTTP_Listener_config">
-        <http:listener-connection host="0.0.0.0" port="${dynamic.port}" usePersistentConnections="false"/>
-    </http:listener-config>
     <http:request-config name="HTTP_Request_configuration" enableCookies="true">
         <http:request-connection host="localhost" port="${dynamic.port}"/>
     </http:request-config>
@@ -49,13 +44,16 @@
             <set-variable value="#[payload as String]" variableName="response"/>
         </munit:execution>
         <munit:validation>
-            <munit-tools:assert-equals actual="#[vars.response]" expected='#["blah blah"]'/>
+            <munit-tools:assert-equals actual="#[vars.response]" expected='#["Response from server"]'/>
         </munit:validation>
     </munit:test>
     <flow name="expect100ContinueTestWithValidResponseFlow">
-        <http:listener config-ref="HTTP_Listener_config" path="/continue">
-            <http:response statusCode="200"/>
-        </http:listener>
-        <set-payload value="#['blah blah']"/>
+        <http-mock:server-endpoint config-ref="serverConfig" path="/continue">
+            <http-mock:response statusCode="200" reasonPhrase="Created" >
+                <http-mock:body>#['Response from server']</http-mock:body>
+                <http-mock:headers>#[{'Content-Type': 'text/plain; charset=UTF-8', 'X-Custom': 'custom-value'}]</http-mock:headers>
+            </http-mock:response>
+        </http-mock:server-endpoint>
+        <logger />
     </flow>
 </mule>
