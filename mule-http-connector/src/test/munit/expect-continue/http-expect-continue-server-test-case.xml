@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:http-mock="http://www.mulesoft.org/schema/mule/http-mock"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/http-mock http://www.mulesoft.org/schema/mule/http-mock/current/mule-http-mock.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		       http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+
+    <munit:config name="http-expect-continue-client-test-case"/>
+    <munit:dynamic-port propertyName="dynamic.port"/>
+
+    <!--    The below tests have http-listener component and use wiremock client to send a request-->
+
+    <http-mock:client-config name="expectContinueClientConfig"/>
+
+    <http:listener-config name="listenerConfig">
+        <http:listener-connection host="localhost" port="${dynamic.port}"/>
+    </http:listener-config>
+
+    <munit:test name="testExpect100ContinueBehaviourForServer">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="expect100ContinueTestForListenerWithValidResponseFlow"/>
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <http-mock:do-post config-ref="expectContinueClientConfig" url="http://localhost:${dynamic.port}/continue-1"
+                               requestHeaders="#[{'Expect' : '100-continue'}]" payload="#['some very large payload here']"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(200)]"/>
+            <munit-tools:assert-that expression="#[%dw 2.0 output application/java --- payload.^raw as String]"
+                                     is="#[MunitTools::equalTo('some very large payload here')]"/>
+        </munit:validation>
+    </munit:test>
+
+    <flow name="expect100ContinueTestForListenerWithValidResponseFlow">
+        <http:listener config-ref="listenerConfig"  path="/continue-1" responseStreamingMode="AUTO"/>
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
+    </flow>
+
+</mule>
