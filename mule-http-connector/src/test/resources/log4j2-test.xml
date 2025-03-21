@@ -7,6 +7,8 @@
     </Appenders>
 
     <Loggers>
+        <!-- HTTP Wire Logging (set DEBUG to enable) -->
+        <AsyncLogger name="org.mule.service.http.impl.service.HttpMessageLogger" level="INFO" />
 
         <!-- CXF is used heavily by Mule for web services -->
         <AsyncLogger name="org.apache.cxf" level="WARN"/>
