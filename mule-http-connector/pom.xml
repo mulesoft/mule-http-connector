@@ -27,7 +27,7 @@
         <fluentHcVersion>4.5.13</fluentHcVersion>
         <grizzlyVersion>2.3.36-MULE-028</grizzlyVersion>
         <mockitoVersion>4.11.0</mockitoVersion>
-        <equalsverifierVersion>3.19.1</equalsverifierVersion>
+        <equalsverifierVersion>3.19.2</equalsverifierVersion>
 
         <commonsLang3Version>3.12.0</commonsLang3Version>
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
