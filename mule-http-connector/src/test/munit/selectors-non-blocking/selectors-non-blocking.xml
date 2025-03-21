@@ -5,7 +5,8 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
       xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
-      xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="
       	http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
 		http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
@@ -17,7 +18,7 @@
     <munit:dynamic-port propertyName="dynamic.port"/>
     <munit:dynamic-port propertyName="slow.responder.port"/>
 
-    <http:listener-config name="selectorsNonBlockingListenerConfig" doc:name="HTTP Listener config" >
+    <http:listener-config name="selectorsNonBlockingListenerConfig" >
         <http:listener-connection host="0.0.0.0" port="${dynamic.port}" />
     </http:listener-config>
 
@@ -29,23 +30,23 @@
         <http:request-connection host="localhost" port="${slow.responder.port}" streamResponse="true" />
     </http:request-config>
 
-    <!-- TODO (W-17444122): Un-ignore this test for Netty -->
-    <munit:test name="Some selector is available while handling slow requests" description="Test" ignore="#[p('mule.http.service.implementation') == 'NETTY']">
+    <munit:test name="Some selector is available while handling slow requests" description="Test">
         <munit:enable-flow-sources >
             <munit:enable-flow-source value="TestFlow" />
         </munit:enable-flow-sources>
         <munit:execution >
-            <java:invoke-static doc:name="Spawn as many slow requests as selector threads" class="org.mule.test.SlowRequester" method="spawnSlowRequests(Integer)" >
+            <java:invoke-static class="org.mule.test.SlowRequester" method="spawnSlowRequests(Integer)" >
                 <java:args><![CDATA[#[{arg0: ${dynamic.port}}]]]></java:args>
             </java:invoke-static>
 
-            <http:request method="GET" doc:name="Test Request" path="/test" config-ref="selectorsNonBlockingRequestConfig"/>
-            <set-variable value="#[payload as String]" doc:name="Set Variable" variableName="test_response"/>
+            <http:request method="GET" path="/test" config-ref="selectorsNonBlockingRequestConfig"/>
+            <set-variable value="#[payload as String]" variableName="test_response"/>
 
-            <java:invoke-static doc:name="Close sockets" class="org.mule.test.SlowRequester" method="closeSockets()"/>
+            <java:invoke-static class="org.mule.test.SlowRequester" method="closeSockets()"/>
         </munit:execution>
         <munit:validation>
-            <munit-tools:assert-equals doc:name="Assert (N+1)th request completed (some selector was available)" actual="#[vars.test_response]" expected='#["Test payload"]'/>
+            <!-- Assert (N+1)th request completed (some selector was available) -->
+            <munit-tools:assert-equals actual="#[vars.test_response]" expected='#["Test payload"]'/>
         </munit:validation>
     </munit:test>
 
@@ -82,12 +83,13 @@
             <java:invoke-static class="org.mule.test.SlowResponderServer" method="stopServer()" />
         </munit:execution>
         <munit:validation>
-            <munit-tools:assert-equals doc:name="Assert (N+1)th request completed (some selector was available)" actual="#[vars.test_response]" expected='#["Test payload"]'/>
+            <!-- Assert (N+1)th request completed (some selector was available) -->
+            <munit-tools:assert-equals actual="#[vars.test_response]" expected='#["Test payload"]'/>
         </munit:validation>
     </munit:test>
     
     <flow name="TestFlow" >
-        <http:listener doc:name="Test" path="/test" config-ref="selectorsNonBlockingListenerConfig" />
+        <http:listener path="/test" config-ref="selectorsNonBlockingListenerConfig" />
         <set-payload value='#["Test payload"]' />
     </flow>
 
