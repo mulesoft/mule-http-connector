@@ -20,7 +20,7 @@
         <jacoco.version>0.8.12</jacoco.version>
 
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
-        <javaFormatter.plugin.version>2.25.0</javaFormatter.plugin.version>
+        <javaFormatter.plugin.version>2.17.0</javaFormatter.plugin.version>
         <formatterGoal>validate</formatterGoal>
 
         <munit.extensions.maven.plugin.version>1.5.0</munit.extensions.maven.plugin.version>
@@ -157,9 +157,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.wiremock</groupId>
+            <groupId>com.github.tomakehurst</groupId>
             <artifactId>wiremock</artifactId>
-            <version>3.10.0</version>
+            <version>2.27.2</version>
         </dependency>
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
