@@ -26,7 +26,7 @@
 
     <munit:test name="testExpect100ContinueBehaviourForServer">
         <munit:enable-flow-sources>
-            <munit:enable-flow-source value="expect100ContinueTestForListenerWithValidResponseFlow"/>
+            <munit:enable-flow-source value="expect100ContinueTestForListenerWithValidRequestFlow"/>
         </munit:enable-flow-sources>
         <munit:execution>
             <http-mock:do-post config-ref="expectContinueClientConfig" url="http://localhost:${dynamic.port}/continue-1"
@@ -39,9 +39,26 @@
         </munit:validation>
     </munit:test>
 
-    <flow name="expect100ContinueTestForListenerWithValidResponseFlow">
+    <flow name="expect100ContinueTestForListenerWithValidRequestFlow">
         <http:listener config-ref="listenerConfig"  path="/continue-1" responseStreamingMode="AUTO"/>
         <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
     </flow>
 
+    <munit:test name="testExpect100ContinueBehaviourForServerWithBadHeader">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="expect100ContinueTestForListenerWithInvalidRequestFlow"/>
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <http-mock:do-post config-ref="expectContinueClientConfig" url="http://localhost:${dynamic.port}/continue-1"
+                               requestHeaders="#[{'Expect' : 'incorrect-header'}]" payload="#['some very large payload here']"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(417)]"/>
+        </munit:validation>
+    </munit:test>
+
+    <flow name="expect100ContinueTestForListenerWithInvalidRequestFlow">
+        <http:listener config-ref="listenerConfig"  path="/continue-1" responseStreamingMode="AUTO"/>
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
+    </flow>
 </mule>

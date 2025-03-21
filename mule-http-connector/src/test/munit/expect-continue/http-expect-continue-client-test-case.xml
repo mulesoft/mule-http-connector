@@ -27,42 +27,7 @@
     <munit:test name="expect100ContinueTestWithValidResponse"
                 description="Send a Http POST with Expect 100 and server responds correctly">
         <munit:enable-flow-sources>
-            <munit:enable-flow-source value="<!--    The below tests have http-listener component and use wiremock client to send a request-->
-
-    <http-mock:client-config name="expectContinueClientConfig"/>
-
-            <http:listener-config name="listenerConfig">
-                <http:listener-connection host="localhost" port="${dynamic.port}"/>
-            </http:listener-config>
-
-            <munit:test name="testExpect100ContinueBehaviourForServer">
-                <munit:enable-flow-sources>
-                    <munit:enable-flow-source value="expect100ContinueTestForListenerWithValidResponseFlow"/>
-                </munit:enable-flow-sources>
-                <munit:execution>
-                    <http-mock:do-post config-ref="expectContinueClientConfig" url="http://localhost:${dynamic.port}/continue-1"
-                                       requestHeaders="#[{'Expect' : '100-continue'}]" payload="#['some very large payload here']"/>
-                </munit:execution>
-                <munit:validation>
-                    <munit-tools:assert-that expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(200)]"/>
-                    <munit-tools:assert-that expression="#[attributes.reasonPhrase]" is="#[MunitTools::equalTo('OK')]"/>
-                    <munit-tools:assert-that expression="#[%dw 2.0 output application/java --- payload.^raw as String]"
-                                             is="#[MunitTools::equalTo('some very large payload here')]"/>
-                </munit:validation>
-            </munit:test>
-
-            <flow name="expect100ContinueTestForListenerWithValidResponseFlow">
-                <http:listener config-ref="listenerConfig"  path="/continue-1" responseStreamingMode="AUTO"/>
-
-                <logger message="Headers: #[attributes.headers]" level="INFO"/>
-                <logger message="Payload received: #[payload]" level="INFO"/>
-
-                <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
-            </flow>
-
-
-
-            "/>
+            <munit:enable-flow-source value="expect100ContinueTestWithValidResponseFlow"/>
         </munit:enable-flow-sources>
         <munit:execution>
             <http:request method="POST" config-ref="HTTP_Request_configuration" path="/continue">
