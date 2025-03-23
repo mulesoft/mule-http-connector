@@ -11,7 +11,7 @@ import static org.mule.test.extensions.http.mock.internal.server.DelegateToFlowT
 import static org.mule.test.extensions.http.mock.internal.server.DelegateToFlowTransformer.TRANSFORMER_NAME;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathTemplate;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
@@ -37,7 +37,7 @@ public final class HTTPMockServer {
   }
 
   public StubRemover addHandlerFor(String path, SourceCallback<?, ?> sourceCallback) {
-    StubMapping stubMapping = wireMockServer.stubFor(WireMock.any(urlPathEqualTo(path))
+    StubMapping stubMapping = wireMockServer.stubFor(WireMock.any(urlPathTemplate(path))
         .willReturn(aResponse().withTransformer(TRANSFORMER_NAME, SOURCE_CALLBACK_WIREMOCK_PARAMETER, sourceCallback)));
     return new StubRemover(stubMapping, wireMockServer);
   }
