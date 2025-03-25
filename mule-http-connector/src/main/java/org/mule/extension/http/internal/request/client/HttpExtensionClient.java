@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.internal.request.client;
 
+import static org.mule.extension.http.internal.request.UriUtils.resolveUri;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 
@@ -19,8 +20,13 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
+import org.mule.sdk.api.http.sse.ClientWithSse;
+import org.mule.sdk.api.http.sse.ServerSentEventSource;
+import org.mule.sdk.api.http.sse.SseRetryConfig;
 
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Composition of a {@link ShareableHttpClient} with URI and authentication parameters that allow falling back to connection
@@ -28,11 +34,12 @@ import java.util.concurrent.CompletableFuture;
  *
  * @since 1.0
  */
-public class HttpExtensionClient implements Startable, Stoppable {
+public class HttpExtensionClient implements Startable, Stoppable, ClientWithSse {
 
   private final HttpRequestAuthentication authentication;
   private final ShareableHttpClient httpClient;
   private final UriParameters uriParameters;
+  private final Map<String, ServerSentEventSource> sseSourcesByPath = new ConcurrentHashMap<>();
 
   public HttpExtensionClient(ShareableHttpClient httpClient, UriParameters uriParameters,
                              HttpRequestAuthentication authentication) {
@@ -73,5 +80,13 @@ public class HttpExtensionClient implements Startable, Stoppable {
                                               HttpAuthentication authentication,
                                               HttpSendBodyMode sendBodyMode) {
     return httpClient.sendAsync(request, responseTimeout, followRedirects, authentication, sendBodyMode);
+  }
+
+  @Override
+  public ServerSentEventSource sseSource(String path, SseRetryConfig retryConfig) {
+    return sseSourcesByPath.computeIfAbsent(path, p -> {
+      String uri = resolveUri(uriParameters.getScheme(), uriParameters.getHost().trim(), uriParameters.getPort(), path);
+      return httpClient.sseSource(uri, retryConfig);
+    });
   }
 }
