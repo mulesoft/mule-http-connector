@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <!-- Global Listener -->
+    <http:listener-config name="listenerConfig">
+        <http:listener-connection host="localhost" port="${port}"/>
+    </http:listener-config>
+
+    <!-- Global Anonymous Proxy -->
+    <http:proxy name="anonymousProxyConfig" host="localhost" port="${proxyPort}" />
+    <http:request-config name="configRefAnonymousProxy" basePath="basePath">
+        <http:request-connection host="localhost" port="${httpPort}" proxyConfig="anonymousProxyConfig"/>
+    </http:request-config>
+
+    <flow name="RefAnonymousProxy">
+        <http:listener config-ref="listenerConfig" path="/test/RefAnonymousProxy" />
+        <http:request config-ref="configRefAnonymousProxy" path="requestPath"/>
+    </flow>
+
+    <!-- Inner Anonymous Proxy -->
+    <http:request-config name="configInnerAnonymousProxy" basePath="basePath">
+        <http:request-connection host="localhost" port="${httpPort}">
+            <http:proxy-config>
+                <http:proxy host="localhost" port="${proxyPort}"/>
+            </http:proxy-config>
+        </http:request-connection>
+    </http:request-config>
+
+    <flow name="InnerAnonymousProxy">
+        <http:listener config-ref="listenerConfig" path="/test/InnerAnonymousProxy" />
+        <http:request config-ref="configInnerAnonymousProxy" path="requestPath"/>
+    </flow>
+
+    <!-- Global Username/Password Proxy -->
+    <http:proxy name="userPassProxyConfig" host="localhost" port="${proxyPort}" username="theUsername" password="thePassword" />
+    <http:request-config name="configRefUserPassProxy" basePath="basePath">
+        <http:request-connection host="localhost" port="${httpPort}" proxyConfig="userPassProxyConfig"/>
+    </http:request-config>
+
+    <flow name="RefUserPassProxy">
+        <http:listener config-ref="listenerConfig" path="/test/RefUserPassProxy" />
+        <http:request config-ref="configRefUserPassProxy" path="requestPath"/>
+    </flow>
+
+    <!-- Inner Username/Password Proxy -->
+    <http:request-config name="configInnerUserPassProxy" basePath="basePath">
+        <http:request-connection host="localhost" port="${httpPort}">
+            <http:proxy-config>
+                <http:proxy host="localhost" port="${proxyPort}" username="theUsername" password="thePassword" />
+            </http:proxy-config>
+        </http:request-connection>
+
+    </http:request-config>
+
+    <flow name="InnerUserPassProxy">
+        <http:listener config-ref="listenerConfig" path="/test/InnerUserPassProxy" />
+        <http:request config-ref="configInnerUserPassProxy" path="requestPath"/>
+    </flow>
+</mule>

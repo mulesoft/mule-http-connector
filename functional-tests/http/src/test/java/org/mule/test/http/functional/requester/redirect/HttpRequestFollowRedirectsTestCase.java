@@ -11,9 +11,8 @@ import static org.mule.test.http.functional.fips.DefaultTestConfiguration.getDef
 import static java.lang.String.format;
 
 import static javax.servlet.http.HttpServletResponse.SC_MOVED_TEMPORARILY;
-
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 
 import org.mule.functional.api.flow.FlowRunner;
@@ -24,13 +23,14 @@ import org.mule.test.http.functional.requester.AbstractHttpRequestTestCase;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.eclipse.jetty.server.Request;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class HttpRequestFollowRedirectsTestCase extends AbstractHttpRequestTestCase {
 

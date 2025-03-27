@@ -8,9 +8,9 @@ package org.mule.test.http.functional.requester;
 
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.probe.JUnitProbe;
@@ -19,12 +19,13 @@ import org.mule.tck.probe.PollingProber;
 import java.io.IOException;
 import java.util.Collection;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.eclipse.jetty.io.EndPoint;
 import org.eclipse.jetty.server.Request;
+
 import org.junit.Test;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class HttpRequestConnectionsPersistenceTestCase extends AbstractHttpRequestTestCase {
 

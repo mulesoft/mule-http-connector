@@ -21,13 +21,15 @@ import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import io.qameta.allure.Description;
 import org.eclipse.jetty.server.Request;
+
 import org.junit.Rule;
 import org.junit.Test;
+
+import io.qameta.allure.Description;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class HttpRequestResponseHeadersTestCase extends AbstractHttpRequestTestCase {
 

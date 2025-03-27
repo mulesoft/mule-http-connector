@@ -12,8 +12,8 @@ import static org.mule.runtime.http.api.HttpHeaders.Values.CLOSE;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.HTTPS;
 import static org.mule.test.http.functional.fips.DefaultTestConfiguration.getDefaultEnvironmentConfiguration;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -21,11 +21,12 @@ import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletResponse;
+import org.junit.Rule;
+import org.junit.Test;
 
 import io.qameta.allure.Story;
-import org.junit.Test;
-import org.junit.Rule;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 @Story(HTTPS)
 public class HttpRequestTlsConnectionCloseTestCase extends AbstractHttpRequestTestCase {

@@ -22,8 +22,8 @@ import org.mule.test.http.functional.requester.TestAuthorizer;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import com.ning.http.client.ntlm.NTLMEngine;
 

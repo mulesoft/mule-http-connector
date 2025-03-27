@@ -7,6 +7,7 @@
 package org.mule.extension.http.api;
 
 import static java.lang.System.lineSeparator;
+
 import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
 import org.mule.runtime.api.util.MultiMap;
@@ -14,6 +15,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
@@ -74,5 +76,25 @@ public abstract class HttpAttributes implements Serializable {
     }
     builder.append(formatHttpAttributesMapsToString(name, stream));
     return builder;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(headers);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    HttpAttributes other = (HttpAttributes) obj;
+    return Objects.equals(headers, other.headers);
   }
 }

@@ -17,11 +17,12 @@ import org.mule.runtime.api.util.concurrent.Latch;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.eclipse.jetty.server.Request;
+
 import org.junit.Test;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class HttpRequestTimeoutTestCase extends AbstractHttpRequestTestCase {
 

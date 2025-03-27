@@ -6,15 +6,16 @@
  */
 package org.mule.extension.http.api.listener;
 
-import static java.lang.Boolean.getBoolean;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Collections.emptyMap;
 import static org.mule.extension.http.api.HttpHeaders.Names.AUTHORIZATION;
 import static org.mule.extension.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
 import static org.mule.extension.http.internal.HttpConnectorConstants.BASIC_LAX_DECODING_PROPERTY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.authFailedForUser;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
+
+import static java.lang.Boolean.getBoolean;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Collections.emptyMap;
 
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
 import org.mule.extension.http.api.HttpRequestAttributes;
@@ -37,6 +38,7 @@ import java.util.Base64;
 import java.util.Base64.Decoder;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -166,5 +168,28 @@ public class HttpBasicAuthenticationFilter {
   public static void refreshSystemProperties() {
     LAX_DECODING = getBoolean(BASIC_LAX_DECODING_PROPERTY);
   }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(attributes, realm, securityProviders);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    HttpBasicAuthenticationFilter other = (HttpBasicAuthenticationFilter) obj;
+    return Objects.equals(attributes, other.attributes)
+        && Objects.equals(realm, other.realm)
+        && Objects.equals(securityProviders, other.securityProviders);
+  }
+
 
 }
