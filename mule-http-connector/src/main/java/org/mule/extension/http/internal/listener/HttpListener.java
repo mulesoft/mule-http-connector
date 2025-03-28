@@ -6,12 +6,6 @@
  */
 package org.mule.extension.http.internal.listener;
 
-import static java.lang.Boolean.FALSE;
-import static java.lang.String.format;
-import static java.lang.Thread.currentThread;
-import static java.util.Arrays.asList;
-import static java.util.Optional.ofNullable;
-import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 import static org.mule.extension.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.extension.http.api.error.HttpError.BASIC_AUTHENTICATION;
 import static org.mule.extension.http.api.error.HttpError.NOT_FOUND;
@@ -36,6 +30,14 @@ import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.getReasonPhraseForStatusCode;
 import static org.mule.runtime.http.api.HttpHeaders.Names.X_CORRELATION_ID;
+
+import static java.lang.Boolean.FALSE;
+import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
+import static java.util.Arrays.asList;
+import static java.util.Optional.ofNullable;
+
+import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
@@ -48,7 +50,10 @@ import org.mule.extension.http.api.listener.server.HttpListenerConfig;
 import org.mule.extension.http.api.streaming.HttpStreamingType;
 import org.mule.extension.http.internal.HttpMetadataResolver;
 import org.mule.extension.http.internal.listener.intercepting.InterceptingException;
-import org.mule.extension.http.internal.listener.server.ModuleRequestHandler;
+import org.mule.extension.http.internal.ser.HttpResponseReadyCallbackProxy;
+import org.mule.extension.http.internal.service.server.HttpRequestContextProxy;
+import org.mule.extension.http.internal.service.server.HttpServerProxy;
+import org.mule.extension.http.internal.service.server.RequestHandlerProxy;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -61,7 +66,6 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.api.util.MultiMap;
@@ -101,11 +105,11 @@ import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.mule.runtime.http.api.domain.message.response.HttpResponseBuilder;
 import org.mule.runtime.http.api.domain.request.HttpRequestContext;
-import org.mule.runtime.http.api.server.HttpServer;
-import org.mule.runtime.http.api.server.RequestHandler;
 import org.mule.runtime.http.api.server.RequestHandlerManager;
 import org.mule.runtime.http.api.server.async.HttpResponseReadyCallback;
 import org.mule.runtime.http.api.server.async.ResponseStatusCallback;
+import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
+import org.mule.sdk.compatibility.api.utils.ForwardCompatibilityHelper;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -113,9 +117,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.inject.Inject;
-
-import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
-import org.mule.sdk.compatibility.api.utils.ForwardCompatibilityHelper;
 
 import org.slf4j.Logger;
 
@@ -159,7 +160,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   private HttpListenerConfig config;
 
   @Connection
-  private ConnectionProvider<HttpServer> serverProvider;
+  private ConnectionProvider<HttpServerProxy> serverProvider;
 
   @Inject
   private NotificationListenerRegistry notificationListenerRegistry;
@@ -207,7 +208,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   @Placement(tab = ADVANCED_TAB)
   private boolean deferredResponse = false;
 
-  private HttpServer server;
+  private HttpServerProxy server;
   private HttpListenerResponseSender responseSender;
   private ListenerPath listenerPath;
   private RequestHandlerManager requestHandlerManager;
@@ -436,21 +437,16 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
     }
   }
 
-  private RequestHandler getRequestHandler(SourceCallback<InputStream, HttpRequestAttributes> sourceCallback) {
+  private RequestHandlerProxy getRequestHandler(SourceCallback<InputStream, HttpRequestAttributes> sourceCallback) {
     ClassLoader appRegionClassLoader = currentThread().getContextClassLoader();
 
-    return new ModuleRequestHandler() {
+    return new RequestHandlerProxy() {
 
       @Override
-      public Result<InputStream, HttpRequestAttributes> createResult(HttpRequestContext requestContext) {
-        return HttpListener.this.createResult(requestContext);
-      }
-
-      @Override
-      public void handleRequest(HttpRequestContext requestContext, HttpResponseReadyCallback responseCallback) {
+      public void handleRequest(HttpRequestContextProxy requestContext, HttpResponseReadyCallbackProxy responseCallback) {
         // TODO: MULE-9698 Analyse adding security here to reject the DefaultHttpRequestContext and avoid creating a Message
         try {
-          Result<InputStream, HttpRequestAttributes> result = createResult(requestContext);
+          Result<InputStream, HttpRequestAttributes> result = HttpListener.this.createResult(requestContext);
 
           HttpResponseContext responseContext = new HttpResponseContext();
           final String httpVersion = requestContext.getRequest().getProtocol().asString();
@@ -473,8 +469,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
             DistributedTraceContextManager distributedTraceContextManager =
                 forwardCompatibilityHelper.get().getDistributedTraceContextManager(context);
             distributedTraceContextManager.setRemoteTraceContextMap(headers);
-            getHttpListenerCurrentSpanCustomizer(result.getAttributes().get(), server.getServerAddress().getIp(),
-                                                 server.getServerAddress().getPort())
+            getHttpListenerCurrentSpanCustomizer(result.getAttributes().get(), server.getIp(), server.getPort())
                                                      .customizeSpan(distributedTraceContextManager);
           }
 
@@ -599,7 +594,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
         .reasonPhrase(reasonPhraseFromException != null ? reasonPhraseFromException : throwable.getMessage());
   }
 
-  private Result<InputStream, HttpRequestAttributes> createResult(HttpRequestContext requestContext) {
+  private Result<InputStream, HttpRequestAttributes> createResult(HttpRequestContextProxy requestContext) {
     return transform(requestContext, getDefaultEncoding(muleContext), listenerPath);
     // TODO: MULE-9748 Analyse RequestContext use in HTTP extension
     // Update RequestContext ThreadLocal for backwards compatibility

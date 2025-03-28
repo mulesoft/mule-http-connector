@@ -11,26 +11,26 @@ import static org.mule.runtime.api.connection.ConnectionValidationResult.failure
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.util.ClassUtils.getMethod;
 import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.ADVANCED;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.SECURITY_TAB;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTP;
 import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
 
-import static java.lang.Long.parseLong;
 import static java.lang.String.format;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.extension.http.internal.service.server.HttpServerProxy;
+import org.mule.extension.http.internal.service.HttpServiceProxy;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.tls.TlsContextFactory;
@@ -45,15 +45,11 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.http.api.HttpConstants;
-import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.http.api.server.HttpServer;
-import org.mule.runtime.http.api.server.HttpServerConfiguration;
-import org.mule.runtime.http.api.server.ServerAddress;
 import org.mule.runtime.http.api.server.ServerCreationException;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
@@ -65,9 +61,8 @@ import org.slf4j.Logger;
  * @since 1.0
  */
 @Alias("listener")
-public class HttpListenerProvider implements CachedConnectionProvider<HttpServer>, Lifecycle {
+public class HttpListenerProvider implements CachedConnectionProvider<HttpServerProxy>, Lifecycle {
 
-  private static final String DEFAULT_READ_TIME_OUT_IN_MILLIS = "30000";
   private static final Logger logger = getLogger(HttpListenerProvider.class);
 
   public static final class ConnectionParams {
@@ -176,7 +171,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
   private TlsContextFactory tlsContext;
 
   @Inject
-  private HttpService httpService;
+  private HttpServiceProxy httpService;
 
   @Inject
   protected MuleContext muleContext;
@@ -188,7 +183,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
   private NotificationListenerRegistry notificationListenerRegistry;
 
   private MuleContextStopWatcher muleContextStopWatcher;
-  private HttpServer server;
+  private HttpServerProxy server;
 
   @Override
   public void initialise() throws InitialisationException {
@@ -218,10 +213,8 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
 
     verifyConnectionsParameters();
 
-    HttpServerConfiguration serverConfiguration = getServerConfiguration();
-
     try {
-      server = httpService.getServerFactory().create(serverConfiguration);
+      server = httpService.createServer(configName, connectionParams, tlsContext, getIoSchedulerSupplier());
     } catch (ServerCreationException e) {
       throw new InitialisationException(createStaticMessage(buildFailureMessage("create", e)), e, this);
     }
@@ -232,39 +225,14 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
     }
   }
 
-  private HttpServerConfiguration getServerConfiguration() {
-    HttpServerConfiguration.Builder builder = new HttpServerConfiguration.Builder()
-        .setHost(connectionParams.getHost())
-        .setPort(connectionParams.getPort())
-        .setTlsContextFactory(tlsContext).setUsePersistentConnections(connectionParams.getUsePersistentConnections())
-        .setConnectionIdleTimeout(connectionParams.getConnectionIdleTimeout())
-        .setName(configName);
-
-    setReadTimeout(builder);
-
-    builder.setSchedulerSupplier(() -> schedulerService
-        .ioScheduler(SchedulerConfig.config().withName(getSchedulerName(connectionParams))));
-
-    return builder.build();
-  }
-
-  private void setReadTimeout(HttpServerConfiguration.Builder builder) {
-    Method method = getMethod(HttpServerConfiguration.Builder.class, "setReadTimeout", new Class[] {long.class});
-    if (method != null) {
-      try {
-        method.invoke(builder, connectionParams.getReadTimeout());
-      } catch (InvocationTargetException | IllegalAccessException e) {
-        throw new MuleRuntimeException(createStaticMessage("Exception while calling method by reflection"), e);
-      }
-    } else if (connectionParams.getReadTimeout() != parseLong(DEFAULT_READ_TIME_OUT_IN_MILLIS)) {
-      logger
-          .warn("The current Mule version does not support the configuration of the Read Timeout parameter, please update to the newest version");
-    }
+  private Supplier<Scheduler> getIoSchedulerSupplier() {
+    return () -> schedulerService
+            .ioScheduler(SchedulerConfig.config().withName(getSchedulerName(connectionParams)));
   }
 
   private String getSchedulerName(ConnectionParams connectionParams) {
     return format("http-listener-scheduler-io[%s://%s:%d]", connectionParams.getProtocol().getScheme(),
-                  connectionParams.getHost(), connectionParams.getPort());
+            connectionParams.getHost(), connectionParams.getPort());
   }
 
   @Override
@@ -305,29 +273,27 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
   }
 
   @Override
-  public HttpServer connect() throws ConnectionException {
+  public HttpServerProxy connect() throws ConnectionException {
     return new HttpServerDelegate(server) {
 
       @Override
-      public HttpServer stop() {
+      public void stop() {
         if (muleContextStopWatcher.isStopping()) {
           super.stop();
         }
-        return this;
       }
     };
   }
 
   @Override
-  public void disconnect(HttpServer server) {
+  public void disconnect(HttpServerProxy server) {
     // server could be shared with other listeners, do nothing
   }
 
   @Override
-  public ConnectionValidationResult validate(HttpServer server) {
+  public ConnectionValidationResult validate(HttpServerProxy server) {
     if (server.isStopped() || server.isStopping()) {
-      ServerAddress serverAddress = server.getServerAddress();
-      return failure(format("Server on host %s and port %s is stopped.", serverAddress.getIp(), serverAddress.getPort()),
+      return failure(format("Server on host %s and port %s is stopped.", server.getIp(), server.getPort()),
                      new ConnectionException("Server stopped."));
     } else {
       return ConnectionValidationResult.success();

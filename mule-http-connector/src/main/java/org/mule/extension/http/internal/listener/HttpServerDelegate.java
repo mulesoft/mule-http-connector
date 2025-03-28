@@ -6,56 +6,27 @@
  */
 package org.mule.extension.http.internal.listener;
 
-import org.mule.runtime.http.api.HttpConstants;
+import org.mule.extension.http.internal.service.server.HttpServerProxy;
 import org.mule.runtime.http.api.server.HttpServer;
-import org.mule.runtime.http.api.server.RequestHandler;
 import org.mule.runtime.http.api.server.RequestHandlerManager;
-import org.mule.runtime.http.api.server.ServerAddress;
 
 import java.io.IOException;
-import java.util.Collection;
+import java.util.List;
 
 /**
  * Base class for applying the delegate design pattern around an {@link HttpServer}
  */
-public class HttpServerDelegate implements HttpServer {
+public class HttpServerDelegate implements HttpServerProxy {
 
-  private final HttpServer delegate;
+  private final HttpServerProxy delegate;
 
-  HttpServerDelegate(HttpServer delegate) {
+  HttpServerDelegate(HttpServerProxy delegate) {
     this.delegate = delegate;
   }
 
   @Override
-  public HttpServer start() throws IOException {
+  public void start() throws IOException {
     delegate.start();
-    return this;
-  }
-
-  @Override
-  public HttpServer stop() {
-    delegate.stop();
-    return this;
-  }
-
-  @Override
-  public void dispose() {
-    delegate.dispose();
-  }
-
-  @Override
-  public ServerAddress getServerAddress() {
-    return delegate.getServerAddress();
-  }
-
-  @Override
-  public HttpConstants.Protocol getProtocol() {
-    return delegate.getProtocol();
-  }
-
-  @Override
-  public boolean isStopping() {
-    return delegate.isStopping();
   }
 
   @Override
@@ -64,16 +35,32 @@ public class HttpServerDelegate implements HttpServer {
   }
 
   @Override
-  public RequestHandlerManager addRequestHandler(Collection<String> methods, String path, RequestHandler requestHandler) {
-    return delegate.addRequestHandler(methods, path, requestHandler);
+  public void stop() {
+    delegate.stop();
   }
 
   @Override
-  public RequestHandlerManager addRequestHandler(String path, RequestHandler requestHandler) {
-    return delegate.addRequestHandler(path, requestHandler);
+  public void dispose() {
+    delegate.dispose();
   }
 
-  protected HttpServer getDelegate() {
-    return delegate;
+  @Override
+  public boolean isStopping() {
+    return false;
+  }
+
+  @Override
+  public String getIp() {
+    return "";
+  }
+
+  @Override
+  public int getPort() {
+    return 0;
+  }
+
+  @Override
+  public RequestHandlerManager addRequestHandler(List<String> list, String path, Object requestHandler) {
+    return null;
   }
 }

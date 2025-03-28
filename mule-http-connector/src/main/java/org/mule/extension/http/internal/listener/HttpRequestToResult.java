@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PR
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
+import org.mule.extension.http.internal.service.server.HttpRequestContextProxy;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
@@ -34,7 +35,7 @@ public class HttpRequestToResult {
 
   private static final Logger logger = LoggerFactory.getLogger(HttpRequestToResult.class);
 
-  public static Result<InputStream, HttpRequestAttributes> transform(final HttpRequestContext requestContext,
+  public static Result<InputStream, HttpRequestAttributes> transform(final HttpRequestContextProxy requestContext,
                                                                      final Charset encoding,
                                                                      ListenerPath listenerPath) {
     final HttpRequest request = requestContext.getRequest();
