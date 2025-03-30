@@ -7,53 +7,117 @@
 package org.mule.test.extensions.http.mock.internal.server;
 
 
-import static org.mule.test.extensions.http.mock.internal.server.DelegateToFlowTransformer.SOURCE_CALLBACK_WIREMOCK_PARAMETER;
-import static org.mule.test.extensions.http.mock.internal.server.DelegateToFlowTransformer.TRANSFORMER_NAME;
-
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathTemplate;
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.client.WireMock;
-import com.github.tomakehurst.wiremock.stubbing.StubMapping;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * WireMock-implemented HTTP Server.
- */
-public final class HTTPMockServer {
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 
-  private final WireMockServer wireMockServer;
+public class HTTPMockServer {
 
-  public HTTPMockServer(int port) {
-    wireMockServer = new WireMockServer(wireMockConfig().port(port).extensions(new DelegateToFlowTransformer()));
-    wireMockServer.start();
+  private final Server server;
+  private final ConcurrentHashMap<String, SourceCallback<?, ?>> pathToCallback = new ConcurrentHashMap<>();
+
+  public HTTPMockServer(int port) throws Exception {
+    this.server = new Server(port);
+    ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+    context.setContextPath("/");
+    context.addServlet(new ServletHolder(new MockServlet()), "/*");
+    server.setHandler(context);
+    server.start();
   }
 
   public void invalidate() {
-    wireMockServer.stop();
+    try {
+      server.stop();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
-  public StubRemover addHandlerFor(String path, SourceCallback<?, ?> sourceCallback) {
-    StubMapping stubMapping = wireMockServer.stubFor(WireMock.any(urlPathTemplate(path))
-        .willReturn(aResponse().withTransformer(TRANSFORMER_NAME, SOURCE_CALLBACK_WIREMOCK_PARAMETER, sourceCallback)));
-    return new StubRemover(stubMapping, wireMockServer);
+  public StubRemover addHandlerFor(String path, SourceCallback<?, ?> callback) {
+    pathToCallback.put(path, callback);
+    return new StubRemover(path);
   }
 
-  public static class StubRemover {
+  public class StubRemover {
 
-    private final StubMapping stubMapping;
-    private final WireMockServer wireMockServer;
+    private final String path;
 
-    public StubRemover(StubMapping stubMapping, WireMockServer wireMockServer) {
-      this.stubMapping = stubMapping;
-      this.wireMockServer = wireMockServer;
+    public StubRemover(String path) {
+      this.path = path;
     }
 
     public void removeStub() {
-      wireMockServer.removeStubMapping(stubMapping);
+      pathToCallback.remove(path);
+    }
+  }
+
+
+  private class MockServlet extends HttpServlet {
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+      handle(req, resp);
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+      handle(req, resp);
+    }
+
+    private void handle(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+      String path = req.getRequestURI();
+      SourceCallback<InputStream, HTTPMockRequestAttributes> callback =
+          (SourceCallback<InputStream, HTTPMockRequestAttributes>) pathToCallback.get(path);
+
+      if (callback == null) {
+        resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        resp.getWriter().write("Not Found");
+        return;
+      }
+
+      String expectHeader = req.getHeader("Expect");
+      if (expectHeader != null && expectHeader.equalsIgnoreCase("100-continue")) {
+        resp.setStatus(HttpServletResponse.SC_CONTINUE);
+        resp.flushBuffer();
+      }
+
+      byte[] requestBody = toByteArray(req.getInputStream());
+      HTTPMockServerResponse mockResponse = DelegateToFlowTransformer.delegate(callback, requestBody);
+
+      byte[] responseBody = mockResponse.getBody() != null ? toByteArray(mockResponse.getBody().getValue()) : new byte[0];
+
+      resp.setStatus(mockResponse.getStatusCode());
+      resp.setContentLength(responseBody.length);
+      resp.setCharacterEncoding("UTF-8");
+      resp.setContentType("application/json");
+
+      mockResponse.getHeaders().entrySet().forEach(entry -> resp.addHeader(entry.getKey(), entry.getValue()));
+      try (OutputStream os = resp.getOutputStream()) {
+        os.write(responseBody);
+        os.flush();
+      }
+    }
+
+    private byte[] toByteArray(InputStream input) throws IOException {
+      ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+      byte[] data = new byte[1024];
+      int nRead;
+      while ((nRead = input.read(data, 0, data.length)) != -1) {
+        buffer.write(data, 0, nRead);
+      }
+      return buffer.toByteArray();
     }
   }
 }
