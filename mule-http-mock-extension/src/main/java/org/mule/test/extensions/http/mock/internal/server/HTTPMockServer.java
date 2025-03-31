@@ -6,8 +6,6 @@
  */
 package org.mule.test.extensions.http.mock.internal.server;
 
-
-
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 
 import java.io.ByteArrayOutputStream;
@@ -16,9 +14,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.concurrent.ConcurrentHashMap;
 
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
