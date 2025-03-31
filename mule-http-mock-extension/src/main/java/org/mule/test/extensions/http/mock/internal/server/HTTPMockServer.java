@@ -32,6 +32,7 @@ public class HTTPMockServer {
     ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
     context.setContextPath("/");
     context.addServlet(new ServletHolder(new MockServlet()), "/*");
+    context.addServlet(new ServletHolder(new ExpectContinueServlet()), "/expect-continue");
     server.setHandler(context);
     server.start();
   }
@@ -62,7 +63,6 @@ public class HTTPMockServer {
     }
   }
 
-
   private class MockServlet extends HttpServlet {
 
     @Override
@@ -86,12 +86,6 @@ public class HTTPMockServer {
         return;
       }
 
-      String expectHeader = req.getHeader("Expect");
-      if (expectHeader != null && expectHeader.equalsIgnoreCase("100-continue")) {
-        resp.setStatus(HttpServletResponse.SC_CONTINUE);
-        resp.flushBuffer();
-      }
-
       byte[] requestBody = toByteArray(req.getInputStream());
       HTTPMockServerResponse mockResponse = DelegateToFlowTransformer.delegate(callback, requestBody);
 
@@ -101,6 +95,69 @@ public class HTTPMockServer {
       resp.setContentLength(responseBody.length);
       resp.setCharacterEncoding("UTF-8");
       resp.setContentType("application/json");
+
+      mockResponse.getHeaders().entrySet().forEach(entry -> resp.addHeader(entry.getKey(), entry.getValue()));
+      try (OutputStream os = resp.getOutputStream()) {
+        os.write(responseBody);
+        os.flush();
+      }
+    }
+
+    private byte[] toByteArray(InputStream input) throws IOException {
+      ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+      byte[] data = new byte[1024];
+      int nRead;
+      while ((nRead = input.read(data, 0, data.length)) != -1) {
+        buffer.write(data, 0, nRead);
+      }
+      return buffer.toByteArray();
+    }
+  }
+
+  private class ExpectContinueServlet extends HttpServlet {
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+      handle(req, resp);
+    }
+
+    private void handle(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+      String path = req.getRequestURI();
+      SourceCallback<InputStream, HTTPMockRequestAttributes> callback =
+          (SourceCallback<InputStream, HTTPMockRequestAttributes>) pathToCallback.get(path);
+
+      long expectHeaderReceived = 0;
+      long sent100Continue = 0;
+      long bodyReceived;
+
+      if (callback == null) {
+        resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        resp.getWriter().write("Not Found");
+        return;
+      }
+
+      String expectHeader = req.getHeader("Expect");
+      if (expectHeader != null && expectHeader.equalsIgnoreCase("100-continue")) {
+        expectHeaderReceived = System.currentTimeMillis();
+        resp.setStatus(HttpServletResponse.SC_CONTINUE);
+        resp.flushBuffer();
+        sent100Continue = System.currentTimeMillis();
+      }
+
+      byte[] requestBody = toByteArray(req.getInputStream());
+      bodyReceived = System.currentTimeMillis();
+      HTTPMockServerResponse mockResponse = DelegateToFlowTransformer.delegate(callback, requestBody);
+
+      byte[] responseBody = mockResponse.getBody() != null ? toByteArray(mockResponse.getBody().getValue()) : new byte[0];
+
+      resp.setStatus(mockResponse.getStatusCode());
+      resp.setContentLength(responseBody.length);
+      resp.setCharacterEncoding("UTF-8");
+      resp.setContentType("application/json");
+
+      resp.addHeader("X-Expect-Header-Time", String.valueOf(expectHeaderReceived));
+      resp.addHeader("X-Continue-Sent-Time", String.valueOf(sent100Continue));
+      resp.addHeader("X-Body-Received-Time", String.valueOf(bodyReceived));
 
       mockResponse.getHeaders().entrySet().forEach(entry -> resp.addHeader(entry.getKey(), entry.getValue()));
       try (OutputStream os = resp.getOutputStream()) {
