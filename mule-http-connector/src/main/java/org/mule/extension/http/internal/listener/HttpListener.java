@@ -54,6 +54,7 @@ import org.mule.extension.http.internal.ser.HttpResponseReadyCallbackProxy;
 import org.mule.extension.http.internal.service.server.HttpRequestContextProxy;
 import org.mule.extension.http.internal.service.server.HttpServerProxy;
 import org.mule.extension.http.internal.service.server.RequestHandlerProxy;
+import org.mule.extension.http.internal.service.server.ResponseStatusCallbackProxy;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -104,10 +105,7 @@ import org.mule.runtime.http.api.domain.HttpProtocol;
 import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.mule.runtime.http.api.domain.message.response.HttpResponseBuilder;
-import org.mule.runtime.http.api.domain.request.HttpRequestContext;
 import org.mule.runtime.http.api.server.RequestHandlerManager;
-import org.mule.runtime.http.api.server.async.HttpResponseReadyCallback;
-import org.mule.runtime.http.api.server.async.ResponseStatusCallback;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 import org.mule.sdk.compatibility.api.utils.ForwardCompatibilityHelper;
 
@@ -311,7 +309,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
 
     addStatusCodeAttribute(distributedTraceContextManager, response.getStatusCode(), LOGGER);
     updateServerSpanStatus(distributedTraceContextManager, response.getStatusCode(), LOGGER);
-    final HttpResponseReadyCallback responseCallback = context.getResponseCallback();
+    final HttpResponseReadyCallbackProxy responseCallback = context.getResponseCallback();
     callbackContext.addVariable(RESPONSE_SEND_ATTEMPT, true);
     responseCallback.responseReady(response, new ResponseFailureStatusCallback(responseCallback, completionCallback));
   }
@@ -335,7 +333,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
       response = buildErrorResponse();
     }
 
-    final HttpResponseReadyCallback responseCallback = context.getResponseCallback();
+    final HttpResponseReadyCallbackProxy responseCallback = context.getResponseCallback();
     callbackContext.addVariable(RESPONSE_SEND_ATTEMPT, true);
     responseCallback.responseReady(response, new ResponseFailureStatusCallback(responseCallback, completionCallback));
   }
@@ -470,7 +468,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
                 forwardCompatibilityHelper.get().getDistributedTraceContextManager(context);
             distributedTraceContextManager.setRemoteTraceContextMap(headers);
             getHttpListenerCurrentSpanCustomizer(result.getAttributes().get(), server.getIp(), server.getPort())
-                                                     .customizeSpan(distributedTraceContextManager);
+                .customizeSpan(distributedTraceContextManager);
           }
 
           sourceCallback.handle(result, context);
@@ -524,7 +522,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
         return result.getAttributes().get().getHeaders();
       }
 
-      private void sendErrorResponse(InterceptingException interceptor, HttpResponseReadyCallback responseCallback) {
+      private void sendErrorResponse(InterceptingException interceptor, HttpResponseReadyCallbackProxy responseCallback) {
         HttpStatus status = interceptor.status();
 
         HttpResponseBuilder responseBuilder = HttpResponse.builder()
@@ -535,7 +533,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
             .forEach(entry -> responseBuilder.addHeader(entry.getKey(), entry.getValue()));
 
         responseCallback.responseReady(responseBuilder
-            .build(), new ResponseStatusCallback() {
+            .build(), new ResponseStatusCallbackProxy() {
 
               @Override
               public void responseSendFailure(Throwable exception) {
@@ -548,14 +546,14 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
       }
 
       private void sendErrorResponse(final HttpStatus status, String message,
-                                     HttpResponseReadyCallback responseCallback) {
+                                     HttpResponseReadyCallbackProxy responseCallback) {
         byte[] responseData = message.getBytes();
         responseCallback.responseReady(HttpResponse.builder()
             .statusCode(status.getStatusCode())
             .reasonPhrase(status.getReasonPhrase())
             .entity(new ByteArrayHttpEntity(responseData))
             .addHeader(CONTENT_LENGTH, Integer.toString(responseData.length))
-            .build(), new ResponseStatusCallback() {
+            .build(), new ResponseStatusCallbackProxy() {
 
               @Override
               public void responseSendFailure(Throwable exception) {
@@ -612,9 +610,9 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
 
   public class ResponseFailureStatusCallback extends BaseResponseStatusCallback {
 
-    private final HttpResponseReadyCallback responseReadyCallback;
+    private final HttpResponseReadyCallbackProxy responseReadyCallback;
 
-    public ResponseFailureStatusCallback(HttpResponseReadyCallback responseReadyCallback,
+    public ResponseFailureStatusCallback(HttpResponseReadyCallbackProxy responseReadyCallback,
                                          SourceCompletionCallback completionCallback) {
       super(completionCallback);
       this.responseReadyCallback = responseReadyCallback;
@@ -642,7 +640,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
     }
   }
 
-  private abstract class BaseResponseStatusCallback implements ResponseStatusCallback {
+  private abstract class BaseResponseStatusCallback implements ResponseStatusCallbackProxy {
 
     protected final SourceCompletionCallback completionCallback;
 

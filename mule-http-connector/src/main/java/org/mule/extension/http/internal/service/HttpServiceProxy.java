@@ -51,9 +51,12 @@ public class HttpServiceProxy {
                                       Supplier<Scheduler> ioSchedulerSupplier)
       throws ServerCreationException {
     if (sdkApiService.isPresent()) {
-      return new HttpServerProxySdkApi(sdkApiService.get().server(builder -> configureServerBuilderForSdkApi(builder, configName, connectionParams, tlsContext, ioSchedulerSupplier)));
+      return new HttpServerProxySdkApi(sdkApiService.get()
+          .server(builder -> configureServerBuilderForSdkApi(builder, configName, connectionParams, tlsContext,
+                                                             ioSchedulerSupplier)));
     }
-    return new HttpServerProxyMuleApi(muleService.getServerFactory().create(getServerConfigurationForMuleApi(configName, connectionParams, tlsContext, ioSchedulerSupplier)));
+    return new HttpServerProxyMuleApi(muleService.getServerFactory()
+        .create(getServerConfigurationForMuleApi(configName, connectionParams, tlsContext, ioSchedulerSupplier)));
   }
 
   private void configureServerBuilderForSdkApi(HttpServerConfigurationBuilder builder,
@@ -62,17 +65,18 @@ public class HttpServiceProxy {
                                                TlsContextFactory tlsContext,
                                                Supplier<Scheduler> ioSchedulerSupplier) {
     builder.setHost(connectionParams.getHost())
-            .setPort(connectionParams.getPort())
-            .setTlsContextFactory(tlsContext)
-            .setUsePersistentConnections(connectionParams.getUsePersistentConnections())
-            .setConnectionIdleTimeout(connectionParams.getConnectionIdleTimeout())
-            .setName(configName)
-            .setSchedulerSupplier(ioSchedulerSupplier)
-            .setReadTimeout(connectionParams.getReadTimeout());
+        .setPort(connectionParams.getPort())
+        .setTlsContextFactory(tlsContext)
+        .setUsePersistentConnections(connectionParams.getUsePersistentConnections())
+        .setConnectionIdleTimeout(connectionParams.getConnectionIdleTimeout())
+        .setName(configName)
+        .setSchedulerSupplier(ioSchedulerSupplier)
+        .setReadTimeout(connectionParams.getReadTimeout());
   }
 
   private HttpServerConfiguration getServerConfigurationForMuleApi(String configName, ConnectionParams connectionParams,
-                                                                   TlsContextFactory tlsContext, Supplier<Scheduler> ioSchedulerSupplier) {
+                                                                   TlsContextFactory tlsContext,
+                                                                   Supplier<Scheduler> ioSchedulerSupplier) {
     HttpServerConfiguration.Builder builder = new HttpServerConfiguration.Builder()
         .setHost(connectionParams.getHost())
         .setPort(connectionParams.getPort())

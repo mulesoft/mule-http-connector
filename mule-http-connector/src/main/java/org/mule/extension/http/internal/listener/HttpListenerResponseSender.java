@@ -12,12 +12,12 @@ import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER
 
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.internal.listener.intercepting.Interception;
+import org.mule.extension.http.internal.ser.HttpResponseReadyCallbackProxy;
+import org.mule.extension.http.internal.service.server.ResponseStatusCallbackProxy;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.mule.runtime.http.api.domain.message.response.HttpResponseBuilder;
-import org.mule.runtime.http.api.server.async.HttpResponseReadyCallback;
-import org.mule.runtime.http.api.server.async.ResponseStatusCallback;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 
 import java.util.concurrent.RejectedExecutionException;
@@ -42,7 +42,7 @@ public class HttpListenerResponseSender {
                            final SourceCompletionCallback completionCallback,
                            DistributedTraceContextManager distributedTraceContextManager) {
     final HttpResponse httpResponse = buildResponse(response, context.getInterception(), context.isSupportStreaming());
-    final HttpResponseReadyCallback responseCallback = context.getResponseCallback();
+    final HttpResponseReadyCallbackProxy responseCallback = context.getResponseCallback();
     addStatusCodeAttribute(distributedTraceContextManager, httpResponse.getStatusCode(), LOGGER);
     updateServerSpanStatus(distributedTraceContextManager, httpResponse.getStatusCode(), LOGGER);
     if (context.isDeferredResponse()) {
@@ -62,7 +62,8 @@ public class HttpListenerResponseSender {
     }
   }
 
-  private void internalSendResponse(SourceCompletionCallback completionCallback, HttpResponseReadyCallback responseCallback,
+  private void internalSendResponse(SourceCompletionCallback completionCallback,
+                                    HttpResponseReadyCallbackProxy responseCallback,
                                     HttpResponse httpResponse) {
     responseCallback.responseReady(httpResponse, getResponseFailureCallback(responseCallback, completionCallback));
   }
@@ -72,8 +73,8 @@ public class HttpListenerResponseSender {
     return responseFactory.create(HttpResponse.builder(), interception, listenerResponseBuilder, supportStreaming);
   }
 
-  public ResponseStatusCallback getResponseFailureCallback(HttpResponseReadyCallback responseReadyCallback,
-                                                           SourceCompletionCallback completionCallback) {
+  public ResponseStatusCallbackProxy getResponseFailureCallback(HttpResponseReadyCallbackProxy responseReadyCallback,
+                                                                SourceCompletionCallback completionCallback) {
     return new FailureResponseStatusCallback(responseReadyCallback, completionCallback);
   }
 
@@ -81,12 +82,12 @@ public class HttpListenerResponseSender {
    * Implemented as an inner class instead of an anonymous class so that no problem arises in case reflection is needed for
    * retrieval of methods. This may be the case for backward compatibility concerns.
    */
-  public static class FailureResponseStatusCallback implements ResponseStatusCallback {
+  public static class FailureResponseStatusCallback implements ResponseStatusCallbackProxy {
 
-    private HttpResponseReadyCallback responseReadyCallback;
+    private HttpResponseReadyCallbackProxy responseReadyCallback;
     private SourceCompletionCallback completionCallback;
 
-    public FailureResponseStatusCallback(HttpResponseReadyCallback responseReadyCallback,
+    public FailureResponseStatusCallback(HttpResponseReadyCallbackProxy responseReadyCallback,
                                          SourceCompletionCallback completionCallback) {
       this.responseReadyCallback = responseReadyCallback;
       this.completionCallback = completionCallback;

@@ -6,25 +6,25 @@
  */
 package org.mule.extension.http.internal.listener;
 
-import static java.lang.Boolean.parseBoolean;
-import static java.lang.String.format;
-import static java.nio.charset.Charset.defaultCharset;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.String.format;
+import static java.nio.charset.Charset.defaultCharset;
+
 import org.mule.extension.http.api.HttpRequestAttributes;
+import org.mule.extension.http.internal.service.message.HttpEntityProxy;
 import org.mule.extension.http.internal.service.server.HttpRequestContextProxy;
+import org.mule.extension.http.internal.service.server.HttpRequestProxy;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.http.api.domain.entity.HttpEntity;
-import org.mule.runtime.http.api.domain.message.request.HttpRequest;
-import org.mule.runtime.http.api.domain.request.HttpRequestContext;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Component that transforms an HTTP request to a proper {@link Result}.
@@ -38,11 +38,11 @@ public class HttpRequestToResult {
   public static Result<InputStream, HttpRequestAttributes> transform(final HttpRequestContextProxy requestContext,
                                                                      final Charset encoding,
                                                                      ListenerPath listenerPath) {
-    final HttpRequest request = requestContext.getRequest();
+    final HttpRequestProxy request = requestContext.getRequest();
 
     MediaType mediaType = getMediaType(request.getHeaderValue(CONTENT_TYPE), encoding);
 
-    final HttpEntity entity = request.getEntity();
+    final HttpEntityProxy entity = request.getEntity();
     InputStream payload = entity.getContent();
 
     HttpRequestAttributes attributes =
@@ -50,7 +50,7 @@ public class HttpRequestToResult {
 
     Result.Builder<InputStream, HttpRequestAttributes> resultBuilder = Result.builder();
     if (entity.getLength().isPresent()) {
-      resultBuilder.length(entity.getLength().get());
+      resultBuilder.length(entity.getLength().getAsLong());
     }
 
     return resultBuilder.output(payload).mediaType(mediaType).attributes(attributes).build();

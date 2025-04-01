@@ -227,12 +227,12 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
 
   private Supplier<Scheduler> getIoSchedulerSupplier() {
     return () -> schedulerService
-            .ioScheduler(SchedulerConfig.config().withName(getSchedulerName(connectionParams)));
+        .ioScheduler(SchedulerConfig.config().withName(getSchedulerName(connectionParams)));
   }
 
   private String getSchedulerName(ConnectionParams connectionParams) {
     return format("http-listener-scheduler-io[%s://%s:%d]", connectionParams.getProtocol().getScheme(),
-            connectionParams.getHost(), connectionParams.getPort());
+                  connectionParams.getHost(), connectionParams.getPort());
   }
 
   @Override

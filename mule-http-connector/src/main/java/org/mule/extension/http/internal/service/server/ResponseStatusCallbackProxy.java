@@ -6,9 +6,9 @@
  */
 package org.mule.extension.http.internal.service.server;
 
-import org.mule.extension.http.internal.ser.HttpResponseReadyCallbackProxy;
+public interface ResponseStatusCallbackProxy {
 
-public interface RequestHandlerProxy {
+  void responseSendFailure(Throwable throwable);
 
-  void handleRequest(HttpRequestContextProxy requestContext, HttpResponseReadyCallbackProxy responseCallback);
+  void responseSendSuccessfully();
 }

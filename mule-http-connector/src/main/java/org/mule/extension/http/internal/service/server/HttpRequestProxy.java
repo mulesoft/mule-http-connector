@@ -1,0 +1,28 @@
+/*
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+package org.mule.extension.http.internal.service.server;
+
+import org.mule.extension.http.internal.service.message.HttpEntityProxy;
+import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.http.api.domain.HttpProtocol;
+
+import java.net.URI;
+
+public interface HttpRequestProxy {
+
+  String getHeaderValue(String headerName);
+
+  HttpEntityProxy getEntity();
+
+  URI getUri();
+
+  String getMethod();
+
+  HttpProtocol getProtocol();
+
+  MultiMap<String, String> getHeaders();
+}

@@ -7,6 +7,7 @@
 package org.mule.extension.http.internal.listener;
 
 import org.mule.extension.http.internal.service.server.HttpServerProxy;
+import org.mule.extension.http.internal.service.server.RequestHandlerProxy;
 import org.mule.runtime.http.api.server.HttpServer;
 import org.mule.runtime.http.api.server.RequestHandlerManager;
 
@@ -60,7 +61,12 @@ public class HttpServerDelegate implements HttpServerProxy {
   }
 
   @Override
-  public RequestHandlerManager addRequestHandler(List<String> list, String path, Object requestHandler) {
+  public RequestHandlerManager addRequestHandler(List<String> list, String path, RequestHandlerProxy requestHandler) {
+    return null;
+  }
+
+  @Override
+  public RequestHandlerManager addRequestHandler(String path, RequestHandlerProxy requestHandler) {
     return null;
   }
 }

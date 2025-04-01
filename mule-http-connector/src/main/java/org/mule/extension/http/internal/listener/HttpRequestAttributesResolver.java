@@ -11,16 +11,15 @@ import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.decodeUriP
 
 import static java.lang.System.arraycopy;
 
-import org.mule.extension.http.api.certificate.AlternativeNameData;
-import org.mule.extension.http.api.certificate.CertificateData;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpRequestAttributesBuilder;
+import org.mule.extension.http.api.certificate.AlternativeNameData;
+import org.mule.extension.http.api.certificate.CertificateData;
 import org.mule.extension.http.api.certificate.CertificateExtension;
 import org.mule.extension.http.api.certificate.PrincipalData;
 import org.mule.extension.http.api.certificate.PublicKeyData;
-import org.mule.runtime.http.api.domain.message.request.HttpRequest;
-import org.mule.runtime.http.api.domain.request.ClientConnection;
-import org.mule.runtime.http.api.domain.request.HttpRequestContext;
+import org.mule.extension.http.internal.service.server.HttpRequestContextProxy;
+import org.mule.extension.http.internal.service.server.HttpRequestProxy;
 
 import java.math.BigInteger;
 import java.net.URI;
@@ -38,16 +37,16 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Creates {@link HttpRequestAttributes} based on an {@link HttpRequestContext}, it's parts and a {@link ListenerPath}.
+ * Creates {@link HttpRequestAttributes} based on an {@link HttpRequestContextProxy}, it's parts and a {@link ListenerPath}.
  */
 public class HttpRequestAttributesResolver {
 
   private static final String QUERY = "?";
 
-  private HttpRequestContext requestContext;
+  private HttpRequestContextProxy requestContext;
   private ListenerPath listenerPath;
 
-  public HttpRequestAttributesResolver setRequestContext(HttpRequestContext requestContext) {
+  public HttpRequestAttributesResolver setRequestContext(HttpRequestContextProxy requestContext) {
     this.requestContext = requestContext;
     return this;
   }
@@ -58,9 +57,8 @@ public class HttpRequestAttributesResolver {
   }
 
   public HttpRequestAttributes resolve() {
-
     String listenerPath = this.listenerPath.getResolvedPath();
-    HttpRequest request = requestContext.getRequest();
+    HttpRequestProxy request = requestContext.getRequest();
 
     URI uri = request.getUri();
     String path = uri.getPath();
@@ -68,8 +66,6 @@ public class HttpRequestAttributesResolver {
     String uriString = path;
     String rawUriString = rawPath;
     String relativePath = this.listenerPath.getRelativePath(path);
-
-    ClientConnection clientConnection = requestContext.getClientConnection();
 
     String queryString = uri.getQuery();
     String rawQuery = uri.getRawQuery();
@@ -94,11 +90,11 @@ public class HttpRequestAttributesResolver {
         .uriParams(decodeUriParams(listenerPath, rawPath))
         .queryString(queryString)
         .queryParams(decodeQueryString(rawQuery))
-        .localAddress(requestContext.getServerConnection().getLocalHostAddress().toString())
-        .remoteAddress(clientConnection.getRemoteHostAddress().toString())
+        .localAddress(requestContext.getServerAddress().toString())
+        .remoteAddress(requestContext.getClientAddress().toString())
         .clientCertificate(() -> {
           try {
-            return buildCertificateData(clientConnection);
+            return buildCertificateData(requestContext.getClientCertificate());
           } catch (CertificateEncodingException e) {
             throw new RuntimeException(e);
           } catch (Exception e) {
@@ -109,8 +105,7 @@ public class HttpRequestAttributesResolver {
   }
 
 
-  public static CertificateData buildCertificateData(ClientConnection clientConnection) throws Exception {
-    Certificate certificate = clientConnection.getClientCertificate();
+  public static CertificateData buildCertificateData(Certificate certificate) throws Exception {
     if (certificate == null) {
       return null;
     }
