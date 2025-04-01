@@ -6,8 +6,12 @@
  */
 package org.mule.test.http.internal.request;
 
+import static org.mule.tck.junit4.matcher.IsEmptyOptional.empty;
+import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
+
 import static java.lang.Thread.sleep;
 import static java.util.concurrent.Executors.newFixedThreadPool;
+
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
@@ -19,26 +23,15 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.tck.junit4.matcher.IsEmptyOptional.empty;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
-import io.qameta.allure.Story;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.mockito.Mockito;
+import org.mule.extension.http.internal.delegate.HttpServiceApiProxy;
 import org.mule.extension.http.internal.request.HttpRequesterConnectionManager;
 import org.mule.extension.http.internal.request.ShareableHttpClient;
-import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.http.api.client.HttpClient;
 import org.mule.runtime.http.api.client.HttpClientConfiguration;
-import org.mule.runtime.http.api.client.HttpClientFactory;
+import org.mule.sdk.api.http.HttpClientFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -48,6 +41,16 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.mockito.Mockito;
+import org.slf4j.Logger;
 
 @Feature(HTTP_EXTENSION)
 @Story("HTTP Request")
@@ -60,7 +63,7 @@ public class HttpRequesterConnectionManagerTestCase extends AbstractMuleTestCase
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
-  private HttpService httpService = mock(HttpService.class);
+  private HttpServiceApiProxy httpService = mock(HttpServiceApiProxy.class);
   private HttpClient delegateHttpClient = spy(HttpClient.class);
   private HttpClient otherHttpClient = spy(HttpClient.class);
   private HttpRequesterConnectionManager connectionManager = new HttpRequesterConnectionManager(httpService);

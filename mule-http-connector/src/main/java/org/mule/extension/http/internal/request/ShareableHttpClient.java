@@ -6,11 +6,19 @@
  */
 package org.mule.extension.http.internal.request;
 
+import static org.mule.extension.http.api.request.HttpSendBodyMode.ALWAYS;
+
 import org.mule.extension.http.api.request.HttpSendBodyMode;
-import org.mule.runtime.http.api.client.HttpClient;
+import org.mule.extension.http.api.request.proxy.HttpProxyConfig;
+import org.mule.extension.http.internal.delegate.HttpServiceApiProxy;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
+import org.mule.sdk.api.http.HttpClient;
+import org.mule.sdk.api.http.HttpRequestOptions;
+import org.mule.sdk.api.http.HttpRequestOptionsBuilder;
+import org.mule.sdk.api.http.sse.ServerSentEventSource;
+import org.mule.sdk.api.http.sse.SseRetryConfig;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -20,11 +28,14 @@ import java.util.concurrent.CompletableFuture;
  */
 public class ShareableHttpClient {
 
-  private HttpClient delegate;
-  private Integer usageCount = new Integer(0);
+  private final HttpServiceApiProxy httpService;
+  private final HttpClient<HttpRequest, HttpRequestOptions<HttpAuthentication, HttpProxyConfig>, HttpResponse> delegate;
+  private Integer usageCount = 0;
 
-  public ShareableHttpClient(HttpClient client) {
+  public ShareableHttpClient(HttpClient<HttpRequest, HttpRequestOptions<HttpAuthentication, HttpProxyConfig>, HttpResponse> client,
+                             HttpServiceApiProxy httpService) {
     delegate = client;
+    this.httpService = httpService;
   }
 
   public synchronized void start() {
@@ -50,6 +61,16 @@ public class ShareableHttpClient {
   public CompletableFuture<HttpResponse> sendAsync(HttpRequest request, int responseTimeout, boolean followRedirects,
                                                    HttpAuthentication authentication,
                                                    HttpSendBodyMode sendBodyMode) {
-    return HttpClientReflection.sendAsync(delegate, request, responseTimeout, followRedirects, authentication, sendBodyMode);
+    HttpRequestOptionsBuilder<HttpAuthentication, HttpProxyConfig> optionsBuilder = httpService.requestOptionsBuilder();
+    return delegate.sendAsync(request, optionsBuilder
+        .responseTimeout(responseTimeout)
+        .followsRedirect(followRedirects)
+        .authentication(authentication)
+        .sendBodyAlways(ALWAYS == sendBodyMode)
+        .build());
+  }
+
+  public ServerSentEventSource sseSource(String uri, SseRetryConfig retryConfig) {
+    return delegate.sseSource(uri, retryConfig);
   }
 }
