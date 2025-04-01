@@ -20,7 +20,7 @@
         <jacoco.version>0.8.12</jacoco.version>
 
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
-        <javaFormatter.plugin.version>2.25.0</javaFormatter.plugin.version>
+        <javaFormatter.plugin.version>2.16.0</javaFormatter.plugin.version>
         <formatterGoal>validate</formatterGoal>
 
         <munit.extensions.maven.plugin.version>1.5.0</munit.extensions.maven.plugin.version>
