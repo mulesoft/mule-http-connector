@@ -6,8 +6,6 @@
  */
 package org.mule.test.extensions.http.mock.internal.server;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
@@ -17,75 +15,56 @@ import java.io.InputStream;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
-import com.github.tomakehurst.wiremock.extension.Parameters;
-import com.github.tomakehurst.wiremock.extension.ResponseDefinitionTransformerV2;
-import com.github.tomakehurst.wiremock.http.ResponseDefinition;
-import com.github.tomakehurst.wiremock.stubbing.ServeEvent;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * WireMock transformer used to delegate the request received in the server-endpoint source to the rest of the flow.
+ * Utility class that delegates incoming mock HTTP requests to the Mule flow associated with the configured
+ * {@link SourceCallback}.
+ *
+ * <p>
+ * This class facilitates asynchronous interaction between the embedded mock HTTP server and the flow under test. It allows the
+ * HTTP request body to be sent into the flow, and a {@link HTTPMockServerResponse} to be returned once the flow completes.
+ * </p>
+ *
+ * <p>
+ * The flow completes by invoking {@link HTTPMockServerEndpointSource#completeResponse}, which retrieves and completes the
+ * {@link CompletableFuture} that was added to the {@link SourceCallbackContext} by this transformer.
+ * </p>
+ *
+ * <p>
+ * In the event of flow failure or interruption, a generic {@code 500 Internal Server Error} response is returned instead.
+ * </p>
  */
-public class DelegateToFlowTransformer implements ResponseDefinitionTransformerV2 {
+public class DelegateToFlowTransformer {
 
-  public static final String TRANSFORMER_NAME = "delegate-to-flow-transformer";
-  public static final String SOURCE_CALLBACK_WIREMOCK_PARAMETER = "source-callback";
   public static final String RESPONSE_FUTURE_PARAMETER = "response-future";
 
-  private static final Logger LOGGER = getLogger(DelegateToFlowTransformer.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DelegateToFlowTransformer.class);
 
-  @Override
-  public ResponseDefinition transform(ServeEvent serveEvent) {
-    LOGGER.debug("transform() called");
-    Parameters parameters = serveEvent.getTransformerParameters();
-    SourceCallback<InputStream, HTTPMockRequestAttributes> sourceCallback =
-        (SourceCallback) parameters.get(SOURCE_CALLBACK_WIREMOCK_PARAMETER);
-    SourceCallbackContext sourceContext = sourceCallback.createContext();
+  private DelegateToFlowTransformer() {}
 
-    CompletableFuture<ResponseDefinition> responseFuture = new CompletableFuture<>();
-    sourceContext.addVariable(RESPONSE_FUTURE_PARAMETER, responseFuture);
+  public static HTTPMockServerResponse delegate(SourceCallback<InputStream, HTTPMockRequestAttributes> callback,
+                                                byte[] requestBody) {
+    SourceCallbackContext context = callback.createContext();
+    CompletableFuture<HTTPMockServerResponse> future = new CompletableFuture<>();
+    context.addVariable(RESPONSE_FUTURE_PARAMETER, future);
 
-    sourceCallback.handle(Result.<InputStream, HTTPMockRequestAttributes>builder()
-        .output(getBodyAsInputStream(serveEvent))
-        .attributes(getRequestAttributes(serveEvent))
-        .build(), sourceContext);
+    callback.handle(Result.<InputStream, HTTPMockRequestAttributes>builder().output(new ByteArrayInputStream(requestBody))
+        .attributes(new HTTPMockRequestAttributes()).build(), context);
 
     try {
-      return responseFuture.get();
+      return future.get();
     } catch (InterruptedException e) {
-      LOGGER.error("Error occurred while waiting for flow to finish", e);
+      LOGGER.error("Interrupted while waiting for flow to complete", e);
       Thread.currentThread().interrupt();
     } catch (ExecutionException e) {
-      LOGGER.error("Error occurred while waiting for flow to finish", e);
+      LOGGER.error("Exception during flow execution", e);
     }
 
-    return new ResponseDefinitionBuilder()
-        .withStatus(500)
-        .withBody("Error while waiting for flow to finish")
-        .build();
-  }
-
-  @Override
-  public String getName() {
-    return TRANSFORMER_NAME;
-  }
-
-  @Override
-  public boolean applyGlobally() {
-    return false;
-  }
-
-  private static ByteArrayInputStream getBodyAsInputStream(ServeEvent serveEvent) {
-    byte[] bodyBytes = serveEvent.getRequest().getBody();
-    if (LOGGER.isInfoEnabled()) {
-      LOGGER.info("Received body as String: {}", new String(bodyBytes));
-    }
-    return new ByteArrayInputStream(bodyBytes);
-  }
-
-  // TODO: Implement!
-  private static HTTPMockRequestAttributes getRequestAttributes(ServeEvent serveEvent) {
-    return new HTTPMockRequestAttributes();
+    HTTPMockServerResponse errorResponse = new HTTPMockServerResponse();
+    errorResponse.setStatusCode(500);
+    errorResponse.setReasonPhrase("Internal Server Error");
+    return errorResponse;
   }
 }

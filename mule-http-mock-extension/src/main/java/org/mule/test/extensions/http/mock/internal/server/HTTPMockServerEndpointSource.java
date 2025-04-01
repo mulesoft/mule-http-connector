@@ -13,7 +13,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
 import org.mule.runtime.extension.api.annotation.execution.OnTerminate;
@@ -30,16 +29,39 @@ import java.io.InputStream;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
-import com.github.tomakehurst.wiremock.http.ResponseDefinition;
 import org.slf4j.Logger;
 
 /**
- * Source that receives HTTP requests to a certain endpoint, and forwards them to the rest of the flow.
+ * A MuleSoft source that exposes a mock HTTP server endpoint for testing flows.
+ *
+ * <p>
+ * This source is intended for use in MUnit tests, where an embedded HTTP server responds to incoming requests and delegates the
+ * request payload to the configured Mule flow using {@link SourceCallback}.
+ * </p>
+ *
+ * <p>
+ * It registers a path-specific handler on startup and removes it on stop. The embedded server is provided by the
+ * {@link HTTPMockServer} connection, allowing central server management across multiple endpoint sources.
+ * </p>
+ *
+ * <p>
+ * Responses from flows are asynchronously collected and sent back to the corresponding HTTP clients using a
+ * {@link CompletableFuture} mechanism.
+ * </p>
+ *
+ * Supported operations:
+ * <ul>
+ * <li>Registers an endpoint path on start</li>
+ * <li>Removes the endpoint path on stop</li>
+ * <li>Completes async response on success</li>
+ * </ul>
+ *
+ * DSL Alias: {@code server-endpoint}
  */
 @MediaType(value = ANY, strict = false)
 @Alias("server-endpoint")
-public class HTTPMockServerEndpointSource extends Source<InputStream, HTTPMockRequestAttributes> {
+public class HTTPMockServerEndpointSource
+    extends Source<InputStream, HTTPMockRequestAttributes> {
 
   private static final Logger LOGGER = getLogger(HTTPMockServerEndpointSource.class);
 
@@ -56,7 +78,7 @@ public class HTTPMockServerEndpointSource extends Source<InputStream, HTTPMockRe
   private HTTPMockServer.StubRemover removeStubCallback;
 
   @Override
-  public void onStart(SourceCallback sourceCallback) throws MuleException {
+  public void onStart(SourceCallback<InputStream, HTTPMockRequestAttributes> sourceCallback) throws MuleException {
     mockServer = serverProvider.connect();
     removeStubCallback = mockServer.addHandlerFor(path, sourceCallback);
   }
@@ -69,26 +91,18 @@ public class HTTPMockServerEndpointSource extends Source<InputStream, HTTPMockRe
 
   @OnTerminate
   public void onTerminate() {
-    // TODO: What if...
     LOGGER.warn("TERMINATE CALLED, BUT NOT IMPLEMENTED");
   }
 
   @OnSuccess
   public void completeResponse(@ParameterGroup(name = "response", showInDsl = true) HTTPMockServerResponse response,
                                SourceCallbackContext callbackContext) {
-    LOGGER.info("Generating response...");
-
-    ResponseDefinitionBuilder builder = new ResponseDefinitionBuilder();
-    builder.withStatus(response.getStatusCode());
-    builder.withStatusMessage(response.getReasonPhrase());
-    response.getHeaders().forEach(builder::withHeader);
-    builder.withBody(IOUtils.toString(response.getBody().getValue()));
-    ResponseDefinition responseDefinition = builder.build();
-
-    Optional<CompletableFuture<ResponseDefinition>> responseFutureOptional =
+    LOGGER.info("Completing response from flow...");
+    Optional<CompletableFuture<HTTPMockServerResponse>> responseFutureOptional =
         callbackContext.getVariable(RESPONSE_FUTURE_PARAMETER);
-    responseFutureOptional
-        .orElseThrow(() -> new IllegalStateException("Source callback context doesn't have the response future"))
-        .complete(responseDefinition);
+
+    responseFutureOptional.orElseThrow(
+                                       () -> new IllegalStateException("Source callback context doesn't have the response future"))
+        .complete(response);
   }
 }

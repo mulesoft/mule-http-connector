@@ -17,24 +17,26 @@
     <http-mock:server-config name="serverConfig" >
         <http-mock:server-connection port="${mock.dynamic.port}" />
     </http-mock:server-config>
-    <flow name="mockFlow">
+
+    <!-- Configure client for testing the mock server -->
+    <http-mock:client-config name="testClientConfig" />
+
+
+    <!-- Test case for HTTP GET -->
+
+    <flow name="mockGetFlow">
         <http-mock:server-endpoint config-ref="serverConfig" path="/mock">
             <http-mock:response statusCode="201" reasonPhrase="Created" >
                 <http-mock:body>#['Mocked response body']</http-mock:body>
                 <http-mock:headers>#[{'X-Custom' : 'custom-value'}]</http-mock:headers>
             </http-mock:response>
         </http-mock:server-endpoint>
-
         <logger />
     </flow>
 
-    <!-- Test configuration -->
-    <http-mock:client-config name="testClientConfig" />
-
-    <!-- Test case -->
-    <munit:test name="testTheMockEndpoint" >
+    <munit:test name="testTheMockEndpointGet" >
         <munit:enable-flow-sources>
-            <munit:enable-flow-source value="mockFlow" />
+            <munit:enable-flow-source value="mockGetFlow" />
         </munit:enable-flow-sources>
         <munit:execution>
             <http-mock:do-get config-ref="testClientConfig" url="http://localhost:${mock.dynamic.port}/mock" />
@@ -44,6 +46,72 @@
             <munit-tools:assert-that expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(201)]" />
             <munit-tools:assert-that expression="#[attributes.reasonPhrase]" is="#[MunitTools::equalTo('Created')]" />
             <munit-tools:assert-that expression="#[attributes.headers['X-Custom']]" is="#[MunitTools::equalTo('custom-value')]" />
+        </munit:validation>
+    </munit:test>
+
+    <!-- Test case for HTTP POST -->
+
+    <flow name="mockPostFlow">
+        <http-mock:server-endpoint config-ref="serverConfig" path="/mock">
+            <http-mock:response statusCode="201" reasonPhrase="Created" >
+                <http-mock:body>#['Received payload: ' ++ (payload as String)]</http-mock:body>
+                <http-mock:headers>#[{'X-Custom': 'custom-value', 'X-Received': payload as String}]</http-mock:headers>
+            </http-mock:response>
+        </http-mock:server-endpoint>
+        <logger />
+    </flow>
+    <munit:test name="testTheMockEndpointPost">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="mockPostFlow" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <http-mock:do-post config-ref="testClientConfig"
+                               url="http://localhost:${mock.dynamic.port}/mock"
+                               payload="#['payload']" />
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[attributes.statusCode]"
+                                     is="#[MunitTools::equalTo(201)]" />
+            <munit-tools:assert-that expression="#[attributes.reasonPhrase]"
+                                     is="#[MunitTools::equalTo('Created')]" />
+            <munit-tools:assert-that expression="#[%dw 2.0 output application/java --- payload.^raw as String]"
+                                     is="#[MunitTools::equalTo('Received payload: payload')]" />
+
+        </munit:validation>
+    </munit:test>
+
+    <!-- Test case for HTTP Expect continue -->
+
+    <flow name="expectContinueFlow">
+        <http-mock:server-endpoint config-ref="serverConfig" path="/expect-continue">
+            <http-mock:response statusCode="201" reasonPhrase="Created" >
+                <http-mock:body>#['Received payload: ' ++ (payload as String)]</http-mock:body>
+            </http-mock:response>
+        </http-mock:server-endpoint>
+        <logger />
+    </flow>
+    <munit:test name="testExpect100Continue">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="expectContinueFlow" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <http-mock:do-post config-ref="testClientConfig"
+                               url="http://localhost:${mock.dynamic.port}/expect-continue"
+                               requestHeaders="#[{'Expect' : '100-continue'}]"
+                               payload="#['some very large response here']" />
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[attributes.statusCode]"
+                                     is="#[MunitTools::equalTo(201)]" />
+            <munit-tools:assert-that expression="#[attributes.reasonPhrase]"
+                                     is="#[MunitTools::equalTo('Created')]" />
+            <munit-tools:assert-that expression="#[attributes.headers['X-Expect-Header-Time'] as Number]"
+                                     is="#[MunitTools::lessThan(attributes.headers['X-Continue-Sent-Time'] as Number)]" />
+            <munit-tools:assert-that expression="#[attributes.headers['X-Continue-Sent-Time'] as Number]"
+                                     is="#[MunitTools::lessThan(attributes.headers['X-Body-Received-Time'] as Number)]" />
+            <munit-tools:assert-that expression="#[%dw 2.0 output application/java --- payload.^raw as String]"
+                                     is="#[MunitTools::equalTo('Received payload: some very large response here')]" />
+
         </munit:validation>
     </munit:test>
 </mule>
