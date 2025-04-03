@@ -22,7 +22,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.http.api.server.HttpServerConfiguration;
 import org.mule.runtime.http.api.server.ServerCreationException;
-import org.mule.sdk.api.http.server.HttpServerConfigurationBuilder;
+import org.mule.sdk.api.http.server.HttpServerConfigurer;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -36,11 +36,10 @@ import org.slf4j.Logger;
 public class HttpServiceProxy {
 
   private static final Logger LOGGER = getLogger(HttpServiceProxy.class);
-
   private static final String DEFAULT_READ_TIME_OUT_IN_MILLIS = "30000";
 
   @Inject
-  org.mule.runtime.http.api.HttpService muleService;
+  private org.mule.runtime.http.api.HttpService muleService;
 
   @Inject
   private Optional<org.mule.sdk.api.http.HttpService> sdkApiService;
@@ -51,20 +50,24 @@ public class HttpServiceProxy {
                                       Supplier<Scheduler> ioSchedulerSupplier)
       throws ServerCreationException {
     if (sdkApiService.isPresent()) {
-      return new HttpServerProxySdkApi(sdkApiService.get()
-          .server(builder -> configureServerBuilderForSdkApi(builder, configName, connectionParams, tlsContext,
-                                                             ioSchedulerSupplier)));
+      try {
+        return new HttpServerProxySdkApi(sdkApiService.get()
+            .server(configurer -> configureServerBuilderForSdkApi(configurer, configName, connectionParams, tlsContext,
+                                                                  ioSchedulerSupplier)));
+      } catch (org.mule.sdk.api.http.server.ServerCreationException e) {
+        throw new ServerCreationException("Delegation error", e);
+      }
     }
     return new HttpServerProxyMuleApi(muleService.getServerFactory()
         .create(getServerConfigurationForMuleApi(configName, connectionParams, tlsContext, ioSchedulerSupplier)));
   }
 
-  private void configureServerBuilderForSdkApi(HttpServerConfigurationBuilder builder,
+  private void configureServerBuilderForSdkApi(HttpServerConfigurer configurer,
                                                String configName,
                                                ConnectionParams connectionParams,
                                                TlsContextFactory tlsContext,
                                                Supplier<Scheduler> ioSchedulerSupplier) {
-    builder.setHost(connectionParams.getHost())
+    configurer.setHost(connectionParams.getHost())
         .setPort(connectionParams.getPort())
         .setTlsContextFactory(tlsContext)
         .setUsePersistentConnections(connectionParams.getUsePersistentConnections())
@@ -91,6 +94,7 @@ public class HttpServiceProxy {
     return builder.build();
   }
 
+  // This is done via reflection because it was added before forward compatibility.
   private void setReadTimeoutWithReflection(HttpServerConfiguration.Builder builder, ConnectionParams connectionParams) {
     Method method = getMethod(HttpServerConfiguration.Builder.class, "setReadTimeout", new Class[] {long.class});
     if (method != null) {
