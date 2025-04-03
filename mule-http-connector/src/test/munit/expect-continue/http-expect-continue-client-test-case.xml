@@ -49,7 +49,7 @@
                 <http:headers>
                     <![CDATA[#[{
                 'Expect': '100-continue',
-                'Content-Type': 'application/json',
+                'Content-Type': 'text/plain',
                 'Content-Length': '36'
                 }]]]>
                 </http:headers>
@@ -65,8 +65,8 @@
                                      is="#[MunitTools::lessThan(attributes.headers['X-Continue-Sent-Time'] as Number)]" />
             <munit-tools:assert-that expression="#[attributes.headers['X-Continue-Sent-Time'] as Number]"
                                      is="#[MunitTools::lessThan(attributes.headers['X-Body-Received-Time'] as Number)]" />
-            <munit-tools:assert-that expression="#[%dw 2.0 output application/java --- payload.^raw as String]"
-                                     is="#[MunitTools::equalTo('Received payload: some very large response here')]" />
+            <munit-tools:assert-that expression="#[%dw 2.0 output application/java --- payload as String { format: 'text' }]"
+                                     is="#[MunitTools::equalTo('some very large response here')]" />
 
         </munit:validation>
     </munit:test>
