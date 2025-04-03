@@ -50,7 +50,7 @@
                     <![CDATA[#[{
                 'Expect': '100-continue',
                 'Content-Type': 'application/json',
-                'Content-Length': '160'
+                'Content-Length': '36'
                 }]]]>
                 </http:headers>
             </http:request>
