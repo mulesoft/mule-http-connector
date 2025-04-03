@@ -20,7 +20,7 @@
         <jacoco.version>0.8.12</jacoco.version>
 
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
-        <javaFormatter.plugin.version>2.25.0</javaFormatter.plugin.version>
+        <javaFormatter.plugin.version>2.16.0</javaFormatter.plugin.version>
         <formatterGoal>validate</formatterGoal>
 
         <munit.extensions.maven.plugin.version>1.5.0</munit.extensions.maven.plugin.version>
@@ -164,28 +164,22 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>11.0.25</version>
+            <version>9.4.57.v20241219</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlet</artifactId>
-            <version>11.0.25</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-http</artifactId>
-            <version>11.0.25</version>
+            <version>9.4.57.v20241219</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-util</artifactId>
-            <version>11.0.25</version>
+            <version>9.4.57.v20241219</version>
         </dependency>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>4.0.1</version>
-            <scope>provided</scope>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-http</artifactId>
+            <version>9.4.57.v20241219</version>
         </dependency>
     </dependencies>
 
