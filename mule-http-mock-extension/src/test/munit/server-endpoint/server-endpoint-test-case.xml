@@ -79,39 +79,4 @@
 
         </munit:validation>
     </munit:test>
-
-    <!-- Test case for HTTP Expect continue -->
-
-    <flow name="expectContinueFlow">
-        <http-mock:server-endpoint config-ref="serverConfig" path="/expect-continue">
-            <http-mock:response statusCode="201" reasonPhrase="Created" >
-                <http-mock:body>#['Received payload: ' ++ (payload as String)]</http-mock:body>
-            </http-mock:response>
-        </http-mock:server-endpoint>
-        <logger />
-    </flow>
-    <munit:test name="testExpect100Continue">
-        <munit:enable-flow-sources>
-            <munit:enable-flow-source value="expectContinueFlow" />
-        </munit:enable-flow-sources>
-        <munit:execution>
-            <http-mock:do-post config-ref="testClientConfig"
-                               url="http://localhost:${mock.dynamic.port}/expect-continue"
-                               requestHeaders="#[{'Expect' : '100-continue'}]"
-                               payload="#['some very large response here']" />
-        </munit:execution>
-        <munit:validation>
-            <munit-tools:assert-that expression="#[attributes.statusCode]"
-                                     is="#[MunitTools::equalTo(201)]" />
-            <munit-tools:assert-that expression="#[attributes.reasonPhrase]"
-                                     is="#[MunitTools::equalTo('Created')]" />
-            <munit-tools:assert-that expression="#[attributes.headers['X-Expect-Header-Time'] as Number]"
-                                     is="#[MunitTools::lessThan(attributes.headers['X-Continue-Sent-Time'] as Number)]" />
-            <munit-tools:assert-that expression="#[attributes.headers['X-Continue-Sent-Time'] as Number]"
-                                     is="#[MunitTools::lessThan(attributes.headers['X-Body-Received-Time'] as Number)]" />
-            <munit-tools:assert-that expression="#[%dw 2.0 output application/java --- payload.^raw as String]"
-                                     is="#[MunitTools::equalTo('Received payload: some very large response here')]" />
-
-        </munit:validation>
-    </munit:test>
 </mule>

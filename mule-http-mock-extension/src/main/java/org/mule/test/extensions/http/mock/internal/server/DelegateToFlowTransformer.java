@@ -19,22 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Utility class that delegates incoming mock HTTP requests to the Mule flow associated with the configured
- * {@link SourceCallback}.
- *
- * <p>
- * This class facilitates asynchronous interaction between the embedded mock HTTP server and the flow under test. It allows the
- * HTTP request body to be sent into the flow, and a {@link HTTPMockServerResponse} to be returned once the flow completes.
- * </p>
- *
- * <p>
- * The flow completes by invoking {@link HTTPMockServerEndpointSource#completeResponse}, which retrieves and completes the
- * {@link CompletableFuture} that was added to the {@link SourceCallbackContext} by this transformer.
- * </p>
- *
- * <p>
- * In the event of flow failure or interruption, a generic {@code 500 Internal Server Error} response is returned instead.
- * </p>
+ * Utility class to delegate the request received in the server-endpoint source to the rest of the flow.
  */
 public class DelegateToFlowTransformer {
 
