@@ -21,7 +21,7 @@
     </http-mock:server-config>
 
     <http:request-config name="HTTP_Request_configuration" enableCookies="true">
-        <http:request-connection host="localhost" port="${dynamic.port}"/>
+        <http:request-connection host="localhost" port="${mock.dynamic.port}"/>
     </http:request-config>
 
     <!-- Configure client for testing the mock server -->
