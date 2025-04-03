@@ -1,107 +1,186 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core"
-      xmlns:http-mock="http://www.mulesoft.org/schema/mule/http-mock"
+
+<mule xmlns:http-mock="http://www.mulesoft.org/schema/mule/http-mock"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
-      xsi:schemaLocation="
-               http://www.mulesoft.org/schema/mule/http-mock http://www.mulesoft.org/schema/mule/http-mock/current/mule-http-mock.xsd
-               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
-		       http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
-               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http-mock http://www.mulesoft.org/schema/mule/http-mock/current/mule-http-mock.xsd
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-
-    <munit:config name="http-expect-continue-client-test-case"/>
-    <munit:dynamic-port propertyName="dynamic.port"/>
+    <munit:config name="http-expect-continue-client-test-case.xml" />
 
     <!-- Mock server config -->
-    <http-mock:server-config name="serverConfig">
-        <http-mock:server-connection port="${dynamic.port}"/>
+    <munit:dynamic-port propertyName="mock.dynamic.port" />
+    <http-mock:server-config name="serverConfig" >
+        <http-mock:server-connection port="${mock.dynamic.port}" />
     </http-mock:server-config>
 
-    <http:request-config name="HTTP_Request_configuration" enableCookies="true">
-        <http:request-connection host="localhost" port="${dynamic.port}"/>
+    <http:request-config name="HTTP_Request_configuration_client_expect_continue" enableCookies="true">
+        <http:request-connection host="localhost" port="${mock.dynamic.port}"/>
     </http:request-config>
-    <munit:test name="expect100ContinueTestWithValidResponse"
-                description="Send a Http POST with Expect 100 and server responds correctly">
+
+    <http:request-config name="HTTP_Request_configuration_client_expect_continue_with_persistent_connection" enableCookies="true">
+        <http:request-connection host="localhost" port="${mock.dynamic.port}"/>
+    </http:request-config>
+
+    <!-- Test case for HTTP Expect continue -->
+    <flow name="expectContinueFlow">
+        <http-mock:server-endpoint config-ref="serverConfig" path="/expect-continue">
+            <http-mock:response statusCode="201" reasonPhrase="Created" >
+                <http-mock:body>#[(payload as String)]</http-mock:body>
+            </http-mock:response>
+        </http-mock:server-endpoint>
+        <logger />
+    </flow>
+    <munit:test name="testExpect100Continue" ignore="#[Munit::muleVersionPriorTo('4.9.0') and p('mule.http.service.implementation') == 'NETTY']">
         <munit:enable-flow-sources>
-            <munit:enable-flow-source value="expect100ContinueTestWithValidResponseFlow"/>
+            <munit:enable-flow-source value="expectContinueFlow" />
         </munit:enable-flow-sources>
         <munit:execution>
-            <http:request method="POST" config-ref="HTTP_Request_configuration" path="/continue">
+            <http:request method="POST" config-ref="HTTP_Request_configuration_client_expect_continue" path="/expect-continue">
                 <http:body>
                     <![CDATA[#['some very large response to server']]]>
                 </http:body>
                 <http:headers>
                     <![CDATA[#[{
                 'Expect': '100-continue',
-                'Content-Type': 'application/json',
-                'Content-Length': '160'
+                'Content-Type': 'text/plain',
+                'Content-Length': '34'
                 }]]]>
                 </http:headers>
             </http:request>
-            <set-variable value="#[payload as String]" variableName="response"/>
         </munit:execution>
         <munit:validation>
-            <munit-tools:assert-equals actual="#[vars.response]" expected='#["Response from server"]'/>
+            <munit-tools:assert-that expression="#[attributes.statusCode]"
+                                     is="#[MunitTools::equalTo(201)]" />
+            <munit-tools:assert-that expression="#[attributes.reasonPhrase]"
+                                     is="#[MunitTools::equalTo('Created')]" />
+            <munit-tools:assert-that expression="#[attributes.headers['X-Expect-Header-Time'] as Number]"
+                                     is="#[MunitTools::lessThanOrEqualTo(attributes.headers['X-Continue-Sent-Time'] as Number)]" />
+            <munit-tools:assert-that expression="#[%dw 2.0 output application/java --- payload.^raw as String]"
+                                     is="#[MunitTools::equalTo('some very large response to server')]" />
         </munit:validation>
     </munit:test>
-    <flow name="expect100ContinueTestWithValidResponseFlow">
-        <http-mock:server-endpoint config-ref="serverConfig" path="/continue">
-            <http-mock:response statusCode="200" reasonPhrase="Created" >
-                <http-mock:body>#['Response from server']</http-mock:body>
-                <http-mock:headers>#[{'Content-Type': 'text/plain; charset=UTF-8', 'X-Custom': 'custom-value'}]</http-mock:headers>
+
+    <!-- Test case for HTTP Expect continue with persistent connection-->
+    <flow name="expectContinueFlowWithPersistentConnection">
+        <http-mock:server-endpoint config-ref="serverConfig" path="/expect-continue">
+            <http-mock:response statusCode="201" reasonPhrase="Created" >
+                <http-mock:body>#[(payload as String)]</http-mock:body>
             </http-mock:response>
         </http-mock:server-endpoint>
         <logger />
     </flow>
-
-    <munit:test name="expect100ContinueTestWithErrorResponse"
-                description="Send an HTTP POST with Expect 100 and server responds with an error (417 Expectation Failed)"
-    >
+    <munit:test name="testExpect100ContinueWithPersistentConnection" ignore="#[Munit::muleVersionPriorTo('4.9.0') and p('mule.http.service.implementation') == 'NETTY']">
         <munit:enable-flow-sources>
-            <munit:enable-flow-source value="expect100ContinueTestWithErrorResponseFlow"/>
+            <munit:enable-flow-source value="expectContinueFlowWithPersistentConnection" />
         </munit:enable-flow-sources>
+        <munit:execution>
+            <http:request method="POST" config-ref="HTTP_Request_configuration_client_expect_continue_with_persistent_connection" path="/expect-continue">
+                <http:body>
+                    <![CDATA[#['some very large response to server']]]>
+                </http:body>
+                <http:headers>
+                    <![CDATA[#[{
+                'Expect': '100-continue',
+                'Content-Type': 'text/plain',
+                'Content-Length': '34'
+                }]]]>
+                </http:headers>
+            </http:request>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[attributes.statusCode]"
+                                     is="#[MunitTools::equalTo(201)]" />
+            <munit-tools:assert-that expression="#[attributes.reasonPhrase]"
+                                     is="#[MunitTools::equalTo('Created')]" />
+            <munit-tools:assert-that expression="#[attributes.headers['X-Expect-Header-Time'] as Number]"
+                                     is="#[MunitTools::lessThanOrEqualTo(attributes.headers['X-Continue-Sent-Time'] as Number)]" />
+            <munit-tools:assert-that expression="#[%dw 2.0 output application/java --- payload.^raw as String]"
+                                     is="#[MunitTools::equalTo('some very large response to server')]" />
+        </munit:validation>
+    </munit:test>
 
+    <!-- Test case for HTTP Expect continue when expect header is malformed-->
+    <flow name="expectContinueFlowFor417">
+        <http-mock:server-endpoint config-ref="serverConfig" path="/expect-continue">
+            <http-mock:response statusCode="201" reasonPhrase="Created" >
+                <http-mock:body>#[(payload as String)]</http-mock:body>
+            </http-mock:response>
+        </http-mock:server-endpoint>
+        <logger />
+    </flow>
+    <munit:test name="testExpect100ContinueFor417" ignore="#[Munit::muleVersionPriorTo('4.9.0') and p('mule.http.service.implementation') == 'NETTY']">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="expectContinueFlowFor417" />
+        </munit:enable-flow-sources>
         <munit:execution>
             <try>
-                <http:request method="POST"
-                              config-ref="HTTP_Request_configuration"
-                              path="/continue-error">
+                <http:request method="POST" config-ref="HTTP_Request_configuration_client_expect_continue" path="/expect-continue" >
                     <http:body>
                         <![CDATA[#['some very large response to server']]]>
                     </http:body>
                     <http:headers>
                         <![CDATA[#[{
-                'Expect': '100-continue',
-                'Content-Type': 'application/json'
-            }]]]>
+                'Expect': 'xxx',
+                'Content-Type': 'text/plain',
+                'Content-Length': '34'
+                }]]]>
                     </http:headers>
                 </http:request>
-                <set-variable value="#[payload as String]" variableName="successPayload"/>
                 <error-handler >
                     <on-error-continue enableNotifications="true" logException="true">
                         <set-variable value="#[error.description]" variableName="errorMessage"/>
                     </on-error-continue>
                 </error-handler>
             </try>
-
         </munit:execution>
-
         <munit:validation>
-            <munit-tools:assert-that is="#[MunitTools::containsString('failed with status code 417.')]" expression="#[vars.errorMessage]"/>
+            <munit-tools:assert-that is="#[MunitTools::containsString('failed with status code 417')]" expression="#[vars.errorMessage]"/>
         </munit:validation>
     </munit:test>
-    <flow name="expect100ContinueTestWithErrorResponseFlow">
-        <http-mock:server-endpoint config-ref="serverConfig" path="/continue-error">
-            <http-mock:response statusCode="417" reasonPhrase="Expectation Failed">
-                <http-mock:body>
-                    <![CDATA[#['Expectation Failed']]]>
-                </http-mock:body>
+
+    <!-- Test case for HTTP Expect continue when client has a low timeout-->
+    <flow name="expectContinueFlowForTimeout">
+        <http-mock:server-endpoint config-ref="serverConfig" path="/expect-continue-delay">
+            <http-mock:response statusCode="201" reasonPhrase="Created" >
+                <http-mock:body>#[(payload as String)]</http-mock:body>
             </http-mock:response>
         </http-mock:server-endpoint>
         <logger />
     </flow>
+    <munit:test name="testExpect100ContinueForTimeout" ignore="#[Munit::muleVersionPriorTo('4.9.0') and p('mule.http.service.implementation') == 'NETTY']">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="expectContinueFlowForTimeout" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <try>
+                <http:request method="POST" config-ref="HTTP_Request_configuration_client_expect_continue" path="/expect-continue-delay" responseTimeout="1">
+                    <http:body>
+                        <![CDATA[#['some very large response to server']]]>
+                    </http:body>
+                    <http:headers>
+                        <![CDATA[#[{
+                'Expect': '100-continue',
+                'Content-Type': 'text/plain',
+                'Content-Length': '34'
+                }]]]>
+                    </http:headers>
+                </http:request>
+                <error-handler >
+                    <on-error-continue enableNotifications="true" logException="true">
+                        <set-variable value="#[error.description]" variableName="errorMessage"/>
+                    </on-error-continue>
+                </error-handler>
+            </try>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that is="#[MunitTools::containsString('Timeout exceeded')]" expression="#[vars.errorMessage]"/>
+        </munit:validation>
+    </munit:test>
 </mule>

@@ -258,13 +258,7 @@
                 <artifactId>spring-core</artifactId>
                 <version>${springVersion}</version>
             </dependency>
-            <dependency>
-                <groupId>commons-codec</groupId>
-                <artifactId>commons-codec</artifactId>
-                <version>1.10</version> <!-- or try 1.15 if that's compatible -->
-            </dependency>
         </dependencies>
-
     </dependencyManagement>
 
     <dependencies>
@@ -434,12 +428,6 @@
             <artifactId>bctls-fips</artifactId>
             <version>${bctls-fips.version}</version>
             <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-            <version>1.10</version> <!-- or try 1.15 if that's compatible -->
         </dependency>
     </dependencies>
 
