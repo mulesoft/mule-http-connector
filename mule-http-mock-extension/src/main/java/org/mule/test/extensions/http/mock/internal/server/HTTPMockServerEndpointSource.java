@@ -61,7 +61,7 @@ import org.slf4j.Logger;
 @MediaType(value = ANY, strict = false)
 @Alias("server-endpoint")
 public class HTTPMockServerEndpointSource
-  extends Source<InputStream, HTTPMockRequestAttributes> {
+    extends Source<InputStream, HTTPMockRequestAttributes> {
 
   private static final Logger LOGGER = getLogger(HTTPMockServerEndpointSource.class);
 
@@ -99,10 +99,10 @@ public class HTTPMockServerEndpointSource
                                SourceCallbackContext callbackContext) {
     LOGGER.info("Completing response from flow...");
     Optional<CompletableFuture<HTTPMockServerResponse>> responseFutureOptional =
-      callbackContext.getVariable(RESPONSE_FUTURE_PARAMETER);
+        callbackContext.getVariable(RESPONSE_FUTURE_PARAMETER);
 
     responseFutureOptional.orElseThrow(
-        () -> new IllegalStateException("Source callback context doesn't have the response future"))
-      .complete(response);
+                                       () -> new IllegalStateException("Source callback context doesn't have the response future"))
+        .complete(response);
   }
 }

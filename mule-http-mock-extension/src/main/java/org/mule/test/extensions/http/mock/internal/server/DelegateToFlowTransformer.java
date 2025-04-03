@@ -51,7 +51,7 @@ public class DelegateToFlowTransformer {
     context.addVariable(RESPONSE_FUTURE_PARAMETER, future);
 
     callback.handle(Result.<InputStream, HTTPMockRequestAttributes>builder().output(new ByteArrayInputStream(requestBody))
-                      .attributes(new HTTPMockRequestAttributes()).build(), context);
+        .attributes(new HTTPMockRequestAttributes()).build(), context);
 
     try {
       return future.get();
