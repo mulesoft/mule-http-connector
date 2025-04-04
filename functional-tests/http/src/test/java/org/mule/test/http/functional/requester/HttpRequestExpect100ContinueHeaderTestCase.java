@@ -51,7 +51,7 @@ public class HttpRequestExpect100ContinueHeaderTestCase
 
   @Override
   protected String getConfigFile() {
-    return "http-request-expect-success-header-config.xml";
+    return "http-request-expect-header-success-config.xml";
   }
 
   @Test
