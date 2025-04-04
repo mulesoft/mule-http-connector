@@ -66,4 +66,42 @@
                                      is="#[MunitTools::equalTo('some very large response to server')]" />
         </munit:validation>
     </munit:test>
+
+    <flow name="expectContinueFlowFor417">
+        <http-mock:server-endpoint config-ref="serverConfig" path="/expect-continue">
+            <http-mock:response statusCode="201" reasonPhrase="Created" >
+                <http-mock:body>#[(payload as String)]</http-mock:body>
+            </http-mock:response>
+        </http-mock:server-endpoint>
+        <logger />
+    </flow>
+    <munit:test name="testExpect100ContinueFor417">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="expectContinueFlowForTimeout" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <try>
+                <http:request method="POST" config-ref="HTTP_Request_configuration" path="/expect-continue">
+                    <http:body>
+                        <![CDATA[#['some very large response to server']]]>
+                    </http:body>
+                    <http:headers>
+                        <![CDATA[#[{
+                'Expect': 'xxx',
+                'Content-Type': 'text/plain',
+                'Content-Length': '36'
+                }]]]>
+                    </http:headers>
+                </http:request>
+                <error-handler >
+                    <on-error-continue enableNotifications="true" logException="true">
+                        <set-variable value="#[error.description]" variableName="errorMessage"/>
+                    </on-error-continue>
+                </error-handler>
+            </try>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that is="#[MunitTools::containsString('failed with status code 417')]" expression="#[vars.errorMessage]"/>
+        </munit:validation>
+    </munit:test>
 </mule>
