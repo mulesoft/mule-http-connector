@@ -28,7 +28,6 @@
     <http-mock:client-config name="testClientConfig" />
 
     <!-- Test case for HTTP Expect continue -->
-
     <flow name="expectContinueFlow">
         <http-mock:server-endpoint config-ref="serverConfig" path="/expect-continue">
             <http-mock:response statusCode="201" reasonPhrase="Created" >
@@ -67,6 +66,7 @@
         </munit:validation>
     </munit:test>
 
+    <!-- Test case for HTTP Expect continue when expect header is malformed-->
     <flow name="expectContinueFlowFor417">
         <http-mock:server-endpoint config-ref="serverConfig" path="/expect-continue">
             <http-mock:response statusCode="201" reasonPhrase="Created" >
@@ -77,7 +77,7 @@
     </flow>
     <munit:test name="testExpect100ContinueFor417">
         <munit:enable-flow-sources>
-            <munit:enable-flow-source value="expectContinueFlowForTimeout" />
+            <munit:enable-flow-source value="expectContinueFlowFor417" />
         </munit:enable-flow-sources>
         <munit:execution>
             <try>
