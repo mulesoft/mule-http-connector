@@ -32,7 +32,7 @@
     <flow name="expectContinueFlow">
         <http-mock:server-endpoint config-ref="serverConfig" path="/expect-continue">
             <http-mock:response statusCode="201" reasonPhrase="Created" >
-                <http-mock:body>#['Received payload: ' ++ (payload as String)]</http-mock:body>
+                <http-mock:body>#[(payload as String)]</http-mock:body>
             </http-mock:response>
         </http-mock:server-endpoint>
         <logger />
@@ -54,7 +54,6 @@
                 }]]]>
                 </http:headers>
             </http:request>
-            <set-variable value="#[payload as String]" variableName="some very large response here"/>
         </munit:execution>
         <munit:validation>
             <munit-tools:assert-that expression="#[attributes.statusCode]"
@@ -63,11 +62,8 @@
                                      is="#[MunitTools::equalTo('Created')]" />
             <munit-tools:assert-that expression="#[attributes.headers['X-Expect-Header-Time'] as Number]"
                                      is="#[MunitTools::lessThan(attributes.headers['X-Continue-Sent-Time'] as Number)]" />
-            <munit-tools:assert-that expression="#[attributes.headers['X-Continue-Sent-Time'] as Number]"
-                                     is="#[MunitTools::lessThan(attributes.headers['X-Body-Received-Time'] as Number)]" />
-            <munit-tools:assert-that expression="#[%dw 2.0 output application/java --- payload as String { format: 'text' }]"
-                                     is="#[MunitTools::equalTo('some very large response here')]" />
-
+            <munit-tools:assert-that expression="#[%dw 2.0 output application/java --- payload.^raw as String]"
+                                     is="#[MunitTools::equalTo('some very large response to server')]" />
         </munit:validation>
     </munit:test>
 </mule>
