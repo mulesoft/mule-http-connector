@@ -11,14 +11,18 @@ import org.mule.runtime.http.api.server.HttpServer;
 import org.mule.runtime.http.api.server.RequestHandler;
 import org.mule.runtime.http.api.server.RequestHandlerManager;
 import org.mule.runtime.http.api.server.ServerAddress;
+import org.mule.sdk.api.http.sse.ServerWithSse;
+import org.mule.sdk.api.http.sse.SseClient;
+import org.mule.sdk.api.http.sse.SseEndpointManager;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.function.Consumer;
 
 /**
  * Base class for applying the delegate design pattern around an {@link HttpServer}
  */
-public class HttpServerDelegate implements HttpServer {
+public class HttpServerDelegate implements HttpServer, ServerWithSse {
 
   private final HttpServer delegate;
 
@@ -73,7 +77,12 @@ public class HttpServerDelegate implements HttpServer {
     return delegate.addRequestHandler(path, requestHandler);
   }
 
-  protected HttpServer getDelegate() {
-    return delegate;
+  @Override
+  public SseEndpointManager sse(String ssePath, Consumer<SseClient> sseClientHandler) {
+    if (delegate instanceof ServerWithSse) {
+      return ((ServerWithSse) delegate).sse(ssePath, sseClientHandler);
+    } else {
+      throw new UnsupportedOperationException("Server-sent events are not supported");
+    }
   }
 }
