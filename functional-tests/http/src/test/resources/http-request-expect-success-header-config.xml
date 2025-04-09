@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="
-               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+          http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+          http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <http:request-config name="requestConfig">
+
+<http:request-config name="requestConfig">
         <http:request-connection host="localhost" port="${httpPort}" usePersistentConnections="${persistentConnection}"/>
     </http:request-config>
 
@@ -16,7 +18,7 @@
                 #[{'Expect' : '100-continue'}]
             </http:headers>
             <http:response-validator>
-                <http:success-status-code-validator values="0..599" />
+                <http:success-status-code-validator values="0..399" />
             </http:response-validator>
         </http:request>
     </flow>
@@ -24,7 +26,18 @@
     <flow name="requestFlowNoHeaders">
         <http:request config-ref="requestConfig" method="POST" path="/" responseTimeout="20000">
             <http:response-validator>
-                <http:success-status-code-validator values="0..599" />
+                <http:success-status-code-validator values="0..399" />
+            </http:response-validator>
+        </http:request>
+    </flow>
+
+    <flow name="requestFlowWithLowTimeout">
+        <http:request config-ref="requestConfig" method="POST" path="/" responseTimeout="1">
+            <http:headers>
+                #[{'Expect' : '100-continue'}]
+            </http:headers>
+            <http:response-validator>
+                <http:success-status-code-validator values="0..399" />
             </http:response-validator>
         </http:request>
     </flow>

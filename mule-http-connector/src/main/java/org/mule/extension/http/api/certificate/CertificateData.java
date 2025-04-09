@@ -12,7 +12,6 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.util.Arrays;
@@ -25,10 +24,9 @@ import java.util.Set;
  * A custom Data Transfer Object (DTO) to replace {@link java.security.cert.Certificate},
  * {@link java.security.cert.X509Certificate}, and related classes.
  * <p>
- * This class provides a comprehensive representation of a certificate with various attributes
- * such as type, encoded form, version, subject and issuer distinguished names, serial number,
- * validity period, public key, signature algorithm details, and extensions.
- * It implements {@link java.io.Serializable} to allow its instances to be serialized.
+ * This class provides a comprehensive representation of a certificate with various attributes such as type, encoded form,
+ * version, subject and issuer distinguished names, serial number, validity period, public key, signature algorithm details, and
+ * extensions. It implements {@link java.io.Serializable} to allow its instances to be serialized.
  * </p>
  */
 public class CertificateData implements Serializable {
@@ -73,28 +71,28 @@ public class CertificateData implements Serializable {
   /**
    * Constructs a new {@code CertificateData} instance with detailed attributes.
    *
-   * @param type                        the type of the certificate
-   * @param encoded                     the encoded form of the certificate
-   * @param version                     the version of the certificate
-   * @param subjectDN                   the subject distinguished name
-   * @param issuerDN                    the issuer distinguished name
-   * @param serialNumber                the serial number of the certificate
-   * @param notBefore                   the start date of the validity period
-   * @param notAfter                    the end date of the validity period
-   * @param publicKey                   the public key of the certificate
-   * @param sigAlgName                  the signature algorithm name
-   * @param sigAlgOID                   the signature algorithm OID
-   * @param sigAlgParams                the signature algorithm parameters
-   * @param signature                   the signature
-   * @param basicConstraints            the basic constraints
-   * @param extendedKeyUsage            the extended key usage
-   * @param keyUsage                    the key usage
-   * @param issuerUniqueID              the issuer unique ID
-   * @param subjectAlternativeNames     the subject alternative names
-   * @param issuerAlternativeNames      the issuer alternative names
-   * @param extensions                  the certificate extensions
-   * @param criticalOids                the critical OIDs
-   * @param nonCriticalOids             the non-critical OIDs
+   * @param type                             the type of the certificate
+   * @param encoded                          the encoded form of the certificate
+   * @param version                          the version of the certificate
+   * @param subjectDN                        the subject distinguished name
+   * @param issuerDN                         the issuer distinguished name
+   * @param serialNumber                     the serial number of the certificate
+   * @param notBefore                        the start date of the validity period
+   * @param notAfter                         the end date of the validity period
+   * @param publicKey                        the public key of the certificate
+   * @param sigAlgName                       the signature algorithm name
+   * @param sigAlgOID                        the signature algorithm OID
+   * @param sigAlgParams                     the signature algorithm parameters
+   * @param signature                        the signature
+   * @param basicConstraints                 the basic constraints
+   * @param extendedKeyUsage                 the extended key usage
+   * @param keyUsage                         the key usage
+   * @param issuerUniqueID                   the issuer unique ID
+   * @param subjectAlternativeNames          the subject alternative names
+   * @param issuerAlternativeNames           the issuer alternative names
+   * @param extensions                       the certificate extensions
+   * @param criticalOids                     the critical OIDs
+   * @param nonCriticalOids                  the non-critical OIDs
    * @param hasUnsupportedCriticalExtensions whether the certificate has unsupported critical extensions
    */
   public CertificateData(String type, byte[] encoded, int version, PrincipalData subjectDN, PrincipalData issuerDN,
@@ -384,7 +382,7 @@ public class CertificateData implements Serializable {
   /**
    * Checks if the certificate is currently valid.
    *
-   * @throws CertificateExpiredException   if the certificate has expired
+   * @throws CertificateExpiredException     if the certificate has expired
    * @throws CertificateNotYetValidException if the certificate is not yet valid
    */
   public void checkValidity() throws CertificateExpiredException, CertificateNotYetValidException {
@@ -396,7 +394,7 @@ public class CertificateData implements Serializable {
    * Checks if the certificate is valid at the specified date.
    *
    * @param date the date to check the validity against
-   * @throws CertificateExpiredException   if the certificate has expired
+   * @throws CertificateExpiredException     if the certificate has expired
    * @throws CertificateNotYetValidException if the certificate is not yet valid
    */
   public void checkValidity(Date date) throws CertificateExpiredException, CertificateNotYetValidException {
@@ -409,21 +407,26 @@ public class CertificateData implements Serializable {
   }
 
   @Override
-  public boolean equals(Object other) {
-    if (this == other) {
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + Arrays.hashCode(encoded);
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
       return true;
     }
-    if (!(other instanceof CertificateData)) {
+    if (obj == null) {
       return false;
     }
-    try {
-      byte[] thisCert = getEncoded();
-      byte[] otherCert = ((CertificateData) other).getEncoded();
-
-      return Arrays.equals(thisCert, otherCert);
-    } catch (CertificateException e) {
+    if (getClass() != obj.getClass()) {
       return false;
     }
+    CertificateData other = (CertificateData) obj;
+    return Arrays.equals(encoded, other.encoded);
   }
 
   @Override

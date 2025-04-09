@@ -26,7 +26,7 @@
         <http:request-connection host="localhost" port="${dynamic.port}"/>
     </http:request-config>
 
-    <munit:test name="cookiesWithMultipleRedirect" description="Cookies are replaced during the redirect mechanism">
+    <munit:test name="cookiesWithMultipleRedirect" description="Cookies are replaced during the redirect mechanism]" ignore="#[Munit::muleVersionPriorTo('4.9.3') and p('mule.http.service.implementation') == 'NETTY']">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="incrementalCookieSetterFlow" />
             <munit:enable-flow-source value="getCookieHeaderAsPayloadFlow" />
@@ -47,7 +47,8 @@
         </munit:validation>
     </munit:test>
 
-    <munit:test name="cookiesWithMultipleRedirectAndInitialValueSetManually" description="Cookies are replaced during the redirect mechanism, even if we set an initial value">
+    <munit:test name="cookiesWithMultipleRedirectAndInitialValueSetManually"
+                description="Cookies are replaced during the redirect mechanism, even if we set an initial value" ignore="#[Munit::muleVersionPriorTo('4.9.3') and p('mule.http.service.implementation') == 'NETTY']">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="incrementalCookieSetterFlow" />
             <munit:enable-flow-source value="getCookieHeaderAsPayloadFlow" />

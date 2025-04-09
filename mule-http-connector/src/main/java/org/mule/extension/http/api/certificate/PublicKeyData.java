@@ -12,9 +12,8 @@ import java.math.BigInteger;
 /**
  * A custom Data Transfer Object (DTO) to replace the {@link java.security.PublicKey} class.
  * <p>
- * This class provides a representation of a public key with various attributes such as
- * algorithm, encoded form, parameters, modulus, and the public key string. It implements
- * {@link java.io.Serializable} to allow its instances to be serialized.
+ * This class provides a representation of a public key with various attributes such as algorithm, encoded form, parameters,
+ * modulus, and the public key string. It implements {@link java.io.Serializable} to allow its instances to be serialized.
  * </p>
  */
 public class PublicKeyData implements Serializable {

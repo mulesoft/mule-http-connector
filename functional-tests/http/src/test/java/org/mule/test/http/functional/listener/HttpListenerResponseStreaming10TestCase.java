@@ -109,7 +109,7 @@ public class HttpListenerResponseStreaming10TestCase extends HttpListenerRespons
   /**
    * Last paragraph of <a href="http://tools.ietf.org/html/rfc2068#section-3.6">rfc2068#section-3.6</a> states: A server MUST NOT
    * send transfer-codings to an HTTP/1.0 client.
-   * 
+   *
    * @throws IOException
    */
   @Test

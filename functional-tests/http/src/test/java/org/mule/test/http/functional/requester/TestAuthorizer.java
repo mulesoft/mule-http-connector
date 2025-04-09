@@ -8,19 +8,19 @@ package org.mule.test.http.functional.requester;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public interface TestAuthorizer {
 
   /**
    * Method to implement the authorization test logic.
-   * 
+   *
    * @param address                    target address
    * @param request                    HTTP request
    * @param response                   HTTP response
    * @param addAuthorizeMessageInProxy whether the authorization has to be sent from proxy
-   * 
+   *
    * @return request authorized
    * @throws IOException exception in request
    */

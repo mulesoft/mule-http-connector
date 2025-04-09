@@ -15,7 +15,7 @@ public interface Interception {
 
   /**
    * Returns the headers used for response decoration, deny-list or other operation defined by the interceptor.
-   * 
+   *
    * @return headers to operate with.
    */
   MultiMap<String, String> getHeaders();

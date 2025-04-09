@@ -17,6 +17,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.security.cert.Certificate;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
@@ -121,16 +122,16 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
   /**
    * Actual {@link Certificate} to use, avoid any processing until it's actually needed.
    * </p>
-   * In order to avoid updating this module's minMuleVersion and maintain both the lazy and serializable properties, {@link CertificateProvider}
-   * was created.
-   * Implementations of {@link CertificateProvider} will change according to the available classes provided by the version of mule-api at runtime.
-   * For versions prior to 1.1.5(4.1.5), the required classes to fully support this functionality will not be present.
-   * As a consequence, {@link HttpRequestAttributes} serialization may not behave as required.
+   * In order to avoid updating this module's minMuleVersion and maintain both the lazy and serializable properties,
+   * {@link CertificateProvider} was created. Implementations of {@link CertificateProvider} will change according to the
+   * available classes provided by the version of mule-api at runtime. For versions prior to 1.1.5(4.1.5), the required classes to
+   * fully support this functionality will not be present. As a consequence, {@link HttpRequestAttributes} serialization may not
+   * behave as required.
    * </p>
-   * Specifically, and only in this case, if running in an EE runtime prior to 4.1.5 and using a Kryo serializer,
-   * the client certificate value will be lost after serialization and {@link HttpRequestAttributes#getClientCertificate()} will return null.
-   * If found in that situation, a workaround is to call {@link HttpRequestAttributes#getClientCertificate()} before serialization.
-   * That way, the certificate will be resolved and serialization will work.
+   * Specifically, and only in this case, if running in an EE runtime prior to 4.1.5 and using a Kryo serializer, the client
+   * certificate value will be lost after serialization and {@link HttpRequestAttributes#getClientCertificate()} will return null.
+   * If found in that situation, a workaround is to call {@link HttpRequestAttributes#getClientCertificate()} before
+   * serialization. That way, the certificate will be resolved and serialization will work.
    */
   private final CertificateProvider lazyClientCertificateProvider;
 
@@ -254,4 +255,43 @@ public class HttpRequestAttributes extends BaseHttpRequestAttributes {
     }
     return this.queryString;
   }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result =
+        prime * result + Objects.hash(clientCertificate, listenerPath, localAddress, maskedRequestPath, method, queryString,
+                                      rawRequestPath, rawRequestUri, relativePath, remoteAddress, requestUri, scheme, version);
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    HttpRequestAttributes other = (HttpRequestAttributes) obj;
+    return Objects.equals(clientCertificate, other.clientCertificate)
+        && Objects.equals(listenerPath, other.listenerPath)
+        && Objects.equals(localAddress, other.localAddress)
+        && Objects.equals(maskedRequestPath, other.maskedRequestPath)
+        && Objects.equals(method, other.method)
+        && Objects.equals(queryString, other.queryString)
+        && Objects.equals(rawRequestPath, other.rawRequestPath)
+        && Objects.equals(rawRequestUri, other.rawRequestUri)
+        && Objects.equals(relativePath, other.relativePath)
+        && Objects.equals(remoteAddress, other.remoteAddress)
+        && Objects.equals(requestUri, other.requestUri)
+        && Objects.equals(scheme, other.scheme)
+        && Objects.equals(version, other.version);
+  }
+
+
 }

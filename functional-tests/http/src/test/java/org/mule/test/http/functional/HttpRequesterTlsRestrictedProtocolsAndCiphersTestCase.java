@@ -11,8 +11,8 @@ import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStor
 import static org.mule.test.http.functional.fips.DefaultTestConfiguration.getDefaultEnvironmentConfiguration;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import org.mule.runtime.core.api.util.FileUtils;
@@ -24,20 +24,22 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import io.qameta.allure.Story;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+
+import io.qameta.allure.Story;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Story(HTTPS)
 public class HttpRequesterTlsRestrictedProtocolsAndCiphersTestCase extends AbstractHttpTestCase {
@@ -132,7 +134,7 @@ public class HttpRequesterTlsRestrictedProtocolsAndCiphersTestCase extends Abstr
    * Creates a TLS server that doesn't support a specific cipher suite and protocol.
    */
   private Server createTlsServer(String disabledCipherSuite, String disabledProtocol) throws Exception {
-    SslContextFactory sslContextFactory = new SslContextFactory.Server();
+    SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
     sslContextFactory
         .setKeyStorePath(FileUtils.getResourcePath(getDefaultEnvironmentConfiguration().getTestServerKeyStore(), getClass()));
     sslContextFactory.setKeyStoreType(getDefaultEnvironmentConfiguration().getTestStoreType());

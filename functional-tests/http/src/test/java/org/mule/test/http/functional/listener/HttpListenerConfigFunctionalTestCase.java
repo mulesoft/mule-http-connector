@@ -113,8 +113,18 @@ public class HttpListenerConfigFunctionalTestCase extends AbstractHttpTestCase {
     SocketRequester socketRequester = new SocketRequester("localhost", noListenerConfigPort.getNumber());
     socketRequester.initialize();
     socketRequester.doRequest("GET " + invalidPathWithSpecialCharacters + " HTTP/1.1");
-    assertThat(socketRequester.getResponse(),
-               containsString(format(NO_LISTENER_ENTITY_FORMAT, escapeHtml4(invalidPathWithSpecialCharacters))));
+
+    String errorMessage;
+    if (System.getProperty("mule.http.service.implementation", "GRIZZLY").equals("GRIZZLY")) {
+      errorMessage = format(NO_LISTENER_ENTITY_FORMAT, escapeHtml4(invalidPathWithSpecialCharacters));
+    } else {
+      String url = format("http://127.0.0.1:%d%s", noListenerConfigPort.getNumber(), invalidPathWithSpecialCharacters);
+      int indexOfLT = url.indexOf('<');
+      errorMessage =
+          format("HTTP request parsing failed with error: \"Illegal character in path at index %d: %s\"", indexOfLT, url);
+    }
+
+    assertThat(socketRequester.getResponse(), containsString(errorMessage));
     socketRequester.finalizeGracefully();
   }
 

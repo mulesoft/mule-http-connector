@@ -17,8 +17,9 @@ public final class TestUtils {
 
   /**
    * Reads a String from an {@link InputStream} until certain pattern is found, and returns that String.
+   *
    * @param inputStream the stream to read.
-   * @param pattern the pattern to match.
+   * @param pattern     the pattern to match.
    * @return a String that contains the pattern, or the whole content if the end of stream is reached.
    * @throws IOException if an error occurs while reading.
    */
@@ -29,12 +30,13 @@ public final class TestUtils {
     boolean endOfStream = false;
     while (!patternFound && !endOfStream) {
       int bytesNum = inputStream.read(inBuf);
-      requestAsText.append(new String(inBuf, 0, bytesNum));
-      if (requestAsText.toString().contains(pattern)) {
-        patternFound = true;
-      }
       if (bytesNum == -1) {
         endOfStream = true;
+      } else {
+        requestAsText.append(new String(inBuf, 0, bytesNum));
+        if (requestAsText.toString().contains(pattern)) {
+          patternFound = true;
+        }
       }
     }
     return requestAsText.toString();

@@ -6,15 +6,6 @@
  */
 package org.mule.test.http.functional.proxy;
 
-import static java.lang.String.valueOf;
-import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.metadata.DataType.fromObject;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
@@ -22,6 +13,17 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpHeaders.Names.X_FORWARDED_FOR;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.PROXY;
+
+import static java.lang.String.valueOf;
+
+import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.startsWith;
 
 import org.mule.extension.http.api.HttpAttributes;
 import org.mule.extension.http.api.HttpRequestAttributes;
@@ -39,12 +41,6 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.TestInputStream;
 import org.mule.test.http.functional.requester.AbstractHttpRequestTestCase;
 
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.AsyncHttpClientConfig;
-import com.ning.http.client.ListenableFuture;
-import com.ning.http.client.generators.InputStreamBodyGenerator;
-import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Collection;
@@ -53,10 +49,12 @@ import java.util.OptionalLong;
 import java.util.Set;
 import java.util.function.Function;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.AsyncHttpClientConfig;
+import com.ning.http.client.ListenableFuture;
+import com.ning.http.client.generators.InputStreamBodyGenerator;
+import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 
-import io.qameta.allure.Story;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
@@ -65,9 +63,15 @@ import org.apache.http.client.fluent.Response;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.entity.StringEntity;
+
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+
+import io.qameta.allure.Story;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Story(PROXY)
 public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
@@ -242,7 +246,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
 
     policy = builder -> {
       ByteArrayInputStream stream = new ByteArrayInputStream(TEST_PAYLOAD.getBytes());
-      return builder.payload(new TypedValue<Object>(stream, fromObject(stream), OptionalLong.of(length)));
+      return builder.payload(new TypedValue<>(stream, fromObject(stream), OptionalLong.of(length)));
     };
 
     Response response = Request.Post(getProxyUrl("policy"))

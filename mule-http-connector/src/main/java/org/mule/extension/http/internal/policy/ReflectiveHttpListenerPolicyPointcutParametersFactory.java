@@ -32,7 +32,7 @@ import java.util.Collection;
 /**
  * HttpListenerPolicyPointcutParametersFactory implementation which makes use of pointcut attributes API which was included in
  * 4.3.0.
- * 
+ *
  * Since the connector needs to work with older versions of the runtime, the API is invoked using reflection to be able to compile
  * it.
  */

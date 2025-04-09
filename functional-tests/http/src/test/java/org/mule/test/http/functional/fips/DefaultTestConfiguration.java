@@ -84,26 +84,6 @@ public class DefaultTestConfiguration implements TestConfiguration {
   }
 
   @Override
-  public String getKeyStorePKS12Type() {
-    return delegate.getKeyStorePKS12Type();
-  }
-
-  @Override
-  public String getTrustStoreJCEKSType() {
-    return delegate.getTrustStoreJCEKSType();
-  }
-
-  @Override
-  public String getCertificateAuthorityEntity() {
-    return delegate.getCertificateAuthorityEntity();
-  }
-
-  @Override
-  public String getTrustFileForCrl() {
-    return delegate.getTrustFileForCrl();
-  }
-
-  @Override
   public String getTestSslKeyStoreWithHostName() {
     return delegate.getTestSslKeyStoreWithHostName();
   }

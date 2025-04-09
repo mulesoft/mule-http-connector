@@ -20,11 +20,6 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.Executor;
 
-import javax.servlet.AsyncContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.eclipse.jetty.io.Connection;
 import org.eclipse.jetty.io.EndPoint;
 import org.eclipse.jetty.io.ManagedSelector;
@@ -34,6 +29,11 @@ import org.eclipse.jetty.proxy.ConnectHandler;
 import org.eclipse.jetty.server.HttpConnection;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.util.thread.Scheduler;
+
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class NtlmConnectHandler extends ConnectHandler {
 
@@ -109,7 +109,8 @@ public class NtlmConnectHandler extends ConnectHandler {
       asyncContext.setTimeout(0);
 
       LOG.debug("Connecting to {}", address);
-      ConnectContext connectContext = new ConnectContext(request, response, asyncContext, HttpConnection.getCurrentConnection());
+      ConnectContext connectContext =
+          new ConnectContext(request, response, asyncContext, HttpConnection.getCurrentConnection().getEndPoint());
       selector.connect(channel, connectContext);
     } catch (Exception x) {
       onConnectFailure(request, response, null, x);
@@ -149,7 +150,7 @@ public class NtlmConnectHandler extends ConnectHandler {
     @Override
     protected EndPoint newEndPoint(SelectableChannel selectableChannel, ManagedSelector managedSelector,
                                    SelectionKey selectionKey) {
-      return new SocketChannelEndPoint(selectableChannel, managedSelector, selectionKey, getScheduler());
+      return new SocketChannelEndPoint((SocketChannel) selectableChannel, managedSelector, selectionKey, getScheduler());
     }
 
     @Override

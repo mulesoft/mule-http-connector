@@ -17,8 +17,9 @@ import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import java.util.Optional;
 
 /**
- * Component to use as {@link org.mule.runtime.extension.api.annotation.param.ParameterGroup} for the expressions
- * needed in the {@link HttpPollingSourceExpressions} to apply to the response
+ * Component to use as {@link org.mule.runtime.extension.api.annotation.param.ParameterGroup} for the expressions needed in the
+ * {@link HttpPollingSourceExpressions} to apply to the response
+ *
  * @since 1.8
  */
 public final class HttpPollingSourceExpressions {

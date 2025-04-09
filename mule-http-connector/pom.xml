@@ -21,15 +21,17 @@
     <description>A Mule extension that provides HTTP server and client functionality</description>
 
     <properties>
-        <jacoco.version>0.8.11</jacoco.version>
+        <jacoco.version>0.8.12</jacoco.version>
         <aspectjVersion>1.9.22.1</aspectjVersion>
 
         <fluentHcVersion>4.5.13</fluentHcVersion>
-        <grizzlyVersion>2.3.36-MULE-026</grizzlyVersion>
+        <grizzlyVersion>2.3.36-MULE-028</grizzlyVersion>
         <mockitoVersion>4.11.0</mockitoVersion>
+        <equalsverifierVersion>3.19.2</equalsverifierVersion>
 
         <commonsLang3Version>3.12.0</commonsLang3Version>
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
+        <javaFormatter.plugin.version>2.16.0</javaFormatter.plugin.version>
 
         <muleJavaEeBomVersion>4.7.2</muleJavaEeBomVersion>
         <muleSocketsConnectorVersion>1.2.5</muleSocketsConnectorVersion>
@@ -45,12 +47,12 @@
         <!-- Remove when a new parent version with MTF is available -->
         <munit.input.directory>src/test/munit</munit.input.directory>
         <munit.output.directory>${basedir}/target/test-mule/munit</munit.output.directory>
-        <munit.extensions.maven.plugin.version>1.4.0</munit.extensions.maven.plugin.version>
-        <munit.version>3.3.1</munit.version>
+        <munit.extensions.maven.plugin.version>1.6.0-SNAPSHOT</munit.extensions.maven.plugin.version>
+        <munit.version>3.5.0-SNAPSHOT</munit.version>
         <mtf-tools.version>1.2.0</mtf-tools.version>
         <mavenResources.version>3.3.1</mavenResources.version>
         <!-- MUnit minMuleVersion is 4.3.0 -->
-        <munitMinMuleVersion>4.3.0</munitMinMuleVersion>
+        <munitMinMuleVersion>4.6.0</munitMinMuleVersion>
 
         <muleObjectStoreConnectorTestVersion>1.2.2</muleObjectStoreConnectorTestVersion>
 
@@ -68,13 +70,6 @@
         <bcpg-fips.version>1.0.7.1</bcpg-fips.version>
         <bcmail-fips.version>1.0.4</bcmail-fips.version>
         <bc-fips.version>1.0.2.5</bc-fips.version>
-
-        <surefire.args>
-            --add-opens=java.base/java.lang=ALL-UNNAMED
-            --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
-            --add-opens=java.base/java.lang.invoke=ALL-UNNAMED
-            --add-opens=java.base/sun.security.provider=ALL-UNNAMED
-        </surefire.args>
     </properties>
 
     <build>
@@ -235,7 +230,7 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            
+
             <!-- These override the version obtained transitively from a dependency declared in the parent pom. -->
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -371,6 +366,12 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-inline</artifactId>
             <version>${mockitoVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>nl.jqno.equalsverifier</groupId>
+            <artifactId>equalsverifier</artifactId>
+            <version>${equalsverifierVersion}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

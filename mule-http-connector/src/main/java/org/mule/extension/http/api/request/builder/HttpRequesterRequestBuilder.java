@@ -6,11 +6,12 @@
  */
 package org.mule.extension.http.api.request.builder;
 
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.unmodifiableMap;
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 import static org.mule.runtime.extension.api.runtime.parameter.OutboundCorrelationStrategy.AUTO;
 import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
+
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.unmodifiableMap;
 
 import org.mule.extension.http.api.HttpMessageBuilder;
 import org.mule.extension.http.internal.request.HttpRequesterConfig;
@@ -29,6 +30,7 @@ import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Component that specifies how to create a proper HTTP request.
@@ -144,8 +146,7 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
   }
 
   /**
-   * @deprecated
-   * use {@link HttpRequesterRequestBuilder#toHttpRequestBuilder} instead
+   * @deprecated use {@link HttpRequesterRequestBuilder#toHttpRequestBuilder} instead
    */
   @Deprecated
   public HttpRequestBuilder configure(HttpRequesterConfig config) {
@@ -220,4 +221,32 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
     }
 
   }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(body, correlationId, correlationInfo, headers, queryParams, sendCorrelationId, uriParams);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    HttpRequesterRequestBuilder other = (HttpRequesterRequestBuilder) obj;
+    return Objects.equals(body, other.body)
+        && Objects.equals(correlationId, other.correlationId)
+        && Objects.equals(correlationInfo, other.correlationInfo)
+        && Objects.equals(headers, other.headers)
+        && Objects.equals(queryParams, other.queryParams)
+        && sendCorrelationId == other.sendCorrelationId
+        && Objects.equals(uriParams, other.uriParams);
+  }
+
+
 }

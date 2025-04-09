@@ -92,7 +92,7 @@
         </munit:validation>
     </munit:test>
 
-    <munit:test name="redirect-loop" description="Create a request to an endpoint that return 301 to itself. Should throw a MaxRedirect exception">
+    <munit:test name="redirect-loop" description="Create a request to an endpoint that return 301 to itself. Should throw a MaxRedirect exception " ignore="#[Munit::muleVersionPriorTo('4.9.3') and p('mule.http.service.implementation') == 'NETTY']">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="redirect-loop-flow" />
         </munit:enable-flow-sources>
@@ -131,7 +131,7 @@
     </munit:test>
 
     <munit:test name="302-redirect-test"
-                description="Create a request to an endpoint that return 302. Should follow redirect with GET method">
+                description="Create a request to an endpoint that return 302. Should follow redirect with GET method" ignore="#[Munit::muleVersionPriorTo('4.9.3') and p('mule.http.service.implementation') == 'NETTY']">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="302-redirect" />
             <munit:enable-flow-source value="only-get-request" />
@@ -149,7 +149,7 @@
 
     <munit:test name="302-redirect-test-honour-body-semantics"
                 description="Create a request to an endpoint that return 302. Should follow redirect with GET method and remove the body"
-                ignore="#[Munit::muleVersionPriorTo('4.4.0') or Munit::muleVersionEqualTo('4.4.0')]">
+                ignore="#[Munit::muleVersionPriorTo('4.9.3') and p('mule.http.service.implementation') == 'NETTY']">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="302-redirect-body" />
             <munit:enable-flow-source value="only-get-request-body" />
@@ -201,7 +201,7 @@
     </munit:test>
 
     <munit:test name="moved-test-with-set-cookie" description="Create a request to an endpoint that return 301 with set-cookie.
-     Should create a new request with a cookie header">
+     Should create a new request with a cookie header" ignore="#[Munit::muleVersionPriorTo('4.9.3') and p('mule.http.service.implementation') == 'NETTY']">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="moved-with-set-cookie" />
             <munit:enable-flow-source value="response-with-set-cookie" />

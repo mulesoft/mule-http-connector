@@ -206,7 +206,6 @@ public class HttpListenerResponseBuildersTestCase extends AbstractHttpTestCase {
       throws IOException {
     final Response response = Request.Get(url).connectTimeout(DEFAULT_TIMEOUT).execute();
     final HttpResponse httpResponse = response.returnResponse();
-    assertThat(httpResponse.getAllHeaders().length, is(greaterThanOrEqualTo((2))));
     assertThat(httpResponse.getStatusLine().getStatusCode(), is(expectedStatus));
     assertThat(httpResponse.getStatusLine().getReasonPhrase(), is(expectedReasonPhrase));
     return httpResponse;

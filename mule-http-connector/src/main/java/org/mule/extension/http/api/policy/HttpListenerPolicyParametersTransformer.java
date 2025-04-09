@@ -103,6 +103,7 @@ public class HttpListenerPolicyParametersTransformer implements SourcePolicyPara
   }
 
   enum ResponseType {
+
     SUCCESS(200, "response"), FAILURE(500, "errorResponse");
 
     private final Integer statusCode;
