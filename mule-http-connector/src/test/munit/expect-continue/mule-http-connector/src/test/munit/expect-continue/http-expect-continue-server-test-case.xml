@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http-mock="http://www.mulesoft.org/schema/mule/http-mock"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http-mock http://www.mulesoft.org/schema/mule/http-mock/current/mule-http-mock.xsd
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <munit:config name="http-expect-continue-server-test-case.xml" />
+    <munit:dynamic-port propertyName="mock.dynamic.port" />
+
+    <!-- Configure client for testing the server -->
+    <http-mock:client-config name="testClientConfig" />
+
+    <http:listener-config name="HTTP_Listener_config_server_expect_continue">
+        <http:listener-connection host="localhost" port="${mock.dynamic.port}" />
+    </http:listener-config>
+
+    <!--    TODO W-18220084 Add assertions for server sending and receiving the expect headers (this will need a change in the behaviour of OkHttp client -->
+
+    <!--     Test case for HTTP Expect continue -->
+    <flow name="expectContinueServerFlow">
+        <http:listener responseStreamingMode="AUTO" path="/expect-continue" allowedMethods="POST" config-ref="HTTP_Listener_config_server_expect_continue">
+            <http:response statusCode="200" reasonPhrase="OK">
+            </http:response>
+        </http:listener>
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
+        <logger />
+    </flow>
+
+    <munit:test name="testExpect100Continue">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="expectContinueServerFlow" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <http-mock:do-post config-ref="testClientConfig"
+                               url="http://localhost:${mock.dynamic.port}/expect-continue"
+                               requestHeaders="#[{'Expect' : '100-continue'}]"
+                               payload="#['some very large response here']" />
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(200)]" />
+            <munit-tools:assert-that expression="#[attributes.reasonPhrase]" is="#[MunitTools::equalTo('OK')]" />
+            <munit-tools:assert-that expression="#[(payload as String)]" is="#[MunitTools::containsString('some very large response here')]"/>
+        </munit:validation>
+    </munit:test>
+
+    <!-- Test case for HTTP Expect continue when header is malformed-->
+    <flow name="expectContinueServerFlowFor417">
+        <http:listener responseStreamingMode="AUTO" path="/expect-continue" allowedMethods="POST" config-ref="HTTP_Listener_config_server_expect_continue">
+            <http:response statusCode="200" reasonPhrase="OK">
+            </http:response>
+        </http:listener>
+        <set-payload value="#[%dw 2.0 output application/java --- payload.^raw as String]"/>
+        <logger />
+    </flow>
+
+    <!--    TODO W-18220042 [http service][grizzly] Investigate 417 error not being returned for malformed headers in grizzly -->
+    <munit:test name="testExpect100ContinueFor417" ignore="#[p('mule.http.service.implementation') != 'NETTY']">
+        <munit:enable-flow-sources>
+            <munit:enable-flow-source value="expectContinueServerFlowFor417" />
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <http-mock:do-post config-ref="testClientConfig"
+                               url="http://localhost:${mock.dynamic.port}/expect-continue"
+                               requestHeaders="#[{'Expect' : 'xxx'}]"
+                               payload="#['some very large response here']" />
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(417)]" />
+            <munit-tools:assert-that expression="#[attributes.reasonPhrase]" is="#[MunitTools::equalTo('Expectation Failed')]" />
+        </munit:validation>
+    </munit:test>
+</mule>
