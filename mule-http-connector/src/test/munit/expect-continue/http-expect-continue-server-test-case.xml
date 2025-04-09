@@ -12,7 +12,7 @@
 		http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
         http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
-    <munit:config name="http-expect-continue-server-test-case.xml" />
+    <munit:config name="http-expect-continue-server-test-case" />
     <munit:dynamic-port propertyName="mock.dynamic.port" />
 
     <!-- Configure client for testing the server -->
