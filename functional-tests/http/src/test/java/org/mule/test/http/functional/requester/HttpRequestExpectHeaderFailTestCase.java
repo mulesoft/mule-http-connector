@@ -35,7 +35,7 @@ public class HttpRequestExpectHeaderFailTestCase extends AbstractHttpExpectHeade
 
   @Test
   public void handlesExpectationFailedResponse() throws Exception {
-    // TODO (W-15666548): Enable this for NETTY too.
+    // TODO W-18238012 [http connector] Remove 100 continue functional tests which have been migrated to MTF
     assumeThat(getProperty("mule.http.service.implementation", "GRIZZLY"), is("GRIZZLY"));
 
     startExpectFailedServer();

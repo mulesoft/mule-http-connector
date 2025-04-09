@@ -322,7 +322,7 @@ public class HTTPMockServer {
     }
 
     private void handle(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-      long delayMillis = 30000;
+      long delayMillis = 2000;
       try {
         Thread.sleep(delayMillis);
       } catch (InterruptedException e) {
