@@ -129,7 +129,7 @@ public class HTTPMockServer {
     private void handle(HttpServletRequest req, HttpServletResponse resp) throws IOException {
       String path = req.getRequestURI();
       SourceCallback<InputStream, HTTPMockRequestAttributes> callback =
-        (SourceCallback<InputStream, HTTPMockRequestAttributes>) pathToCallback.get(path);
+          (SourceCallback<InputStream, HTTPMockRequestAttributes>) pathToCallback.get(path);
 
       if (callback == null) {
         resp.setStatus(SC_NOT_FOUND);
@@ -213,7 +213,7 @@ public class HTTPMockServer {
     private void handle(HttpServletRequest req, HttpServletResponse resp) throws IOException {
       String path = req.getRequestURI();
       SourceCallback<InputStream, HTTPMockRequestAttributes> callback =
-        (SourceCallback<InputStream, HTTPMockRequestAttributes>) pathToCallback.get(path);
+          (SourceCallback<InputStream, HTTPMockRequestAttributes>) pathToCallback.get(path);
 
       long expectHeaderReceivedAtTimestamp = 0;
       long continueResponseSentAtTimestamp = 0;
@@ -331,7 +331,7 @@ public class HTTPMockServer {
 
       String path = req.getRequestURI();
       SourceCallback<InputStream, HTTPMockRequestAttributes> callback =
-        (SourceCallback<InputStream, HTTPMockRequestAttributes>) pathToCallback.get(path);
+          (SourceCallback<InputStream, HTTPMockRequestAttributes>) pathToCallback.get(path);
 
       if (callback == null) {
         resp.setStatus(SC_NOT_FOUND);
@@ -343,8 +343,8 @@ public class HTTPMockServer {
       HTTPMockServerResponse mockResponse = DelegateToFlowTransformer.delegate(callback, requestBody);
 
       byte[] responseBody = mockResponse.getBody() != null
-        ? toByteArray(mockResponse.getBody().getValue())
-        : new byte[0];
+          ? toByteArray(mockResponse.getBody().getValue())
+          : new byte[0];
 
       resp.setStatus(mockResponse.getStatusCode());
       resp.setContentLength(responseBody.length);
