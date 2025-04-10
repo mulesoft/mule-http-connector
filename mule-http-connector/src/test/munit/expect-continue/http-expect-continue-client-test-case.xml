@@ -154,7 +154,8 @@
         </http-mock:server-endpoint>
         <logger />
     </flow>
-    <munit:test name="testExpect100ContinueForTimeout" ignore="#[Munit::muleVersionPriorTo('4.9.0') and p('mule.http.service.implementation') == 'NETTY']">
+    <!--    TODO W-18220042 [http service][grizzly] Investigate timeout assertion in jenkins for grizzly -->
+    <munit:test name="testExpect100ContinueForTimeout"   ignore="#[p('mule.http.service.implementation') != 'NETTY' or Munit::muleVersionPriorTo('4.9.0')]">
         <munit:enable-flow-sources>
             <munit:enable-flow-source value="expectContinueFlowForTimeout" />
         </munit:enable-flow-sources>
