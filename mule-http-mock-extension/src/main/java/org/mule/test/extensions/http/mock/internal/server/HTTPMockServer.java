@@ -51,6 +51,8 @@ public class HTTPMockServer {
     context.setContextPath("/");
     context.addServlet(new ServletHolder(new MockServlet()), "/*");
     context.addServlet(new ServletHolder(new ExpectContinueServlet()), "/expect-continue");
+    context.addServlet(new ServletHolder(new DelayExpectContinueServlet()), "/expect-continue-delay");
+
     server.setHandler(context);
     server.start();
     LOGGER.info("HTTP mock server started on port {}", port);
@@ -263,4 +265,109 @@ public class HTTPMockServer {
       return buffer.toByteArray();
     }
   }
+
+  /**
+   * Servlet dedicated to handling HTTP requests with the {@code Expect: 100-continue} header, with an added artificial delay.
+   *
+   * <p>
+   * This servlet simulates proper handling of the HTTP/1.1 "100 Continue" mechanism by first imposing a delay (e.g., 30 seconds)
+   * before fully reading the request body and processing the request. This is used for testing scenarios where a timeout or
+   * delayed response is needed.
+   * </p>
+   *
+   * <p>
+   * When a request is received at the mapping (e.g., "/expect-continue-delay"), the servlet:
+   * </p>
+   * <ol>
+   * <li>Checks for the {@code Expect: 100-continue} header and, if present, sends an interim 100 Continue status.</li>
+   * <li>Waits for a pre-configured delay period of 30,000 milli seconds.</li>
+   * <li>Reads the full request body and delegates processing to the custom {@link DelegateToFlowTransformer}.</li>
+   * <li>Generates an {@link HTTPMockServerResponse} with the final status, headers, and body.</li>
+   * <li>Tracks key processing timestamps which are exposed via custom response headers:
+   * <ul>
+   * <li>{@code X-Expect-Header-Time}: Time when the Expect header was received.</li>
+   * <li>{@code X-Continue-Sent-Time}: Time when the 100 Continue response was sent.</li>
+   * <li>{@code X-Body-Received-Time}: Time when the full request body was received.</li>
+   * </ul>
+   * </li>
+   * </ol>
+   *
+   * <p>
+   * Response status:
+   * </p>
+   * <ul>
+   * <li>100 Continue (if applicable)</li>
+   * <li>Final status from the {@code HTTPMockServerResponse}</li>
+   * <li>404 if no handler is registered for the requested path</li>
+   * </ul>
+   *
+   * <p>
+   * Response headers include:
+   * </p>
+   * <ul>
+   * <li>Standard response headers from the {@code HTTPMockServerResponse}</li>
+   * <li>Timestamp headers for diagnostics and verification</li>
+   * </ul>
+   *
+   * <p>
+   * This servlet is used for testing HTTP client behavior with the Expect/Continue mechanism under delayed response conditions in
+   * MUnit scenarios.
+   * </p>
+   */
+  private class DelayExpectContinueServlet extends HttpServlet {
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+      handle(req, resp);
+    }
+
+    private void handle(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+      long delayMillis = 10_000;
+      try {
+        Thread.sleep(delayMillis);
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+      }
+
+      String path = req.getRequestURI();
+      SourceCallback<InputStream, HTTPMockRequestAttributes> callback =
+          (SourceCallback<InputStream, HTTPMockRequestAttributes>) pathToCallback.get(path);
+
+      if (callback == null) {
+        resp.setStatus(SC_NOT_FOUND);
+        resp.getWriter().write("Not Found");
+        return;
+      }
+
+      byte[] requestBody = toByteArray(req.getInputStream());
+      HTTPMockServerResponse mockResponse = DelegateToFlowTransformer.delegate(callback, requestBody);
+
+      byte[] responseBody = mockResponse.getBody() != null
+          ? toByteArray(mockResponse.getBody().getValue())
+          : new byte[0];
+
+      resp.setStatus(mockResponse.getStatusCode());
+      resp.setContentLength(responseBody.length);
+      resp.setCharacterEncoding("UTF-8");
+      resp.setContentType("application/json");
+
+      mockResponse.getHeaders().entrySet().forEach(entry -> resp.addHeader(entry.getKey(), entry.getValue()));
+
+      try (OutputStream os = resp.getOutputStream()) {
+        os.write(responseBody);
+        os.flush();
+      }
+    }
+
+    private byte[] toByteArray(InputStream input) throws IOException {
+      ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+      byte[] data = new byte[1024];
+      int nRead;
+      while ((nRead = input.read(data, 0, data.length)) != -1) {
+        buffer.write(data, 0, nRead);
+      }
+      return buffer.toByteArray();
+    }
+  }
+
 }
