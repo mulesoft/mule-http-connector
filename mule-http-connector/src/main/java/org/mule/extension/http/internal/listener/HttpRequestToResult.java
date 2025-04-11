@@ -15,7 +15,7 @@ import static java.nio.charset.Charset.defaultCharset;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.internal.service.message.HttpEntityProxy;
-import org.mule.extension.http.internal.service.server.HttpRequestContextProxy;
+import org.mule.extension.http.internal.service.server.RequestContext;
 import org.mule.extension.http.internal.service.server.HttpRequestProxy;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -35,14 +35,12 @@ public class HttpRequestToResult {
 
   private static final Logger logger = LoggerFactory.getLogger(HttpRequestToResult.class);
 
-  public static Result<InputStream, HttpRequestAttributes> transform(final HttpRequestContextProxy requestContext,
+  public static Result<InputStream, HttpRequestAttributes> transform(final RequestContext requestContext,
                                                                      final Charset encoding,
                                                                      ListenerPath listenerPath) {
-    final HttpRequestProxy request = requestContext.getRequest();
+    MediaType mediaType = getMediaType(requestContext.getHeaderValue(CONTENT_TYPE), encoding);
 
-    MediaType mediaType = getMediaType(request.getHeaderValue(CONTENT_TYPE), encoding);
-
-    final HttpEntityProxy entity = request.getEntity();
+    final HttpEntityProxy entity = requestContext.getEntity();
     InputStream payload = entity.getContent();
 
     HttpRequestAttributes attributes =

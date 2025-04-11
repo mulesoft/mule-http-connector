@@ -4,10 +4,8 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.http.internal.ser;
+package org.mule.extension.http.internal.service.server;
 
-import org.mule.extension.http.internal.listener.HttpListenerResponseSender;
-import org.mule.extension.http.internal.service.server.ResponseStatusCallbackProxy;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 
 public interface HttpResponseReadyCallbackProxy {

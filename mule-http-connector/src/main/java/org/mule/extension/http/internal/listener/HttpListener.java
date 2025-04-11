@@ -50,9 +50,10 @@ import org.mule.extension.http.api.listener.server.HttpListenerConfig;
 import org.mule.extension.http.api.streaming.HttpStreamingType;
 import org.mule.extension.http.internal.HttpMetadataResolver;
 import org.mule.extension.http.internal.listener.intercepting.InterceptingException;
-import org.mule.extension.http.internal.ser.HttpResponseReadyCallbackProxy;
-import org.mule.extension.http.internal.service.server.HttpRequestContextProxy;
+import org.mule.extension.http.internal.service.server.EndpointAvailabilityManager;
+import org.mule.extension.http.internal.service.server.HttpResponseReadyCallbackProxy;
 import org.mule.extension.http.internal.service.server.HttpServerProxy;
+import org.mule.extension.http.internal.service.server.RequestContext;
 import org.mule.extension.http.internal.service.server.RequestHandlerProxy;
 import org.mule.extension.http.internal.service.server.ResponseStatusCallbackProxy;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -105,7 +106,6 @@ import org.mule.runtime.http.api.domain.HttpProtocol;
 import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.mule.runtime.http.api.domain.message.response.HttpResponseBuilder;
-import org.mule.runtime.http.api.server.RequestHandlerManager;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 import org.mule.sdk.compatibility.api.utils.ForwardCompatibilityHelper;
 
@@ -209,7 +209,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   private HttpServerProxy server;
   private HttpListenerResponseSender responseSender;
   private ListenerPath listenerPath;
-  private RequestHandlerManager requestHandlerManager;
+  private EndpointAvailabilityManager requestHandlerManager;
   private HttpResponseFactory responseFactory;
   private ErrorTypeMatcher knownErrors;
   private Class interpretedAttributes;
@@ -380,7 +380,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
       throw new MuleRuntimeException(e);
     }
     knownErrors = new DisjunctiveErrorTypeMatcher(createErrorMatcherList(muleContext.getErrorTypeRepository()));
-    requestHandlerManager.start();
+    requestHandlerManager.available();
 
     if (muleContextStopWatcher == null) {
       muleContextStopWatcher = new MuleContextStopWatcher();
@@ -422,8 +422,8 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
     }
 
     if (requestHandlerManager != null) {
-      requestHandlerManager.stop();
-      requestHandlerManager.dispose();
+      requestHandlerManager.unavailable();
+      requestHandlerManager.remove();
     }
 
     if (responseSenderScheduler != null) {
@@ -441,13 +441,13 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
     return new RequestHandlerProxy() {
 
       @Override
-      public void handleRequest(HttpRequestContextProxy requestContext, HttpResponseReadyCallbackProxy responseCallback) {
+      public void handleRequest(RequestContext requestContext, HttpResponseReadyCallbackProxy responseCallback) {
         // TODO: MULE-9698 Analyse adding security here to reject the DefaultHttpRequestContext and avoid creating a Message
         try {
           Result<InputStream, HttpRequestAttributes> result = HttpListener.this.createResult(requestContext);
 
           HttpResponseContext responseContext = new HttpResponseContext();
-          final String httpVersion = requestContext.getRequest().getProtocol().asString();
+          final String httpVersion = requestContext.getProtocol().asString();
           responseContext.setHttpVersion(httpVersion);
           responseContext.setSupportStreaming(supportsTransferEncoding(httpVersion));
           responseContext.setResponseCallback(responseCallback);
@@ -592,7 +592,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
         .reasonPhrase(reasonPhraseFromException != null ? reasonPhraseFromException : throwable.getMessage());
   }
 
-  private Result<InputStream, HttpRequestAttributes> createResult(HttpRequestContextProxy requestContext) {
+  private Result<InputStream, HttpRequestAttributes> createResult(RequestContext requestContext) {
     return transform(requestContext, getDefaultEncoding(muleContext), listenerPath);
     // TODO: MULE-9748 Analyse RequestContext use in HTTP extension
     // Update RequestContext ThreadLocal for backwards compatibility

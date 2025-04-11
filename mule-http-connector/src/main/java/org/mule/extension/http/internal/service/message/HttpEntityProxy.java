@@ -6,10 +6,20 @@
  */
 package org.mule.extension.http.internal.service.message;
 
+import org.mule.sdk.api.http.domain.entity.HttpEntity;
+
 import java.io.InputStream;
 import java.util.OptionalLong;
 
 public interface HttpEntityProxy {
+
+  static HttpEntityProxy forSdkApi(HttpEntity entity) {
+    return null;
+  }
+
+  static HttpEntityProxy forMuleApi(org.mule.runtime.http.api.domain.entity.HttpEntity entity) {
+    return null;
+  }
 
   InputStream getContent();
 

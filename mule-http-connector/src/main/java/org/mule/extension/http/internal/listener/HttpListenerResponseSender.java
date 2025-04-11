@@ -12,7 +12,7 @@ import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER
 
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.internal.listener.intercepting.Interception;
-import org.mule.extension.http.internal.ser.HttpResponseReadyCallbackProxy;
+import org.mule.extension.http.internal.service.server.HttpResponseReadyCallbackProxy;
 import org.mule.extension.http.internal.service.server.ResponseStatusCallbackProxy;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;

@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.internal.service.server;
 
+// TODO: Replace this with a CompletableFuture<Void>
 public interface ResponseStatusCallbackProxy {
 
   void responseSendFailure(Throwable throwable);

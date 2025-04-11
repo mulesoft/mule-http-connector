@@ -18,8 +18,7 @@ import org.mule.extension.http.api.certificate.CertificateData;
 import org.mule.extension.http.api.certificate.CertificateExtension;
 import org.mule.extension.http.api.certificate.PrincipalData;
 import org.mule.extension.http.api.certificate.PublicKeyData;
-import org.mule.extension.http.internal.service.server.HttpRequestContextProxy;
-import org.mule.extension.http.internal.service.server.HttpRequestProxy;
+import org.mule.extension.http.internal.service.server.RequestContext;
 
 import java.math.BigInteger;
 import java.net.URI;
@@ -37,16 +36,16 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Creates {@link HttpRequestAttributes} based on an {@link HttpRequestContextProxy}, it's parts and a {@link ListenerPath}.
+ * Creates {@link HttpRequestAttributes} based on an {@link RequestContext}, it's parts and a {@link ListenerPath}.
  */
 public class HttpRequestAttributesResolver {
 
   private static final String QUERY = "?";
 
-  private HttpRequestContextProxy requestContext;
+  private RequestContext requestContext;
   private ListenerPath listenerPath;
 
-  public HttpRequestAttributesResolver setRequestContext(HttpRequestContextProxy requestContext) {
+  public HttpRequestAttributesResolver setRequestContext(RequestContext requestContext) {
     this.requestContext = requestContext;
     return this;
   }
@@ -58,9 +57,8 @@ public class HttpRequestAttributesResolver {
 
   public HttpRequestAttributes resolve() {
     String listenerPath = this.listenerPath.getResolvedPath();
-    HttpRequestProxy request = requestContext.getRequest();
 
-    URI uri = request.getUri();
+    URI uri = requestContext.getUri();
     String path = uri.getPath();
     String rawPath = uri.getRawPath();
     String uriString = path;
@@ -83,10 +81,10 @@ public class HttpRequestAttributesResolver {
         .rawRequestPath(rawPath)
         .requestUri(uriString)
         .rawRequestUri(rawUriString)
-        .method(request.getMethod())
+        .method(requestContext.getMethod())
         .scheme(requestContext.getScheme())
-        .version(request.getProtocol().asString())
-        .headers(request.getHeaders())
+        .version(requestContext.getProtocol().asString())
+        .headers(requestContext.getHeaders())
         .uriParams(decodeUriParams(listenerPath, rawPath))
         .queryString(queryString)
         .queryParams(decodeQueryString(rawQuery))

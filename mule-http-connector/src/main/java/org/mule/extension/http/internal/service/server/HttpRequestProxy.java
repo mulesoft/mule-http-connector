@@ -6,23 +6,7 @@
  */
 package org.mule.extension.http.internal.service.server;
 
-import org.mule.extension.http.internal.service.message.HttpEntityProxy;
-import org.mule.runtime.api.util.MultiMap;
-import org.mule.runtime.http.api.domain.HttpProtocol;
-
-import java.net.URI;
-
 public interface HttpRequestProxy {
 
-  String getHeaderValue(String headerName);
 
-  HttpEntityProxy getEntity();
-
-  URI getUri();
-
-  String getMethod();
-
-  HttpProtocol getProtocol();
-
-  MultiMap<String, String> getHeaders();
 }

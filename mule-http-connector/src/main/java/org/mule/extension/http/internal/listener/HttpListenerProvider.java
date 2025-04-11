@@ -21,7 +21,7 @@ import static java.lang.String.format;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.extension.http.internal.service.server.HttpServerProxy;
-import org.mule.extension.http.internal.service.HttpServiceProxy;
+import org.mule.extension.http.internal.service.HttpServiceWrapper;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -171,7 +171,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<HttpServer
   private TlsContextFactory tlsContext;
 
   @Inject
-  private HttpServiceProxy httpService;
+  private HttpServiceWrapper httpService;
 
   @Inject
   protected MuleContext muleContext;
