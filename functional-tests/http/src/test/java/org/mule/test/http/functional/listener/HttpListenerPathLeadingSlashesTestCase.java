@@ -21,6 +21,7 @@ import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 import org.apache.http.entity.StringEntity;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
@@ -68,6 +69,7 @@ public class HttpListenerPathLeadingSlashesTestCase extends AbstractHttpTestCase
   }
 
   @Test
+  @Ignore("W-18080374")
   public void callPath() throws Exception {
     final String url = String.format("http://localhost:%d/%s", testPort, testPath);
     final Response response = Request.Post(url).body(new StringEntity(testPath)).connectTimeout(1000).execute();

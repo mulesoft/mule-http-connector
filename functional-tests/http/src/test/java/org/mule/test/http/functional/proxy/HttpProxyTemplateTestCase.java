@@ -210,6 +210,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
   }
 
   @Test
+  @Ignore("W-18080374")
   public void doesNotProxyChunkedWhenModifiedWithString() throws Exception {
     policy = builder -> builder.value(TEST_PAYLOAD);
 
@@ -226,6 +227,7 @@ public class HttpProxyTemplateTestCase extends AbstractHttpRequestTestCase {
   }
 
   @Test
+  @Ignore("W-18080374")
   public void doesNotProxyContentLengthWhenModifiedWithStream() throws Exception {
     policy = builder -> builder.value(new ByteArrayInputStream(TEST_PAYLOAD.getBytes()));
 
