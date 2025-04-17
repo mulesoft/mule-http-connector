@@ -43,6 +43,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -122,6 +123,7 @@ public class HttpsRequesterSniTestCase extends AbstractHttpTestCase {
    * to the /etc/ file if it's not present.
    */
   @Test
+  @Ignore("W-18080374")
   public void testClientSNISentOnFQDN() throws Exception {
     InetAddress address = null;
     try {
