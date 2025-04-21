@@ -9,7 +9,7 @@
     <packaging>pom</packaging>
     <version>1.11.0-SNAPSHOT</version>
 
-    <name>HTTP Connector's Parent Pom</name>
+    <name>HTTP Connector's Parent POM</name>
 
     <properties>
         <jdk.version>1.8</jdk.version>
