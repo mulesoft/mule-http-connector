@@ -56,7 +56,7 @@
 
         <muleObjectStoreConnectorTestVersion>1.2.2</muleObjectStoreConnectorTestVersion>
 
-        <springVersion>5.3.39</springVersion>
+        <springVersion>5.3.39-spring-framework-5.3.45</springVersion>
 
         <mulesoftLicenseVersion>1.4.0</mulesoftLicenseVersion>
         <license.maven.plugin.version>4.6</license.maven.plugin.version>
