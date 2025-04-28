@@ -11,6 +11,7 @@
 
     <name>HTTP Connector's Parent Pom</name>
 
+
     <properties>
         <jdk.version>1.8</jdk.version>
         <mavenCompilerVersion>3.14.0</mavenCompilerVersion>
