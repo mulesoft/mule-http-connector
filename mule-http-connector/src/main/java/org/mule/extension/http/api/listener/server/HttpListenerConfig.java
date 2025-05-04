@@ -19,6 +19,7 @@ import org.mule.extension.http.internal.listener.HttpListenerProvider;
 import org.mule.extension.http.internal.listener.ListenerPath;
 import org.mule.extension.http.internal.listener.intercepting.HttpListenerInterceptor;
 import org.mule.extension.http.api.listener.intercepting.cors.CorsInterceptorWrapper;
+import org.mule.extension.http.internal.sse.SseEndpoint;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.util.MultiMap;
@@ -36,7 +37,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
  */
 @Configuration(name = "listenerConfig")
 @ConnectionProviders(HttpListenerProvider.class)
-@Sources(HttpListener.class)
+@Sources({HttpListener.class, SseEndpoint.class})
 public class HttpListenerConfig implements Initialisable {
 
   /**
