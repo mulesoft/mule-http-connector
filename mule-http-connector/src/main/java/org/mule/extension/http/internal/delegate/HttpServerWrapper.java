@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.http.internal.listener;
+package org.mule.extension.http.internal.delegate;
 
 import org.mule.sdk.api.http.HttpServer;
 import org.mule.sdk.api.http.sse.SseClient;
@@ -13,14 +13,11 @@ import org.mule.sdk.api.http.sse.SseHandlerManager;
 import java.io.IOException;
 import java.util.function.Consumer;
 
-/**
- * Base class for applying the delegate design pattern around an {@link HttpServer}
- */
-public class HttpServerDelegate implements HttpServer {
+public class HttpServerWrapper implements HttpServer {
 
-  private final HttpServer delegate;
+  private final org.mule.runtime.http.api.server.HttpServer delegate;
 
-  HttpServerDelegate(HttpServer delegate) {
+  public HttpServerWrapper(org.mule.runtime.http.api.server.HttpServer delegate) {
     this.delegate = delegate;
   }
 
@@ -28,6 +25,11 @@ public class HttpServerDelegate implements HttpServer {
   public HttpServer start() throws IOException {
     delegate.start();
     return this;
+  }
+
+  @Override
+  public boolean isStopped() {
+    return delegate.isStopped();
   }
 
   @Override
@@ -42,27 +44,22 @@ public class HttpServerDelegate implements HttpServer {
   }
 
   @Override
-  public boolean isStopped() {
-    return delegate.isStopped();
-  }
-
-  @Override
   public boolean isStopping() {
     return delegate.isStopping();
   }
 
   @Override
   public String getHost() {
-    return delegate.getHost();
+    return delegate.getServerAddress().getIp();
   }
 
   @Override
   public int getPort() {
-    return delegate.getPort();
+    return delegate.getServerAddress().getPort();
   }
 
   @Override
   public SseHandlerManager sse(String path, Consumer<SseClient> clientHandler) {
-    return delegate.sse(path, clientHandler);
+    throw new UnsupportedOperationException("Not implemented yet");
   }
 }
