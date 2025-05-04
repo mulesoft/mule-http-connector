@@ -24,11 +24,11 @@ import io.qameta.allure.Issue;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-//TODO W-17430471 Migrate 100 continue test to Munit
 @RunnerDelegateTo(Parameterized.class)
 public class HttpRequestExpect100ContinueHeaderTestCase
     extends AbstractHttpExpectHeaderServerTestCase {
 
+  // TODO W-18238012 [http connector] Remove 100 continue functional tests which have been migrated to MTF
   private static final String REQUEST_FLOW_NAME = "requestFlow";
 
   private static final String REQUEST_FLOW_NAME_WITHOUT_HEADERS = "requestFlowNoHeaders";
