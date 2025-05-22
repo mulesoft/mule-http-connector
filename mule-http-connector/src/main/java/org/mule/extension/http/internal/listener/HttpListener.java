@@ -50,6 +50,7 @@ import org.mule.extension.http.api.listener.server.HttpListenerConfig;
 import org.mule.extension.http.api.streaming.HttpStreamingType;
 import org.mule.extension.http.internal.HttpMetadataResolver;
 import org.mule.extension.http.internal.listener.intercepting.InterceptingException;
+import org.mule.extension.http.internal.service.message.HttpResponseProxy;
 import org.mule.extension.http.internal.service.server.EndpointAvailabilityManager;
 import org.mule.extension.http.internal.service.server.HttpResponseReadyCallbackProxy;
 import org.mule.extension.http.internal.service.server.HttpServerProxy;
@@ -311,7 +312,8 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
     updateServerSpanStatus(distributedTraceContextManager, response.getStatusCode(), LOGGER);
     final HttpResponseReadyCallbackProxy responseCallback = context.getResponseCallback();
     callbackContext.addVariable(RESPONSE_SEND_ATTEMPT, true);
-    responseCallback.responseReady(response, new ResponseFailureStatusCallback(responseCallback, completionCallback));
+    responseCallback.responseReady(HttpResponseProxy.fromMuleApi(response),
+                                   new ResponseFailureStatusCallback(responseCallback, completionCallback));
   }
 
   private void sendBackPressureResponse(BackPressureContext ctx, SourceCompletionCallback completionCallback) {
@@ -335,7 +337,8 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
 
     final HttpResponseReadyCallbackProxy responseCallback = context.getResponseCallback();
     callbackContext.addVariable(RESPONSE_SEND_ATTEMPT, true);
-    responseCallback.responseReady(response, new ResponseFailureStatusCallback(responseCallback, completionCallback));
+    responseCallback.responseReady(HttpResponseProxy.fromMuleApi(response),
+                                   new ResponseFailureStatusCallback(responseCallback, completionCallback));
   }
 
   private HttpResponseBuilder createFailureResponseBuilder(Error error) {
@@ -532,8 +535,8 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
         interceptor.headers().entryList()
             .forEach(entry -> responseBuilder.addHeader(entry.getKey(), entry.getValue()));
 
-        responseCallback.responseReady(responseBuilder
-            .build(), new ResponseStatusCallbackProxy() {
+        responseCallback.responseReady(HttpResponseProxy.fromMuleApi(responseBuilder
+            .build()), new ResponseStatusCallbackProxy() {
 
               @Override
               public void responseSendFailure(Throwable exception) {
@@ -548,12 +551,12 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
       private void sendErrorResponse(final HttpStatus status, String message,
                                      HttpResponseReadyCallbackProxy responseCallback) {
         byte[] responseData = message.getBytes();
-        responseCallback.responseReady(HttpResponse.builder()
+        responseCallback.responseReady(HttpResponseProxy.fromMuleApi(HttpResponse.builder()
             .statusCode(status.getStatusCode())
             .reasonPhrase(status.getReasonPhrase())
             .entity(new ByteArrayHttpEntity(responseData))
             .addHeader(CONTENT_LENGTH, Integer.toString(responseData.length))
-            .build(), new ResponseStatusCallbackProxy() {
+            .build()), new ResponseStatusCallbackProxy() {
 
               @Override
               public void responseSendFailure(Throwable exception) {
@@ -621,7 +624,8 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
     @Override
     public void responseSendFailure(Throwable throwable) {
       LOGGER.error("Found exception trying to send response", throwable);
-      responseReadyCallback.responseReady(buildErrorResponse(), new ResponseSendFailureStatusCallback(completionCallback));
+      responseReadyCallback.responseReady(HttpResponseProxy.fromMuleApi(buildErrorResponse()),
+                                          new ResponseSendFailureStatusCallback(completionCallback));
     }
   }
 

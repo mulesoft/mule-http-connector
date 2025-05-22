@@ -6,8 +6,23 @@
  */
 package org.mule.extension.http.internal.service.server;
 
-// TODO: Replace this with a CompletableFuture<Void>
+// TODO: Replace this with a CompletableFuture<Void>?
 public interface ResponseStatusCallbackProxy {
+
+  static org.mule.sdk.api.http.server.async.ResponseStatusCallback forSdkApi(ResponseStatusCallbackProxy statusCallback) {
+    return new org.mule.sdk.api.http.server.async.ResponseStatusCallback() {
+
+      @Override
+      public void responseSendFailure(Throwable throwable) {
+        statusCallback.responseSendFailure(throwable);
+      }
+
+      @Override
+      public void responseSendSuccessfully() {
+        statusCallback.responseSendSuccessfully();
+      }
+    };
+  }
 
   void responseSendFailure(Throwable throwable);
 

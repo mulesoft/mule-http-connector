@@ -12,6 +12,7 @@ import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER
 
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.internal.listener.intercepting.Interception;
+import org.mule.extension.http.internal.service.message.HttpResponseProxy;
 import org.mule.extension.http.internal.service.server.HttpResponseReadyCallbackProxy;
 import org.mule.extension.http.internal.service.server.ResponseStatusCallbackProxy;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -65,7 +66,8 @@ public class HttpListenerResponseSender {
   private void internalSendResponse(SourceCompletionCallback completionCallback,
                                     HttpResponseReadyCallbackProxy responseCallback,
                                     HttpResponse httpResponse) {
-    responseCallback.responseReady(httpResponse, getResponseFailureCallback(responseCallback, completionCallback));
+    responseCallback.responseReady(HttpResponseProxy.fromMuleApi(httpResponse),
+                                   getResponseFailureCallback(responseCallback, completionCallback));
   }
 
   protected HttpResponse buildResponse(HttpListenerResponseBuilder listenerResponseBuilder, Interception interception,
@@ -96,7 +98,7 @@ public class HttpListenerResponseSender {
     @Override
     public void responseSendFailure(Throwable throwable) {
       try {
-        responseReadyCallback.responseReady(buildErrorResponse(), this);
+        responseReadyCallback.responseReady(HttpResponseProxy.fromMuleApi(buildErrorResponse()), this);
         completionCallback.success();
       } catch (Throwable t) {
         completionCallback.error(t);

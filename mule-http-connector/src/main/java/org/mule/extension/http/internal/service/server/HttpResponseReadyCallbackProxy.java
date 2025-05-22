@@ -6,9 +6,42 @@
  */
 package org.mule.extension.http.internal.service.server;
 
-import org.mule.runtime.http.api.domain.message.response.HttpResponse;
+import org.mule.extension.http.internal.service.message.HttpResponseProxy;
+import org.mule.sdk.api.http.server.async.HttpResponseReadyCallback;
 
 public interface HttpResponseReadyCallbackProxy {
 
-  void responseReady(HttpResponse httpResponse, ResponseStatusCallbackProxy failureResponseStatusCallback);
+  static HttpResponseReadyCallbackProxy forSdkApi(HttpResponseReadyCallback readyCallback) {
+    return new ImplementationForSdkApi(readyCallback);
+  }
+
+  static HttpResponseReadyCallbackProxy forMuleApi() {
+    return new ImplementationForMuleApi();
+  }
+
+  void responseReady(HttpResponseProxy httpResponse, ResponseStatusCallbackProxy failureResponseStatusCallback);
+
+
+  class ImplementationForSdkApi implements HttpResponseReadyCallbackProxy {
+
+    private final HttpResponseReadyCallback readyCallback;
+
+    public ImplementationForSdkApi(HttpResponseReadyCallback readyCallback) {
+      this.readyCallback = readyCallback;
+    }
+
+    @Override
+    public void responseReady(HttpResponseProxy httpResponse, ResponseStatusCallbackProxy statusCallback) {
+      readyCallback.responseReady(httpResponse.toSdkApi(), ResponseStatusCallbackProxy.forSdkApi(statusCallback));
+    }
+  }
+
+
+  class ImplementationForMuleApi implements HttpResponseReadyCallbackProxy {
+
+    @Override
+    public void responseReady(HttpResponseProxy httpResponse, ResponseStatusCallbackProxy failureResponseStatusCallback) {
+
+    }
+  }
 }

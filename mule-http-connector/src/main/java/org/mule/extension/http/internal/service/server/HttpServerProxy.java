@@ -128,8 +128,7 @@ public interface HttpServerProxy {
     @Override
     public EndpointAvailabilityManager addRequestHandler(String path, RequestHandlerProxy requestHandler) {
       return EndpointAvailabilityManager.forSdkApi(delegate.addRequestHandler(path, (ctx, readyCallback) -> {
-        // TODO: Null?
-        requestHandler.handleRequest(RequestContext.forSdkApi(ctx), null);
+        requestHandler.handleRequest(RequestContext.forSdkApi(ctx), HttpResponseReadyCallbackProxy.forSdkApi(readyCallback));
       }));
     }
 
