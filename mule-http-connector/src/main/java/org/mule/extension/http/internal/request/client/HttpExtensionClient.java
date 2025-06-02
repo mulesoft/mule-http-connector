@@ -8,6 +8,9 @@ package org.mule.extension.http.internal.request.client;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.http.api.client.auth.HttpAuthenticationType.BASIC;
+import static org.mule.runtime.http.api.client.auth.HttpAuthenticationType.DIGEST;
+import static org.mule.runtime.http.api.client.auth.HttpAuthenticationType.NTLM;
 
 import org.mule.extension.http.api.request.HttpSendBodyMode;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
@@ -16,11 +19,13 @@ import org.mule.extension.http.internal.request.ShareableHttpClient;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.sdk.api.http.client.auth.HttpAuthentication;
+import org.mule.runtime.http.api.client.auth.HttpAuthentication;
+import org.mule.sdk.api.http.client.auth.HttpAuthenticationConfigurer;
 import org.mule.sdk.api.http.domain.message.request.HttpRequest;
 import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 /**
  * Composition of a {@link ShareableHttpClient} with URI and authentication parameters that allow falling back to connection
@@ -72,6 +77,30 @@ public class HttpExtensionClient implements Startable, Stoppable {
   public CompletableFuture<HttpResponse> send(HttpRequest request, int responseTimeout, boolean followRedirects,
                                               HttpAuthentication authentication,
                                               HttpSendBodyMode sendBodyMode) {
-    return httpClient.sendAsync(request, responseTimeout, followRedirects, authentication, sendBodyMode);
+    return httpClient.sendAsync(request, responseTimeout, followRedirects, authConfigurer(authentication), sendBodyMode);
+  }
+
+  private Consumer<HttpAuthenticationConfigurer> authConfigurer(HttpAuthentication authentication) {
+    return configurer -> {
+      if (authentication == null) {
+        return;
+      }
+
+      if (NTLM.equals(authentication.getType())) {
+        HttpAuthentication.HttpNtlmAuthentication ntlmAuthentication = (HttpAuthentication.HttpNtlmAuthentication) authentication;
+        configurer.ntlm(ntlmAuthentication.getUsername(), ntlmAuthentication.getPassword(), ntlmAuthentication.isPreemptive(),
+                        ntlmAuthentication.getDomain(), ntlmAuthentication.getWorkstation());
+        return;
+      }
+
+      if (DIGEST.equals(authentication.getType())) {
+        configurer.digest(authentication.getUsername(), authentication.getPassword(), authentication.isPreemptive());
+        return;
+      }
+
+      if (BASIC.equals(authentication.getType())) {
+        configurer.basic(authentication.getUsername(), authentication.getPassword(), authentication.isPreemptive());
+      }
+    };
   }
 }

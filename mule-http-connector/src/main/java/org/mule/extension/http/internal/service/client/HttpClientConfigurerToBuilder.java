@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.http.internal.service.server;
+package org.mule.extension.http.internal.service.client;
 
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.http.api.client.HttpClientConfiguration;
 import org.mule.runtime.http.api.tcp.TcpClientSocketProperties;
 import org.mule.runtime.http.api.tcp.TcpClientSocketPropertiesBuilder;
 import org.mule.sdk.api.http.client.HttpClientConfigurer;
-import org.mule.sdk.api.http.client.proxy.ProxyConfig;
+import org.mule.sdk.api.http.client.proxy.ProxyConfigurer;
 import org.mule.sdk.api.http.tcp.TcpSocketPropertiesConfigurer;
 
 import java.util.Objects;
@@ -28,12 +28,6 @@ public final class HttpClientConfigurerToBuilder implements HttpClientConfigurer
   @Override
   public HttpClientConfigurer setTlsContextFactory(TlsContextFactory tlsContextFactory) {
     builder.setTlsContextFactory(tlsContextFactory);
-    return this;
-  }
-
-  @Override
-  public HttpClientConfigurer setProxyConfig(ProxyConfig proxyConfig) {
-    // builder.setProxyConfig(proxyConfig);
     return this;
   }
 
@@ -75,6 +69,7 @@ public final class HttpClientConfigurerToBuilder implements HttpClientConfigurer
 
   @Override
   public HttpClientConfigurer setDecompress(Boolean decompress) {
+    // Reflection?
     // builder.setDecompress(decompress);
     return this;
   }
@@ -85,6 +80,14 @@ public final class HttpClientConfigurerToBuilder implements HttpClientConfigurer
     TcpSocketPropertiesConfigurerToBuilder configurer = new TcpSocketPropertiesConfigurerToBuilder(propsBuilder);
     configurerConsumer.accept(configurer);
     builder.setClientSocketProperties(propsBuilder.build());
+    return this;
+  }
+
+  @Override
+  public HttpClientConfigurer configProxy(Consumer<ProxyConfigurer> configurerConsumer) {
+    ProxyConfigurerImpl configurer = new ProxyConfigurerImpl();
+    configurerConsumer.accept(configurer);
+    builder.setProxyConfig(configurer.build());
     return this;
   }
 

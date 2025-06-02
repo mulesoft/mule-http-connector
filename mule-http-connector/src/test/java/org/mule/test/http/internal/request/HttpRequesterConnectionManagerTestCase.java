@@ -24,7 +24,7 @@ import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.sdk.api.http.HttpService;
 import org.mule.sdk.api.http.client.HttpClient;
 import org.mule.sdk.api.http.client.HttpClientConfigurer;
-import org.mule.sdk.api.http.client.proxy.ProxyConfig;
+import org.mule.sdk.api.http.client.proxy.ProxyConfigurer;
 import org.mule.sdk.api.http.tcp.TcpSocketPropertiesConfigurer;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -129,7 +129,6 @@ public class HttpRequesterConnectionManagerTestCase extends AbstractMuleTestCase
   private static class TestConfigurer implements HttpClientConfigurer {
 
     private TlsContextFactory tlsContextFactory;
-    private ProxyConfig proxyConfig;
     private int maxConnections;
     private boolean usePersistentConnections;
     private int connectionIdleTimeout;
@@ -138,16 +137,11 @@ public class HttpRequesterConnectionManagerTestCase extends AbstractMuleTestCase
     private String name;
     private Boolean decompress;
     private Consumer<TcpSocketPropertiesConfigurer> tcpConfigurer;
+    private Consumer<ProxyConfigurer> proxyConfigurer;
 
     @Override
     public HttpClientConfigurer setTlsContextFactory(TlsContextFactory tlsContextFactory) {
       this.tlsContextFactory = tlsContextFactory;
-      return this;
-    }
-
-    @Override
-    public HttpClientConfigurer setProxyConfig(ProxyConfig proxyConfig) {
-      this.proxyConfig = proxyConfig;
       return this;
     }
 
@@ -196,6 +190,12 @@ public class HttpRequesterConnectionManagerTestCase extends AbstractMuleTestCase
     @Override
     public HttpClientConfigurer configClientSocketProperties(Consumer<TcpSocketPropertiesConfigurer> configurer) {
       this.tcpConfigurer = configurer;
+      return this;
+    }
+
+    @Override
+    public HttpClientConfigurer configProxy(Consumer<ProxyConfigurer> configurer) {
+      this.proxyConfigurer = configurer;
       return this;
     }
   }

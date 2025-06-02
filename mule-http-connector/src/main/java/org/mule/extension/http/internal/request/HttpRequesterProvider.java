@@ -50,9 +50,10 @@ import org.mule.runtime.extension.api.annotation.param.RefName;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
+import org.mule.runtime.http.api.client.auth.HttpAuthentication;
+import org.mule.runtime.http.api.client.proxy.ProxyConfig;
 import org.mule.sdk.api.http.HttpConstants;
 import org.mule.sdk.api.http.client.HttpClientConfigurer;
-import org.mule.sdk.api.http.client.proxy.ProxyConfig;
 
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
@@ -209,7 +210,6 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
     configurer
         .setName(format(NAME_PATTERN, configName))
         .setTlsContextFactory(tlsContext)
-        .setProxyConfig(proxyConfig)
         .configClientSocketProperties(tcpConfigurer -> {
           TcpClientSocketProperties socketProperties = connectionParams.getClientSocketProperties();
           tcpConfigurer
@@ -226,6 +226,25 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
         .setConnectionIdleTimeout(connectionParams.getConnectionIdleTimeout())
         .setStreaming(connectionParams.getStreamResponse())
         .setResponseBufferSize(connectionParams.getResponseBufferSize());
+
+    if (authentication instanceof HttpAuthentication) {
+    }
+
+    if (proxyConfig != null) {
+      configurer.configProxy(proxyConfigurer -> {
+        proxyConfigurer
+            .host(proxyConfig.getHost())
+            .port(proxyConfig.getPort())
+            .username(proxyConfig.getUsername())
+            .password(proxyConfig.getPassword())
+            .nonProxyHosts(proxyConfig.getNonProxyHosts());
+
+        if (proxyConfig instanceof HttpProxyConfig.HttpNtlmProxyConfig) {
+          HttpProxyConfig.HttpNtlmProxyConfig ntlmProxyConfig = (HttpProxyConfig.HttpNtlmProxyConfig) proxyConfig;
+          proxyConfigurer.ntlm(ntlmProxyConfigurer -> ntlmProxyConfigurer.domain(ntlmProxyConfig.getNtlmDomain()));
+        }
+      });
+    }
   }
 
   private String getConfigurationId() {

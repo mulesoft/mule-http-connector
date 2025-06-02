@@ -43,8 +43,8 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
+import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.sdk.api.http.HttpService;
-import org.mule.sdk.api.http.client.auth.HttpAuthentication;
 import org.mule.sdk.api.http.domain.message.request.HttpRequest;
 import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 

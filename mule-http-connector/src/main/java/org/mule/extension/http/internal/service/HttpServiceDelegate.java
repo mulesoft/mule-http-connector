@@ -9,10 +9,6 @@ package org.mule.extension.http.internal.service;
 import org.mule.sdk.api.http.HttpService;
 import org.mule.sdk.api.http.client.HttpClient;
 import org.mule.sdk.api.http.client.HttpClientConfigurer;
-import org.mule.sdk.api.http.client.auth.HttpAuthenticationBuilder;
-import org.mule.sdk.api.http.client.proxy.NtlmProxyConfigBuilder;
-import org.mule.sdk.api.http.client.proxy.ProxyConfig;
-import org.mule.sdk.api.http.client.proxy.ProxyConfigBuilder;
 import org.mule.sdk.api.http.domain.message.request.HttpRequestBuilder;
 import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 import org.mule.sdk.api.http.domain.message.response.HttpResponseBuilder;
@@ -84,35 +80,5 @@ public class HttpServiceDelegate implements HttpService {
   @Override
   public HttpRequestBuilder requestBuilder(boolean preserveHeaderCase) {
     return delegate.requestBuilder(preserveHeaderCase);
-  }
-
-  @Override
-  public HttpAuthenticationBuilder authBuilder() {
-    return delegate.authBuilder();
-  }
-
-  @Override
-  public HttpAuthenticationBuilder basicAuthBuilder(String username, String password) {
-    return delegate.basicAuthBuilder(username, password);
-  }
-
-  @Override
-  public HttpAuthenticationBuilder digestAuthBuilder(String username, String password) {
-    return delegate.digestAuthBuilder(username, password);
-  }
-
-  @Override
-  public HttpAuthenticationBuilder.HttpNtlmAuthenticationBuilder ntlmAuthBuilder(String username, String password) {
-    return delegate.ntlmAuthBuilder(username, password);
-  }
-
-  @Override
-  public ProxyConfigBuilder<ProxyConfig, ?> proxyConfigBuilder() {
-    return delegate.proxyConfigBuilder();
-  }
-
-  @Override
-  public NtlmProxyConfigBuilder ntlmProxyConfigBuilder() {
-    return delegate.ntlmProxyConfigBuilder();
   }
 }
