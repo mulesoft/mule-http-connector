@@ -6,10 +6,10 @@
  */
 package org.mule.extension.http.internal.service;
 
+import org.mule.extension.http.internal.service.client.HttpClientConfigurerToBuilder;
 import org.mule.extension.http.internal.service.client.HttpClientWrapper;
 import org.mule.extension.http.internal.service.message.HttpRequestBuilderWrapper;
 import org.mule.extension.http.internal.service.message.HttpResponseBuilderWrapper;
-import org.mule.extension.http.internal.service.server.HttpClientConfigurerToBuilder;
 import org.mule.extension.http.internal.service.server.HttpServerConfigurerToBuilder;
 import org.mule.extension.http.internal.service.server.HttpServerWrapper;
 import org.mule.runtime.http.api.client.HttpClientConfiguration;
@@ -17,10 +17,6 @@ import org.mule.runtime.http.api.server.HttpServerConfiguration;
 import org.mule.sdk.api.http.HttpService;
 import org.mule.sdk.api.http.client.HttpClient;
 import org.mule.sdk.api.http.client.HttpClientConfigurer;
-import org.mule.sdk.api.http.client.auth.HttpAuthenticationBuilder;
-import org.mule.sdk.api.http.client.proxy.NtlmProxyConfigBuilder;
-import org.mule.sdk.api.http.client.proxy.ProxyConfig;
-import org.mule.sdk.api.http.client.proxy.ProxyConfigBuilder;
 import org.mule.sdk.api.http.domain.message.request.HttpRequestBuilder;
 import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 import org.mule.sdk.api.http.domain.message.response.HttpResponseBuilder;
@@ -103,36 +99,6 @@ public class MuleApiImplementationWrapper implements HttpService {
 
   @Override
   public PathAndMethodRequestMatcherBuilder requestMatcherBuilder() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public HttpAuthenticationBuilder authBuilder() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public HttpAuthenticationBuilder basicAuthBuilder(String username, String password) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public HttpAuthenticationBuilder digestAuthBuilder(String username, String password) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public HttpAuthenticationBuilder.HttpNtlmAuthenticationBuilder ntlmAuthBuilder(String username, String password) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public ProxyConfigBuilder<ProxyConfig, ?> proxyConfigBuilder() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public NtlmProxyConfigBuilder ntlmProxyConfigBuilder() {
     throw new UnsupportedOperationException();
   }
 }

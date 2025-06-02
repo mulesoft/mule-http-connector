@@ -9,12 +9,14 @@ package org.mule.extension.http.internal.request;
 import static org.mule.extension.http.api.request.HttpSendBodyMode.ALWAYS;
 
 import org.mule.extension.http.api.request.HttpSendBodyMode;
+import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.sdk.api.http.client.HttpClient;
-import org.mule.sdk.api.http.client.auth.HttpAuthentication;
+import org.mule.sdk.api.http.client.auth.HttpAuthenticationConfigurer;
 import org.mule.sdk.api.http.domain.message.request.HttpRequest;
 import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 /**
  * Wrapper implementation of an {@link HttpClient} that allows being shared by only configuring the client when first required and
@@ -50,12 +52,13 @@ public class ShareableHttpClient {
   }
 
   public CompletableFuture<HttpResponse> sendAsync(HttpRequest request, int responseTimeout, boolean followRedirects,
-                                                   HttpAuthentication authentication,
+                                                   Consumer<HttpAuthenticationConfigurer> authenticationConfigurer,
                                                    HttpSendBodyMode sendBodyMode) {
+    // TODO: Auth!
     return delegate.sendAsync(request, options -> options
         .setResponseTimeout(responseTimeout)
         .setFollowsRedirect(followRedirects)
-        .setAuthentication(authentication)
+        .setAuthentication(authenticationConfigurer)
         .setSendBodyAlways(sendBodyMode.equals(ALWAYS)));
   }
 }

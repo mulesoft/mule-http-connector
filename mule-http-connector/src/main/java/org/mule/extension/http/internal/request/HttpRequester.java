@@ -55,7 +55,7 @@ import org.mule.runtime.extension.api.notification.NotificationEmitter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
-import org.mule.sdk.api.http.client.auth.HttpAuthentication;
+import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.sdk.api.http.domain.entity.HttpEntity;
 import org.mule.sdk.api.http.domain.message.request.HttpRequest;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;

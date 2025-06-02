@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.http.internal.service.server;
+package org.mule.extension.http.internal.service.client;
 
 import org.mule.runtime.http.api.tcp.TcpClientSocketPropertiesBuilder;
 import org.mule.sdk.api.http.tcp.TcpSocketPropertiesConfigurer;
