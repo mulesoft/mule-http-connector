@@ -18,6 +18,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.fail;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
@@ -39,6 +40,7 @@ import org.mule.test.http.functional.AbstractHttpTestCase;
 
 import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
+import java.util.concurrent.ExecutionException;
 
 import org.junit.After;
 import org.junit.Before;
@@ -95,13 +97,15 @@ public class HttpListenerValidateCertificateTestCase extends AbstractHttpTestCas
     }
   }
 
-  @Test(expected = IOException.class)
+  @Test
   public void serverWithValidationRejectsRequestWithInvalidCertificate() throws Exception {
     tlsContextFactory = tlsContextFactoryBuilder.build();
     createHttpClient();
 
     // Send a request without configuring key store in the client.
-    sendRequest(getUrl(portWithValidation.getNumber()), TEST_MESSAGE);
+    ExecutionException exception =
+        assertThrows(ExecutionException.class, () -> sendRequest(getUrl(portWithValidation.getNumber()), TEST_MESSAGE));
+    assertThat(exception.getCause(), instanceOf(IOException.class));
   }
 
   @Test
