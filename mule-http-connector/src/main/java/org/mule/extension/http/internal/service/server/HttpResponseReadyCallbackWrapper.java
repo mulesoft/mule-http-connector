@@ -10,9 +10,10 @@ import org.mule.extension.http.internal.service.message.sdktomule.HttpResponseWr
 import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 import org.mule.sdk.api.http.server.async.HttpResponseReadyCallback;
 import org.mule.sdk.api.http.server.async.ResponseStatusCallback;
+import org.mule.sdk.api.http.sse.server.SseClient;
+import org.mule.sdk.api.http.sse.server.SseClientConfigurer;
 
-import java.io.Writer;
-import java.nio.charset.Charset;
+import java.util.function.Consumer;
 
 public class HttpResponseReadyCallbackWrapper implements HttpResponseReadyCallback {
 
@@ -29,7 +30,7 @@ public class HttpResponseReadyCallbackWrapper implements HttpResponseReadyCallba
   }
 
   @Override
-  public Writer startResponse(HttpResponse response, ResponseStatusCallback responseStatusCallback, Charset encoding) {
+  public SseClient startSseResponse(Consumer<SseClientConfigurer> configConsumer) {
     throw new UnsupportedOperationException();
   }
 }

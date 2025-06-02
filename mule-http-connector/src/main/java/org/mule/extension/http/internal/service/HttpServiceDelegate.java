@@ -14,11 +14,7 @@ import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 import org.mule.sdk.api.http.domain.message.response.HttpResponseBuilder;
 import org.mule.sdk.api.http.server.HttpServer;
 import org.mule.sdk.api.http.server.HttpServerConfigurer;
-import org.mule.sdk.api.http.server.PathAndMethodRequestMatcherBuilder;
-import org.mule.sdk.api.http.server.RequestHandler;
-import org.mule.sdk.api.http.server.RequestMatcher;
 import org.mule.sdk.api.http.server.ServerCreationException;
-import org.mule.sdk.api.http.utils.RequestMatcherRegistryBuilder;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -45,21 +41,6 @@ public class HttpServiceDelegate implements HttpService {
   @Override
   public HttpServer server(Consumer<HttpServerConfigurer> configBuilder) throws ServerCreationException {
     return delegate.server(configBuilder);
-  }
-
-  @Override
-  public RequestMatcherRegistryBuilder<RequestHandler> requestMatcherRegistryBuilder() {
-    return delegate.requestMatcherRegistryBuilder();
-  }
-
-  @Override
-  public RequestMatcher acceptAllRequests() {
-    return delegate.acceptAllRequests();
-  }
-
-  @Override
-  public PathAndMethodRequestMatcherBuilder requestMatcherBuilder() {
-    return delegate.requestMatcherBuilder();
   }
 
   @Override
