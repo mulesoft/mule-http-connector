@@ -6,8 +6,8 @@
  */
 package org.mule.test.http.functional.requester.ntlm;
 
-import static org.mule.runtime.http.api.HttpHeaders.Names.AUTHORIZATION;
-import static org.mule.runtime.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
+import static org.mule.sdk.api.http.HttpHeaders.Names.AUTHORIZATION;
+import static org.mule.sdk.api.http.HttpHeaders.Names.WWW_AUTHENTICATE;
 import static org.mule.test.http.functional.fips.DefaultTestConfiguration.isFipsTesting;
 
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;

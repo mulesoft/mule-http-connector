@@ -17,7 +17,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
-import org.mule.runtime.http.api.HttpConstants;
+import org.mule.sdk.api.http.HttpConstants;
 
 import java.util.Objects;
 

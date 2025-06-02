@@ -11,15 +11,15 @@ import static org.mule.extension.http.api.HttpHeaders.Values.KEEP_ALIVE;
 import static org.mule.extension.http.api.streaming.HttpStreamingType.AUTO;
 import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
 import static org.mule.runtime.api.metadata.DataType.STRING;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.runtime.http.api.HttpHeaders.Names.CONNECTION;
-import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.OK;
+import static org.mule.sdk.api.http.HttpHeaders.Names.CONNECTION;
+import static org.mule.sdk.api.http.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -29,7 +29,9 @@ import org.mule.extension.http.internal.listener.intercepting.NoInterception;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.api.util.MultiMap;
-import org.mule.runtime.http.api.domain.message.response.HttpResponse;
+import org.mule.runtime.module.extension.api.http.message.HttpResponseBuilderWrapper;
+import org.mule.sdk.api.http.domain.message.response.HttpResponse;
+import org.mule.sdk.api.http.domain.message.response.HttpResponseBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.ByteArrayInputStream;
@@ -56,7 +58,7 @@ public class HttpResponseFactoryTestCase extends AbstractMuleContextTestCase {
 
   @Test
   @Description("Verifies that the correct Content-Length is sent even when a wrong one is set as header.")
-  public void testContentLengthIsOverridden() throws Exception {
+  public void testContentLengthIsOverridden() {
     HttpListenerResponseBuilder listenerResponseBuilder = mock(HttpListenerResponseBuilder.class);
     TypedValue<Object> payload = new TypedValue<>(new ByteArrayInputStream(EXAMPLE_STRING.getBytes(UTF_8)), INPUT_STREAM);
     when(listenerResponseBuilder.getBody()).thenReturn(payload);
@@ -67,8 +69,12 @@ public class HttpResponseFactoryTestCase extends AbstractMuleContextTestCase {
     HttpResponseFactory httpResponseBuilder = new HttpResponseFactory(AUTO, muleContext.getTransformationService(), () -> false);
 
     HttpResponse httpResponse =
-        httpResponseBuilder.create(HttpResponse.builder(), new NoInterception(), listenerResponseBuilder, true);
+        httpResponseBuilder.create(responseBuilder(), new NoInterception(), listenerResponseBuilder, true);
     assertThat(httpResponse.getHeaderValue(CONTENT_LENGTH), is(String.valueOf(EXAMPLE_STRING.length())));
+  }
+
+  private HttpResponseBuilder responseBuilder() {
+    return new HttpResponseBuilderWrapper(org.mule.runtime.http.api.domain.message.response.HttpResponse.builder());
   }
 
   @Test
@@ -86,7 +92,7 @@ public class HttpResponseFactoryTestCase extends AbstractMuleContextTestCase {
 
     exceptionGrabber.expect(RuntimeException.class);
     exceptionGrabber.expectMessage(INVALID_DATA_MSG);
-    httpResponseBuilder.create(HttpResponse.builder(), new NoInterception(), listenerResponseBuilder, true);
+    httpResponseBuilder.create(responseBuilder(), new NoInterception(), listenerResponseBuilder, true);
   }
 
   @Issue("MULE-18396")
@@ -133,7 +139,7 @@ public class HttpResponseFactoryTestCase extends AbstractMuleContextTestCase {
         new HttpResponseFactory(AUTO, muleContext.getTransformationService(), () -> shouldForceConnectionClose);
 
     HttpResponse httpResponseWithHeader =
-        httpResponseBuilder.create(HttpResponse.builder(), new NoInterception(), listenerResponseBuilder, true);
+        httpResponseBuilder.create(responseBuilder(), new NoInterception(), listenerResponseBuilder, true);
 
     if (shouldForceConnectionClose) {
       assertThat(httpResponseWithHeader.getHeaderValue(CONNECTION), is(CLOSE));

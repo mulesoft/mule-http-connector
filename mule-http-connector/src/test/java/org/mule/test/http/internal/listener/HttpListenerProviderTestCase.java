@@ -13,7 +13,7 @@ import static org.mockito.Mockito.doThrow;
 
 import org.mule.extension.http.internal.listener.HttpListenerProvider;
 import org.mule.runtime.api.exception.DefaultMuleException;
-import org.mule.runtime.http.api.server.HttpServer;
+import org.mule.sdk.api.http.server.HttpServer;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.lang.reflect.Field;

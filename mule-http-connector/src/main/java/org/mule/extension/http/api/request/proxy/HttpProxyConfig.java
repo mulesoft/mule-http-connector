@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.api.request.proxy;
 
-import org.mule.runtime.http.api.client.proxy.ProxyConfig;
+import org.mule.sdk.api.http.client.proxy.ProxyConfig;
 
 /**
  * Marker interface for exposing the proxy configuration as an imported type.

@@ -7,13 +7,13 @@
 package org.mule.extension.http.internal.request.profiling.tracing;
 
 import static java.lang.String.valueOf;
-import static org.mule.runtime.http.api.domain.HttpProtocol.HTTP_0_9;
-import static org.mule.runtime.http.api.domain.HttpProtocol.HTTP_1_0;
+import static org.mule.sdk.api.http.domain.HttpProtocol.HTTP_0_9;
+import static org.mule.sdk.api.http.domain.HttpProtocol.HTTP_1_0;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.extension.http.internal.listener.profiling.tracing.HttpListenerCurrentSpanCustomizer;
-import org.mule.runtime.http.api.domain.HttpProtocol;
-import org.mule.runtime.http.api.domain.message.request.HttpRequest;
+import org.mule.sdk.api.http.domain.HttpProtocol;
+import org.mule.sdk.api.http.domain.message.request.HttpRequest;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 import org.slf4j.Logger;
 

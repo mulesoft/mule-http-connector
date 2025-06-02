@@ -10,7 +10,7 @@ import static java.util.Arrays.asList;
 import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.extension.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.mule.test.http.AllureConstants.HttpFeature.HttpStory.REJECT_INVALID_TRANSFER_ENCODING;
 
@@ -23,7 +23,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mule.runtime.api.util.MultiMap;
-import org.mule.runtime.http.api.HttpConstants.HttpStatus;
+import org.mule.sdk.api.http.HttpConstants.HttpStatus;
 
 import java.util.Locale;
 

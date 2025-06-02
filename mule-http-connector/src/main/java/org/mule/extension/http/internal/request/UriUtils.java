@@ -6,20 +6,20 @@
  */
 package org.mule.extension.http.internal.request;
 
+import static org.mule.extension.http.internal.HttpConnectorConstants.ENCODE_URI_PARAMS_PROPERTY;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.encodeSpaces;
+
 import static java.lang.Boolean.getBoolean;
 import static java.lang.String.format;
 import static java.net.URLEncoder.encode;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.regex.Matcher.quoteReplacement;
 import static java.util.regex.Pattern.compile;
-import static org.mule.extension.http.internal.HttpConnectorConstants.ENCODE_URI_PARAMS_PROPERTY;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.encodeSpaces;
 
-import org.mule.extension.http.api.request.builder.KeyValuePair;
 import org.mule.extension.http.api.request.builder.UriParam;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.http.api.HttpConstants;
+import org.mule.sdk.api.http.HttpConstants;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;

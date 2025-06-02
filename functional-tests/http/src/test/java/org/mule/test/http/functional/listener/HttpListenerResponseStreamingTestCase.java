@@ -16,9 +16,9 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
-import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
-import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
+import static org.mule.sdk.api.http.HttpHeaders.Names.CONTENT_LENGTH;
+import static org.mule.sdk.api.http.HttpHeaders.Names.TRANSFER_ENCODING;
+import static org.mule.sdk.api.http.HttpHeaders.Values.CHUNKED;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;

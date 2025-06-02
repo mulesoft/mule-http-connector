@@ -7,7 +7,7 @@
 package org.mule.extension.http.internal.request.builder;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.runtime.http.api.domain.message.response.HttpResponse;
+import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 
 /**
  * Creates {@link HttpResponseAttributes} based on an {@HttpResponse} and it's parts.

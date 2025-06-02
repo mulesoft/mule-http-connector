@@ -13,9 +13,9 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
-import org.mule.runtime.http.api.domain.entity.EmptyHttpEntity;
-import org.mule.runtime.http.api.domain.entity.HttpEntity;
-import org.mule.runtime.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.sdk.api.http.domain.entity.EmptyHttpEntity;
+import org.mule.sdk.api.http.domain.entity.HttpEntity;
+import org.mule.sdk.api.http.domain.entity.InputStreamHttpEntity;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;

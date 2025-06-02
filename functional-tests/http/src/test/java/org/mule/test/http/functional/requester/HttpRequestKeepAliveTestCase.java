@@ -6,9 +6,9 @@
  */
 package org.mule.test.http.functional.requester;
 
-import static org.mule.runtime.http.api.HttpHeaders.Names.CONNECTION;
-import static org.mule.runtime.http.api.HttpHeaders.Values.CLOSE;
-import static org.mule.runtime.http.api.HttpHeaders.Values.KEEP_ALIVE;
+import static org.mule.sdk.api.http.HttpHeaders.Names.CONNECTION;
+import static org.mule.sdk.api.http.HttpHeaders.Values.CLOSE;
+import static org.mule.sdk.api.http.HttpHeaders.Values.KEEP_ALIVE;
 
 import static java.util.Collections.singletonMap;
 

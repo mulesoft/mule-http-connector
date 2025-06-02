@@ -8,7 +8,7 @@ package org.mule.extension.http.internal.request.client;
 
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extension.http.api.request.client.UriParameters;
-import org.mule.runtime.http.api.HttpConstants.Protocol;
+import org.mule.sdk.api.http.HttpConstants.Protocol;
 
 import org.slf4j.Logger;
 

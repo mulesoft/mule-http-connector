@@ -22,7 +22,7 @@ import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
-import org.mule.runtime.http.api.domain.message.request.HttpRequest;
+import org.mule.sdk.api.http.domain.message.request.HttpRequest;
 
 import javax.inject.Inject;
 import java.io.InputStream;

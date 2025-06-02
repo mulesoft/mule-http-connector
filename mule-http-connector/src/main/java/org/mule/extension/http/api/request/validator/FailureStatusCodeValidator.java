@@ -10,7 +10,7 @@ import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
-import org.mule.runtime.http.api.domain.message.request.HttpRequest;
+import org.mule.sdk.api.http.domain.message.request.HttpRequest;
 
 import java.io.InputStream;
 import java.util.function.IntConsumer;

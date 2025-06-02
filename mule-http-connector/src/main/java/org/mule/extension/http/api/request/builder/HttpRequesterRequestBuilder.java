@@ -8,7 +8,6 @@ package org.mule.extension.http.api.request.builder;
 
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 import static org.mule.runtime.extension.api.runtime.parameter.OutboundCorrelationStrategy.AUTO;
-import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
@@ -26,8 +25,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
 import org.mule.runtime.extension.api.runtime.parameter.OutboundCorrelationStrategy;
-import org.mule.runtime.http.api.domain.message.request.HttpRequest;
-import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
+import org.mule.sdk.api.http.domain.message.request.HttpRequestBuilder;
 
 import java.util.Map;
 import java.util.Objects;
@@ -154,9 +152,7 @@ public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
   }
 
   public HttpRequestBuilder toHttpRequestBuilder(HttpRequesterConfig config) {
-    return HttpRequest.builder(PRESERVE_HEADER_CASE || config.isPreserveHeadersCase())
-        .headers(headers)
-        .queryParams(queryParams);
+    return null;
   }
 
   public static Builder builder() {

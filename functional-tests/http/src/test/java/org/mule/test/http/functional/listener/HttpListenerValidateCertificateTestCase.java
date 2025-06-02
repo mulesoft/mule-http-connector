@@ -6,7 +6,7 @@
  */
 package org.mule.test.http.functional.listener;
 
-import static org.mule.runtime.http.api.HttpConstants.Method.POST;
+import static org.mule.sdk.api.http.HttpConstants.Method.POST;
 import static org.mule.tck.processor.FlowAssert.verify;
 import static org.mule.test.http.functional.fips.DefaultTestConfiguration.getDefaultEnvironmentConfiguration;
 
@@ -17,11 +17,11 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 
-import org.mule.extension.http.api.certificate.CertificateData;
 import org.mule.extension.http.api.HttpRequestAttributes;
+import org.mule.extension.http.api.certificate.CertificateData;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.tls.TlsContextFactory;
@@ -29,12 +29,10 @@ import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.http.api.HttpService;
-import org.mule.runtime.http.api.client.HttpClient;
-import org.mule.runtime.http.api.client.HttpClientConfiguration;
-import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
-import org.mule.runtime.http.api.domain.message.request.HttpRequest;
-import org.mule.runtime.http.api.domain.message.response.HttpResponse;
+import org.mule.sdk.api.http.client.HttpClient;
+import org.mule.sdk.api.http.domain.entity.ByteArrayHttpEntity;
+import org.mule.sdk.api.http.domain.message.request.HttpRequest;
+import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;
@@ -135,17 +133,16 @@ public class HttpListenerValidateCertificateTestCase extends AbstractHttpTestCas
   }
 
   public void createHttpClient() {
-    httpClientWithCertificate = getService(HttpService.class).getClientFactory()
-        .create(new HttpClientConfiguration.Builder()
-            .setName(getClass().getSimpleName())
-            .setTlsContextFactory(tlsContextFactory).build());
+    httpClientWithCertificate = httpService
+        .client(configBuilder -> configBuilder.setName(getClass().getSimpleName()).setTlsContextFactory(tlsContextFactory));
     httpClientWithCertificate.start();
   }
 
   private String sendRequest(String url, String payload) throws Exception {
     HttpRequest request =
-        HttpRequest.builder().uri(url).method(POST).entity(new ByteArrayHttpEntity(payload.getBytes())).build();
-    final HttpResponse response = httpClientWithCertificate.send(request, RECEIVE_TIMEOUT, false, null);
+        requestBuilder().uri(url).method(POST).entity(new ByteArrayHttpEntity(payload.getBytes())).build();
+    final HttpResponse response = httpClientWithCertificate
+        .sendAsync(request, options -> options.setResponseTimeout(RECEIVE_TIMEOUT).setFollowsRedirect(false)).get();
 
     return IOUtils.toString(response.getEntity().getContent());
   }

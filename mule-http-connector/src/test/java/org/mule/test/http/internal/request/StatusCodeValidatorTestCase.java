@@ -15,7 +15,7 @@ import org.mule.extension.http.api.request.validator.FailureStatusCodeValidator;
 import org.mule.extension.http.api.request.validator.RangeStatusCodeValidator;
 import org.mule.extension.http.api.request.validator.SuccessStatusCodeValidator;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.http.api.domain.message.request.HttpRequest;
+import org.mule.sdk.api.http.domain.message.request.HttpRequest;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;
