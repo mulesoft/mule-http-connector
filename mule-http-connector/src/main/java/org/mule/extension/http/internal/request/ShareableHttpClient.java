@@ -6,11 +6,13 @@
  */
 package org.mule.extension.http.internal.request;
 
+import static org.mule.extension.http.api.request.HttpSendBodyMode.ALWAYS;
+
 import org.mule.extension.http.api.request.HttpSendBodyMode;
-import org.mule.runtime.http.api.client.HttpClient;
-import org.mule.runtime.http.api.client.auth.HttpAuthentication;
-import org.mule.runtime.http.api.domain.message.request.HttpRequest;
-import org.mule.runtime.http.api.domain.message.response.HttpResponse;
+import org.mule.sdk.api.http.client.HttpClient;
+import org.mule.sdk.api.http.client.auth.HttpAuthentication;
+import org.mule.sdk.api.http.domain.message.request.HttpRequest;
+import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -39,9 +41,9 @@ public class ShareableHttpClient {
   }
 
   public synchronized void stop() {
-    // In case this fails we do not want the usageCount to be reincremented
-    // as it will not be further used. If shouldn't be the case that more than
-    // two stops happen.
+    // In case this fails, we do not want the usageCount to be re-incremented
+    // as it will not be further used.
+    // It shouldn't be the case that more than two stops happen.
     if (--usageCount == 0) {
       delegate.stop();
     }
@@ -50,6 +52,10 @@ public class ShareableHttpClient {
   public CompletableFuture<HttpResponse> sendAsync(HttpRequest request, int responseTimeout, boolean followRedirects,
                                                    HttpAuthentication authentication,
                                                    HttpSendBodyMode sendBodyMode) {
-    return HttpClientReflection.sendAsync(delegate, request, responseTimeout, followRedirects, authentication, sendBodyMode);
+    return delegate.sendAsync(request, options -> options
+        .setResponseTimeout(responseTimeout)
+        .setFollowsRedirect(followRedirects)
+        .setAuthentication(authentication)
+        .setSendBodyAlways(sendBodyMode.equals(ALWAYS)));
   }
 }

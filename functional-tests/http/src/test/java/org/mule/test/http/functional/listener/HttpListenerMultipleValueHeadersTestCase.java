@@ -15,7 +15,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.OK;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.MULTI_MAP;
 
 import org.mule.extension.http.api.HttpRequestAttributes;

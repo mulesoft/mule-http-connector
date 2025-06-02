@@ -6,12 +6,13 @@
  */
 package org.mule.test.http.functional.listener;
 
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
 import static org.mule.tck.probe.PollingProber.check;
+
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
-import org.mule.runtime.http.api.HttpConstants.HttpStatus;
-import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
-import org.mule.runtime.http.api.domain.message.request.HttpRequest;
+import org.mule.sdk.api.http.HttpConstants.HttpStatus;
+import org.mule.sdk.api.http.domain.entity.ByteArrayHttpEntity;
+import org.mule.sdk.api.http.domain.message.request.HttpRequest;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
@@ -35,6 +36,7 @@ public class HttpBackPressureTestCase extends AbstractHttpTestCase {
 
   @Override
   protected void doSetUp() throws Exception {
+    super.doSetUp();
     stop = new AtomicBoolean(false);
   }
 
@@ -53,26 +55,29 @@ public class HttpBackPressureTestCase extends AbstractHttpTestCase {
 
     Semaphore semaphore = new Semaphore(1024);
 
-    final HttpRequest post = HttpRequest.builder().uri(url).method("POST")
+    final HttpRequest post = requestBuilder().uri(url).method("POST")
         .entity(new ByteArrayHttpEntity(path.getBytes()))
         .build();
 
-    new Thread((CheckedRunnable) () -> {
+    Thread thread = new Thread((CheckedRunnable) () -> {
       while (!stop.get()) {
         semaphore.acquire();
-        httpClient.sendAsync(post, 60000, false, null).whenComplete((response, e) -> {
-          try {
-            if (response != null && response.getStatusCode() == expectedStatus.getStatusCode()
-                && response.getReasonPhrase().equals(expectedStatus.getReasonPhrase())) {
-              stop.set(true);
-            }
-          } finally {
-            semaphore.release();
-          }
-        });
+        httpClient.sendAsync(post, configurer -> configurer.setResponseTimeout(60_000).setFollowsRedirect(false))
+            .whenComplete((response, e) -> {
+              try {
+                if (response != null && response.getStatusCode() == expectedStatus.getStatusCode()
+                    && response.getReasonPhrase().equals(expectedStatus.getReasonPhrase())) {
+                  stop.set(true);
+                }
+              } finally {
+                semaphore.release();
+              }
+            });
       }
-    }).start();
+    });
 
+    thread.start();
     check(30000, 100, stop::get);
+    thread.join();
   }
 }

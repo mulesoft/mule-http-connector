@@ -7,8 +7,8 @@
 package org.mule.extension.http.internal.request;
 
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.http.api.domain.entity.HttpEntity;
-import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
+import org.mule.sdk.api.http.domain.entity.HttpEntity;
+import org.mule.sdk.api.http.domain.message.request.HttpRequestBuilder;
 
 import java.util.Optional;
 

@@ -6,12 +6,6 @@
  */
 package org.mule.extension.http.internal.listener;
 
-import static java.lang.Boolean.FALSE;
-import static java.lang.String.format;
-import static java.lang.Thread.currentThread;
-import static java.util.Arrays.asList;
-import static java.util.Optional.ofNullable;
-import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 import static org.mule.extension.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.extension.http.api.error.HttpError.BASIC_AUTHENTICATION;
 import static org.mule.extension.http.api.error.HttpError.NOT_FOUND;
@@ -31,11 +25,19 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.getReasonPhraseForStatusCode;
-import static org.mule.runtime.http.api.HttpHeaders.Names.X_CORRELATION_ID;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.BAD_REQUEST;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.getReasonPhraseForStatusCode;
+import static org.mule.sdk.api.http.HttpHeaders.Names.X_CORRELATION_ID;
+
+import static java.lang.Boolean.FALSE;
+import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
+import static java.util.Arrays.asList;
+import static java.util.Optional.ofNullable;
+
+import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.extension.http.api.HttpListenerResponseAttributes;
@@ -61,7 +63,6 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.api.util.MultiMap;
@@ -95,17 +96,20 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceResult;
-import org.mule.runtime.http.api.HttpConstants.HttpStatus;
-import org.mule.runtime.http.api.domain.HttpProtocol;
-import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
-import org.mule.runtime.http.api.domain.message.response.HttpResponse;
-import org.mule.runtime.http.api.domain.message.response.HttpResponseBuilder;
-import org.mule.runtime.http.api.domain.request.HttpRequestContext;
-import org.mule.runtime.http.api.server.HttpServer;
-import org.mule.runtime.http.api.server.RequestHandler;
-import org.mule.runtime.http.api.server.RequestHandlerManager;
-import org.mule.runtime.http.api.server.async.HttpResponseReadyCallback;
-import org.mule.runtime.http.api.server.async.ResponseStatusCallback;
+import org.mule.sdk.api.http.HttpConstants.HttpStatus;
+import org.mule.sdk.api.http.HttpService;
+import org.mule.sdk.api.http.domain.HttpProtocol;
+import org.mule.sdk.api.http.domain.entity.ByteArrayHttpEntity;
+import org.mule.sdk.api.http.domain.message.request.HttpRequestContext;
+import org.mule.sdk.api.http.domain.message.response.HttpResponse;
+import org.mule.sdk.api.http.domain.message.response.HttpResponseBuilder;
+import org.mule.sdk.api.http.server.EndpointAvailabilityHandler;
+import org.mule.sdk.api.http.server.HttpServer;
+import org.mule.sdk.api.http.server.RequestHandler;
+import org.mule.sdk.api.http.server.async.HttpResponseReadyCallback;
+import org.mule.sdk.api.http.server.async.ResponseStatusCallback;
+import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
+import org.mule.sdk.compatibility.api.utils.ForwardCompatibilityHelper;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -113,9 +117,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.inject.Inject;
-
-import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
-import org.mule.sdk.compatibility.api.utils.ForwardCompatibilityHelper;
+import javax.inject.Named;
 
 import org.slf4j.Logger;
 
@@ -167,6 +169,10 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   @Inject
   private java.util.Optional<ForwardCompatibilityHelper> forwardCompatibilityHelper;
 
+  @Inject
+  @Named("_httpServiceDelegate")
+  private HttpService httpService;
+
   private MuleContextStopWatcher muleContextStopWatcher;
 
   /**
@@ -210,7 +216,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   private HttpServer server;
   private HttpListenerResponseSender responseSender;
   private ListenerPath listenerPath;
-  private RequestHandlerManager requestHandlerManager;
+  private EndpointAvailabilityHandler requestHandlerManager;
   private HttpResponseFactory responseFactory;
   private ErrorTypeMatcher knownErrors;
   private Class interpretedAttributes;
@@ -320,7 +326,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
     final HttpResponseContext context = callbackContext.<HttpResponseContext>getVariable(RESPONSE_CONTEXT)
         .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(RESPONSE_CONTEXT_NOT_FOUND)));
 
-    HttpResponseBuilder responseBuilder = HttpResponse.builder().statusCode(SERVICE_UNAVAILABLE.getStatusCode());
+    HttpResponseBuilder responseBuilder = httpService.responseBuilder().statusCode(SERVICE_UNAVAILABLE.getStatusCode());
     HttpListenerErrorResponseBuilder errorResponseBuilder = new HttpListenerErrorResponseBuilder();
     errorResponseBuilder.setBody(new TypedValue<>(null, STRING));
     errorResponseBuilder.setStatusCode(SERVICE_UNAVAILABLE.getStatusCode());
@@ -344,14 +350,14 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
     if (hasCustomResponse(ofNullable(error))) {
       Message errorMessage = error.getErrorMessage();
       HttpResponseAttributes attributes = (HttpResponseAttributes) errorMessage.getAttributes().getValue();
-      failureResponseBuilder = HttpResponse.builder()
+      failureResponseBuilder = httpService.responseBuilder()
           .statusCode(attributes.getStatusCode())
           .reasonPhrase(attributes.getReasonPhrase());
       attributes.getHeaders().forEach(failureResponseBuilder::addHeader);
     } else if (error != null) {
       failureResponseBuilder = createDefaultFailureResponseBuilder(error, INTERNAL_SERVER_ERROR);
     } else {
-      failureResponseBuilder = HttpResponse.builder();
+      failureResponseBuilder = httpService.responseBuilder();
     }
     return failureResponseBuilder;
   }
@@ -363,7 +369,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
 
     responseSenderScheduler = schedulerService.ioScheduler(config().withName("response-sender-io"));
     responseFactory = new HttpResponseFactory(responseStreamingMode, transformationService, this::isContextStopping);
-    responseSender = new HttpListenerResponseSender(responseFactory, responseSenderScheduler);
+    responseSender = new HttpListenerResponseSender(responseFactory, responseSenderScheduler, httpService::responseBuilder);
     startIfNeeded(responseFactory);
 
     validatePath();
@@ -381,7 +387,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
       throw new MuleRuntimeException(e);
     }
     knownErrors = new DisjunctiveErrorTypeMatcher(createErrorMatcherList(muleContext.getErrorTypeRepository()));
-    requestHandlerManager.start();
+    requestHandlerManager.available();
 
     if (muleContextStopWatcher == null) {
       muleContextStopWatcher = new MuleContextStopWatcher();
@@ -423,8 +429,8 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
     }
 
     if (requestHandlerManager != null) {
-      requestHandlerManager.stop();
-      requestHandlerManager.dispose();
+      requestHandlerManager.unavailable();
+      requestHandlerManager.remove();
     }
 
     if (responseSenderScheduler != null) {
@@ -532,7 +538,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
       private void sendErrorResponse(InterceptingException interceptor, HttpResponseReadyCallback responseCallback) {
         HttpStatus status = interceptor.status();
 
-        HttpResponseBuilder responseBuilder = HttpResponse.builder()
+        HttpResponseBuilder responseBuilder = httpService.responseBuilder()
             .statusCode(status.getStatusCode())
             .reasonPhrase(status.getReasonPhrase());
 
@@ -555,7 +561,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
       private void sendErrorResponse(final HttpStatus status, String message,
                                      HttpResponseReadyCallback responseCallback) {
         byte[] responseData = message.getBytes();
-        responseCallback.responseReady(HttpResponse.builder()
+        responseCallback.responseReady(httpService.responseBuilder()
             .statusCode(status.getStatusCode())
             .reasonPhrase(status.getReasonPhrase())
             .entity(new ByteArrayHttpEntity(responseData))
@@ -594,7 +600,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
     // Default to the HTTP transport exception mapping for compatibility
     Throwable throwable = error.getCause();
     String reasonPhraseFromException = getReasonPhraseForStatusCode(httpStatus.getStatusCode());
-    return HttpResponse.builder()
+    return httpService.responseBuilder()
         .statusCode(httpStatus.getStatusCode())
         .reasonPhrase(reasonPhraseFromException != null ? reasonPhraseFromException : throwable.getMessage());
   }
@@ -608,7 +614,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   }
 
   protected HttpResponse buildErrorResponse() {
-    final HttpResponseBuilder errorResponseBuilder = HttpResponse.builder();
+    final HttpResponseBuilder errorResponseBuilder = httpService.responseBuilder();
     final HttpResponse errorResponse = errorResponseBuilder.statusCode(INTERNAL_SERVER_ERROR.getStatusCode())
         .reasonPhrase(INTERNAL_SERVER_ERROR.getReasonPhrase())
         .build();

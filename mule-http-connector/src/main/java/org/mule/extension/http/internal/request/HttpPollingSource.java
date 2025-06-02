@@ -6,15 +6,11 @@
  */
 package org.mule.extension.http.internal.request;
 
-import static java.lang.String.format;
-import static java.lang.Thread.currentThread;
-import static java.nio.charset.Charset.defaultCharset;
-import static java.util.Optional.empty;
 import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST;
 import static org.mule.extension.http.internal.request.EmptyDistributedTraceContextManager.getDistributedTraceContextManager;
 import static org.mule.extension.http.internal.request.HttpPollingSourceUtils.getItemId;
-import static org.mule.extension.http.internal.request.HttpPollingSourceUtils.getItems;
 import static org.mule.extension.http.internal.request.HttpPollingSourceUtils.getItemWatermark;
+import static org.mule.extension.http.internal.request.HttpPollingSourceUtils.getItems;
 import static org.mule.extension.http.internal.request.HttpPollingSourceUtils.isValidExpression;
 import static org.mule.extension.http.internal.request.HttpPollingSourceUtils.resolveBody;
 import static org.mule.extension.http.internal.request.HttpPollingSourceUtils.resolveHeaders;
@@ -22,8 +18,8 @@ import static org.mule.extension.http.internal.request.HttpPollingSourceUtils.re
 import static org.mule.extension.http.internal.request.HttpPollingSourceUtils.resolveUriParams;
 import static org.mule.extension.http.internal.request.HttpRequestUtils.createHttpRequester;
 import static org.mule.extension.http.internal.request.UriUtils.buildPath;
-import static org.mule.extension.http.internal.request.UriUtils.resolveUri;
 import static org.mule.extension.http.internal.request.UriUtils.replaceUriParams;
+import static org.mule.extension.http.internal.request.UriUtils.resolveUri;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
@@ -31,6 +27,11 @@ import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.DROP;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.FAIL;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.WAIT;
+
+import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
+import static java.nio.charset.Charset.defaultCharset;
+import static java.util.Optional.empty;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.request.builder.HttpRequesterSimpleRequestBuilder;
@@ -59,8 +60,8 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
-import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
@@ -71,20 +72,23 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.PollContext;
 import org.mule.runtime.extension.api.runtime.source.PollingSource;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
-import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.mule.sdk.api.http.HttpService;
+import org.mule.sdk.api.http.domain.message.request.HttpRequestBuilder;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.nio.charset.Charset;
-import java.util.List;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Alias("pollingSource")
 @org.mule.runtime.extension.api.annotation.param.MediaType(value = org.mule.runtime.extension.api.annotation.param.MediaType.ANY,
@@ -121,6 +125,10 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
 
   @Inject
   private ExpressionLanguage expressionLanguage;
+
+  @Inject
+  @Named("_httpServiceDelegate")
+  private HttpService httpService;
 
   private HttpExtensionClient client;
   private Scheduler scheduler;
@@ -189,7 +197,7 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
     LOGGER.debug("Starting HTTP Polling Source in {}", location.getRootContainerName());
     scheduler = schedulerService.ioScheduler();
     client = clientProvider.connect();
-    httpRequester = createHttpRequester(false, muleContext);
+    httpRequester = createHttpRequester(false, muleContext, httpService);
     validateExpressions();
   }
 
@@ -248,12 +256,12 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
     }
   }
 
-  private RequestCreator getRequesCreator(Serializable watermark) {
+  private RequestCreator getRequestCreator(Serializable watermark) {
     return new RequestCreator() {
 
       @Override
       public HttpRequestBuilder createRequestBuilder(HttpRequesterConfig config) {
-        return requestBuilder.toHttpRequestBuilder(config)
+        return httpService.requestBuilder(config.isPreserveHeadersCase())
             .headers(resolveHeaders(requestBuilder.getRequestHeaders(), watermark, expressionLanguage))
             .queryParams(resolveQueryParams(requestBuilder.getRequestQueryParams(), watermark, expressionLanguage));
       }
@@ -279,7 +287,7 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
       Result<InputStream, HttpResponseAttributes> result = httpRequester
           .doSyncRequest(client, config, resolvedUri, method, config.getRequestStreamingMode(), config.getSendBodyMode(),
                          config.getFollowRedirects(), client.getDefaultAuthentication(), config.getResponseTimeout(),
-                         getResponseValidator(), transformationService, getRequesCreator(currentWatermark), true, muleContext,
+                         getResponseValidator(), transformationService, getRequestCreator(currentWatermark), true, muleContext,
                          scheduler, injectedHeaders, getDistributedTraceContextManager());
       pollResult(pollContext, result, currentWatermark, resolvedUri);
     } catch (ExecutionException e) {

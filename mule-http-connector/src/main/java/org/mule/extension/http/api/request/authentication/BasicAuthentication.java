@@ -6,8 +6,8 @@
  */
 package org.mule.extension.http.api.request.authentication;
 
-import static org.mule.runtime.http.api.client.auth.HttpAuthenticationType.BASIC;
-import org.mule.runtime.http.api.client.auth.HttpAuthenticationType;
+import static org.mule.sdk.api.http.client.auth.HttpAuthenticationType.BASIC;
+import org.mule.sdk.api.http.client.auth.HttpAuthenticationType;
 
 
 /**

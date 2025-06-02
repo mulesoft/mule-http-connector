@@ -8,7 +8,7 @@ package org.mule.extension.http.internal.listener;
 
 import org.mule.extension.http.internal.listener.intercepting.Interception;
 import org.mule.extension.http.internal.listener.intercepting.NoInterception;
-import org.mule.runtime.http.api.server.async.HttpResponseReadyCallback;
+import org.mule.sdk.api.http.server.async.HttpResponseReadyCallback;
 
 /**
  * Holds temporary state necessary to emit an http response

@@ -10,12 +10,12 @@ import static java.util.Arrays.stream;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Optional.ofNullable;
 import static org.mule.extension.http.api.HttpHeaders.Names.CONTENT_TYPE;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.getStatusByCode;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.getStatusByCode;
 
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.error.MuleErrors;
-import org.mule.runtime.http.api.HttpConstants.HttpStatus;
-import org.mule.runtime.http.api.domain.message.request.HttpRequest;
+import org.mule.sdk.api.http.HttpConstants.HttpStatus;
+import org.mule.sdk.api.http.domain.message.request.HttpRequest;
 
 import java.util.HashSet;
 import java.util.Optional;

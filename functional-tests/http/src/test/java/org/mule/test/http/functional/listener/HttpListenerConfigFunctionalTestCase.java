@@ -6,9 +6,9 @@
  */
 package org.mule.test.http.functional.listener;
 
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.METHOD_NOT_ALLOWED;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.NOT_FOUND;
-import static org.mule.runtime.http.api.HttpConstants.Method.GET;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.METHOD_NOT_ALLOWED;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.NOT_FOUND;
+import static org.mule.sdk.api.http.HttpConstants.Method.GET;
 
 import static java.lang.String.format;
 
@@ -17,12 +17,12 @@ import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.http.api.HttpConstants.HttpStatus;
-import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
-import org.mule.runtime.http.api.domain.message.request.HttpRequest;
+import org.mule.sdk.api.http.HttpConstants.HttpStatus;
+import org.mule.sdk.api.http.domain.entity.ByteArrayHttpEntity;
+import org.mule.sdk.api.http.domain.message.request.HttpRequest;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;
@@ -147,9 +147,9 @@ public class HttpListenerConfigFunctionalTestCase extends AbstractHttpTestCase {
 
   private String callAndAssertStatusWithMuleClient(String url, int expectedStatus) throws Exception {
     HttpRequest request =
-        HttpRequest.builder().uri(url).method(GET).entity(new ByteArrayHttpEntity(TEST_PAYLOAD.getBytes())).build();
-    final org.mule.runtime.http.api.domain.message.response.HttpResponse response =
-        httpClient.send(request, RECEIVE_TIMEOUT, false, null);
+        requestBuilder().uri(url).method(GET).entity(new ByteArrayHttpEntity(TEST_PAYLOAD.getBytes())).build();
+    final org.mule.sdk.api.http.domain.message.response.HttpResponse response =
+        httpClient.sendAsync(request, config -> config.setResponseTimeout(RECEIVE_TIMEOUT).setFollowsRedirect(false)).get();
     assertThat(response.getStatusCode(), is(expectedStatus));
 
     return IOUtils.toString(response.getEntity().getContent());

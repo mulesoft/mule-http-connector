@@ -6,15 +6,17 @@
  */
 package org.mule.test.http.functional;
 
+import static org.mule.extension.http.api.HttpMessageBuilder.refreshSystemProperties;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.OK;
+import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.HEADER_CASE_PRESERVATION;
+
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toSet;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mule.extension.http.api.HttpMessageBuilder.refreshSystemProperties;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.HEADER_CASE_PRESERVATION;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
@@ -25,18 +27,16 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
+import java.io.IOException;
+import java.util.Set;
+
+import io.qameta.allure.Story;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.fluent.Request;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.util.Set;
-
-import io.qameta.allure.Story;
 
 @Story(HEADER_CASE_PRESERVATION)
 public class HttpHeaderCaseTestCase extends AbstractHttpTestCase {
@@ -92,7 +92,7 @@ public class HttpHeaderCaseTestCase extends AbstractHttpTestCase {
   }
 
   @Test
-  public void proxyPreservesRequestHeaderCase() throws ClientProtocolException, IOException {
+  public void proxyPreservesRequestHeaderCase() throws IOException {
     HttpResponse response = Request.Get(format("http://localhost:%s/proxyRequest", port.getNumber()))
         .addHeader("pRoXyHeAdEr", "value").execute().returnResponse();
 
@@ -102,7 +102,7 @@ public class HttpHeaderCaseTestCase extends AbstractHttpTestCase {
   }
 
   @Test
-  public void proxyPreservesResponseHeaderCase() throws ClientProtocolException, IOException {
+  public void proxyPreservesResponseHeaderCase() throws IOException {
     HttpResponse response = Request.Get(format("http://localhost:%s/proxyResponse", port.getNumber()))
         .execute().returnResponse();
 

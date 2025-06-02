@@ -6,11 +6,11 @@
  */
 package org.mule.test.http.functional.requester;
 
-import static org.mule.runtime.http.api.HttpHeaders.Names.CONNECTION;
-import static org.mule.runtime.http.api.HttpHeaders.Names.HOST;
-import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
-import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
-import static org.mule.runtime.http.api.HttpHeaders.Values.CLOSE;
+import static org.mule.sdk.api.http.HttpHeaders.Names.CONNECTION;
+import static org.mule.sdk.api.http.HttpHeaders.Names.HOST;
+import static org.mule.sdk.api.http.HttpHeaders.Names.TRANSFER_ENCODING;
+import static org.mule.sdk.api.http.HttpHeaders.Values.CHUNKED;
+import static org.mule.sdk.api.http.HttpHeaders.Values.CLOSE;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;

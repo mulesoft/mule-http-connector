@@ -6,9 +6,10 @@
  */
 package org.mule.extension.http.api.request.builder;
 
+import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
+
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
-import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
 
 import org.mule.extension.http.internal.request.HttpRequesterConfig;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;

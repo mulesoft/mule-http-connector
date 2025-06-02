@@ -21,7 +21,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.policy.PolicyProvider;
-import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
+import org.mule.sdk.api.http.domain.CaseInsensitiveMultiMap;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.runtime.policy.api.SourcePolicyPointcutParametersFactory;
 

@@ -15,8 +15,8 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.annotation.param.ParameterGroup.CONNECTION;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.SECURITY_TAB;
-import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTP;
-import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
+import static org.mule.sdk.api.http.HttpConstants.Protocol.HTTP;
+import static org.mule.sdk.api.http.HttpConstants.Protocol.HTTPS;
 
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
@@ -50,9 +50,9 @@ import org.mule.runtime.extension.api.annotation.param.RefName;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
-import org.mule.runtime.http.api.HttpConstants;
-import org.mule.runtime.http.api.client.HttpClientConfiguration;
-import org.mule.runtime.http.api.client.proxy.ProxyConfig;
+import org.mule.sdk.api.http.HttpConstants;
+import org.mule.sdk.api.http.client.HttpClientConfigurer;
+import org.mule.sdk.api.http.client.proxy.ProxyConfig;
 
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
@@ -192,7 +192,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
 
   @Override
   public HttpExtensionClient connect() throws ConnectionException {
-    ShareableHttpClient httpClient = connectionManager.lookupOrCreate(getConfigurationId(), this::getHttpClientConfiguration);
+    ShareableHttpClient httpClient = connectionManager.lookupOrCreate(getConfigurationId(), this::configureClient);
     UriParameters uriParameters = new DefaultUriParameters(connectionParams.getProtocol(), connectionParams.getHost(),
                                                            connectionParams.getPort());
     HttpExtensionClient extensionClient = new HttpExtensionClient(httpClient, uriParameters, authentication);
@@ -205,21 +205,27 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
     return extensionClient;
   }
 
-  private HttpClientConfiguration getHttpClientConfiguration() {
-    String name = format(NAME_PATTERN, configName);
-
-    HttpClientConfiguration configuration = new HttpClientConfiguration.Builder()
+  private void configureClient(HttpClientConfigurer configurer) {
+    configurer
+        .setName(format(NAME_PATTERN, configName))
         .setTlsContextFactory(tlsContext)
         .setProxyConfig(proxyConfig)
-        .setClientSocketProperties(buildTcpProperties(connectionParams.getClientSocketProperties()))
+        .configClientSocketProperties(tcpConfigurer -> {
+          TcpClientSocketProperties socketProperties = connectionParams.getClientSocketProperties();
+          tcpConfigurer
+              .sendBufferSize(socketProperties.getSendBufferSize())
+              .sendBufferSize(socketProperties.getSendBufferSize())
+              .clientTimeout(socketProperties.getClientTimeout())
+              .sendTcpNoDelay(socketProperties.getSendTcpNoDelay())
+              .linger(socketProperties.getLinger())
+              .keepAlive(socketProperties.getKeepAlive())
+              .connectionTimeout(socketProperties.getConnectionTimeout());
+        })
         .setMaxConnections(connectionParams.getMaxConnections())
         .setUsePersistentConnections(connectionParams.getUsePersistentConnections())
         .setConnectionIdleTimeout(connectionParams.getConnectionIdleTimeout())
         .setStreaming(connectionParams.getStreamResponse())
-        .setResponseBufferSize(connectionParams.getResponseBufferSize())
-        .setName(name)
-        .build();
-    return configuration;
+        .setResponseBufferSize(connectionParams.getResponseBufferSize());
   }
 
   private String getConfigurationId() {

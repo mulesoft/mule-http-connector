@@ -43,9 +43,10 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
-import org.mule.runtime.http.api.client.auth.HttpAuthentication;
-import org.mule.runtime.http.api.domain.message.request.HttpRequest;
-import org.mule.runtime.http.api.domain.message.response.HttpResponse;
+import org.mule.sdk.api.http.HttpService;
+import org.mule.sdk.api.http.client.auth.HttpAuthentication;
+import org.mule.sdk.api.http.domain.message.request.HttpRequest;
+import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 
 import java.net.CookieManager;
 import java.util.List;
@@ -54,6 +55,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * Requester connectivity validator. It validates the connections created by the {@link HttpRequesterProvider}.
@@ -173,6 +175,10 @@ public class HttpConnectivityValidator implements Initialisable {
   // It's only used to propagate the initialisation to response validator.
   private MuleContext muleContext;
 
+  @Inject
+  @Named("_httpServiceDelegate")
+  private HttpService httpService;
+
   public void validate(HttpExtensionClient client, RequestConnectionParams connectionParams)
       throws ExecutionException, InterruptedException, ResponseValidatorTypedException {
     HttpRequest request = buildTestRequest(connectionParams);
@@ -198,7 +204,7 @@ public class HttpConnectivityValidator implements Initialisable {
 
   private HttpRequest buildTestRequest(RequestConnectionParams connectionParams) {
     String uriString = getUriString(connectionParams);
-    return HttpRequest.builder()
+    return httpService.requestBuilder()
         .uri(uriString)
         .method(requestMethod)
         .headers(toMultiMap(requestBuilder.getRequestHeaders()))

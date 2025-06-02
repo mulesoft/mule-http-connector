@@ -7,7 +7,7 @@
 package org.mule.extension.http.internal.listener.intercepting;
 
 import org.mule.runtime.api.util.MultiMap;
-import org.mule.runtime.http.api.HttpConstants.HttpStatus;
+import org.mule.sdk.api.http.HttpConstants.HttpStatus;
 
 /**
  * If the {@link org.mule.extension.http.internal.listener.HttpListener} needs to be notified about an error in the intecepting

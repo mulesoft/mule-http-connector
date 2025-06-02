@@ -6,7 +6,7 @@
  */
 package org.mule.test.http.functional.listener;
 
-import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
+import static org.mule.sdk.api.http.HttpHeaders.Names.CONTENT_TYPE;
 
 import static java.util.Arrays.asList;
 

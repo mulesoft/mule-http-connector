@@ -10,10 +10,10 @@ import static org.mule.extension.http.api.error.HttpError.CONNECTIVITY;
 import static org.mule.extension.http.internal.listener.HttpListener.HTTP_NAMESPACE;
 import static org.mule.functional.api.exception.ExpectedError.none;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
-import static org.mule.runtime.http.api.HttpConstants.Method.GET;
-import static org.mule.runtime.http.api.HttpConstants.Method.POST;
-import static org.mule.runtime.http.api.HttpHeaders.Names.HOST;
-import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
+import static org.mule.sdk.api.http.HttpConstants.Method.GET;
+import static org.mule.sdk.api.http.HttpConstants.Method.POST;
+import static org.mule.sdk.api.http.HttpHeaders.Names.HOST;
+import static org.mule.sdk.api.http.HttpHeaders.Names.TRANSFER_ENCODING;
 
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;

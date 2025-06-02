@@ -6,14 +6,18 @@
  */
 package org.mule.extension.http.internal.listener;
 
-import org.mule.runtime.http.api.HttpConstants;
-import org.mule.runtime.http.api.server.HttpServer;
-import org.mule.runtime.http.api.server.RequestHandler;
-import org.mule.runtime.http.api.server.RequestHandlerManager;
-import org.mule.runtime.http.api.server.ServerAddress;
+import org.mule.sdk.api.http.HttpConstants;
+import org.mule.sdk.api.http.server.EndpointAvailabilityHandler;
+import org.mule.sdk.api.http.server.HttpServer;
+import org.mule.sdk.api.http.server.RequestHandler;
+import org.mule.sdk.api.http.server.ServerAddress;
+import org.mule.sdk.api.http.sse.server.SseClient;
+import org.mule.sdk.api.http.sse.server.SseEndpointManager;
+import org.mule.sdk.api.http.sse.server.SseRequestContext;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.function.Consumer;
 
 /**
  * Base class for applying the delegate design pattern around an {@link HttpServer}
@@ -27,15 +31,13 @@ public class HttpServerDelegate implements HttpServer {
   }
 
   @Override
-  public HttpServer start() throws IOException {
+  public void start() throws IOException {
     delegate.start();
-    return this;
   }
 
   @Override
-  public HttpServer stop() {
+  public void stop() {
     delegate.stop();
-    return this;
   }
 
   @Override
@@ -64,13 +66,19 @@ public class HttpServerDelegate implements HttpServer {
   }
 
   @Override
-  public RequestHandlerManager addRequestHandler(Collection<String> methods, String path, RequestHandler requestHandler) {
+  public EndpointAvailabilityHandler addRequestHandler(Collection<String> methods, String path, RequestHandler requestHandler) {
     return delegate.addRequestHandler(methods, path, requestHandler);
   }
 
   @Override
-  public RequestHandlerManager addRequestHandler(String path, RequestHandler requestHandler) {
+  public EndpointAvailabilityHandler addRequestHandler(String path, RequestHandler requestHandler) {
     return delegate.addRequestHandler(path, requestHandler);
+  }
+
+  @Override
+  public SseEndpointManager sse(String ssePath, Consumer<SseRequestContext> onRequest, Consumer<SseClient> onClient) {
+    // TODO: implement...
+    return null;
   }
 
   protected HttpServer getDelegate() {

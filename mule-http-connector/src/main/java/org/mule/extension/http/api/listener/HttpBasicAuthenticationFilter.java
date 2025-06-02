@@ -11,7 +11,7 @@ import static org.mule.extension.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
 import static org.mule.extension.http.internal.HttpConnectorConstants.BASIC_LAX_DECODING_PROPERTY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.authFailedForUser;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.UNAUTHORIZED;
 
 import static java.lang.Boolean.getBoolean;
 import static java.nio.charset.StandardCharsets.UTF_8;

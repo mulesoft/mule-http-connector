@@ -6,12 +6,6 @@
  */
 package org.mule.extension.http.internal.request;
 
-import static java.lang.String.valueOf;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.unmodifiableSet;
-import static java.util.Optional.ofNullable;
 import static org.mule.extension.http.api.error.HttpError.SECURITY;
 import static org.mule.extension.http.api.error.HttpError.TRANSFORMATION;
 import static org.mule.extension.http.api.streaming.HttpStreamingType.ALWAYS;
@@ -22,12 +16,19 @@ import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
-import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
-import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
-import static org.mule.runtime.http.api.HttpHeaders.Names.COOKIE;
-import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
-import static org.mule.runtime.http.api.HttpHeaders.Names.X_CORRELATION_ID;
-import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
+import static org.mule.sdk.api.http.HttpHeaders.Names.CONTENT_LENGTH;
+import static org.mule.sdk.api.http.HttpHeaders.Names.CONTENT_TYPE;
+import static org.mule.sdk.api.http.HttpHeaders.Names.COOKIE;
+import static org.mule.sdk.api.http.HttpHeaders.Names.TRANSFER_ENCODING;
+import static org.mule.sdk.api.http.HttpHeaders.Names.X_CORRELATION_ID;
+import static org.mule.sdk.api.http.HttpHeaders.Values.CHUNKED;
+
+import static java.lang.String.valueOf;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.unmodifiableSet;
+import static java.util.Optional.ofNullable;
 
 import org.mule.extension.http.api.request.HttpSendBodyMode;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
@@ -39,13 +40,14 @@ import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.exception.ModuleException;
-import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
-import org.mule.runtime.http.api.domain.entity.EmptyHttpEntity;
-import org.mule.runtime.http.api.domain.entity.HttpEntity;
-import org.mule.runtime.http.api.domain.entity.InputStreamHttpEntity;
-import org.mule.runtime.http.api.domain.entity.multipart.HttpPart;
-import org.mule.runtime.http.api.domain.message.request.HttpRequest;
-import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
+import org.mule.sdk.api.http.HttpService;
+import org.mule.sdk.api.http.domain.entity.ByteArrayHttpEntity;
+import org.mule.sdk.api.http.domain.entity.EmptyHttpEntity;
+import org.mule.sdk.api.http.domain.entity.HttpEntity;
+import org.mule.sdk.api.http.domain.entity.InputStreamHttpEntity;
+import org.mule.sdk.api.http.domain.entity.multipart.Part;
+import org.mule.sdk.api.http.domain.message.request.HttpRequest;
+import org.mule.sdk.api.http.domain.message.request.HttpRequestBuilder;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 
 import java.io.ByteArrayInputStream;
@@ -89,8 +91,13 @@ public class HttpRequestFactory {
       "Transfer-Encoding header value was invalid and will not be sent.";
 
   private static final String COOKIES_SEPARATOR = "; ";
+  private final HttpService httpService;
 
   private boolean logFirstIgnoredBody = true;
+
+  public HttpRequestFactory(HttpService httpService) {
+    this.httpService = httpService;
+  }
 
   /**
    * Creates an {@HttpRequest}.
@@ -411,7 +418,7 @@ public class HttpRequestFactory {
     }
 
     @Override
-    public Collection<HttpPart> getParts() {
+    public Collection<Part> getParts() {
       return emptyList();
     }
 
