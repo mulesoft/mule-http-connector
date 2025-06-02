@@ -6,12 +6,15 @@
  */
 package org.mule.extension.http.internal.request;
 
+import static java.util.Optional.ofNullable;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.sdk.api.http.HttpService;
 import org.mule.sdk.api.http.client.HttpClientConfigurer;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
@@ -49,6 +52,18 @@ public class HttpRequesterConnectionManager implements Disposable {
   public synchronized ShareableHttpClient lookupOrCreate(String configName, Consumer<HttpClientConfigurer> configurer) {
     return clients.computeIfAbsent(configName,
                                    name -> new ShareableHttpClient(httpService.client(configurer)));
+  }
+
+  /**
+   * Searches for an already existing {@link ShareableHttpClient} associated with the desired configuration name.
+   *
+   * @param configName the name of the client to look for
+   * @return an {@link Optional} with an {@link ShareableHttpClient} if found or an empty one otherwise
+   * @deprecated use {@link #lookupOrCreate} instead.
+   */
+  @Deprecated
+  public Optional<ShareableHttpClient> lookup(String configName) {
+    return ofNullable(clients.get(configName));
   }
 
   @Override
