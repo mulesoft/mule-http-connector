@@ -28,7 +28,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableSet;
-import static java.util.Optional.ofNullable;
+import static java.util.OptionalLong.empty;
 
 import org.mule.extension.http.api.request.HttpSendBodyMode;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
@@ -379,7 +379,7 @@ public class HttpRequestFactory {
     }
   }
 
-  private class RepeatableInputStreamHttpEntity implements HttpEntity {
+  private static class RepeatableInputStreamHttpEntity implements HttpEntity {
 
     private Long contentLength;
     private final CursorStreamProvider streamProvider;
@@ -420,9 +420,8 @@ public class HttpRequestFactory {
     }
 
     @Override
-    public Optional<Long> getLength() {
-      return ofNullable(contentLength);
+    public OptionalLong getBytesLength() {
+      return contentLength == null ? empty() : OptionalLong.of(contentLength);
     }
-
   }
 }

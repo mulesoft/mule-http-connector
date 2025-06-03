@@ -6,6 +6,8 @@
  */
 package org.mule.extension.http.internal.service.message.sdktomule;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
@@ -15,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.OptionalLong;
 
 public class HttpEntityWrapper implements HttpEntity {
 
@@ -51,6 +54,7 @@ public class HttpEntityWrapper implements HttpEntity {
 
   @Override
   public Optional<Long> getLength() {
-    return sdkEntity.getLength();
+    OptionalLong length = sdkEntity.getBytesLength();
+    return length.isPresent() ? of(length.getAsLong()) : empty();
   }
 }

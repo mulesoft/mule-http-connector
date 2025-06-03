@@ -14,7 +14,7 @@ import org.mule.sdk.api.http.domain.message.request.HttpRequestBuilder;
 import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 import org.mule.sdk.api.http.domain.message.response.HttpResponseBuilder;
 import org.mule.sdk.api.http.server.HttpServer;
-import org.mule.sdk.api.http.server.HttpServerConfigurer;
+import org.mule.sdk.api.http.server.HttpServerConfig;
 import org.mule.sdk.api.http.server.ServerCreationException;
 
 import java.util.Optional;
@@ -35,13 +35,13 @@ public class HttpServiceDelegate implements HttpService {
   public HttpServiceDelegate() {}
 
   @Override
-  public HttpClient client(Consumer<HttpClientConfig> configBuilder) {
-    return delegate.client(configBuilder);
+  public HttpClient client(Consumer<HttpClientConfig> configCallback) {
+    return delegate.client(configCallback);
   }
 
   @Override
-  public HttpServer server(Consumer<HttpServerConfigurer> configBuilder) throws ServerCreationException {
-    return delegate.server(configBuilder);
+  public HttpServer server(Consumer<HttpServerConfig> configCallback) throws ServerCreationException {
+    return delegate.server(configCallback);
   }
 
   @Override
