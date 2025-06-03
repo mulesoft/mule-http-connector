@@ -11,7 +11,7 @@ import org.mule.extension.http.internal.service.client.HttpClientWrapper;
 import org.mule.extension.http.internal.service.message.HttpEntityFactoryImpl;
 import org.mule.extension.http.internal.service.message.HttpRequestBuilderWrapper;
 import org.mule.extension.http.internal.service.message.HttpResponseBuilderWrapper;
-import org.mule.extension.http.internal.service.server.HttpServerConfigurerToBuilder;
+import org.mule.extension.http.internal.service.server.HttpServerConfigToBuilder;
 import org.mule.extension.http.internal.service.server.HttpServerWrapper;
 import org.mule.runtime.http.api.client.HttpClientConfiguration;
 import org.mule.runtime.http.api.server.HttpServerConfiguration;
@@ -23,7 +23,7 @@ import org.mule.sdk.api.http.domain.message.request.HttpRequestBuilder;
 import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 import org.mule.sdk.api.http.domain.message.response.HttpResponseBuilder;
 import org.mule.sdk.api.http.server.HttpServer;
-import org.mule.sdk.api.http.server.HttpServerConfigurer;
+import org.mule.sdk.api.http.server.HttpServerConfig;
 
 import java.util.function.Consumer;
 
@@ -36,10 +36,10 @@ public class MuleApiImplementationWrapper implements HttpService {
   }
 
   @Override
-  public HttpClient client(Consumer<HttpClientConfig> configBuilder) {
+  public HttpClient client(Consumer<HttpClientConfig> configCallback) {
     HttpClientConfiguration.Builder builder = new HttpClientConfiguration.Builder();
     HttpClientConfigToBuilder configurer = new HttpClientConfigToBuilder(builder);
-    configBuilder.accept(configurer);
+    configCallback.accept(configurer);
     HttpClientConfiguration configuration = builder.build();
     try {
       return new HttpClientWrapper(httpService.getClientFactory().create(configuration));
@@ -49,11 +49,11 @@ public class MuleApiImplementationWrapper implements HttpService {
   }
 
   @Override
-  public HttpServer server(Consumer<HttpServerConfigurer> configBuilder)
+  public HttpServer server(Consumer<HttpServerConfig> configCallback)
       throws org.mule.sdk.api.http.server.ServerCreationException {
     HttpServerConfiguration.Builder builder = new HttpServerConfiguration.Builder();
-    HttpServerConfigurerToBuilder configurer = new HttpServerConfigurerToBuilder(builder);
-    configBuilder.accept(configurer);
+    HttpServerConfigToBuilder configurer = new HttpServerConfigToBuilder(builder);
+    configCallback.accept(configurer);
     HttpServerConfiguration configuration = builder.build();
     try {
       return new HttpServerWrapper(httpService.getServerFactory().create(configuration));

@@ -188,14 +188,14 @@ public class HttpRequesterConnectionManagerTestCase extends AbstractMuleTestCase
     }
 
     @Override
-    public HttpClientConfig configClientSocketProperties(Consumer<TcpSocketPropertiesConfigurer> configurer) {
-      this.tcpConfigurer = configurer;
+    public HttpClientConfig configClientSocketProperties(Consumer<TcpSocketPropertiesConfigurer> configCallback) {
+      this.tcpConfigurer = configCallback;
       return this;
     }
 
     @Override
-    public HttpClientConfig configProxy(Consumer<ProxyConfig> configurer) {
-      this.proxyConfigurer = configurer;
+    public HttpClientConfig configProxy(Consumer<ProxyConfig> configCallback) {
+      this.proxyConfigurer = configCallback;
       return this;
     }
   }

@@ -11,7 +11,7 @@ import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 import org.mule.sdk.api.http.server.async.HttpResponseReadyCallback;
 import org.mule.sdk.api.http.server.async.ResponseStatusCallback;
 import org.mule.sdk.api.http.sse.server.SseClient;
-import org.mule.sdk.api.http.sse.server.SseClientConfigurer;
+import org.mule.sdk.api.http.sse.server.SseClientConfig;
 
 import java.util.function.Consumer;
 
@@ -30,7 +30,7 @@ public class HttpResponseReadyCallbackWrapper implements HttpResponseReadyCallba
   }
 
   @Override
-  public SseClient startSseResponse(Consumer<SseClientConfigurer> configConsumer) {
+  public SseClient startSseResponse(Consumer<SseClientConfig> configConsumer) {
     throw new UnsupportedOperationException();
   }
 }

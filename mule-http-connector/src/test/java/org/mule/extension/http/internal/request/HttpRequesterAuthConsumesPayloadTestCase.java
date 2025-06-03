@@ -12,6 +12,7 @@ import static org.mule.sdk.api.http.HttpHeaders.Names.CONTENT_TYPE;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.OptionalLong.of;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -115,7 +116,7 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     textPayload = "some text payload";
     InputStream payloadInputStream = IOUtils.toInputStream(textPayload);
     when(entity.getContent()).thenReturn(payloadInputStream);
-    when(entity.getLength()).thenReturn(of((long) textPayload.length()));
+    when(entity.getBytesLength()).thenReturn(of(textPayload.length()));
 
     when(streamingHelper.resolveCursorProvider(entity.getContent())).thenReturn(new FakeCursorProvider(payloadInputStream));
 

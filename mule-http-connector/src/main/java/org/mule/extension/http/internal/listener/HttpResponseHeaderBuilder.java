@@ -11,8 +11,9 @@ import static org.mule.sdk.api.http.HttpHeaders.Names.ACCESS_CONTROL_ALLOW_ORIGI
 import static org.mule.sdk.api.http.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.sdk.api.http.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.sdk.api.http.HttpHeaders.Names.TRANSFER_ENCODING;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.sdk.api.http.domain.CaseInsensitiveMultiMap;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 import org.mule.sdk.api.http.domain.message.response.HttpResponseBuilder;
 
 import java.util.Collection;

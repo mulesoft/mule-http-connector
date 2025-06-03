@@ -6,11 +6,11 @@
  */
 package org.mule.extension.http.internal.listener;
 
-import static java.lang.Boolean.parseBoolean;
-import static java.lang.String.format;
-import static java.nio.charset.Charset.defaultCharset;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.sdk.api.http.HttpHeaders.Names.CONTENT_TYPE;
+
+import static java.lang.Boolean.parseBoolean;
+import static java.nio.charset.Charset.defaultCharset;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.runtime.api.metadata.MediaType;
@@ -19,11 +19,11 @@ import org.mule.sdk.api.http.domain.entity.HttpEntity;
 import org.mule.sdk.api.http.domain.message.request.HttpRequest;
 import org.mule.sdk.api.http.domain.message.request.HttpRequestContext;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.InputStream;
 import java.nio.charset.Charset;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Component that transforms an HTTP request to a proper {@link Result}.
@@ -32,7 +32,11 @@ import java.nio.charset.Charset;
  */
 public class HttpRequestToResult {
 
-  private static final Logger logger = LoggerFactory.getLogger(HttpRequestToResult.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(HttpRequestToResult.class);
+
+  private HttpRequestToResult() {
+    // private constructor to avoid wrong instantiations.
+  }
 
   public static Result<InputStream, HttpRequestAttributes> transform(final HttpRequestContext requestContext,
                                                                      final Charset encoding,
@@ -48,18 +52,16 @@ public class HttpRequestToResult {
         new HttpRequestAttributesResolver().setRequestContext(requestContext).setListenerPath(listenerPath).resolve();
 
     Result.Builder<InputStream, HttpRequestAttributes> resultBuilder = Result.builder();
-    if (entity.getLength().isPresent()) {
-      resultBuilder.length(entity.getLength().get());
-    }
+    entity.getBytesLength().ifPresent(resultBuilder::length);
 
     return resultBuilder.output(payload).mediaType(mediaType).attributes(attributes).build();
   }
 
   /**
    *
-   * @param contentTypeValue
+   * @param contentTypeValue the content type.
    * @param defaultCharset   the encoding to use if the given {@code contentTypeValue} doesn't have a {@code charset} parameter.
-   * @return
+   * @return the media type.
    */
   public static MediaType getMediaType(final String contentTypeValue, Charset defaultCharset) {
     MediaType mediaType = MediaType.ANY;
@@ -72,8 +74,8 @@ public class HttpRequestToResult {
         if (parseBoolean(System.getProperty(SYSTEM_PROPERTY_PREFIX + "strictContentType"))) {
           throw e;
         } else {
-          logger.warn(format("%s when parsing Content-Type '%s': %s", e.getClass().getName(), contentTypeValue, e.getMessage()));
-          logger.warn(format("Using default encoding: %s", defaultCharset().name()));
+          LOGGER.warn("{} when parsing Content-Type '{}': {}", e.getClass().getName(), contentTypeValue, e.getMessage());
+          LOGGER.warn("Using default encoding: {}", defaultCharset().name());
         }
       }
     }
