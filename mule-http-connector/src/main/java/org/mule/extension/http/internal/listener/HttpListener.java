@@ -99,7 +99,6 @@ import org.mule.runtime.extension.api.runtime.source.SourceResult;
 import org.mule.sdk.api.http.HttpConstants.HttpStatus;
 import org.mule.sdk.api.http.HttpService;
 import org.mule.sdk.api.http.domain.HttpProtocol;
-import org.mule.sdk.api.http.domain.entity.ByteArrayHttpEntity;
 import org.mule.sdk.api.http.domain.message.request.HttpRequestContext;
 import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 import org.mule.sdk.api.http.domain.message.response.HttpResponseBuilder;
@@ -368,7 +367,8 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
     resolveFullPath();
 
     responseSenderScheduler = schedulerService.ioScheduler(config().withName("response-sender-io"));
-    responseFactory = new HttpResponseFactory(responseStreamingMode, transformationService, this::isContextStopping);
+    responseFactory = new HttpResponseFactory(responseStreamingMode, transformationService, this::isContextStopping,
+                                              httpService.entityFactory());
     responseSender = new HttpListenerResponseSender(responseFactory, responseSenderScheduler, httpService::responseBuilder);
     startIfNeeded(responseFactory);
 
@@ -564,7 +564,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
         responseCallback.responseReady(httpService.responseBuilder()
             .statusCode(status.getStatusCode())
             .reasonPhrase(status.getReasonPhrase())
-            .entity(new ByteArrayHttpEntity(responseData))
+            .entity(httpService.entityFactory().fromByteArray(responseData))
             .addHeader(CONTENT_LENGTH, Integer.toString(responseData.length))
             .build(), new ResponseStatusCallback() {
 

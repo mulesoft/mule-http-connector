@@ -17,7 +17,7 @@ import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.sdk.api.http.HttpService;
+import org.mule.sdk.api.http.domain.entity.HttpEntityFactory;
 
 public class HttpRequestUtils {
 
@@ -44,9 +44,9 @@ public class HttpRequestUtils {
   }
 
   public static HttpRequester createHttpRequester(boolean httpResponseProfilingEnabled, MuleContext muleContext,
-                                                  HttpService httpService)
+                                                  HttpEntityFactory entityFactory)
       throws MuleException {
-    return new HttpRequester(new HttpRequestFactory(httpService), new HttpResponseToResult(), new HttpErrorMessageGenerator(),
+    return new HttpRequester(new HttpRequestFactory(entityFactory), new HttpResponseToResult(), new HttpErrorMessageGenerator(),
                              getProfilingDataProducer(httpResponseProfilingEnabled, muleContext));
   }
 

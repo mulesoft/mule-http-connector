@@ -9,11 +9,11 @@ package org.mule.extension.http.internal.service.client;
 import org.mule.extension.http.internal.service.message.muletosdk.HttpResponseWrapper;
 import org.mule.extension.http.internal.service.message.sdktomule.HttpRequestWrapper;
 import org.mule.sdk.api.http.client.HttpClient;
-import org.mule.sdk.api.http.client.HttpRequestOptionsConfigurer;
+import org.mule.sdk.api.http.client.HttpRequestOptionsConfig;
 import org.mule.sdk.api.http.domain.message.request.HttpRequest;
 import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 import org.mule.sdk.api.http.sse.client.SseSource;
-import org.mule.sdk.api.http.sse.client.SseSourceConfigurer;
+import org.mule.sdk.api.http.sse.client.SseSourceConfig;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -28,7 +28,7 @@ public class HttpClientWrapper implements HttpClient {
 
   @Override
   public CompletableFuture<HttpResponse> sendAsync(HttpRequest request,
-                                                   Consumer<HttpRequestOptionsConfigurer> configurerConsumer) {
+                                                   Consumer<HttpRequestOptionsConfig> configurerConsumer) {
     CompletableFuture<HttpResponse> future = new CompletableFuture<>();
     // TODO: Reflection client...
     delegate.sendAsync(new HttpRequestWrapper(request), 60000, true, null).whenComplete((res, err) -> {
@@ -42,7 +42,7 @@ public class HttpClientWrapper implements HttpClient {
   }
 
   @Override
-  public SseSource sseSource(Consumer<SseSourceConfigurer> configConsumer) {
+  public SseSource sseSource(Consumer<SseSourceConfig> configConsumer) {
     throw new UnsupportedOperationException();
   }
 

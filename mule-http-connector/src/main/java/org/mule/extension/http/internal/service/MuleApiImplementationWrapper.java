@@ -6,8 +6,9 @@
  */
 package org.mule.extension.http.internal.service;
 
-import org.mule.extension.http.internal.service.client.HttpClientConfigurerToBuilder;
+import org.mule.extension.http.internal.service.client.HttpClientConfigToBuilder;
 import org.mule.extension.http.internal.service.client.HttpClientWrapper;
+import org.mule.extension.http.internal.service.message.HttpEntityFactoryImpl;
 import org.mule.extension.http.internal.service.message.HttpRequestBuilderWrapper;
 import org.mule.extension.http.internal.service.message.HttpResponseBuilderWrapper;
 import org.mule.extension.http.internal.service.server.HttpServerConfigurerToBuilder;
@@ -16,7 +17,8 @@ import org.mule.runtime.http.api.client.HttpClientConfiguration;
 import org.mule.runtime.http.api.server.HttpServerConfiguration;
 import org.mule.sdk.api.http.HttpService;
 import org.mule.sdk.api.http.client.HttpClient;
-import org.mule.sdk.api.http.client.HttpClientConfigurer;
+import org.mule.sdk.api.http.client.HttpClientConfig;
+import org.mule.sdk.api.http.domain.entity.HttpEntityFactory;
 import org.mule.sdk.api.http.domain.message.request.HttpRequestBuilder;
 import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 import org.mule.sdk.api.http.domain.message.response.HttpResponseBuilder;
@@ -34,9 +36,9 @@ public class MuleApiImplementationWrapper implements HttpService {
   }
 
   @Override
-  public HttpClient client(Consumer<HttpClientConfigurer> configBuilder) {
+  public HttpClient client(Consumer<HttpClientConfig> configBuilder) {
     HttpClientConfiguration.Builder builder = new HttpClientConfiguration.Builder();
-    HttpClientConfigurerToBuilder configurer = new HttpClientConfigurerToBuilder(builder);
+    HttpClientConfigToBuilder configurer = new HttpClientConfigToBuilder(builder);
     configBuilder.accept(configurer);
     HttpClientConfiguration configuration = builder.build();
     try {
@@ -79,5 +81,10 @@ public class MuleApiImplementationWrapper implements HttpService {
   public HttpRequestBuilder requestBuilder(boolean preserveHeaderCase) {
     return new HttpRequestBuilderWrapper(org.mule.runtime.http.api.domain.message.request.HttpRequest
         .builder(preserveHeaderCase));
+  }
+
+  @Override
+  public HttpEntityFactory entityFactory() {
+    return new HttpEntityFactoryImpl();
   }
 }

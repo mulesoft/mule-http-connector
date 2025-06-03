@@ -8,7 +8,8 @@ package org.mule.extension.http.internal.service;
 
 import org.mule.sdk.api.http.HttpService;
 import org.mule.sdk.api.http.client.HttpClient;
-import org.mule.sdk.api.http.client.HttpClientConfigurer;
+import org.mule.sdk.api.http.client.HttpClientConfig;
+import org.mule.sdk.api.http.domain.entity.HttpEntityFactory;
 import org.mule.sdk.api.http.domain.message.request.HttpRequestBuilder;
 import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 import org.mule.sdk.api.http.domain.message.response.HttpResponseBuilder;
@@ -34,7 +35,7 @@ public class HttpServiceDelegate implements HttpService {
   public HttpServiceDelegate() {}
 
   @Override
-  public HttpClient client(Consumer<HttpClientConfigurer> configBuilder) {
+  public HttpClient client(Consumer<HttpClientConfig> configBuilder) {
     return delegate.client(configBuilder);
   }
 
@@ -61,5 +62,10 @@ public class HttpServiceDelegate implements HttpService {
   @Override
   public HttpRequestBuilder requestBuilder(boolean preserveHeaderCase) {
     return delegate.requestBuilder(preserveHeaderCase);
+  }
+
+  @Override
+  public HttpEntityFactory entityFactory() {
+    return delegate.entityFactory();
   }
 }

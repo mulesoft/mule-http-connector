@@ -31,7 +31,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.sdk.api.http.client.HttpClient;
-import org.mule.sdk.api.http.domain.entity.ByteArrayHttpEntity;
 import org.mule.sdk.api.http.domain.message.request.HttpRequest;
 import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -144,7 +143,7 @@ public class HttpListenerValidateCertificateTestCase extends AbstractHttpTestCas
 
   private String sendRequest(String url, String payload) throws Exception {
     HttpRequest request =
-        requestBuilder().uri(url).method(POST).entity(new ByteArrayHttpEntity(payload.getBytes())).build();
+        requestBuilder().uri(url).method(POST).entity(createEntity(payload.getBytes())).build();
     final HttpResponse response = httpClientWithCertificate
         .sendAsync(request, options -> options.setResponseTimeout(RECEIVE_TIMEOUT).setFollowsRedirect(false)).get();
 

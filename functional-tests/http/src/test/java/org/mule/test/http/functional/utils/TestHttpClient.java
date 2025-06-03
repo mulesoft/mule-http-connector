@@ -15,11 +15,11 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.sdk.api.http.HttpService;
 import org.mule.sdk.api.http.client.HttpClient;
-import org.mule.sdk.api.http.client.HttpRequestOptionsConfigurer;
+import org.mule.sdk.api.http.client.HttpRequestOptionsConfig;
 import org.mule.sdk.api.http.domain.message.request.HttpRequest;
 import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 import org.mule.sdk.api.http.sse.client.SseSource;
-import org.mule.sdk.api.http.sse.client.SseSourceConfigurer;
+import org.mule.sdk.api.http.sse.client.SseSourceConfig;
 
 import java.lang.management.ManagementFactory;
 import java.util.concurrent.CompletableFuture;
@@ -67,7 +67,7 @@ public class TestHttpClient extends ExternalResource implements HttpClient {
 
   @Override
   public CompletableFuture<HttpResponse> sendAsync(HttpRequest request,
-                                                   Consumer<HttpRequestOptionsConfigurer> configurerConsumer) {
+                                                   Consumer<HttpRequestOptionsConfig> configurerConsumer) {
     return httpClient.sendAsync(request, configurer -> {
       configurerConsumer.accept(configurer);
       configurer.setResponseTimeout(MAX_VALUE);
@@ -75,7 +75,7 @@ public class TestHttpClient extends ExternalResource implements HttpClient {
   }
 
   @Override
-  public SseSource sseSource(Consumer<SseSourceConfigurer> configConsumer) {
+  public SseSource sseSource(Consumer<SseSourceConfig> configConsumer) {
     return httpClient.sseSource(configConsumer);
   }
 

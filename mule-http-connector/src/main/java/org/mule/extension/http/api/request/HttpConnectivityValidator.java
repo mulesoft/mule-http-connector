@@ -240,8 +240,8 @@ public class HttpConnectivityValidator implements Initialisable {
     if (responseValidator != null) {
       initialiseIfNeeded(responseValidator, true, muleContext);
     }
-    requestBuilder =
-        new HttpRequesterTestRequestBuilder(requestBody, requestHeaders, requestQueryParams, requestUriParams, expressionManager);
+    requestBuilder = new HttpRequesterTestRequestBuilder(requestBody, requestHeaders, requestQueryParams, requestUriParams,
+                                                         expressionManager, httpService.entityFactory());
   }
 
   private static class VoidHttpRequesterCookieConfig implements HttpRequesterCookieConfig {

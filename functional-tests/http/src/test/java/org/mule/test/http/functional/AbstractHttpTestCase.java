@@ -23,6 +23,7 @@ import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.sdk.api.http.HttpService;
+import org.mule.sdk.api.http.domain.entity.HttpEntity;
 import org.mule.sdk.api.http.domain.message.request.HttpRequestBuilder;
 import org.mule.sdk.api.http.domain.message.response.HttpResponseBuilder;
 import org.mule.test.http.functional.utils.TestHttpClient;
@@ -111,5 +112,9 @@ public abstract class AbstractHttpTestCase extends MuleArtifactFunctionalTestCas
 
   protected HttpResponseBuilder responseBuilder() {
     return httpService.responseBuilder();
+  }
+
+  protected HttpEntity createEntity(byte[] content) {
+    return httpService.entityFactory().fromByteArray(content);
   }
 }

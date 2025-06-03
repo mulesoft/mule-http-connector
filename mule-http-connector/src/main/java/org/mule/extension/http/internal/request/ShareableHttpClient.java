@@ -9,9 +9,8 @@ package org.mule.extension.http.internal.request;
 import static org.mule.extension.http.api.request.HttpSendBodyMode.ALWAYS;
 
 import org.mule.extension.http.api.request.HttpSendBodyMode;
-import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.sdk.api.http.client.HttpClient;
-import org.mule.sdk.api.http.client.auth.HttpAuthenticationConfigurer;
+import org.mule.sdk.api.http.client.auth.HttpAuthenticationConfig;
 import org.mule.sdk.api.http.domain.message.request.HttpRequest;
 import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 
@@ -52,7 +51,7 @@ public class ShareableHttpClient {
   }
 
   public CompletableFuture<HttpResponse> sendAsync(HttpRequest request, int responseTimeout, boolean followRedirects,
-                                                   Consumer<HttpAuthenticationConfigurer> authenticationConfigurer,
+                                                   Consumer<HttpAuthenticationConfig> authenticationConfigurer,
                                                    HttpSendBodyMode sendBodyMode) {
     // TODO: Auth!
     return delegate.sendAsync(request, options -> options

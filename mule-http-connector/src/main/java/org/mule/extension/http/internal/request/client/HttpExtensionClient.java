@@ -20,7 +20,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
-import org.mule.sdk.api.http.client.auth.HttpAuthenticationConfigurer;
+import org.mule.sdk.api.http.client.auth.HttpAuthenticationConfig;
 import org.mule.sdk.api.http.domain.message.request.HttpRequest;
 import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 
@@ -80,7 +80,7 @@ public class HttpExtensionClient implements Startable, Stoppable {
     return httpClient.sendAsync(request, responseTimeout, followRedirects, authConfigurer(authentication), sendBodyMode);
   }
 
-  private Consumer<HttpAuthenticationConfigurer> authConfigurer(HttpAuthentication authentication) {
+  private Consumer<HttpAuthenticationConfig> authConfigurer(HttpAuthentication authentication) {
     return configurer -> {
       if (authentication == null) {
         return;
