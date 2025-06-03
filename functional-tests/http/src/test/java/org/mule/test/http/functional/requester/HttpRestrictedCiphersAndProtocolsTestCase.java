@@ -26,7 +26,6 @@ import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.sdk.api.http.client.HttpClient;
-import org.mule.sdk.api.http.domain.entity.ByteArrayHttpEntity;
 import org.mule.sdk.api.http.domain.message.request.HttpRequest;
 import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -109,7 +108,7 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
     HttpRequest request = requestBuilder()
         .method(POST)
         .uri(format("https://localhost:%s", port1.getValue()))
-        .entity(new ByteArrayHttpEntity(TEST_PAYLOAD.getBytes()))
+        .entity(createEntity(TEST_PAYLOAD.getBytes()))
         .build();
     final HttpResponse response = httpClientWithCertificate
         .sendAsync(request, options -> options.setResponseTimeout(RECEIVE_TIMEOUT).setFollowsRedirect(false)).get();
@@ -126,7 +125,7 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
     HttpRequest request = requestBuilder()
         .method(POST)
         .uri(format("https://localhost:%s", port3.getValue()))
-        .entity(new ByteArrayHttpEntity(TEST_PAYLOAD.getBytes()))
+        .entity(createEntity(TEST_PAYLOAD.getBytes()))
         .build();
     final HttpResponse response = httpClientWithCertificate
         .sendAsync(request, options -> options.setResponseTimeout(RECEIVE_TIMEOUT).setFollowsRedirect(false)).get();

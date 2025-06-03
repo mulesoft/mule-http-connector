@@ -198,7 +198,7 @@ public class HttpRequestOperations implements Initialisable, Disposable {
 
   private void initializeHttpRequester() throws InitialisationException {
     try {
-      httpRequester = createHttpRequester(httpResponseProfilingEnabled, muleContext, httpService);
+      httpRequester = createHttpRequester(httpResponseProfilingEnabled, muleContext, httpService.entityFactory());
     } catch (MuleException e) {
       throw new InitialisationException(e, this);
     }

@@ -10,7 +10,7 @@ import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.sdk.api.http.HttpService;
-import org.mule.sdk.api.http.client.HttpClientConfigurer;
+import org.mule.sdk.api.http.client.HttpClientConfig;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -49,7 +49,7 @@ public class HttpRequesterConnectionManager implements Disposable {
    *                       {@link ShareableHttpClient} is created.
    * @return the corresponding {@link ShareableHttpClient} if found or a new {@link ShareableHttpClient} otherwise.
    */
-  public synchronized ShareableHttpClient lookupOrCreate(String configName, Consumer<HttpClientConfigurer> configurer) {
+  public synchronized ShareableHttpClient lookupOrCreate(String configName, Consumer<HttpClientConfig> configurer) {
     return clients.computeIfAbsent(configName,
                                    name -> new ShareableHttpClient(httpService.client(configurer)));
   }

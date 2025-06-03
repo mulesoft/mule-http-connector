@@ -6,9 +6,6 @@
  */
 package org.mule.extension.http.internal.listener;
 
-import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
 import static org.mule.extension.http.api.streaming.HttpStreamingType.ALWAYS;
 import static org.mule.extension.http.api.streaming.HttpStreamingType.AUTO;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
@@ -23,27 +20,29 @@ import static org.mule.sdk.api.http.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.sdk.api.http.HttpHeaders.Values.CHUNKED;
 import static org.mule.sdk.api.http.HttpHeaders.Values.CLOSE;
 
-import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
+import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
+
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.api.streaming.HttpStreamingType;
 import org.mule.extension.http.internal.listener.intercepting.Interception;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.api.util.MultiMap;
-import org.mule.sdk.api.http.domain.entity.ByteArrayHttpEntity;
-import org.mule.sdk.api.http.domain.entity.EmptyHttpEntity;
 import org.mule.sdk.api.http.domain.entity.HttpEntity;
-import org.mule.sdk.api.http.domain.entity.InputStreamHttpEntity;
+import org.mule.sdk.api.http.domain.entity.HttpEntityFactory;
 import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 import org.mule.sdk.api.http.domain.message.response.HttpResponseBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Optional;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.slf4j.Logger;
@@ -62,6 +61,7 @@ public class HttpResponseFactory {
 
   private HttpStreamingType responseStreaming = AUTO;
   private TransformationService transformationService;
+  private final HttpEntityFactory httpEntityFactory;
   private Map<Class, TriFunction<TypedValue, Boolean, HttpResponseHeaderBuilder, HttpEntity>> payloadHandlerMapper;
   private Supplier<Boolean> shouldForceConnectionCloseHeader;
 
@@ -69,9 +69,11 @@ public class HttpResponseFactory {
 
   public HttpResponseFactory(HttpStreamingType responseStreaming,
                              TransformationService transformationService,
-                             Supplier<Boolean> shouldForceConnectionCloseHeader) {
+                             Supplier<Boolean> shouldForceConnectionCloseHeader,
+                             HttpEntityFactory httpEntityFactory) {
     this.responseStreaming = responseStreaming;
     this.transformationService = transformationService;
+    this.httpEntityFactory = httpEntityFactory;
     this.payloadHandlerMapper = new HashMap<>();
     this.shouldForceConnectionCloseHeader = shouldForceConnectionCloseHeader;
     initResponsePayloadHandlers();
@@ -131,14 +133,15 @@ public class HttpResponseFactory {
 
     if (payload == null) {
       setupContentLengthEncoding(httpResponseHeaderBuilder, 0);
-      httpEntity = new EmptyHttpEntity();
+      httpEntity = httpEntityFactory.emptyEntity();
     } else {
       httpEntity = getHandler(payload.getClass())
           .map(payloadHandler -> payloadHandler.apply(body, supportsTransferEncoding, httpResponseHeaderBuilder))
           .orElseGet(() -> {
-            ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(getMessageAsBytes(body));
+            byte[] messageAsBytes = getMessageAsBytes(body);
+            HttpEntity byteArrayHttpEntity = httpEntityFactory.fromByteArray(messageAsBytes);
 
-            resolveEncoding(httpResponseHeaderBuilder, supportsTransferEncoding, byteArrayHttpEntity);
+            resolveEncoding(httpResponseHeaderBuilder, supportsTransferEncoding, messageAsBytes);
             return byteArrayHttpEntity;
           });
     }
@@ -152,7 +155,7 @@ public class HttpResponseFactory {
       } else {
         responseBuilder.statusCode(statusCode);
         if (statusCode == NO_CONTENT.getStatusCode() || statusCode == NOT_MODIFIED.getStatusCode()) {
-          httpEntity = new EmptyHttpEntity();
+          httpEntity = httpEntityFactory.emptyEntity();
           httpResponseHeaderBuilder.removeHeader(HEADER_TRANSFER_ENCODING);
         }
       }
@@ -206,34 +209,35 @@ public class HttpResponseFactory {
   }
 
   /**
-   * Generates an {@link InputStreamHttpEntity} without length and makes chunking explicit if supported
+   * Generates an {@link HttpEntity} without length and makes chunking explicit if supported
    */
   private HttpEntity guaranteeStreamingIfPossible(boolean possible, HttpResponseHeaderBuilder headerBuilder, Object stream) {
     if (possible) {
       setupChunkedEncoding(headerBuilder, CHUNKED.equals(headerBuilder.getTransferEncoding()));
     }
-    return new InputStreamHttpEntity((InputStream) stream);
+    return httpEntityFactory.fromInputStream((InputStream) stream);
   }
 
   /**
-   * Generates an {@link InputStreamHttpEntity} with the body's length and the content length explicit with it
+   * Generates an {@link HttpEntity} with the body's length and the content length explicit with it
    */
   private HttpEntity avoidConsumingPayload(HttpResponseHeaderBuilder httpResponseHeaderBuilder, Object payload, Long length) {
     setupContentLengthEncoding(httpResponseHeaderBuilder, length);
-    return new InputStreamHttpEntity((InputStream) payload, length);
+    return httpEntityFactory.fromInputStream((InputStream) payload, length);
   }
 
   /**
-   * Generates a {@link ByteArrayHttpEntity} and makes the content length explicit with it
+   * Generates a {@link HttpEntity} and makes the content length explicit with it
    */
-  private HttpEntity consumePayload(HttpResponseHeaderBuilder httpResponseHeaderBuilder, TypedValue stream) {
-    ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(getMessageAsBytes(stream));
-    setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getBytes().length);
+  private HttpEntity consumePayload(HttpResponseHeaderBuilder httpResponseHeaderBuilder, TypedValue<?> stream) {
+    byte[] messageAsBytes = getMessageAsBytes(stream);
+    HttpEntity byteArrayHttpEntity = httpEntityFactory.fromByteArray(messageAsBytes);
+    setupContentLengthEncoding(httpResponseHeaderBuilder, messageAsBytes.length);
     return byteArrayHttpEntity;
   }
 
   private void resolveEncoding(HttpResponseHeaderBuilder httpResponseHeaderBuilder, boolean supportsTransferEncoding,
-                               ByteArrayHttpEntity byteArrayHttpEntity) {
+                               byte[] messageAsBytes) {
     boolean chunkedTransferEncoding = CHUNKED.equals(httpResponseHeaderBuilder.getTransferEncoding());
     if (responseStreaming == ALWAYS
         || (chunkedTransferEncoding && responseStreaming == AUTO &&
@@ -242,7 +246,7 @@ public class HttpResponseFactory {
         setupChunkedEncoding(httpResponseHeaderBuilder, chunkedTransferEncoding);
       }
     } else {
-      setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getBytes().length);
+      setupContentLengthEncoding(httpResponseHeaderBuilder, messageAsBytes.length);
     }
   }
 

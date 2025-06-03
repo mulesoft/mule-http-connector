@@ -40,11 +40,8 @@ import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.exception.ModuleException;
-import org.mule.sdk.api.http.HttpService;
-import org.mule.sdk.api.http.domain.entity.ByteArrayHttpEntity;
-import org.mule.sdk.api.http.domain.entity.EmptyHttpEntity;
 import org.mule.sdk.api.http.domain.entity.HttpEntity;
-import org.mule.sdk.api.http.domain.entity.InputStreamHttpEntity;
+import org.mule.sdk.api.http.domain.entity.HttpEntityFactory;
 import org.mule.sdk.api.http.domain.entity.multipart.Part;
 import org.mule.sdk.api.http.domain.message.request.HttpRequest;
 import org.mule.sdk.api.http.domain.message.request.HttpRequestBuilder;
@@ -91,21 +88,21 @@ public class HttpRequestFactory {
       "Transfer-Encoding header value was invalid and will not be sent.";
 
   private static final String COOKIES_SEPARATOR = "; ";
-  private final HttpService httpService;
+  private final HttpEntityFactory entityFactory;
 
   private boolean logFirstIgnoredBody = true;
 
-  public HttpRequestFactory(HttpService httpService) {
-    this.httpService = httpService;
+  public HttpRequestFactory(HttpEntityFactory entityFactory) {
+    this.entityFactory = entityFactory;
   }
 
   /**
-   * Creates an {@HttpRequest}.
+   * Creates an {@link HttpRequest}.
    *
    * @param httpRequestCreator The generic {@link RequestCreator} from the request component that should be used to create the
    *                           {@link HttpRequest}.
    * @param authentication     The {@link HttpRequestAuthentication} that should be used to create the {@link HttpRequest}.
-   * @return an {@HttpRequest} configured based on the parameters.
+   * @return an {@link HttpRequest} configured based on the parameters.
    * @throws MuleException if the request creation fails.
    */
   public HttpRequest create(HttpRequesterConfig config, String uri, String method, HttpStreamingType streamingMode,
@@ -224,15 +221,15 @@ public class HttpRequestFactory {
 
     // TODO This screams for a refactor into an Abstract Factory...
     if (emptyBody) {
-      entity = new EmptyHttpEntity();
+      entity = entityFactory.emptyEntity();
     } else if (payload instanceof CursorStreamProvider) {
       if (streamingMode == ALWAYS) {
         entity = guaranteeStreaming(requestBuilder, transferEncoding, contentLength, (CursorStreamProvider) payload);
       } else if (streamingMode == AUTO) {
         if (contentLength.isPresent()) {
           sanitizeForContentLength(requestBuilder, transferEncoding, BOTH_TRANSFER_HEADERS_SET_MESSAGE);
-          entity =
-              new ByteArrayHttpEntity(getPayloadAsBytes(((CursorStreamProvider) payload).openCursor(), transformationService));
+          entity = entityFactory
+              .fromByteArray(getPayloadAsBytes(((CursorStreamProvider) payload).openCursor(), transformationService));
         } else if ((transferEncoding.isPresent() && CHUNKED.equalsIgnoreCase(transferEncoding.get())) || !length.isPresent()) {
           entity = new RepeatableInputStreamHttpEntity((CursorStreamProvider) payload);
         } else {
@@ -244,8 +241,8 @@ public class HttpRequestFactory {
         if (length.isPresent()) {
           entity = avoidConsumingPayload(requestBuilder, (CursorStreamProvider) payload, length);
         } else {
-          entity =
-              new ByteArrayHttpEntity(getPayloadAsBytes(((CursorStreamProvider) payload).openCursor(), transformationService));
+          entity = entityFactory
+              .fromByteArray(getPayloadAsBytes(((CursorStreamProvider) payload).openCursor(), transformationService));
         }
       }
     } else if (payload instanceof InputStream) {
@@ -254,9 +251,9 @@ public class HttpRequestFactory {
       } else if (streamingMode == AUTO) {
         if (contentLength.isPresent()) {
           sanitizeForContentLength(requestBuilder, transferEncoding, BOTH_TRANSFER_HEADERS_SET_MESSAGE);
-          entity = new ByteArrayHttpEntity(getPayloadAsBytes(payload, transformationService));
+          entity = entityFactory.fromByteArray(getPayloadAsBytes(payload, transformationService));
         } else if ((transferEncoding.isPresent() && CHUNKED.equalsIgnoreCase(transferEncoding.get())) || !length.isPresent()) {
-          entity = new InputStreamHttpEntity((InputStream) payload);
+          entity = entityFactory.fromInputStream((InputStream) payload);
         } else {
           sanitizeForContentLength(requestBuilder, transferEncoding, INVALID_TRANSFER_ENCODING_HEADER_MESSAGE);
           entity = avoidConsumingPayload(requestBuilder, (InputStream) payload, length);
@@ -266,7 +263,7 @@ public class HttpRequestFactory {
         if (length.isPresent()) {
           entity = avoidConsumingPayload(requestBuilder, (InputStream) payload, length);
         } else {
-          entity = new ByteArrayHttpEntity(getPayloadAsBytes(payload, transformationService));
+          entity = entityFactory.fromByteArray(getPayloadAsBytes(payload, transformationService));
         }
       }
     } else {
@@ -275,13 +272,13 @@ public class HttpRequestFactory {
         entity = guaranteeStreaming(requestBuilder, transferEncoding, contentLength, new ByteArrayInputStream(payloadAsBytes));
       } else if (streamingMode == NEVER) {
         sanitizeForContentLength(requestBuilder, transferEncoding, TRANSFER_ENCODING_NOT_ALLOWED_WHEN_NEVER_MESSAGE);
-        entity = new ByteArrayHttpEntity(payloadAsBytes);
+        entity = entityFactory.fromByteArray(payloadAsBytes);
       } else {
         // AUTO is defined so we'll let the headers define the transfer type
         if (contentLength.isPresent() && transferEncoding.isPresent()) {
           sanitizeForContentLength(requestBuilder, transferEncoding, BOTH_TRANSFER_HEADERS_SET_MESSAGE);
         }
-        entity = new InputStreamHttpEntity(new ByteArrayInputStream(payloadAsBytes), (long) payloadAsBytes.length);
+        entity = entityFactory.fromInputStream(new ByteArrayInputStream(payloadAsBytes), (long) payloadAsBytes.length);
       }
     }
 
@@ -313,16 +310,16 @@ public class HttpRequestFactory {
   }
 
   /**
-   * Generates an {@link InputStreamHttpEntity} with no length and sanitizes the headers for chunking
+   * Generates an {@link HttpEntity} with no length and sanitizes the headers for chunking
    */
   private HttpEntity guaranteeStreaming(HttpRequestBuilder requestBuilder, Optional<String> transferEncoding,
                                         Optional<String> contentLength, InputStream stream) {
     sanitizeForStreaming(requestBuilder, transferEncoding, contentLength);
-    return new InputStreamHttpEntity(stream);
+    return entityFactory.fromInputStream(stream);
   }
 
   /**
-   * Generates an {@link InputStreamHttpEntity} with no length and sanitizes the headers for chunking
+   * Generates an {@link HttpEntity} with no length and sanitizes the headers for chunking
    */
   private HttpEntity guaranteeStreaming(HttpRequestBuilder requestBuilder, Optional<String> transferEncoding,
                                         Optional<String> contentLength, CursorStreamProvider streamProvider) {
@@ -331,15 +328,15 @@ public class HttpRequestFactory {
   }
 
   /**
-   * Generates an {@link InputStreamHttpEntity} with a length and sets the Content-Length header with it as well
+   * Generates an {@link HttpEntity} with a length and sets the Content-Length header with it as well
    */
   private HttpEntity avoidConsumingPayload(HttpRequestBuilder requestBuilder, InputStream payload, OptionalLong length) {
     requestBuilder.addHeader(CONTENT_LENGTH, valueOf(length.getAsLong()));
-    return new InputStreamHttpEntity(payload, length.getAsLong());
+    return entityFactory.fromInputStream(payload, length.getAsLong());
   }
 
   /**
-   * Generates an {@link InputStreamHttpEntity} with a length and sets the Content-Length header with it as well
+   * Generates an {@link HttpEntity} with a length and sets the Content-Length header with it as well
    */
   private HttpEntity avoidConsumingPayload(HttpRequestBuilder requestBuilder, CursorStreamProvider streamProvider,
                                            OptionalLong length) {

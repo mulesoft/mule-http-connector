@@ -6,16 +6,16 @@
  */
 package org.mule.extension.http.api.request.builder;
 
+import static org.mule.runtime.api.metadata.DataType.STRING;
+
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.hash;
-import static org.mule.runtime.api.metadata.DataType.STRING;
 
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
-import org.mule.sdk.api.http.domain.entity.EmptyHttpEntity;
 import org.mule.sdk.api.http.domain.entity.HttpEntity;
-import org.mule.sdk.api.http.domain.entity.InputStreamHttpEntity;
+import org.mule.sdk.api.http.domain.entity.HttpEntityFactory;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
@@ -33,6 +33,7 @@ public class HttpRequesterTestRequestBuilder {
   private final List<TestQueryParam> requestQueryParams;
   private final List<UriParam> requestUriParams;
   private final ExpressionManager expressionManager;
+  private final HttpEntityFactory entityFactory;
 
   // The request body can be an expression, but as it hasn't any binding we can cache the result in this variable.
   private final String resolvedRequestBody;
@@ -41,12 +42,14 @@ public class HttpRequesterTestRequestBuilder {
                                          List<TestRequestHeader> requestHeaders,
                                          List<TestQueryParam> requestQueryParams,
                                          List<UriParam> requestUriParams,
-                                         ExpressionManager expressionManager) {
+                                         ExpressionManager expressionManager,
+                                         HttpEntityFactory entityFactory) {
     this.requestBody = requestBody;
     this.requestHeaders = requestHeaders;
     this.requestQueryParams = requestQueryParams;
     this.requestUriParams = requestUriParams;
     this.expressionManager = expressionManager;
+    this.entityFactory = entityFactory;
     this.resolvedRequestBody = resolveRequestBody();
   }
 
@@ -82,9 +85,9 @@ public class HttpRequesterTestRequestBuilder {
 
   public HttpEntity buildEntity() {
     if (resolvedRequestBody == null || resolvedRequestBody.isEmpty()) {
-      return new EmptyHttpEntity();
+      return entityFactory.emptyEntity();
     } else {
-      return new InputStreamHttpEntity(new ByteArrayInputStream(resolvedRequestBody.getBytes(UTF_8)));
+      return entityFactory.fromInputStream(new ByteArrayInputStream(resolvedRequestBody.getBytes(UTF_8)));
     }
   }
 

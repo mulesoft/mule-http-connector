@@ -21,7 +21,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.sdk.api.http.HttpConstants.HttpStatus;
-import org.mule.sdk.api.http.domain.entity.ByteArrayHttpEntity;
 import org.mule.sdk.api.http.domain.message.request.HttpRequest;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -147,7 +146,7 @@ public class HttpListenerConfigFunctionalTestCase extends AbstractHttpTestCase {
 
   private String callAndAssertStatusWithMuleClient(String url, int expectedStatus) throws Exception {
     HttpRequest request =
-        requestBuilder().uri(url).method(GET).entity(new ByteArrayHttpEntity(TEST_PAYLOAD.getBytes())).build();
+        requestBuilder().uri(url).method(GET).entity(createEntity(TEST_PAYLOAD.getBytes())).build();
     final org.mule.sdk.api.http.domain.message.response.HttpResponse response =
         httpClient.sendAsync(request, config -> config.setResponseTimeout(RECEIVE_TIMEOUT).setFollowsRedirect(false)).get();
     assertThat(response.getStatusCode(), is(expectedStatus));

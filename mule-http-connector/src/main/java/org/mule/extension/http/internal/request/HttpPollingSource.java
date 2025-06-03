@@ -197,7 +197,7 @@ public class HttpPollingSource extends PollingSource<String, HttpResponseAttribu
     LOGGER.debug("Starting HTTP Polling Source in {}", location.getRootContainerName());
     scheduler = schedulerService.ioScheduler();
     client = clientProvider.connect();
-    httpRequester = createHttpRequester(false, muleContext, httpService);
+    httpRequester = createHttpRequester(false, muleContext, httpService.entityFactory());
     validateExpressions();
   }
 

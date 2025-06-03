@@ -50,10 +50,11 @@ import org.mule.runtime.extension.api.annotation.param.RefName;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
-import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.client.proxy.ProxyConfig;
 import org.mule.sdk.api.http.HttpConstants;
-import org.mule.sdk.api.http.client.HttpClientConfigurer;
+import org.mule.sdk.api.http.client.HttpClientConfig;
+import org.mule.sdk.api.http.client.auth.HttpAuthenticationConfig;
+import org.mule.sdk.api.http.tcp.TcpSocketPropertiesConfigurer;
 
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
@@ -206,61 +207,57 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
     return extensionClient;
   }
 
-  private void configureClient(HttpClientConfigurer configurer) {
+  private void configureClient(HttpClientConfig configurer) {
     configurer
         .setName(format(NAME_PATTERN, configName))
         .setTlsContextFactory(tlsContext)
-        .configClientSocketProperties(tcpConfigurer -> {
-          TcpClientSocketProperties socketProperties = connectionParams.getClientSocketProperties();
-          tcpConfigurer
-              .sendBufferSize(socketProperties.getSendBufferSize())
-              .sendBufferSize(socketProperties.getSendBufferSize())
-              .clientTimeout(socketProperties.getClientTimeout())
-              .sendTcpNoDelay(socketProperties.getSendTcpNoDelay())
-              .linger(socketProperties.getLinger())
-              .keepAlive(socketProperties.getKeepAlive())
-              .connectionTimeout(socketProperties.getConnectionTimeout());
-        })
+        .configClientSocketProperties(this::configTcp)
         .setMaxConnections(connectionParams.getMaxConnections())
         .setUsePersistentConnections(connectionParams.getUsePersistentConnections())
         .setConnectionIdleTimeout(connectionParams.getConnectionIdleTimeout())
         .setStreaming(connectionParams.getStreamResponse())
         .setResponseBufferSize(connectionParams.getResponseBufferSize());
 
-    if (authentication instanceof HttpAuthentication) {
-    }
-
     if (proxyConfig != null) {
-      configurer.configProxy(proxyConfigurer -> {
-        proxyConfigurer
-            .host(proxyConfig.getHost())
-            .port(proxyConfig.getPort())
-            .username(proxyConfig.getUsername())
-            .password(proxyConfig.getPassword())
-            .nonProxyHosts(proxyConfig.getNonProxyHosts());
-
-        if (proxyConfig instanceof HttpProxyConfig.HttpNtlmProxyConfig) {
-          HttpProxyConfig.HttpNtlmProxyConfig ntlmProxyConfig = (HttpProxyConfig.HttpNtlmProxyConfig) proxyConfig;
-          proxyConfigurer.ntlm(ntlmProxyConfigurer -> ntlmProxyConfigurer.domain(ntlmProxyConfig.getNtlmDomain()));
-        }
-      });
+      configurer.configProxy(this::configProxy);
     }
   }
 
-  private String getConfigurationId() {
-    return muleContext.getConfiguration().getId() + "_" + configName;
-  }
-
-  private org.mule.runtime.http.api.tcp.TcpClientSocketProperties buildTcpProperties(TcpClientSocketProperties socketProperties) {
-    return org.mule.runtime.http.api.tcp.TcpClientSocketProperties.builder()
+  private void configTcp(TcpSocketPropertiesConfigurer tcpConfigurer) {
+    TcpClientSocketProperties socketProperties = connectionParams.getClientSocketProperties();
+    tcpConfigurer
         .sendBufferSize(socketProperties.getSendBufferSize())
         .sendBufferSize(socketProperties.getSendBufferSize())
         .clientTimeout(socketProperties.getClientTimeout())
         .sendTcpNoDelay(socketProperties.getSendTcpNoDelay())
         .linger(socketProperties.getLinger())
         .keepAlive(socketProperties.getKeepAlive())
-        .connectionTimeout(socketProperties.getConnectionTimeout())
-        .build();
+        .connectionTimeout(socketProperties.getConnectionTimeout());
+  }
+
+  private void configProxy(org.mule.sdk.api.http.client.proxy.ProxyConfig proxyConfigurer) {
+    proxyConfigurer
+        .host(proxyConfig.getHost())
+        .port(proxyConfig.getPort())
+        .nonProxyHosts(proxyConfig.getNonProxyHosts())
+        .auth(this::configProxyAuth);
+  }
+
+  private void configProxyAuth(HttpAuthenticationConfig authenticationConfig) {
+    if (proxyConfig.getUsername() == null || proxyConfig.getPassword() == null) {
+      return;
+    }
+    if (proxyConfig instanceof HttpProxyConfig.HttpNtlmProxyConfig) {
+      HttpProxyConfig.HttpNtlmProxyConfig ntlmProxyConfig = (HttpProxyConfig.HttpNtlmProxyConfig) proxyConfig;
+      authenticationConfig.ntlm(proxyConfig.getUsername(), proxyConfig.getPassword(), false, ntlmProxyConfig.getNtlmDomain(),
+                                null);
+    } else {
+      authenticationConfig.basic(proxyConfig.getUsername(), proxyConfig.getPassword(), false);
+    }
+  }
+
+  private String getConfigurationId() {
+    return muleContext.getConfiguration().getId() + "_" + configName;
   }
 
   @Override

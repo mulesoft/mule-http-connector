@@ -23,8 +23,8 @@ import org.mule.extension.http.internal.request.ShareableHttpClient;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.sdk.api.http.HttpService;
 import org.mule.sdk.api.http.client.HttpClient;
-import org.mule.sdk.api.http.client.HttpClientConfigurer;
-import org.mule.sdk.api.http.client.proxy.ProxyConfigurer;
+import org.mule.sdk.api.http.client.HttpClientConfig;
+import org.mule.sdk.api.http.client.proxy.ProxyConfig;
 import org.mule.sdk.api.http.tcp.TcpSocketPropertiesConfigurer;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -59,9 +59,9 @@ public class HttpRequesterConnectionManagerTestCase extends AbstractMuleTestCase
   public void setUp() {
     when(httpService.client(any())).thenAnswer(
                                                invocation -> {
-                                                 Consumer<HttpClientConfigurer> consumer =
-                                                     (Consumer<HttpClientConfigurer>) invocation.getArguments()[0];
-                                                 TestConfigurer configurer = new TestConfigurer();
+                                                 Consumer<HttpClientConfig> consumer =
+                                                     (Consumer<HttpClientConfig>) invocation.getArguments()[0];
+                                                 TestConfig configurer = new TestConfig();
                                                  consumer.accept(configurer);
                                                  if (CONFIG_NAME.equals(configurer.name)) {
                                                    return delegateHttpClient;
@@ -126,7 +126,7 @@ public class HttpRequesterConnectionManagerTestCase extends AbstractMuleTestCase
     verify(delegateHttpClient, Mockito.times(2)).start();
   }
 
-  private static class TestConfigurer implements HttpClientConfigurer {
+  private static class TestConfig implements HttpClientConfig {
 
     private TlsContextFactory tlsContextFactory;
     private int maxConnections;
@@ -137,64 +137,64 @@ public class HttpRequesterConnectionManagerTestCase extends AbstractMuleTestCase
     private String name;
     private Boolean decompress;
     private Consumer<TcpSocketPropertiesConfigurer> tcpConfigurer;
-    private Consumer<ProxyConfigurer> proxyConfigurer;
+    private Consumer<ProxyConfig> proxyConfigurer;
 
     @Override
-    public HttpClientConfigurer setTlsContextFactory(TlsContextFactory tlsContextFactory) {
+    public HttpClientConfig setTlsContextFactory(TlsContextFactory tlsContextFactory) {
       this.tlsContextFactory = tlsContextFactory;
       return this;
     }
 
     @Override
-    public HttpClientConfigurer setMaxConnections(int maxConnections) {
+    public HttpClientConfig setMaxConnections(int maxConnections) {
       this.maxConnections = maxConnections;
       return this;
     }
 
     @Override
-    public HttpClientConfigurer setUsePersistentConnections(boolean usePersistentConnections) {
+    public HttpClientConfig setUsePersistentConnections(boolean usePersistentConnections) {
       this.usePersistentConnections = usePersistentConnections;
       return this;
     }
 
     @Override
-    public HttpClientConfigurer setConnectionIdleTimeout(int connectionIdleTimeout) {
+    public HttpClientConfig setConnectionIdleTimeout(int connectionIdleTimeout) {
       this.connectionIdleTimeout = connectionIdleTimeout;
       return this;
     }
 
     @Override
-    public HttpClientConfigurer setStreaming(boolean streaming) {
+    public HttpClientConfig setStreaming(boolean streaming) {
       this.streaming = streaming;
       return this;
     }
 
     @Override
-    public HttpClientConfigurer setResponseBufferSize(int responseBufferSize) {
+    public HttpClientConfig setResponseBufferSize(int responseBufferSize) {
       this.responseBufferSize = responseBufferSize;
       return this;
     }
 
     @Override
-    public HttpClientConfigurer setName(String name) {
+    public HttpClientConfig setName(String name) {
       this.name = name;
       return this;
     }
 
     @Override
-    public HttpClientConfigurer setDecompress(Boolean decompress) {
+    public HttpClientConfig setDecompress(Boolean decompress) {
       this.decompress = decompress;
       return this;
     }
 
     @Override
-    public HttpClientConfigurer configClientSocketProperties(Consumer<TcpSocketPropertiesConfigurer> configurer) {
+    public HttpClientConfig configClientSocketProperties(Consumer<TcpSocketPropertiesConfigurer> configurer) {
       this.tcpConfigurer = configurer;
       return this;
     }
 
     @Override
-    public HttpClientConfigurer configProxy(Consumer<ProxyConfigurer> configurer) {
+    public HttpClientConfig configProxy(Consumer<ProxyConfig> configurer) {
       this.proxyConfigurer = configurer;
       return this;
     }

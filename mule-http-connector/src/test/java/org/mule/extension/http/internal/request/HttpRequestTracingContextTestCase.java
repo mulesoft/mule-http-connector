@@ -36,7 +36,7 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.extension.api.notification.NotificationEmitter;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
-import org.mule.sdk.api.http.HttpService;
+import org.mule.sdk.api.http.domain.entity.HttpEntityFactory;
 import org.mule.sdk.api.http.domain.message.request.HttpRequestBuilder;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 
@@ -102,14 +102,14 @@ public class HttpRequestTracingContextTestCase {
   private Map<String, List<String>> injectedHeaders;
 
   @Mock
-  private HttpService httpService;
+  private HttpEntityFactory entityFactory;
 
   @Rule
   public MockitoRule rule = MockitoJUnit.rule();
 
   @Test
   public void testTraceContext() {
-    HttpRequestFactory httpRequestFactory = new HttpRequestFactory(httpService);
+    HttpRequestFactory httpRequestFactory = new HttpRequestFactory(entityFactory);
     HttpRequester httpRequester = new HttpRequester(httpRequestFactory, httpResponseToResult, httpErrorMessageGenerator);
     DistributedTraceContextManager distributedTraceContextManager = mock(DistributedTraceContextManager.class);
     MuleConfiguration configuration = mock(MuleConfiguration.class);

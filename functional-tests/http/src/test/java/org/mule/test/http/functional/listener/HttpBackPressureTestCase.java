@@ -11,7 +11,6 @@ import static org.mule.tck.probe.PollingProber.check;
 
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.sdk.api.http.HttpConstants.HttpStatus;
-import org.mule.sdk.api.http.domain.entity.ByteArrayHttpEntity;
 import org.mule.sdk.api.http.domain.message.request.HttpRequest;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
@@ -41,7 +40,7 @@ public class HttpBackPressureTestCase extends AbstractHttpTestCase {
   }
 
   @Override
-  protected void doTearDown() throws Exception {
+  protected void doTearDown() {
     stop.set(true);
   }
 
@@ -56,7 +55,7 @@ public class HttpBackPressureTestCase extends AbstractHttpTestCase {
     Semaphore semaphore = new Semaphore(1024);
 
     final HttpRequest post = requestBuilder().uri(url).method("POST")
-        .entity(new ByteArrayHttpEntity(path.getBytes()))
+        .entity(createEntity(path.getBytes()))
         .build();
 
     Thread thread = new Thread((CheckedRunnable) () -> {
