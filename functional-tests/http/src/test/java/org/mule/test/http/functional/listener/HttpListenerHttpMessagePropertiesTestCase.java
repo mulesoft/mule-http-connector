@@ -19,7 +19,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
 import static org.mule.sdk.api.http.HttpHeaders.Names.X_CORRELATION_ID;
 import static org.mule.sdk.api.http.HttpHeaders.Names.X_FORWARDED_FOR;
-import static org.mule.sdk.api.http.domain.HttpProtocol.HTTP_1_1;
+import static org.mule.sdk.api.http.domain.HttpProtocolVersion.HTTP_1_1;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.functional.api.component.TestConnectorQueueHandler;
 import org.mule.runtime.api.message.Message;

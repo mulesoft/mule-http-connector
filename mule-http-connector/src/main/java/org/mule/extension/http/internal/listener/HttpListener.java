@@ -98,7 +98,7 @@ import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceResult;
 import org.mule.sdk.api.http.HttpConstants.HttpStatus;
 import org.mule.sdk.api.http.HttpService;
-import org.mule.sdk.api.http.domain.HttpProtocol;
+import org.mule.sdk.api.http.domain.HttpProtocolVersion;
 import org.mule.sdk.api.http.domain.message.request.HttpRequestContext;
 import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 import org.mule.sdk.api.http.domain.message.response.HttpResponseBuilder;
@@ -459,7 +459,7 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
           Result<InputStream, HttpRequestAttributes> result = createResult(requestContext);
 
           HttpResponseContext responseContext = new HttpResponseContext();
-          final String httpVersion = requestContext.getRequest().getProtocol().asString();
+          final String httpVersion = requestContext.getRequest().getProtocolVersion().asString();
           responseContext.setHttpVersion(httpVersion);
           responseContext.setSupportStreaming(supportsTransferEncoding(httpVersion));
           responseContext.setResponseCallback(responseCallback);
@@ -679,7 +679,8 @@ public class HttpListener extends Source<InputStream, HttpRequestAttributes> {
   }
 
   private boolean supportsTransferEncoding(String httpVersion) {
-    return !(HttpProtocol.HTTP_0_9.asString().equals(httpVersion) || HttpProtocol.HTTP_1_0.asString().equals(httpVersion));
+    return !(HttpProtocolVersion.HTTP_0_9.asString().equals(httpVersion)
+        || HttpProtocolVersion.HTTP_1_0.asString().equals(httpVersion));
   }
 
   private String[] extractAllowedMethods() throws InitialisationException {

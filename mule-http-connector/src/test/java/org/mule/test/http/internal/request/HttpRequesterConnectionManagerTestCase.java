@@ -22,6 +22,7 @@ import org.mule.extension.http.internal.request.HttpRequesterConnectionManager;
 import org.mule.extension.http.internal.request.ShareableHttpClient;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.sdk.api.http.HttpService;
+import org.mule.sdk.api.http.client.ClientCreationException;
 import org.mule.sdk.api.http.client.HttpClient;
 import org.mule.sdk.api.http.client.HttpClientConfig;
 import org.mule.sdk.api.http.client.proxy.ProxyConfig;
@@ -56,7 +57,7 @@ public class HttpRequesterConnectionManagerTestCase extends AbstractMuleTestCase
   private HttpRequesterConnectionManager connectionManager = new HttpRequesterConnectionManager(httpService);
 
   @Before
-  public void setUp() {
+  public void setUp() throws ClientCreationException {
     when(httpService.client(any())).thenAnswer(
                                                invocation -> {
                                                  Consumer<HttpClientConfig> consumer =

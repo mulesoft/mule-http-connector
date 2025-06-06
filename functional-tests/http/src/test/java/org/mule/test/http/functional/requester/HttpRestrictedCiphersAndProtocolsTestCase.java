@@ -25,6 +25,7 @@ import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.sdk.api.http.client.ClientCreationException;
 import org.mule.sdk.api.http.client.HttpClient;
 import org.mule.sdk.api.http.domain.message.request.HttpRequest;
 import org.mule.sdk.api.http.domain.message.response.HttpResponse;
@@ -132,7 +133,7 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
     assertThat(IOUtils.toString(response.getEntity().getContent()), is(TEST_PAYLOAD));
   }
 
-  public void createHttpClient() {
+  public void createHttpClient() throws ClientCreationException {
     httpClientWithCertificate = httpService
         .client(config -> config
             .setName(getClass().getSimpleName())

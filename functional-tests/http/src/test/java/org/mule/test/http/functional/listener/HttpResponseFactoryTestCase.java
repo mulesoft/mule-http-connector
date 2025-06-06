@@ -29,8 +29,8 @@ import org.mule.extension.http.internal.listener.intercepting.NoInterception;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.api.util.MultiMap;
-import org.mule.runtime.module.extension.api.http.message.HttpEntityFactoryImpl;
-import org.mule.runtime.module.extension.api.http.message.HttpResponseBuilderWrapper;
+import org.mule.runtime.http.support.internal.message.HttpEntityFactoryImpl;
+import org.mule.runtime.http.support.internal.message.HttpResponseBuilderWrapper;
 import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 import org.mule.sdk.api.http.domain.message.response.HttpResponseBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -76,7 +76,7 @@ public class HttpResponseFactoryTestCase extends AbstractMuleContextTestCase {
   }
 
   private HttpResponseBuilder responseBuilder() {
-    return new HttpResponseBuilderWrapper(org.mule.runtime.http.api.domain.message.response.HttpResponse.builder());
+    return new HttpResponseBuilderWrapper();
   }
 
   @Test

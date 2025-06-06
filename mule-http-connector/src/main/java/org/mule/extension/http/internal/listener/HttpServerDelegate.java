@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.internal.listener;
 
+import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.sdk.api.http.HttpConstants;
 import org.mule.sdk.api.http.server.EndpointAvailabilityHandler;
 import org.mule.sdk.api.http.server.HttpServer;
@@ -66,6 +67,16 @@ public class HttpServerDelegate implements HttpServer {
   }
 
   @Override
+  public void enableTls(TlsContextFactory tlsContextFactory) {
+    delegate.enableTls(tlsContextFactory);
+  }
+
+  @Override
+  public void disableTls() {
+    delegate.disableTls();
+  }
+
+  @Override
   public EndpointAvailabilityHandler addRequestHandler(Collection<String> methods, String path, RequestHandler requestHandler) {
     return delegate.addRequestHandler(methods, path, requestHandler);
   }
@@ -77,8 +88,7 @@ public class HttpServerDelegate implements HttpServer {
 
   @Override
   public SseEndpointManager sse(String ssePath, Consumer<SseRequestContext> onRequest, Consumer<SseClient> onClient) {
-    // TODO: implement...
-    return null;
+    return delegate.sse(ssePath, onRequest, onClient);
   }
 
   protected HttpServer getDelegate() {

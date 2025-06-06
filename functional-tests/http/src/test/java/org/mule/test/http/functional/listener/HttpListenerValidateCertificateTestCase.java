@@ -30,6 +30,7 @@ import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.sdk.api.http.client.ClientCreationException;
 import org.mule.sdk.api.http.client.HttpClient;
 import org.mule.sdk.api.http.domain.message.request.HttpRequest;
 import org.mule.sdk.api.http.domain.message.response.HttpResponse;
@@ -135,7 +136,7 @@ public class HttpListenerValidateCertificateTestCase extends AbstractHttpTestCas
     assertValidRequest(getUrl(portWithoutValidation.getNumber()));
   }
 
-  public void createHttpClient() {
+  public void createHttpClient() throws ClientCreationException {
     httpClientWithCertificate = httpService
         .client(configBuilder -> configBuilder.setName(getClass().getSimpleName()).setTlsContextFactory(tlsContextFactory));
     httpClientWithCertificate.start();
