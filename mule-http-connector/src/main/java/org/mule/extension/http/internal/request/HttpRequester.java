@@ -26,7 +26,7 @@ import static org.mule.extension.http.internal.request.profiling.tracing.HttpReq
 import static org.mule.extension.http.internal.request.profiling.tracing.HttpSpanUtils.addStatusCodeAttribute;
 import static org.mule.extension.http.internal.request.profiling.tracing.HttpSpanUtils.updateClientSpanStatus;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.http.api.HttpConstants.Protocol.HTTPS;
+import static org.mule.sdk.api.http.HttpConstants.Protocol.HTTPS;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.error.HttpError;
@@ -56,8 +56,8 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
-import org.mule.runtime.http.api.domain.entity.HttpEntity;
-import org.mule.runtime.http.api.domain.message.request.HttpRequest;
+import org.mule.sdk.api.http.domain.entity.HttpEntity;
+import org.mule.sdk.api.http.domain.message.request.HttpRequest;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

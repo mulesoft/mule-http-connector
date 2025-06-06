@@ -7,7 +7,7 @@
 package org.mule.test.http.functional.requester;
 
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
-import static org.mule.runtime.http.api.HttpHeaders.Names.X_CORRELATION_ID;
+import static org.mule.sdk.api.http.HttpHeaders.Names.X_CORRELATION_ID;
 
 import static java.lang.String.format;
 

@@ -6,21 +6,22 @@
  */
 package org.mule.extension.http.internal.listener;
 
+// TODO: Move to SDK API
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.decodeQueryString;
 import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.decodeUriParams;
 
 import static java.lang.System.arraycopy;
 
-import org.mule.extension.http.api.certificate.AlternativeNameData;
-import org.mule.extension.http.api.certificate.CertificateData;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpRequestAttributesBuilder;
+import org.mule.extension.http.api.certificate.AlternativeNameData;
+import org.mule.extension.http.api.certificate.CertificateData;
 import org.mule.extension.http.api.certificate.CertificateExtension;
 import org.mule.extension.http.api.certificate.PrincipalData;
 import org.mule.extension.http.api.certificate.PublicKeyData;
-import org.mule.runtime.http.api.domain.message.request.HttpRequest;
-import org.mule.runtime.http.api.domain.request.ClientConnection;
-import org.mule.runtime.http.api.domain.request.HttpRequestContext;
+import org.mule.sdk.api.http.domain.message.request.ClientConnection;
+import org.mule.sdk.api.http.domain.message.request.HttpRequest;
+import org.mule.sdk.api.http.domain.message.request.HttpRequestContext;
 
 import java.math.BigInteger;
 import java.net.URI;
@@ -89,7 +90,7 @@ public class HttpRequestAttributesResolver {
         .rawRequestUri(rawUriString)
         .method(request.getMethod())
         .scheme(requestContext.getScheme())
-        .version(request.getProtocol().asString())
+        .version(request.getProtocolVersion().asString())
         .headers(request.getHeaders())
         .uriParams(decodeUriParams(listenerPath, rawPath))
         .queryString(queryString)

@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.api.notification;
 
-import org.mule.runtime.http.api.domain.message.response.HttpResponse;
+import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 
 /**
  * HTTP notification data regarding responses.

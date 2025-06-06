@@ -7,11 +7,11 @@
 package org.mule.test.http.functional.proxy;
 
 import static org.mule.runtime.api.metadata.DataType.fromObject;
-import static org.mule.runtime.http.api.HttpHeaders.Names.CONNECTION;
-import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
-import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
-import static org.mule.runtime.http.api.HttpHeaders.Names.X_FORWARDED_FOR;
-import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
+import static org.mule.sdk.api.http.HttpHeaders.Names.CONNECTION;
+import static org.mule.sdk.api.http.HttpHeaders.Names.CONTENT_LENGTH;
+import static org.mule.sdk.api.http.HttpHeaders.Names.TRANSFER_ENCODING;
+import static org.mule.sdk.api.http.HttpHeaders.Names.X_FORWARDED_FOR;
+import static org.mule.sdk.api.http.HttpHeaders.Values.CHUNKED;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.PROXY;
 
 import static java.lang.String.valueOf;

@@ -6,7 +6,7 @@
  */
 package org.mule.test.http.functional.proxy;
 
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.PROXY;
 
 import static java.lang.Thread.currentThread;

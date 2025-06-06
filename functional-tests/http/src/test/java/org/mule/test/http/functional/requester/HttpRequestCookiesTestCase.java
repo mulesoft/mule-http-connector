@@ -6,7 +6,7 @@
  */
 package org.mule.test.http.functional.requester;
 
-import static org.mule.runtime.http.api.HttpHeaders.Names.COOKIE;
+import static org.mule.sdk.api.http.HttpHeaders.Names.COOKIE;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;

@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.api.listener.headers;
 
-import org.mule.runtime.http.api.HttpConstants.HttpStatus;
+import org.mule.sdk.api.http.HttpConstants.HttpStatus;
 
 /**
  * Exception thrown by {@link HttpHeadersValidator} when a headers error is found.

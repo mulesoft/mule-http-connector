@@ -6,11 +6,11 @@
  */
 package org.mule.test.http.functional.requester.ntlm;
 
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.runtime.http.api.HttpHeaders.Names.AUTHORIZATION;
-import static org.mule.runtime.http.api.HttpHeaders.Names.CONNECTION;
-import static org.mule.runtime.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
-import static org.mule.runtime.http.api.HttpHeaders.Values.KEEP_ALIVE;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.OK;
+import static org.mule.sdk.api.http.HttpHeaders.Names.AUTHORIZATION;
+import static org.mule.sdk.api.http.HttpHeaders.Names.CONNECTION;
+import static org.mule.sdk.api.http.HttpHeaders.Names.WWW_AUTHENTICATE;
+import static org.mule.sdk.api.http.HttpHeaders.Values.KEEP_ALIVE;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.NTLM;
 import static org.mule.test.http.functional.fips.DefaultTestConfiguration.isFipsTesting;
 

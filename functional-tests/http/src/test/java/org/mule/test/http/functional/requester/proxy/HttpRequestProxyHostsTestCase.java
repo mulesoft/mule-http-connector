@@ -7,7 +7,7 @@
 package org.mule.test.http.functional.requester.proxy;
 
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.OK;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.PROXY;
 
 import static org.hamcrest.CoreMatchers.equalTo;

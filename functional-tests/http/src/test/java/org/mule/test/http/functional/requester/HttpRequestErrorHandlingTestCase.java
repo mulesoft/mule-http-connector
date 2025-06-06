@@ -9,24 +9,24 @@ package org.mule.test.http.functional.requester;
 import static org.mule.extension.http.internal.listener.HttpListener.HTTP_NAMESPACE;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.runtime.extension.api.error.MuleErrors.ANY;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_GATEWAY;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.EXPECTATION_FAILED;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.FORBIDDEN;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.GATEWAY_TIMEOUT;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.METHOD_NOT_ALLOWED;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.MOVED_PERMANENTLY;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.MOVED_TEMPORARILY;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.MULTIPLE_CHOICES;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.NOT_ACCEPTABLE;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.NOT_FOUND;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.NOT_MODIFIED;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.SEE_OTHER;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.TOO_MANY_REQUESTS;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.UNSUPPORTED_MEDIA_TYPE;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.BAD_GATEWAY;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.BAD_REQUEST;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.EXPECTATION_FAILED;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.FORBIDDEN;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.GATEWAY_TIMEOUT;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.METHOD_NOT_ALLOWED;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.MOVED_PERMANENTLY;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.MOVED_TEMPORARILY;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.MULTIPLE_CHOICES;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.NOT_ACCEPTABLE;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.NOT_FOUND;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.NOT_MODIFIED;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.SEE_OTHER;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.TOO_MANY_REQUESTS;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.UNAUTHORIZED;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.UNSUPPORTED_MEDIA_TYPE;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.ERRORS;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.ERROR_HANDLING;
 
@@ -43,20 +43,18 @@ import org.mule.functional.api.exception.ExpectedError;
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.http.api.HttpConstants.HttpStatus;
+import org.mule.sdk.api.http.HttpConstants.HttpStatus;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
-
-import org.junit.Rule;
-import org.junit.Test;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Stories;
 import io.qameta.allure.Story;
-
 import jakarta.servlet.http.HttpServletResponse;
+import org.junit.Rule;
+import org.junit.Test;
 
 @Stories({@Story(ERROR_HANDLING), @Story(ERRORS)})
 public class HttpRequestErrorHandlingTestCase extends AbstractHttpRequestTestCase {

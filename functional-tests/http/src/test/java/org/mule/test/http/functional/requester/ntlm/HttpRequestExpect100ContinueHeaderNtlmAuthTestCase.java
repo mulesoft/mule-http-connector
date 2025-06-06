@@ -23,8 +23,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-import static org.mule.runtime.http.api.HttpHeaders.Names.AUTHORIZATION;
-import static org.mule.runtime.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
+import static org.mule.sdk.api.http.HttpHeaders.Names.AUTHORIZATION;
+import static org.mule.sdk.api.http.HttpHeaders.Names.WWW_AUTHENTICATE;
 
 import org.mule.test.runner.RunnerDelegateTo;
 

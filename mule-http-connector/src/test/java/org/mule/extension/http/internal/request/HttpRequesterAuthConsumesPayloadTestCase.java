@@ -6,15 +6,27 @@
  */
 package org.mule.extension.http.internal.request;
 
-import io.qameta.allure.Issue;
-import org.apache.commons.io.IOUtils;
-import org.glassfish.grizzly.memory.ByteBufferWrapper;
-import org.glassfish.grizzly.utils.BufferInputStream;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InOrder;
-import org.mockito.stubbing.Answer;
+import static org.mule.extension.http.internal.request.EmptyDistributedTraceContextManager.getDistributedTraceContextManager;
+import static org.mule.sdk.api.http.HttpHeaders.Names.CONTENT_TYPE;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.OptionalLong.of;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.error.HttpErrorMessageGenerator;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
@@ -33,10 +45,10 @@ import org.mule.runtime.extension.api.notification.NotificationEmitter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
-import org.mule.runtime.http.api.domain.entity.HttpEntity;
-import org.mule.runtime.http.api.domain.message.request.HttpRequest;
-import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
-import org.mule.runtime.http.api.domain.message.response.HttpResponse;
+import org.mule.sdk.api.http.domain.entity.HttpEntity;
+import org.mule.sdk.api.http.domain.message.request.HttpRequest;
+import org.mule.sdk.api.http.domain.message.request.HttpRequestBuilder;
+import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,23 +60,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.same;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mule.extension.http.internal.request.EmptyDistributedTraceContextManager.getDistributedTraceContextManager;
-import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
+import io.qameta.allure.Issue;
+import org.apache.commons.io.IOUtils;
+import org.glassfish.grizzly.memory.ByteBufferWrapper;
+import org.glassfish.grizzly.utils.BufferInputStream;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
+import org.mockito.stubbing.Answer;
 
 public class HttpRequesterAuthConsumesPayloadTestCase {
 
@@ -112,7 +116,7 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
     textPayload = "some text payload";
     InputStream payloadInputStream = IOUtils.toInputStream(textPayload);
     when(entity.getContent()).thenReturn(payloadInputStream);
-    when(entity.getLength()).thenReturn(of((long) textPayload.length()));
+    when(entity.getBytesLength()).thenReturn(of(textPayload.length()));
 
     when(streamingHelper.resolveCursorProvider(entity.getContent())).thenReturn(new FakeCursorProvider(payloadInputStream));
 
@@ -134,7 +138,7 @@ public class HttpRequesterAuthConsumesPayloadTestCase {
 
       @Override
       public HttpRequestBuilder createRequestBuilder(HttpRequesterConfig config) {
-        return requestBuilder.toHttpRequestBuilder(config);
+        return null;
       }
 
       @Override

@@ -12,7 +12,7 @@ import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
+import org.mule.sdk.api.http.domain.message.request.HttpRequestBuilder;
 
 import org.slf4j.Logger;
 

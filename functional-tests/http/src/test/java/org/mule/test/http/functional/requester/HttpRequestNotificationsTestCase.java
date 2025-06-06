@@ -6,8 +6,8 @@
  */
 package org.mule.test.http.functional.requester;
 
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.runtime.http.api.HttpConstants.Method.POST;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.OK;
+import static org.mule.sdk.api.http.HttpConstants.Method.POST;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toList;

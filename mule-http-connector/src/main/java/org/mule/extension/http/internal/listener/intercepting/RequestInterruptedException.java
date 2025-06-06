@@ -7,7 +7,7 @@
 package org.mule.extension.http.internal.listener.intercepting;
 
 import org.mule.runtime.api.util.MultiMap;
-import org.mule.runtime.http.api.HttpConstants.HttpStatus;
+import org.mule.sdk.api.http.HttpConstants.HttpStatus;
 
 /**
  * Exception that suggest request to be interrupted and flow not executed.

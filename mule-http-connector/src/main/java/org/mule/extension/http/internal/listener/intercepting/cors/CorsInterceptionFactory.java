@@ -7,8 +7,8 @@
 package org.mule.extension.http.internal.listener.intercepting.cors;
 
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.runtime.http.api.HttpHeaders.Names.ACCESS_CONTROL_ALLOW_ORIGIN;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.OK;
+import static org.mule.sdk.api.http.HttpHeaders.Names.ACCESS_CONTROL_ALLOW_ORIGIN;
 
 import org.mule.extension.http.internal.listener.intercepting.Interception;
 import org.mule.extension.http.internal.listener.intercepting.NoInterception;

@@ -6,12 +6,6 @@
  */
 package org.mule.extension.http.internal.request;
 
-import static java.lang.String.valueOf;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.unmodifiableSet;
-import static java.util.Optional.ofNullable;
 import static org.mule.extension.http.api.error.HttpError.SECURITY;
 import static org.mule.extension.http.api.error.HttpError.TRANSFORMATION;
 import static org.mule.extension.http.api.streaming.HttpStreamingType.ALWAYS;
@@ -22,12 +16,19 @@ import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
-import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
-import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
-import static org.mule.runtime.http.api.HttpHeaders.Names.COOKIE;
-import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
-import static org.mule.runtime.http.api.HttpHeaders.Names.X_CORRELATION_ID;
-import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
+import static org.mule.sdk.api.http.HttpHeaders.Names.CONTENT_LENGTH;
+import static org.mule.sdk.api.http.HttpHeaders.Names.CONTENT_TYPE;
+import static org.mule.sdk.api.http.HttpHeaders.Names.COOKIE;
+import static org.mule.sdk.api.http.HttpHeaders.Names.TRANSFER_ENCODING;
+import static org.mule.sdk.api.http.HttpHeaders.Names.X_CORRELATION_ID;
+import static org.mule.sdk.api.http.HttpHeaders.Values.CHUNKED;
+
+import static java.lang.String.valueOf;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.unmodifiableSet;
+import static java.util.OptionalLong.empty;
 
 import org.mule.extension.http.api.request.HttpSendBodyMode;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
@@ -39,13 +40,11 @@ import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.exception.ModuleException;
-import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
-import org.mule.runtime.http.api.domain.entity.EmptyHttpEntity;
-import org.mule.runtime.http.api.domain.entity.HttpEntity;
-import org.mule.runtime.http.api.domain.entity.InputStreamHttpEntity;
-import org.mule.runtime.http.api.domain.entity.multipart.HttpPart;
-import org.mule.runtime.http.api.domain.message.request.HttpRequest;
-import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
+import org.mule.sdk.api.http.domain.entity.HttpEntity;
+import org.mule.sdk.api.http.domain.entity.HttpEntityFactory;
+import org.mule.sdk.api.http.domain.entity.multipart.Part;
+import org.mule.sdk.api.http.domain.message.request.HttpRequest;
+import org.mule.sdk.api.http.domain.message.request.HttpRequestBuilder;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 
 import java.io.ByteArrayInputStream;
@@ -89,16 +88,21 @@ public class HttpRequestFactory {
       "Transfer-Encoding header value was invalid and will not be sent.";
 
   private static final String COOKIES_SEPARATOR = "; ";
+  private final HttpEntityFactory entityFactory;
 
   private boolean logFirstIgnoredBody = true;
 
+  public HttpRequestFactory(HttpEntityFactory entityFactory) {
+    this.entityFactory = entityFactory;
+  }
+
   /**
-   * Creates an {@HttpRequest}.
+   * Creates an {@link HttpRequest}.
    *
    * @param httpRequestCreator The generic {@link RequestCreator} from the request component that should be used to create the
    *                           {@link HttpRequest}.
    * @param authentication     The {@link HttpRequestAuthentication} that should be used to create the {@link HttpRequest}.
-   * @return an {@HttpRequest} configured based on the parameters.
+   * @return an {@link HttpRequest} configured based on the parameters.
    * @throws MuleException if the request creation fails.
    */
   public HttpRequest create(HttpRequesterConfig config, String uri, String method, HttpStreamingType streamingMode,
@@ -217,15 +221,15 @@ public class HttpRequestFactory {
 
     // TODO This screams for a refactor into an Abstract Factory...
     if (emptyBody) {
-      entity = new EmptyHttpEntity();
+      entity = entityFactory.emptyEntity();
     } else if (payload instanceof CursorStreamProvider) {
       if (streamingMode == ALWAYS) {
         entity = guaranteeStreaming(requestBuilder, transferEncoding, contentLength, (CursorStreamProvider) payload);
       } else if (streamingMode == AUTO) {
         if (contentLength.isPresent()) {
           sanitizeForContentLength(requestBuilder, transferEncoding, BOTH_TRANSFER_HEADERS_SET_MESSAGE);
-          entity =
-              new ByteArrayHttpEntity(getPayloadAsBytes(((CursorStreamProvider) payload).openCursor(), transformationService));
+          entity = entityFactory
+              .fromByteArray(getPayloadAsBytes(((CursorStreamProvider) payload).openCursor(), transformationService));
         } else if ((transferEncoding.isPresent() && CHUNKED.equalsIgnoreCase(transferEncoding.get())) || !length.isPresent()) {
           entity = new RepeatableInputStreamHttpEntity((CursorStreamProvider) payload);
         } else {
@@ -237,8 +241,8 @@ public class HttpRequestFactory {
         if (length.isPresent()) {
           entity = avoidConsumingPayload(requestBuilder, (CursorStreamProvider) payload, length);
         } else {
-          entity =
-              new ByteArrayHttpEntity(getPayloadAsBytes(((CursorStreamProvider) payload).openCursor(), transformationService));
+          entity = entityFactory
+              .fromByteArray(getPayloadAsBytes(((CursorStreamProvider) payload).openCursor(), transformationService));
         }
       }
     } else if (payload instanceof InputStream) {
@@ -247,9 +251,9 @@ public class HttpRequestFactory {
       } else if (streamingMode == AUTO) {
         if (contentLength.isPresent()) {
           sanitizeForContentLength(requestBuilder, transferEncoding, BOTH_TRANSFER_HEADERS_SET_MESSAGE);
-          entity = new ByteArrayHttpEntity(getPayloadAsBytes(payload, transformationService));
+          entity = entityFactory.fromByteArray(getPayloadAsBytes(payload, transformationService));
         } else if ((transferEncoding.isPresent() && CHUNKED.equalsIgnoreCase(transferEncoding.get())) || !length.isPresent()) {
-          entity = new InputStreamHttpEntity((InputStream) payload);
+          entity = entityFactory.fromInputStream((InputStream) payload);
         } else {
           sanitizeForContentLength(requestBuilder, transferEncoding, INVALID_TRANSFER_ENCODING_HEADER_MESSAGE);
           entity = avoidConsumingPayload(requestBuilder, (InputStream) payload, length);
@@ -259,7 +263,7 @@ public class HttpRequestFactory {
         if (length.isPresent()) {
           entity = avoidConsumingPayload(requestBuilder, (InputStream) payload, length);
         } else {
-          entity = new ByteArrayHttpEntity(getPayloadAsBytes(payload, transformationService));
+          entity = entityFactory.fromByteArray(getPayloadAsBytes(payload, transformationService));
         }
       }
     } else {
@@ -268,13 +272,13 @@ public class HttpRequestFactory {
         entity = guaranteeStreaming(requestBuilder, transferEncoding, contentLength, new ByteArrayInputStream(payloadAsBytes));
       } else if (streamingMode == NEVER) {
         sanitizeForContentLength(requestBuilder, transferEncoding, TRANSFER_ENCODING_NOT_ALLOWED_WHEN_NEVER_MESSAGE);
-        entity = new ByteArrayHttpEntity(payloadAsBytes);
+        entity = entityFactory.fromByteArray(payloadAsBytes);
       } else {
         // AUTO is defined so we'll let the headers define the transfer type
         if (contentLength.isPresent() && transferEncoding.isPresent()) {
           sanitizeForContentLength(requestBuilder, transferEncoding, BOTH_TRANSFER_HEADERS_SET_MESSAGE);
         }
-        entity = new InputStreamHttpEntity(new ByteArrayInputStream(payloadAsBytes), (long) payloadAsBytes.length);
+        entity = entityFactory.fromInputStream(new ByteArrayInputStream(payloadAsBytes), (long) payloadAsBytes.length);
       }
     }
 
@@ -306,16 +310,16 @@ public class HttpRequestFactory {
   }
 
   /**
-   * Generates an {@link InputStreamHttpEntity} with no length and sanitizes the headers for chunking
+   * Generates an {@link HttpEntity} with no length and sanitizes the headers for chunking
    */
   private HttpEntity guaranteeStreaming(HttpRequestBuilder requestBuilder, Optional<String> transferEncoding,
                                         Optional<String> contentLength, InputStream stream) {
     sanitizeForStreaming(requestBuilder, transferEncoding, contentLength);
-    return new InputStreamHttpEntity(stream);
+    return entityFactory.fromInputStream(stream);
   }
 
   /**
-   * Generates an {@link InputStreamHttpEntity} with no length and sanitizes the headers for chunking
+   * Generates an {@link HttpEntity} with no length and sanitizes the headers for chunking
    */
   private HttpEntity guaranteeStreaming(HttpRequestBuilder requestBuilder, Optional<String> transferEncoding,
                                         Optional<String> contentLength, CursorStreamProvider streamProvider) {
@@ -324,15 +328,15 @@ public class HttpRequestFactory {
   }
 
   /**
-   * Generates an {@link InputStreamHttpEntity} with a length and sets the Content-Length header with it as well
+   * Generates an {@link HttpEntity} with a length and sets the Content-Length header with it as well
    */
   private HttpEntity avoidConsumingPayload(HttpRequestBuilder requestBuilder, InputStream payload, OptionalLong length) {
     requestBuilder.addHeader(CONTENT_LENGTH, valueOf(length.getAsLong()));
-    return new InputStreamHttpEntity(payload, length.getAsLong());
+    return entityFactory.fromInputStream(payload, length.getAsLong());
   }
 
   /**
-   * Generates an {@link InputStreamHttpEntity} with a length and sets the Content-Length header with it as well
+   * Generates an {@link HttpEntity} with a length and sets the Content-Length header with it as well
    */
   private HttpEntity avoidConsumingPayload(HttpRequestBuilder requestBuilder, CursorStreamProvider streamProvider,
                                            OptionalLong length) {
@@ -375,7 +379,7 @@ public class HttpRequestFactory {
     }
   }
 
-  private class RepeatableInputStreamHttpEntity implements HttpEntity {
+  private static class RepeatableInputStreamHttpEntity implements HttpEntity {
 
     private Long contentLength;
     private final CursorStreamProvider streamProvider;
@@ -411,14 +415,13 @@ public class HttpRequestFactory {
     }
 
     @Override
-    public Collection<HttpPart> getParts() {
+    public Collection<Part> getParts() {
       return emptyList();
     }
 
     @Override
-    public Optional<Long> getLength() {
-      return ofNullable(contentLength);
+    public OptionalLong getBytesLength() {
+      return contentLength == null ? empty() : OptionalLong.of(contentLength);
     }
-
   }
 }

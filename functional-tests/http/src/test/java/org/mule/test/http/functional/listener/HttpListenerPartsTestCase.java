@@ -9,12 +9,12 @@ package org.mule.test.http.functional.listener;
 import static org.mule.runtime.api.metadata.MediaType.BINARY;
 import static org.mule.runtime.api.metadata.MediaType.MULTIPART_MIXED;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
-import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
-import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
-import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
-import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
-import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
-import static org.mule.runtime.http.api.HttpHeaders.Values.MULTIPART_FORM_DATA;
+import static org.mule.sdk.api.http.HttpHeaders.Names.CONTENT_DISPOSITION;
+import static org.mule.sdk.api.http.HttpHeaders.Names.CONTENT_LENGTH;
+import static org.mule.sdk.api.http.HttpHeaders.Names.CONTENT_TYPE;
+import static org.mule.sdk.api.http.HttpHeaders.Names.TRANSFER_ENCODING;
+import static org.mule.sdk.api.http.HttpHeaders.Values.CHUNKED;
+import static org.mule.sdk.api.http.HttpHeaders.Values.MULTIPART_FORM_DATA;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.MULTIPART;
 
 import static java.lang.String.format;

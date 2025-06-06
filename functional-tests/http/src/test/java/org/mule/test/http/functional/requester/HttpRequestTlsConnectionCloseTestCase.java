@@ -7,8 +7,8 @@
 package org.mule.test.http.functional.requester;
 
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
-import static org.mule.runtime.http.api.HttpHeaders.Names.CONNECTION;
-import static org.mule.runtime.http.api.HttpHeaders.Values.CLOSE;
+import static org.mule.sdk.api.http.HttpHeaders.Names.CONNECTION;
+import static org.mule.sdk.api.http.HttpHeaders.Values.CLOSE;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.HTTPS;
 import static org.mule.test.http.functional.fips.DefaultTestConfiguration.getDefaultEnvironmentConfiguration;
 

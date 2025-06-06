@@ -8,7 +8,7 @@ package org.mule.extension.http.api.listener.headers;
 
 import static java.lang.String.format;
 import static org.mule.extension.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.util.MultiMap;

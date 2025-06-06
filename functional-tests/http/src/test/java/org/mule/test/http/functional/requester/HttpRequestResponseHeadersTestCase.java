@@ -7,8 +7,8 @@
 package org.mule.test.http.functional.requester;
 
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
-import static org.mule.runtime.http.api.HttpHeaders.Names.CONNECTION;
-import static org.mule.runtime.http.api.HttpHeaders.Names.UPGRADE;
+import static org.mule.sdk.api.http.HttpHeaders.Names.CONNECTION;
+import static org.mule.sdk.api.http.HttpHeaders.Names.UPGRADE;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.hamcrest.Matchers.equalTo;

@@ -22,11 +22,16 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-import org.mule.runtime.http.api.HttpService;
-import org.mule.service.http.TestHttpClient;
-
+import org.mule.sdk.api.http.HttpService;
+import org.mule.sdk.api.http.domain.entity.HttpEntity;
+import org.mule.sdk.api.http.domain.message.request.HttpRequestBuilder;
+import org.mule.sdk.api.http.domain.message.response.HttpResponseBuilder;
+import org.mule.test.http.functional.utils.TestHttpClient;
 
 import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import io.qameta.allure.Feature;
 import org.hamcrest.Matcher;
@@ -58,8 +63,18 @@ public abstract class AbstractHttpTestCase extends MuleArtifactFunctionalTestCas
       "No appropriate protocol (protocol is disabled or cipher suites are inappropriate)";
   protected static final String NETTY_APPROPRIATE_PROTOCOL_ERROR = "Received fatal alert: protocol_version";
 
+  @Inject
+  @Named("_httpServiceDelegate")
+  protected HttpService httpService;
+
   @Rule
-  public TestHttpClient httpClient = new TestHttpClient.Builder(getService(HttpService.class)).build();
+  public TestHttpClient httpClient;
+
+  @Override
+  protected void doSetUp() throws Exception {
+    super.doSetUp();
+    httpClient = new TestHttpClient.Builder(httpService).build();
+  }
 
   @Override
   protected void addBuilders(List<ConfigurationBuilder> builders) {
@@ -89,5 +104,17 @@ public abstract class AbstractHttpTestCase extends MuleArtifactFunctionalTestCas
                     containsString(NETTY_SSL_ERROR_RESPONSE),
                     containsString(APPROPRIATE_PROTOCOL_ERROR),
                     containsString(NETTY_APPROPRIATE_PROTOCOL_ERROR)));
+  }
+
+  protected HttpRequestBuilder requestBuilder() {
+    return httpService.requestBuilder();
+  }
+
+  protected HttpResponseBuilder responseBuilder() {
+    return httpService.responseBuilder();
+  }
+
+  protected HttpEntity createEntity(byte[] content) {
+    return httpService.entityFactory().fromByteArray(content);
   }
 }
