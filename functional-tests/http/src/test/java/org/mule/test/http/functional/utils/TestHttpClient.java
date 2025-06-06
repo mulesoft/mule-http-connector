@@ -14,6 +14,7 @@ import static java.lang.Integer.MAX_VALUE;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.sdk.api.http.HttpService;
+import org.mule.sdk.api.http.client.ClientCreationException;
 import org.mule.sdk.api.http.client.HttpClient;
 import org.mule.sdk.api.http.client.HttpRequestOptionsConfig;
 import org.mule.sdk.api.http.domain.message.request.HttpRequest;
@@ -41,7 +42,7 @@ public class TestHttpClient extends ExternalResource implements HttpClient {
   private TlsContextFactory tlsContextFactory;
   private HttpClient httpClient;
 
-  private TestHttpClient(HttpService httpService) {
+  private TestHttpClient(HttpService httpService) throws ClientCreationException {
     checkArgument(httpService != null, "httpService cannot be null");
     this.httpService = httpService;
 
@@ -138,9 +139,13 @@ public class TestHttpClient extends ExternalResource implements HttpClient {
      * @return a non null {@link TestHttpClient} with the provided configuration
      */
     public TestHttpClient build() {
-      TestHttpClient httpClient = new TestHttpClient(service);
-      httpClient.tlsContextFactory = tlsContextFactory;
-      return httpClient;
+      try {
+        TestHttpClient httpClient = new TestHttpClient(service);
+        httpClient.tlsContextFactory = tlsContextFactory;
+        return httpClient;
+      } catch (ClientCreationException e) {
+        throw new RuntimeException(e);
+      }
     }
   }
 

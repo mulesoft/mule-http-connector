@@ -7,6 +7,7 @@
 package org.mule.extension.http.internal.service;
 
 import org.mule.sdk.api.http.HttpService;
+import org.mule.sdk.api.http.client.ClientCreationException;
 import org.mule.sdk.api.http.client.HttpClient;
 import org.mule.sdk.api.http.client.HttpClientConfig;
 import org.mule.sdk.api.http.domain.entity.HttpEntityFactory;
@@ -35,7 +36,7 @@ public class HttpServiceDelegate implements HttpService {
   public HttpServiceDelegate() {}
 
   @Override
-  public HttpClient client(Consumer<HttpClientConfig> configCallback) {
+  public HttpClient client(Consumer<HttpClientConfig> configCallback) throws ClientCreationException {
     return delegate.client(configCallback);
   }
 

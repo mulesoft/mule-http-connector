@@ -90,7 +90,7 @@ public class HttpRequestAttributesResolver {
         .rawRequestUri(rawUriString)
         .method(request.getMethod())
         .scheme(requestContext.getScheme())
-        .version(request.getProtocol().asString())
+        .version(request.getProtocolVersion().asString())
         .headers(request.getHeaders())
         .uriParams(decodeUriParams(listenerPath, rawPath))
         .queryString(queryString)

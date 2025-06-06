@@ -21,7 +21,7 @@ import static org.mule.extension.http.internal.request.profiling.tracing.HttpReq
 import static org.mule.extension.http.internal.request.profiling.tracing.HttpRequestCurrentSpanCustomizer.NET_PEER_NAME;
 import static org.mule.extension.http.internal.request.profiling.tracing.HttpRequestCurrentSpanCustomizer.NET_PEER_PORT;
 import static org.mule.extension.http.internal.request.profiling.tracing.HttpRequestCurrentSpanCustomizer.getHttpRequesterCurrentSpanCustomizer;
-import static org.mule.sdk.api.http.domain.HttpProtocol.HTTP_1_1;
+import static org.mule.sdk.api.http.domain.HttpProtocolVersion.HTTP_1_1;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
 import static org.mockito.Mockito.mock;
@@ -115,7 +115,7 @@ public class HttpCurrentSpanCustomizerTestCase {
     URI uri = new URI(uriString);
     when(httpRequest.getMethod()).thenReturn("GET");
     when(httpRequest.getUri()).thenReturn(uri);
-    when(httpRequest.getProtocol()).thenReturn(HTTP_1_1);
+    when(httpRequest.getProtocolVersion()).thenReturn(HTTP_1_1);
 
     HttpCurrentSpanCustomizer httpCurrentSpanCustomizer = getHttpRequesterCurrentSpanCustomizer(httpRequest);
     httpCurrentSpanCustomizer.customizeSpan(distributedTraceContextManager);

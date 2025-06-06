@@ -10,7 +10,7 @@ import org.mule.extension.http.internal.service.message.muletosdk.HttpRequestWra
 import org.mule.extension.http.internal.service.message.sdktomule.HttpEntityWrapper;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.sdk.api.http.HttpConstants;
-import org.mule.sdk.api.http.domain.HttpProtocol;
+import org.mule.sdk.api.http.domain.HttpProtocolVersion;
 import org.mule.sdk.api.http.domain.entity.HttpEntity;
 import org.mule.sdk.api.http.domain.message.request.HttpRequest;
 import org.mule.sdk.api.http.domain.message.request.HttpRequestBuilder;
@@ -52,7 +52,7 @@ public class HttpRequestBuilderWrapper implements HttpRequestBuilder {
   }
 
   @Override
-  public HttpRequestBuilder protocol(HttpProtocol protocol) {
+  public HttpRequestBuilder protocol(HttpProtocolVersion protocol) {
     // builder.protocol(org.mule.runtime.http.api.domain.HttpProtocol.valueOf(protocol.name()));
     return this;
   }
