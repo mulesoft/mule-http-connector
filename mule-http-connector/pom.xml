@@ -42,7 +42,7 @@
         <mulePolicyApiVersion>1.1.3</mulePolicyApiVersion>
         <muleProfilingApiVersion>1.0.0</muleProfilingApiVersion>
         <muleSdkCompatibilityApiVersion>0.7.4</muleSdkCompatibilityApiVersion>
-        <muleSdkApiVersion>0.7.0</muleSdkApiVersion>
+        <muleSdkApiVersion>0.7.5</muleSdkApiVersion>
 
         <!-- Remove when a new parent version with MTF is available -->
         <munit.input.directory>src/test/munit</munit.input.directory>
