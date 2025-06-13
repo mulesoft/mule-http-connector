@@ -1,7 +1,7 @@
 projectType: extension
 mavenTool: "3.9.9"
 
-mavenAdditionalArgs: -pl .,mule-http-connector
+mavenAdditionalArgs: -pl .,mule-http-connector -DmunitMinMuleVersion=4.6.0
 
 additionalTestConfigs:
   functionalTests:
