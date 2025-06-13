@@ -20,7 +20,7 @@ import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStor
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 
-import static org.apache.commons.lang3.RandomStringUtils.insecure;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.apache.http.client.fluent.Request.Post;
 import static org.apache.http.entity.ContentType.APPLICATION_OCTET_STREAM;
 import static org.apache.http.entity.ContentType.TEXT_PLAIN;
@@ -42,6 +42,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 
+import io.qameta.allure.Story;
+import jakarta.servlet.http.Part;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.fluent.Response;
@@ -53,13 +55,8 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.eclipse.jetty.server.MultiPartInputStreamParser;
-
 import org.junit.Rule;
 import org.junit.Test;
-
-import io.qameta.allure.Story;
-
-import jakarta.servlet.http.Part;
 
 @Story(MULTIPART)
 public class HttpListenerPartsTestCase extends AbstractHttpTestCase {
@@ -67,7 +64,7 @@ public class HttpListenerPartsTestCase extends AbstractHttpTestCase {
   private static final String TEXT_BODY_FIELD_NAME = "field1";
   private static final String TEXT_BODY_FIELD_VALUE = "yes";
   private static final String FILE_BODY_FIELD_NAME = "file";
-  public static final String FILE_PART = insecure().nextAlphanumeric(1024) + " \n";
+  public static final String FILE_PART = randomAlphanumeric(1024) + " \n";
   // The value needs to be big enough to ensure several chunks if using transfer encoding chunked.
   private static final String FILE_BODY_FIELD_VALUE = StringUtils.repeat(FILE_PART, 16);
   private static final String FILE_BODY_FIELD_FILENAME = "file.ext";
