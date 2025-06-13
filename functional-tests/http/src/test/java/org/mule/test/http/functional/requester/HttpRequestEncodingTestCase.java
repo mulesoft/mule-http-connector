@@ -9,9 +9,9 @@ package org.mule.test.http.functional.requester;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -22,10 +22,10 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collection;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.junit.Test;
 import org.junit.runners.Parameterized;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 @RunnerDelegateTo(Parameterized.class)
 public class HttpRequestEncodingTestCase extends AbstractHttpRequestTestCase {
@@ -43,9 +43,15 @@ public class HttpRequestEncodingTestCase extends AbstractHttpRequestTestCase {
 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> parameters() {
-    return Arrays.asList(new Object[][] {{"EUC-JP", JAPANESE_MESSAGE}, {"Windows-31J", JAPANESE_MESSAGE},
-        {"ISO-2022-JP", JAPANESE_MESSAGE}, {"UTF-8", JAPANESE_MESSAGE}, {"Arabic", ARABIC_MESSAGE},
-        {"Windows-1256", ARABIC_MESSAGE}, {"Windows-1251", CYRILLIC_MESSAGE}, {"Cyrillic", CYRILLIC_MESSAGE},
+    return Arrays.asList(new Object[][] {
+        {"EUC-JP", JAPANESE_MESSAGE},
+        {"Windows-31J", JAPANESE_MESSAGE},
+        {"ISO-2022-JP", JAPANESE_MESSAGE},
+        {"UTF-8", JAPANESE_MESSAGE},
+        {"Arabic", ARABIC_MESSAGE},
+        {"Windows-1256", ARABIC_MESSAGE},
+        {"Windows-1251", CYRILLIC_MESSAGE},
+        {"Cyrillic", CYRILLIC_MESSAGE},
         {"US-ASCII", SIMPLE_MESSAGE}});
   }
 

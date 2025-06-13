@@ -12,23 +12,25 @@ import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.MULTIPART;
 
 import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.http.api.HttpHeaders;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.util.MultiPartWriter;
+
+import org.junit.Test;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Story;
-import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.util.MultiPartWriter;
-import org.junit.Test;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Story(MULTIPART)
 public class HttpRequestInboundPartsTestCase extends AbstractHttpRequestTestCase {

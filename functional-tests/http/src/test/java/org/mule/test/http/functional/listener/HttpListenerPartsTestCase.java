@@ -6,17 +6,6 @@
  */
 package org.mule.test.http.functional.listener;
 
-import static java.lang.String.format;
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
-import static org.apache.http.client.fluent.Request.Post;
-import static org.apache.http.entity.ContentType.APPLICATION_OCTET_STREAM;
-import static org.apache.http.entity.ContentType.TEXT_PLAIN;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.metadata.MediaType.BINARY;
 import static org.mule.runtime.api.metadata.MediaType.MULTIPART_MIXED;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
@@ -27,6 +16,19 @@ import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.runtime.http.api.HttpHeaders.Values.MULTIPART_FORM_DATA;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.MULTIPART;
+
+import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
+
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
+import static org.apache.http.client.fluent.Request.Post;
+import static org.apache.http.entity.ContentType.APPLICATION_OCTET_STREAM;
+import static org.apache.http.entity.ContentType.TEXT_PLAIN;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.core.Is.is;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.MediaType;
@@ -40,10 +42,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.Part;
-
 import io.qameta.allure.Story;
+import jakarta.servlet.http.Part;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.fluent.Response;
@@ -54,7 +54,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.eclipse.jetty.util.MultiPartInputStreamParser;
+import org.eclipse.jetty.server.MultiPartInputStreamParser;
 import org.junit.Rule;
 import org.junit.Test;
 

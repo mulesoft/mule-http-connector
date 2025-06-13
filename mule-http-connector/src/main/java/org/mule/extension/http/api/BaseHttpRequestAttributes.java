@@ -10,6 +10,7 @@ import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Common parts of all http request attributes.
@@ -57,4 +58,31 @@ public class BaseHttpRequestAttributes extends HttpAttributes {
   public Map<String, String> getUriParams() {
     return uriParams;
   }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + Objects.hash(queryParams, requestPath, uriParams);
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    BaseHttpRequestAttributes other = (BaseHttpRequestAttributes) obj;
+    return Objects.equals(queryParams, other.queryParams)
+        && Objects.equals(requestPath, other.requestPath)
+        && Objects.equals(uriParams, other.uriParams);
+  }
+
+
 }

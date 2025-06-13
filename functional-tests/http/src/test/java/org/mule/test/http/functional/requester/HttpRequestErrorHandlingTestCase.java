@@ -47,7 +47,8 @@ import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletResponse;
+import org.junit.Rule;
+import org.junit.Test;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
@@ -56,6 +57,8 @@ import io.qameta.allure.Story;
 import org.apache.commons.lang3.SystemUtils;
 import org.junit.Rule;
 import org.junit.Test;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 @Stories({@Story(ERROR_HANDLING), @Story(ERRORS)})
 public class HttpRequestErrorHandlingTestCase extends AbstractHttpRequestTestCase {

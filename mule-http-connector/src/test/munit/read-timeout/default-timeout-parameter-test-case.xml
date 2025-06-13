@@ -27,15 +27,15 @@
                 <ee:transform>
                     <ee:message>
                         <ee:set-payload><![CDATA[
-                        %dw 2.0
-                        output application/json
-                        fun getTimeoutCauseOrNull(ex) =
-                            if (ex.class.name == "TimeoutException")
-                            ex
-                            else if (ex == null)
-                            null
-                            else
-                            getTimeoutCauseOrNull(ex.cause)
+                            %dw 2.0
+                            output text/plain
+                            fun getTimeoutCauseOrNull(ex) =
+                                if (ex == null)
+                                    null
+                                else if (ex.message contains "Timeout")
+                                    ex.message
+                                else
+                                    getTimeoutCauseOrNull(ex.cause)
                             ---
                             getTimeoutCauseOrNull(error.cause)
                         ]]></ee:set-payload>

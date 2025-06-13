@@ -22,8 +22,6 @@ public class FipsTestConfiguration implements TestConfiguration {
   private static final String FIPS_TLS_CLIENT_KEY_STORE_WITH_MULTIPLE_KEYS = "tls/clientServerKeyStoreFips";
   private static final String FIPS_TLS_TRUST_STORE_FILE_WITHOUT_MULE_SERVER_CERTIFICATE =
       "tls/trustStoreWithoutMuleServerCertificateFips";
-  private static final String FIPS_CERTIFICATE_AUTHORITY_ENTITY = "tls/crl/certificate-authority-entity.bcfks";
-  private static final String FIPS_TRUST_FILE_FOR_CRL = "tls/crl/trustFile-fips.bcfks";
   private static final String FIPS_TLS_SSLTEST_KEYSTORE_WITH_TEST_HOSTNAME = "tls/ssltest-keystore-with-test-hostname-fips.bcfks";
 
   private static final String FIPS_TLS_SSLTEST_TRUSTORE_WITH_TEST_HOSTNAME =
@@ -85,28 +83,8 @@ public class FipsTestConfiguration implements TestConfiguration {
   }
 
   @Override
-  public String getKeyStorePKS12Type() {
-    return FIPS_TEST_STORE_TYPE;
-  }
-
-  @Override
-  public String getTrustStoreJCEKSType() {
-    return FIPS_TEST_STORE_TYPE;
-  }
-
-  @Override
   public String resolveStorePassword(String defaultPassword) {
     return FIPS_TEST_STORE_PASSWORD;
-  }
-
-  @Override
-  public String getCertificateAuthorityEntity() {
-    return FIPS_CERTIFICATE_AUTHORITY_ENTITY;
-  }
-
-  @Override
-  public String getTrustFileForCrl() {
-    return FIPS_TRUST_FILE_FOR_CRL;
   }
 
   @Override

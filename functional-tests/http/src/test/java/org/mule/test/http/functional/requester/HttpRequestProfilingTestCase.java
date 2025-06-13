@@ -13,10 +13,10 @@ import static org.mule.test.http.functional.AllureConstants.HttpFeature.HTTP_EXT
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.PROFILING;
 
 import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
@@ -33,15 +33,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import org.eclipse.jetty.server.Request;
+
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Feature(HTTP_EXTENSION)
 @Story(PROFILING)

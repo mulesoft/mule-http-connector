@@ -16,27 +16,28 @@ import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 
 public abstract class AbstractHttpRequestTestCase extends AbstractHttpTestCase {
@@ -83,7 +84,7 @@ public abstract class AbstractHttpRequestTestCase extends AbstractHttpTestCase {
   }
 
   protected void enableHttpsServer(Server server) {
-    SslContextFactory sslContextFactory = new SslContextFactory.Server();
+    SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
 
     try {
       sslContextFactory
