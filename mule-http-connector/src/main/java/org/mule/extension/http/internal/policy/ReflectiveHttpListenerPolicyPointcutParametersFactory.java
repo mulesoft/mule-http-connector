@@ -6,12 +6,13 @@
  */
 package org.mule.extension.http.internal.policy;
 
-import static java.lang.String.format;
-import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 import static org.mule.runtime.core.api.util.ClassUtils.getMethod;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
+
+import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.policy.HttpListenerPolicyPointcutParameters;

@@ -7,7 +7,7 @@
 package org.mule.extension.http.api.notification;
 
 import org.mule.runtime.api.util.MultiMap;
-import org.mule.runtime.http.api.domain.message.request.HttpRequest;
+import org.mule.sdk.api.http.domain.message.request.HttpRequest;
 
 /**
  * HTTP notification data regarding requests.

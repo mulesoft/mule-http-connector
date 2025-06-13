@@ -6,7 +6,7 @@
  */
 package org.mule.test.http.functional.requester;
 
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.EXPECTATION_FAILED;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.EXPECTATION_FAILED;
 
 import static java.lang.System.getProperty;
 

@@ -6,19 +6,21 @@
  */
 package org.mule.extension.http.internal.request;
 
-import static java.lang.Boolean.getBoolean;
-import static java.lang.Integer.MAX_VALUE;
-import static java.util.Optional.of;
 import static org.mule.extension.http.internal.HttpConnectorConstants.CONNECTOR_OVERRIDES;
 import static org.mule.extension.http.internal.HttpConnectorConstants.HTTP_ENABLE_PROFILING;
 import static org.mule.extension.http.internal.HttpConnectorConstants.REQUEST;
 import static org.mule.extension.http.internal.HttpConnectorConstants.RESPONSE;
-import static org.mule.extension.http.internal.request.UriUtils.buildPath;
-import static org.mule.extension.http.internal.request.UriUtils.resolveUri;
+import static org.mule.extension.http.internal.request.EmptyDistributedTraceContextManager.getDistributedTraceContextManager;
 import static org.mule.extension.http.internal.request.HttpRequestUtils.createHttpRequester;
 import static org.mule.extension.http.internal.request.HttpRequestUtils.handleCursor;
-import static org.mule.extension.http.internal.request.EmptyDistributedTraceContextManager.getDistributedTraceContextManager;
+import static org.mule.extension.http.internal.request.UriUtils.buildPath;
+import static org.mule.extension.http.internal.request.UriUtils.resolveUri;
+import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
 import static org.mule.sdk.api.annotation.param.MediaType.ANY;
+
+import static java.lang.Boolean.getBoolean;
+import static java.lang.Integer.MAX_VALUE;
+import static java.util.Optional.of;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
@@ -53,16 +55,19 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
-import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
+import org.mule.sdk.api.http.HttpService;
+import org.mule.sdk.api.http.domain.message.request.HttpRequestBuilder;
 import org.mule.sdk.compatibility.api.utils.ForwardCompatibilityHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HttpRequestOperations implements Initialisable, Disposable {
 
@@ -84,6 +89,10 @@ public class HttpRequestOperations implements Initialisable, Disposable {
 
   @Inject
   private java.util.Optional<ForwardCompatibilityHelper> forwardCompatibilityHelper;
+
+  @Inject
+  @Named("_httpServiceDelegate")
+  private HttpService httpService;
 
   private Scheduler scheduler;
 
@@ -159,7 +168,9 @@ public class HttpRequestOperations implements Initialisable, Disposable {
 
       @Override
       public HttpRequestBuilder createRequestBuilder(HttpRequesterConfig config) {
-        return builder.toHttpRequestBuilder(config);
+        return httpService.requestBuilder(PRESERVE_HEADER_CASE || config.isPreserveHeadersCase())
+            .headers(builder.getHeaders())
+            .queryParams(builder.getQueryParams());
       }
 
       @Override
@@ -187,7 +198,7 @@ public class HttpRequestOperations implements Initialisable, Disposable {
 
   private void initializeHttpRequester() throws InitialisationException {
     try {
-      httpRequester = createHttpRequester(httpResponseProfilingEnabled, muleContext);
+      httpRequester = createHttpRequester(httpResponseProfilingEnabled, muleContext, httpService.entityFactory());
     } catch (MuleException e) {
       throw new InitialisationException(e, this);
     }

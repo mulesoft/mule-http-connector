@@ -6,16 +6,15 @@
  */
 package org.mule.test.http.functional.requester;
 
-import static org.mule.runtime.http.api.HttpConstants.Method.GET;
+import static org.mule.sdk.api.http.HttpConstants.Method.GET;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.CONTENT;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
-import org.mule.runtime.http.api.domain.message.request.HttpRequest;
-import org.mule.runtime.http.api.domain.message.response.HttpResponse;
+import org.mule.sdk.api.http.domain.message.request.HttpRequest;
+import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.http.functional.AbstractHttpTestCase;
 
@@ -37,10 +36,9 @@ public class HttpRequestLaxContentTypeTestCase extends AbstractHttpTestCase {
   @Test
   public void sendsInvalidContentTypeOnRequest() throws Exception {
     final String url = String.format("http://localhost:%s/requestClientInvalid", httpPort.getNumber());
-    HttpRequest request =
-        HttpRequest.builder().uri(url).method(GET).entity(new ByteArrayHttpEntity(TEST_MESSAGE.getBytes())).build();
-    final HttpResponse response = httpClient.send(request, RECEIVE_TIMEOUT, false, null);
-
+    HttpRequest request = requestBuilder().uri(url).method(GET).entity(createEntity(TEST_MESSAGE.getBytes())).build();
+    final HttpResponse response =
+        httpClient.sendAsync(request, options -> options.setResponseTimeout(RECEIVE_TIMEOUT).setFollowsRedirect(false)).get();
     assertThat(IOUtils.toString(response.getEntity().getContent()), equalTo("invalidMimeType"));
   }
 

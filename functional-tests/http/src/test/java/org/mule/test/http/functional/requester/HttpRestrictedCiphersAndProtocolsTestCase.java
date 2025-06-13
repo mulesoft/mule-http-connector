@@ -6,18 +6,18 @@
  */
 package org.mule.test.http.functional.requester;
 
-import static org.mule.runtime.http.api.HttpConstants.Method.POST;
+import static org.mule.sdk.api.http.HttpConstants.Method.POST;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.HTTPS;
 import static org.mule.test.http.functional.fips.DefaultTestConfiguration.getDefaultEnvironmentConfiguration;
 import static org.mule.test.http.functional.fips.DefaultTestConfiguration.isFipsTesting;
 
 import static java.lang.String.format;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 
 import org.mule.extension.http.api.error.HttpRequestFailedException;
 import org.mule.functional.api.exception.ExpectedError;
@@ -25,12 +25,10 @@ import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.http.api.HttpService;
-import org.mule.runtime.http.api.client.HttpClient;
-import org.mule.runtime.http.api.client.HttpClientConfiguration;
-import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
-import org.mule.runtime.http.api.domain.message.request.HttpRequest;
-import org.mule.runtime.http.api.domain.message.response.HttpResponse;
+import org.mule.sdk.api.http.client.ClientCreationException;
+import org.mule.sdk.api.http.client.HttpClient;
+import org.mule.sdk.api.http.domain.message.request.HttpRequest;
+import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;
@@ -108,9 +106,13 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
     createHttpClient();
 
     // Uses default ciphers and protocols
-    HttpRequest request = HttpRequest.builder().uri(format("https://localhost:%s", port1.getValue())).method(POST)
-        .entity(new ByteArrayHttpEntity(TEST_PAYLOAD.getBytes())).build();
-    final HttpResponse response = httpClientWithCertificate.send(request, RECEIVE_TIMEOUT, false, null);
+    HttpRequest request = requestBuilder()
+        .method(POST)
+        .uri(format("https://localhost:%s", port1.getValue()))
+        .entity(createEntity(TEST_PAYLOAD.getBytes()))
+        .build();
+    final HttpResponse response = httpClientWithCertificate
+        .sendAsync(request, options -> options.setResponseTimeout(RECEIVE_TIMEOUT).setFollowsRedirect(false)).get();
     assertThat(IOUtils.toString(response.getEntity().getContent()), is(TEST_PAYLOAD));
   }
 
@@ -121,18 +123,21 @@ public class HttpRestrictedCiphersAndProtocolsTestCase extends AbstractHttpTestC
     createHttpClient();
 
     // Forces TLS_DHE_RSA_WITH_AES_128_CBC_SHA
-    HttpRequest request = HttpRequest.builder().uri(format("https://localhost:%s", port3.getValue())).method(POST)
-        .entity(new ByteArrayHttpEntity(TEST_PAYLOAD.getBytes())).build();
-    final HttpResponse response = httpClientWithCertificate.send(request, RECEIVE_TIMEOUT, false, null);
+    HttpRequest request = requestBuilder()
+        .method(POST)
+        .uri(format("https://localhost:%s", port3.getValue()))
+        .entity(createEntity(TEST_PAYLOAD.getBytes()))
+        .build();
+    final HttpResponse response = httpClientWithCertificate
+        .sendAsync(request, options -> options.setResponseTimeout(RECEIVE_TIMEOUT).setFollowsRedirect(false)).get();
     assertThat(IOUtils.toString(response.getEntity().getContent()), is(TEST_PAYLOAD));
   }
 
-  public void createHttpClient() {
-    httpClientWithCertificate = getService(HttpService.class).getClientFactory()
-        .create(new HttpClientConfiguration.Builder()
+  public void createHttpClient() throws ClientCreationException {
+    httpClientWithCertificate = httpService
+        .client(config -> config
             .setName(getClass().getSimpleName())
-            .setTlsContextFactory(tlsContextFactory)
-            .build());
+            .setTlsContextFactory(tlsContextFactory));
     httpClientWithCertificate.start();
   }
 

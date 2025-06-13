@@ -6,14 +6,16 @@
  */
 package org.mule.test.http.functional.listener;
 
+import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.appendQueryParam;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.OK;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.REQUEST_URI_TOO_LONG;
+
 import static java.lang.String.format;
+
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.REQUEST_URI_TOO_LONG;
-import static org.mule.runtime.http.api.utils.HttpEncoderDecoderUtils.appendQueryParam;
+
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.http.functional.AbstractHttpTestCase;

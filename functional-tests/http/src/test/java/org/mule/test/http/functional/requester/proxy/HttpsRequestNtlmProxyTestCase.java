@@ -6,8 +6,8 @@
  */
 package org.mule.test.http.functional.requester.proxy;
 
-import static org.mule.runtime.http.api.HttpHeaders.Names.PROXY_AUTHENTICATE;
-import static org.mule.runtime.http.api.HttpHeaders.Names.PROXY_AUTHORIZATION;
+import static org.mule.sdk.api.http.HttpHeaders.Names.PROXY_AUTHENTICATE;
+import static org.mule.sdk.api.http.HttpHeaders.Names.PROXY_AUTHORIZATION;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.NTLM;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.PROXY;
 import static org.mule.test.http.functional.fips.DefaultTestConfiguration.isFipsTesting;

@@ -11,7 +11,7 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.BINARY;
 import static org.mule.runtime.api.metadata.MediaType.HTML;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
-import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
+import static org.mule.sdk.api.http.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.CONTENT;
 
 import static java.lang.Boolean.TRUE;

@@ -8,19 +8,20 @@ package org.mule.extension.http.internal.listener;
 
 import static org.mule.extension.http.internal.request.profiling.tracing.HttpSpanUtils.addStatusCodeAttribute;
 import static org.mule.extension.http.internal.request.profiling.tracing.HttpSpanUtils.updateServerSpanStatus;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.internal.listener.intercepting.Interception;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
-import org.mule.runtime.http.api.domain.message.response.HttpResponse;
-import org.mule.runtime.http.api.domain.message.response.HttpResponseBuilder;
-import org.mule.runtime.http.api.server.async.HttpResponseReadyCallback;
-import org.mule.runtime.http.api.server.async.ResponseStatusCallback;
+import org.mule.sdk.api.http.domain.message.response.HttpResponse;
+import org.mule.sdk.api.http.domain.message.response.HttpResponseBuilder;
+import org.mule.sdk.api.http.server.async.HttpResponseReadyCallback;
+import org.mule.sdk.api.http.server.async.ResponseStatusCallback;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 
 import java.util.concurrent.RejectedExecutionException;
+import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,10 +32,13 @@ public class HttpListenerResponseSender {
 
   private final HttpResponseFactory responseFactory;
   private final Scheduler scheduler;
+  private final Supplier<HttpResponseBuilder> responseBuilderSupplier;
 
-  public HttpListenerResponseSender(HttpResponseFactory responseFactory, Scheduler responseSenderScheduler) {
+  public HttpListenerResponseSender(HttpResponseFactory responseFactory, Scheduler responseSenderScheduler,
+                                    Supplier<HttpResponseBuilder> responseBuilderSupplier) {
     this.responseFactory = responseFactory;
     this.scheduler = responseSenderScheduler;
+    this.responseBuilderSupplier = responseBuilderSupplier;
   }
 
   public void sendResponse(HttpResponseContext context,
@@ -69,12 +73,12 @@ public class HttpListenerResponseSender {
 
   protected HttpResponse buildResponse(HttpListenerResponseBuilder listenerResponseBuilder, Interception interception,
                                        boolean supportStreaming) {
-    return responseFactory.create(HttpResponse.builder(), interception, listenerResponseBuilder, supportStreaming);
+    return responseFactory.create(responseBuilderSupplier.get(), interception, listenerResponseBuilder, supportStreaming);
   }
 
   public ResponseStatusCallback getResponseFailureCallback(HttpResponseReadyCallback responseReadyCallback,
                                                            SourceCompletionCallback completionCallback) {
-    return new FailureResponseStatusCallback(responseReadyCallback, completionCallback);
+    return new FailureResponseStatusCallback(responseReadyCallback, completionCallback, responseBuilderSupplier);
   }
 
   /**
@@ -83,13 +87,16 @@ public class HttpListenerResponseSender {
    */
   public static class FailureResponseStatusCallback implements ResponseStatusCallback {
 
-    private HttpResponseReadyCallback responseReadyCallback;
-    private SourceCompletionCallback completionCallback;
+    private final HttpResponseReadyCallback responseReadyCallback;
+    private final SourceCompletionCallback completionCallback;
+    private final Supplier<HttpResponseBuilder> responseBuilderSupplier;
 
     public FailureResponseStatusCallback(HttpResponseReadyCallback responseReadyCallback,
-                                         SourceCompletionCallback completionCallback) {
+                                         SourceCompletionCallback completionCallback,
+                                         Supplier<HttpResponseBuilder> responseBuilderSupplier) {
       this.responseReadyCallback = responseReadyCallback;
       this.completionCallback = completionCallback;
+      this.responseBuilderSupplier = responseBuilderSupplier;
     }
 
     @Override
@@ -115,7 +122,7 @@ public class HttpListenerResponseSender {
     }
 
     protected HttpResponse buildErrorResponse() {
-      final HttpResponseBuilder errorResponseBuilder = HttpResponse.builder();
+      final HttpResponseBuilder errorResponseBuilder = responseBuilderSupplier.get();
       final HttpResponse errorResponse = errorResponseBuilder.statusCode(INTERNAL_SERVER_ERROR.getStatusCode())
           .reasonPhrase(INTERNAL_SERVER_ERROR.getReasonPhrase())
           .build();

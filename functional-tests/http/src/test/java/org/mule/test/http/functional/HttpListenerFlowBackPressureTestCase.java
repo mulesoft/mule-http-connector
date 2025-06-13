@@ -6,8 +6,8 @@
  */
 package org.mule.test.http.functional;
 
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.runtime.http.api.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.OK;
+import static org.mule.sdk.api.http.HttpConstants.HttpStatus.SERVICE_UNAVAILABLE;
 import static org.mule.test.http.functional.AllureConstants.HttpFeature.HttpStory.SOURCE_OVERLOAD;
 
 import static java.lang.String.format;

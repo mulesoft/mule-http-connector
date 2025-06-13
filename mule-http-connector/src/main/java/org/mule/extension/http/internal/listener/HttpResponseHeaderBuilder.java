@@ -7,13 +7,14 @@
 package org.mule.extension.http.internal.listener;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.http.api.HttpHeaders.Names.ACCESS_CONTROL_ALLOW_ORIGIN;
-import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_LENGTH;
-import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
-import static org.mule.runtime.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
+import static org.mule.sdk.api.http.HttpHeaders.Names.ACCESS_CONTROL_ALLOW_ORIGIN;
+import static org.mule.sdk.api.http.HttpHeaders.Names.CONTENT_LENGTH;
+import static org.mule.sdk.api.http.HttpHeaders.Names.CONTENT_TYPE;
+import static org.mule.sdk.api.http.HttpHeaders.Names.TRANSFER_ENCODING;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
-import org.mule.runtime.http.api.domain.message.response.HttpResponseBuilder;
+import org.mule.sdk.api.http.domain.message.response.HttpResponseBuilder;
 
 import java.util.Collection;
 import java.util.Map;

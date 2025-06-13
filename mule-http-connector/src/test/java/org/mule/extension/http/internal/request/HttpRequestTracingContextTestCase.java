@@ -10,18 +10,18 @@ import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 
-import static java.lang.Boolean.TRUE;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.mule.extension.http.api.HttpResponseAttributes;
+import org.mule.extension.http.api.error.HttpErrorMessageGenerator;
 import org.mule.extension.http.api.request.HttpSendBodyMode;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
@@ -36,8 +36,8 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.extension.api.notification.NotificationEmitter;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
-import org.mule.runtime.http.api.domain.message.request.HttpRequest;
-import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
+import org.mule.sdk.api.http.domain.entity.HttpEntityFactory;
+import org.mule.sdk.api.http.domain.message.request.HttpRequestBuilder;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 
 import java.io.InputStream;
@@ -53,8 +53,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.extension.http.api.error.HttpErrorMessageGenerator;
 
 @Feature(HTTP_EXTENSION)
 public class HttpRequestTracingContextTestCase {
@@ -103,17 +101,20 @@ public class HttpRequestTracingContextTestCase {
   @Mock
   private Map<String, List<String>> injectedHeaders;
 
+  @Mock
+  private HttpEntityFactory entityFactory;
+
   @Rule
   public MockitoRule rule = MockitoJUnit.rule();
 
   @Test
   public void testTraceContext() {
-    HttpRequestFactory httpRequestFactory = new HttpRequestFactory();
+    HttpRequestFactory httpRequestFactory = new HttpRequestFactory(entityFactory);
     HttpRequester httpRequester = new HttpRequester(httpRequestFactory, httpResponseToResult, httpErrorMessageGenerator);
     DistributedTraceContextManager distributedTraceContextManager = mock(DistributedTraceContextManager.class);
     MuleConfiguration configuration = mock(MuleConfiguration.class);
     when(muleContext.getConfiguration()).thenReturn(configuration);
-    HttpRequestBuilder httpRequesterBuilder = HttpRequest.builder();
+    HttpRequestBuilder httpRequesterBuilder = mock(HttpRequestBuilder.class);
     when(requestCreator.createRequestBuilder(any(HttpRequesterConfig.class))).thenReturn(httpRequesterBuilder);
     when(config.getDefaultHeaders()).thenReturn(emptyList());
     when(requestCreator.getCorrelationData()).thenReturn(empty());
@@ -134,7 +135,6 @@ public class HttpRequestTracingContextTestCase {
                             streamingHelper, callback,
                             injectedHeaders,
                             distributedTraceContextManager);
-    assertThat(httpRequesterBuilder.getHeaderValue(TRACE_CONTEXT_KEY_1).isPresent(), equalTo(TRUE));
-    assertThat(httpRequesterBuilder.getHeaderValue(TRACE_CONTEXT_KEY_1).get(), equalTo(TRACE_CONTEXT_VALUE_1));
+    verify(httpRequesterBuilder).addHeader(TRACE_CONTEXT_KEY_1, TRACE_CONTEXT_VALUE_1);
   }
 }

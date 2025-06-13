@@ -6,11 +6,8 @@
  */
 package org.mule.test.http.internal.request;
 
-import static java.lang.Thread.sleep;
-import static java.util.concurrent.Executors.newFixedThreadPool;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.Assert.assertThat;
+import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -19,35 +16,29 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.tck.junit4.matcher.IsEmptyOptional.empty;
-import static org.mule.test.http.AllureConstants.HttpFeature.HTTP_EXTENSION;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.extension.http.internal.request.HttpRequesterConnectionManager;
+import org.mule.extension.http.internal.request.ShareableHttpClient;
+import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.sdk.api.http.HttpService;
+import org.mule.sdk.api.http.client.ClientCreationException;
+import org.mule.sdk.api.http.client.HttpClient;
+import org.mule.sdk.api.http.client.HttpClientConfig;
+import org.mule.sdk.api.http.client.proxy.ProxyConfig;
+import org.mule.sdk.api.http.tcp.TcpSocketPropertiesConfigurer;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import java.util.function.Consumer;
+
 import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
-import org.mule.extension.http.internal.request.HttpRequesterConnectionManager;
-import org.mule.extension.http.internal.request.ShareableHttpClient;
-import org.mule.runtime.http.api.HttpService;
-import org.mule.runtime.http.api.client.HttpClient;
-import org.mule.runtime.http.api.client.HttpClientConfiguration;
-import org.mule.runtime.http.api.client.HttpClientFactory;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.slf4j.Logger;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.BiFunction;
-import java.util.function.Supplier;
 
 @Feature(HTTP_EXTENSION)
 @Story("HTTP Request")
@@ -65,47 +56,28 @@ public class HttpRequesterConnectionManagerTestCase extends AbstractMuleTestCase
   private HttpClient otherHttpClient = spy(HttpClient.class);
   private HttpRequesterConnectionManager connectionManager = new HttpRequesterConnectionManager(httpService);
 
-  private AtomicBoolean clientFactoryIsSlow = new AtomicBoolean(false);
-
   @Before
-  public void setUp() {
-    HttpClientFactory httpClientFactory = mock(HttpClientFactory.class);
-    when(httpService.getClientFactory()).thenReturn(httpClientFactory);
-    when(httpClientFactory.create(any())).thenAnswer(
-                                                     invocation -> {
-                                                       if (clientFactoryIsSlow.get()) {
-                                                         sleep(500L);
-                                                       }
-                                                       HttpClientConfiguration configuration =
-                                                           (HttpClientConfiguration) invocation.getArguments()[0];
-                                                       if (CONFIG_NAME.equals(configuration.getName())) {
-                                                         return delegateHttpClient;
-                                                       } else {
-                                                         return otherHttpClient;
-                                                       }
-                                                     });
-  }
-
-  @Test
-  public void lookup() {
-    assertThat(connectionManager.lookup(CONFIG_NAME), is(empty()));
-    ShareableHttpClient client = connectionManager.create(CONFIG_NAME, mock(HttpClientConfiguration.class));
-    assertThat(connectionManager.lookup(CONFIG_NAME).get(), is(sameInstance(client)));
-  }
-
-  @Test
-  public void creatingAnExistingClientFails() {
-    connectionManager.create(CONFIG_NAME, mock(HttpClientConfiguration.class));
-    expectedException.expect(IllegalArgumentException.class);
-    expectedException.expectMessage("There's an HttpClient available for config already.");
-    connectionManager.create(CONFIG_NAME, mock(HttpClientConfiguration.class));
+  public void setUp() throws ClientCreationException {
+    when(httpService.client(any())).thenAnswer(
+                                               invocation -> {
+                                                 Consumer<HttpClientConfig> consumer =
+                                                     (Consumer<HttpClientConfig>) invocation.getArguments()[0];
+                                                 TestConfig configurer = new TestConfig();
+                                                 consumer.accept(configurer);
+                                                 if (CONFIG_NAME.equals(configurer.name)) {
+                                                   return delegateHttpClient;
+                                                 } else {
+                                                   return otherHttpClient;
+                                                 }
+                                               });
   }
 
   @Test
   public void sharedClientIsStartedByFirstUse() {
-    HttpClientConfiguration configuration = getHttpClientConfiguration(CONFIG_NAME);
-    ShareableHttpClient client1 = connectionManager.create(CONFIG_NAME, configuration);
-    ShareableHttpClient client2 = connectionManager.lookup(CONFIG_NAME).get();
+    ShareableHttpClient client1 = connectionManager.lookupOrCreate(CONFIG_NAME, cfg -> {
+    });
+    ShareableHttpClient client2 = connectionManager.lookupOrCreate(CONFIG_NAME, cfg -> {
+    });
     client1.start();
     verify(delegateHttpClient).start();
     reset(delegateHttpClient);
@@ -115,8 +87,10 @@ public class HttpRequesterConnectionManagerTestCase extends AbstractMuleTestCase
 
   @Test
   public void sharedClientIsStoppedByLastUse() {
-    ShareableHttpClient client1 = connectionManager.create(CONFIG_NAME, getHttpClientConfiguration(CONFIG_NAME));
-    ShareableHttpClient client2 = connectionManager.lookup(CONFIG_NAME).get();
+    ShareableHttpClient client1 = connectionManager.lookupOrCreate(CONFIG_NAME, cfg -> {
+    });
+    ShareableHttpClient client2 = connectionManager.lookupOrCreate(CONFIG_NAME, cfg -> {
+    });
     client1.start();
     client2.start();
     client1.stop();
@@ -128,9 +102,11 @@ public class HttpRequesterConnectionManagerTestCase extends AbstractMuleTestCase
 
   @Test
   public void differentClientsDoNotAffectEachOther() {
-    ShareableHttpClient client1 = connectionManager.create(CONFIG_NAME, getHttpClientConfiguration(CONFIG_NAME));
+    ShareableHttpClient client1 = connectionManager.lookupOrCreate(CONFIG_NAME, cfg -> {
+    });
     String otherConfig = "otherConfig";
-    connectionManager.create(otherConfig, getHttpClientConfiguration(otherConfig));
+    connectionManager.lookupOrCreate(otherConfig, cfg -> {
+    });
     client1.start();
     verify(otherHttpClient, never()).start();
     client1.stop();
@@ -140,7 +116,8 @@ public class HttpRequesterConnectionManagerTestCase extends AbstractMuleTestCase
   @Test
   public void clientIsStartedAfterFirstError() {
     doThrow(RuntimeException.class).doNothing().when(delegateHttpClient).start();
-    ShareableHttpClient client = connectionManager.create(CONFIG_NAME, getHttpClientConfiguration(CONFIG_NAME));
+    ShareableHttpClient client = connectionManager.lookupOrCreate(CONFIG_NAME, cfg -> {
+    });
     try {
       client.start();
     } catch (RuntimeException e) {
@@ -150,62 +127,77 @@ public class HttpRequesterConnectionManagerTestCase extends AbstractMuleTestCase
     verify(delegateHttpClient, Mockito.times(2)).start();
   }
 
-  @Test
-  @Issue("HTTPC-142")
-  public void noExceptionIsRaisedWhenUsingLookupOrCreate() throws Exception {
-    boolean someExceptionWasCaught = executeSeveralGetOrCreateConcurrentlyAndCheckIfAnExceptionOccurs(this::getOrCreateClient);
-    assertThat(someExceptionWasCaught, is(false));
-  }
+  private static class TestConfig implements HttpClientConfig {
 
-  @Test
-  @Issue("HTTPC-142")
-  public void exceptionMayBeRaisedWhenUsingOldLookupAndCreateCombination() throws Exception {
-    boolean someExceptionWasCaught = executeSeveralGetOrCreateConcurrentlyAndCheckIfAnExceptionOccurs(this::getOrCreateClientOld);
-    assertThat(someExceptionWasCaught, is(true));
-  }
+    private TlsContextFactory tlsContextFactory;
+    private int maxConnections;
+    private boolean usePersistentConnections;
+    private int connectionIdleTimeout;
+    private boolean streaming;
+    private int responseBufferSize;
+    private String name;
+    private Boolean decompress;
+    private Consumer<TcpSocketPropertiesConfigurer> tcpConfigurer;
+    private Consumer<ProxyConfig> proxyConfigurer;
 
-  private boolean executeSeveralGetOrCreateConcurrentlyAndCheckIfAnExceptionOccurs(BiFunction<String, Supplier<? extends HttpClientConfiguration>, ShareableHttpClient> getOrCreateCallback)
-      throws InterruptedException, ExecutionException {
-    // Given a slow client factory.
-    clientFactoryIsSlow.set(true);
-
-    // When we try to getOrCreate clients concurrently
-    int poolSize = 10;
-    ExecutorService executorService = newFixedThreadPool(poolSize);
-    AtomicBoolean someExceptionWasCaught = new AtomicBoolean(false);
-    Collection<Future<?>> futures = new ArrayList<>(poolSize);
-    for (int i = 0; i < poolSize; ++i) {
-      futures.add(executorService.submit(() -> {
-        try {
-          getOrCreateCallback.apply(CONFIG_NAME, () -> getHttpClientConfiguration(CONFIG_NAME));
-        } catch (IllegalArgumentException e) {
-          LOGGER.error("Exception caught", e);
-          someExceptionWasCaught.set(true);
-        }
-      }));
+    @Override
+    public HttpClientConfig setTlsContextFactory(TlsContextFactory tlsContextFactory) {
+      this.tlsContextFactory = tlsContextFactory;
+      return this;
     }
 
-    for (Future<?> future : futures) {
-      future.get();
+    @Override
+    public HttpClientConfig setMaxConnections(int maxConnections) {
+      this.maxConnections = maxConnections;
+      return this;
     }
 
-    // The "then" part should be checked in the caller.
-    return someExceptionWasCaught.get();
-  }
+    @Override
+    public HttpClientConfig setUsePersistentConnections(boolean usePersistentConnections) {
+      this.usePersistentConnections = usePersistentConnections;
+      return this;
+    }
 
-  private ShareableHttpClient getOrCreateClientOld(String configName,
-                                                   Supplier<? extends HttpClientConfiguration> configSupplier) {
-    return connectionManager.lookup(configName).orElseGet(() -> connectionManager.create(configName, configSupplier.get()));
-  }
+    @Override
+    public HttpClientConfig setConnectionIdleTimeout(int connectionIdleTimeout) {
+      this.connectionIdleTimeout = connectionIdleTimeout;
+      return this;
+    }
 
-  private ShareableHttpClient getOrCreateClient(String configName, Supplier<? extends HttpClientConfiguration> configSupplier) {
-    return connectionManager.lookupOrCreate(configName, configSupplier);
-  }
+    @Override
+    public HttpClientConfig setStreaming(boolean streaming) {
+      this.streaming = streaming;
+      return this;
+    }
 
-  private HttpClientConfiguration getHttpClientConfiguration(String configName) {
-    HttpClientConfiguration configuration = mock(HttpClientConfiguration.class);
-    when(configuration.getName()).thenReturn(configName);
-    return configuration;
-  }
+    @Override
+    public HttpClientConfig setResponseBufferSize(int responseBufferSize) {
+      this.responseBufferSize = responseBufferSize;
+      return this;
+    }
 
+    @Override
+    public HttpClientConfig setName(String name) {
+      this.name = name;
+      return this;
+    }
+
+    @Override
+    public HttpClientConfig setDecompress(Boolean decompress) {
+      this.decompress = decompress;
+      return this;
+    }
+
+    @Override
+    public HttpClientConfig configClientSocketProperties(Consumer<TcpSocketPropertiesConfigurer> configCallback) {
+      this.tcpConfigurer = configCallback;
+      return this;
+    }
+
+    @Override
+    public HttpClientConfig configProxy(Consumer<ProxyConfig> configCallback) {
+      this.proxyConfigurer = configCallback;
+      return this;
+    }
+  }
 }

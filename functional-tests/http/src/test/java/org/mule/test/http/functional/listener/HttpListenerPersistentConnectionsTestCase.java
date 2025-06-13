@@ -6,8 +6,8 @@
  */
 package org.mule.test.http.functional.listener;
 
-import static org.mule.runtime.http.api.HttpHeaders.Names.CONNECTION;
-import static org.mule.runtime.http.api.HttpHeaders.Values.KEEP_ALIVE;
+import static org.mule.sdk.api.http.HttpHeaders.Names.CONNECTION;
+import static org.mule.sdk.api.http.HttpHeaders.Values.KEEP_ALIVE;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.emptyOrNullString;

@@ -6,28 +6,26 @@
  */
 package org.mule.extension.http.internal.request;
 
-import static java.lang.Boolean.parseBoolean;
-import static java.lang.String.format;
-import static java.lang.System.getProperty;
-import static java.nio.charset.Charset.defaultCharset;
 import static org.mule.runtime.api.metadata.MediaType.BINARY;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
-import static org.mule.runtime.http.api.HttpHeaders.Names.CONTENT_TYPE;
-import static org.mule.runtime.http.api.HttpHeaders.Names.SET_COOKIE;
-import static org.mule.runtime.http.api.HttpHeaders.Names.SET_COOKIE2;
+import static org.mule.sdk.api.http.HttpHeaders.Names.CONTENT_TYPE;
+import static org.mule.sdk.api.http.HttpHeaders.Names.SET_COOKIE;
+import static org.mule.sdk.api.http.HttpHeaders.Names.SET_COOKIE2;
+
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.String.format;
+import static java.lang.System.getProperty;
+import static java.nio.charset.Charset.defaultCharset;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.internal.request.builder.HttpResponseAttributesBuilder;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.http.api.domain.entity.HttpEntity;
-import org.mule.runtime.http.api.domain.message.response.HttpResponse;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.mule.sdk.api.http.domain.entity.HttpEntity;
+import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 
 import java.io.IOException;
 import java.net.URI;
@@ -40,6 +38,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Component that transforms an HTTP response to a proper {@link Result}.
@@ -68,15 +69,17 @@ public class HttpResponseToResult {
 
     final Result.Builder<Object, HttpResponseAttributes> builder = Result.builder();
     builder.mediaType(getMediaType(getResponseContentType(response, entity), getDefaultEncoding(muleContext)));
-    if (entity.getLength().isPresent()) {
-      builder.length(entity.getLength().get());
-    }
+    entity.getBytesLength().ifPresent(builder::length);
 
     return builder.output(payloadSupplier.get()).attributes(responseAttributes).build();
   }
 
   private boolean empty(HttpEntity entity) {
-    return entity.getLength().filter(length -> length <= 0).isPresent();
+    if (entity.getBytesLength().isPresent()) {
+      return entity.getBytesLength().getAsLong() <= 0;
+    } else {
+      return false;
+    }
   }
 
   private HttpResponseAttributes createAttributes(HttpResponse response) {
