@@ -60,7 +60,7 @@ public class HttpListenerCurrentSpanCustomizer extends HttpCurrentSpanCustomizer
     try {
       distributedTraceContextManager.addCurrentSpanAttribute(HTTP_TARGET, attributes.getListenerPath());
       distributedTraceContextManager.addCurrentSpanAttribute(NET_HOST_NAME, host);
-      distributedTraceContextManager.addCurrentSpanAttribute(NET_HOST_PORT, valueOf(getURI().getPort()));
+      distributedTraceContextManager.addCurrentSpanAttribute(NET_HOST_PORT, valueOf(port));
       distributedTraceContextManager.addCurrentSpanAttribute(HTTP_SCHEME, attributes.getScheme());
       distributedTraceContextManager.addCurrentSpanAttribute(HTTP_ROUTE, attributes.getListenerPath());
       String userAgent = attributes.getHeaders().get(USER_AGENT);
