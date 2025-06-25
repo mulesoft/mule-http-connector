@@ -60,10 +60,10 @@
 
         <maven.surefire.plugin.version>3.5.2</maven.surefire.plugin.version>
 
-        <muleDependenciesVersion>1.0.26</muleDependenciesVersion>
-        <mule.version>4.7.2</mule.version>
+        <muleDependenciesVersion>1.0.27</muleDependenciesVersion>
+        <mule.version>4.9.6</mule.version>
         <muleBomVersion>${mule.version}</muleBomVersion>
-        <muleApiVersion>1.7.2</muleApiVersion>
+        <muleApiVersion>1.9.6</muleApiVersion>
         <httpConnectorVersion>${project.version}</httpConnectorVersion>
     </properties>
 
