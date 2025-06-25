@@ -12,7 +12,6 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.util.Arrays;
@@ -409,21 +408,26 @@ public class CertificateData implements Serializable {
   }
 
   @Override
-  public boolean equals(Object other) {
-    if (this == other) {
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + Arrays.hashCode(encoded);
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
       return true;
     }
-    if (!(other instanceof CertificateData)) {
+    if (obj == null) {
       return false;
     }
-    try {
-      byte[] thisCert = getEncoded();
-      byte[] otherCert = ((CertificateData) other).getEncoded();
-
-      return Arrays.equals(thisCert, otherCert);
-    } catch (CertificateException e) {
+    if (getClass() != obj.getClass()) {
       return false;
     }
+    CertificateData other = (CertificateData) obj;
+    return Arrays.equals(encoded, other.encoded);
   }
 
   @Override

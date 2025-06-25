@@ -16,12 +16,14 @@ import org.mule.test.http.functional.requester.AbstractHttpRequestTestCase;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import org.eclipse.jetty.server.Request;
+
+import org.junit.Rule;
 
 import io.qameta.allure.Story;
-import org.eclipse.jetty.server.Request;
-import org.junit.Rule;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Story(TIMEOUT)
 public abstract class AbstractHttpRedirectTimeoutTestCase extends AbstractHttpRequestTestCase {
@@ -38,6 +40,7 @@ public abstract class AbstractHttpRedirectTimeoutTestCase extends AbstractHttpRe
     this.delay = delay;
   }
 
+  @Override
   protected String getConfigFile() {
     return "http-redirect-timeout-config.xml";
   }

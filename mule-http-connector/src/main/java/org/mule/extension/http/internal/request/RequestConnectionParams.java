@@ -8,6 +8,7 @@ package org.mule.extension.http.internal.request;
 
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
+
 import org.mule.extension.socket.api.socket.tcp.TcpClientSocketProperties;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
@@ -17,6 +18,8 @@ import org.mule.runtime.extension.api.annotation.param.display.Example;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.http.api.HttpConstants;
+
+import java.util.Objects;
 
 /**
  * Groups parameters related to a requester connection
@@ -186,4 +189,34 @@ public final class RequestConnectionParams {
   public void setClientSocketProperties(TcpClientSocketProperties clientSocketProperties) {
     this.clientSocketProperties = clientSocketProperties;
   }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(clientSocketProperties, connectionIdleTimeout, host, maxConnections, port, protocol, responseBufferSize,
+                        streamResponse, usePersistentConnections);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    RequestConnectionParams other = (RequestConnectionParams) obj;
+    return Objects.equals(clientSocketProperties, other.clientSocketProperties)
+        && Objects.equals(connectionIdleTimeout, other.connectionIdleTimeout)
+        && Objects.equals(host, other.host)
+        && Objects.equals(maxConnections, other.maxConnections)
+        && Objects.equals(port, other.port) && protocol == other.protocol
+        && responseBufferSize == other.responseBufferSize
+        && streamResponse == other.streamResponse
+        && usePersistentConnections == other.usePersistentConnections;
+  }
+
+
 }

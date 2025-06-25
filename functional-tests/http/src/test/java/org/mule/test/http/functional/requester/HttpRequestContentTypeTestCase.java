@@ -28,15 +28,15 @@ import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
-import javax.servlet.http.HttpServletResponse;
-
-import io.qameta.allure.Story;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
+import io.qameta.allure.Story;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 @Story(CONTENT)
 public class HttpRequestContentTypeTestCase extends AbstractHttpRequestTestCase {
