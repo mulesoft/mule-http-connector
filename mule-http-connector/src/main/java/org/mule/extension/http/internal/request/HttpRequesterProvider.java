@@ -161,6 +161,9 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
     if (authentication != null) {
       initialiseIfNeeded(authentication, true, muleContext);
     }
+    if (proxyConfig != null) {
+      initialiseIfNeeded(proxyConfig, true, muleContext);
+    }
     if (connectivityTest != null) {
       initialiseIfNeeded(connectivityTest, true, muleContext);
     }
@@ -172,6 +175,9 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
   public void dispose() {
     if (authentication != null) {
       disposeIfNeeded(authentication, LOGGER);
+    }
+    if (proxyConfig != null) {
+      disposeIfNeeded(proxyConfig, LOGGER);
     }
     // MULE-18757: it's necessary to clean up the httpClient in case the app
     // is associated with a domain.
@@ -195,7 +201,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
     ShareableHttpClient httpClient = connectionManager.lookupOrCreate(getConfigurationId(), this::getHttpClientConfiguration);
     UriParameters uriParameters = new DefaultUriParameters(connectionParams.getProtocol(), connectionParams.getHost(),
                                                            connectionParams.getPort());
-    HttpExtensionClient extensionClient = new HttpExtensionClient(httpClient, uriParameters, authentication);
+    HttpExtensionClient extensionClient = new HttpExtensionClient(httpClient, uriParameters, authentication, proxyConfig);
     try {
       extensionClient.start();
     } catch (MuleException e) {
@@ -208,9 +214,13 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpExten
   private HttpClientConfiguration getHttpClientConfiguration() {
     String name = format(NAME_PATTERN, configName);
 
+    // Use the proxy configuration as provided - custom proxy implementations
+    // will handle their own execution logic
+    ProxyConfig standardProxyConfig = proxyConfig;
+
     HttpClientConfiguration configuration = new HttpClientConfiguration.Builder()
         .setTlsContextFactory(tlsContext)
-        .setProxyConfig(proxyConfig)
+        .setProxyConfig(standardProxyConfig)
         .setClientSocketProperties(buildTcpProperties(connectionParams.getClientSocketProperties()))
         .setMaxConnections(connectionParams.getMaxConnections())
         .setUsePersistentConnections(connectionParams.getUsePersistentConnections())

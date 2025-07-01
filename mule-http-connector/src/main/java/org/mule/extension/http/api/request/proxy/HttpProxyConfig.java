@@ -9,9 +9,10 @@ package org.mule.extension.http.api.request.proxy;
 import org.mule.runtime.http.api.client.proxy.ProxyConfig;
 
 /**
- * Marker interface for exposing the proxy configuration as an imported type.
+ * Marker interface for exposing the proxy configuration as an imported type. Extends HttpRequestProxyAuthentication to allow
+ * proxy implementations to provide custom execution behavior.
  */
-public interface HttpProxyConfig extends ProxyConfig {
+public interface HttpProxyConfig extends ProxyConfig, HttpRequestProxyAuthentication {
 
   interface HttpNtlmProxyConfig extends HttpProxyConfig, NtlmProxyConfig {
   }

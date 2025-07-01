@@ -37,10 +37,13 @@ import org.mule.extension.http.api.notification.HttpResponseNotificationData;
 import org.mule.extension.http.api.request.HttpSendBodyMode;
 import org.mule.extension.http.api.request.authentication.HttpRequestAuthentication;
 import org.mule.extension.http.api.request.client.UriParameters;
+import org.mule.extension.http.api.request.proxy.HttpRequestProxyAuthentication;
+
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.api.streaming.HttpStreamingType;
 import org.mule.extension.http.internal.request.client.HttpExtensionClient;
 import org.mule.extension.http.internal.request.profiling.HttpRequestResponseProfilingDataProducerAdaptor;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -141,7 +144,8 @@ public class HttpRequester {
                         boolean checkRetry, MuleContext muleContext, Scheduler scheduler, NotificationEmitter notificationEmitter,
                         StreamingHelper streamingHelper, CompletionCallback<InputStream, HttpResponseAttributes> callback,
                         Map<String, List<String>> injectedHeaders,
-                        DistributedTraceContextManager distributedTraceContextManager) {
+                        DistributedTraceContextManager distributedTraceContextManager)
+      throws MuleException {
 
     int resolvedTimeout = resolveResponseTimeout(muleContext, responseTimeout);
     HttpRequest httpRequester = httpRequestFactory.create(config, uri, method, streamingMode, sendBodyMode, transformationService,
@@ -166,7 +170,7 @@ public class HttpRequester {
                                                                    MuleContext muleContext, Scheduler scheduler,
                                                                    Map<String, List<String>> injectedHeaders,
                                                                    DistributedTraceContextManager distributedTraceContextManager)
-      throws ExecutionException, InterruptedException {
+      throws ExecutionException, InterruptedException, MuleException {
     CompletableFuture<Result<InputStream, HttpResponseAttributes>> future = new CompletableFuture<>();
     CompletionCallback<InputStream, HttpResponseAttributes> callback =
         new CompletionCallback<InputStream, HttpResponseAttributes>() {
@@ -197,10 +201,84 @@ public class HttpRequester {
                                   StreamingHelper streamingHelper,
                                   CompletionCallback<InputStream, HttpResponseAttributes> callback, HttpRequest httpRequest,
                                   int retryCount, Map<String, List<String>> injectedHeaders,
-                                  DistributedTraceContextManager distributedTraceContextManager) {
+                                  DistributedTraceContextManager distributedTraceContextManager)
+      throws MuleException {
     fireNotification(notificationEmitter, REQUEST_START, () -> HttpRequestNotificationData.from(httpRequest),
                      REQUEST_NOTIFICATION_DATA_TYPE);
 
+    // Check if we have a custom proxy authentication that handles execution
+    org.mule.runtime.http.api.client.proxy.ProxyConfig proxyConfig = client.getProxyConfig();
+    if (proxyConfig instanceof HttpRequestProxyAuthentication) {
+      // Delegate to the custom proxy authentication implementation
+      HttpRequestProxyAuthentication proxyAuth = (HttpRequestProxyAuthentication) proxyConfig;
+
+      proxyAuth.executeRequest(httpRequest, responseTimeout, followRedirects, sendBodyMode)
+          .whenComplete((response, exception) -> {
+            if (response != null) {
+              try {
+                fireNotification(notificationEmitter, REQUEST_COMPLETE, () -> HttpResponseNotificationData.from(response),
+                                 RESPONSE_NOTIFICATION_DATA_TYPE);
+
+                HttpEntity entity = response.getEntity();
+
+                Supplier<Object> resultInputStreamSupplier =
+                    resultInputStreamSupplier(streamingHelper, entity, authentication, responseValidator);
+
+                Result<Object, HttpResponseAttributes> result = httpResponseToResult
+                    .convert(config, muleContext, response, entity, resultInputStreamSupplier, httpRequest.getUri());
+
+                // Use the proxy authentication's retry logic
+                proxyAuth.retryIfShould(result, () -> {
+                  scheduler.submit(() -> consumePayload(result));
+                  try {
+                    doRequest(client, config, uri, method, streamingMode, sendBodyMode, followRedirects,
+                              authentication, responseTimeout, responseValidator, transformationService,
+                              requestCreator, false, muleContext, scheduler, notificationEmitter,
+                              streamingHelper, callback, injectedHeaders, distributedTraceContextManager);
+                  } catch (MuleException e) {
+                    throw new RuntimeException(e);
+                  }
+                }, () -> {
+                  if (distributedTraceContextManager != null) {
+                    result.getAttributes().ifPresent(attributes -> {
+                      addStatusCodeAttribute(distributedTraceContextManager,
+                                             attributes.getStatusCode(), logger);
+                      updateClientSpanStatus(distributedTraceContextManager, attributes.getStatusCode(), logger);
+                    });
+                  }
+                  if (streamingHelper != null) {
+                    responseValidator.validate((Result) result, httpRequest, streamingHelper);
+                  } else {
+                    // we don't have streamingHelper in sources
+                    responseValidator.validate((Result) result, httpRequest);
+                  }
+
+                  Result<Object, HttpResponseAttributes> freshResult = httpResponseToResult
+                      .convert(config, muleContext, response, entity, resultInputStreamSupplier, httpRequest.getUri());
+
+                  String correlationId =
+                      requestCreator.getCorrelationData().map(data -> data.getCorrelationInfo().getCorrelationId()).orElse(null);
+                  profilingDataProducer
+                      .ifPresent(profilingDataProducer -> profilingDataProducer.triggerProfilingEvent(result, correlationId));
+
+                  callback.success((Result) freshResult);
+                });
+              } catch (Exception e) {
+                callback.error(e);
+              }
+            } else {
+              logger.error(getErrorMessage(httpRequest));
+              HttpError error = exception instanceof TimeoutException ? TIMEOUT : CONNECTIVITY;
+              callback.error(new HttpRequestFailedException(createStaticMessage(httpErrorMessageGenerator
+                  .createFrom(httpRequest,
+                              getExceptionMessage(exception))),
+                                                            exception, error));
+            }
+          });
+      return;
+    }
+
+    // Standard HTTP client execution for non-custom proxy configurations
     client.send(httpRequest, responseTimeout, followRedirects, resolveAuthentication(authentication), sendBodyMode)
         .whenComplete((response, exception) -> {
           if (response != null) {
@@ -218,10 +296,14 @@ public class HttpRequester {
 
               resendRequest(result, checkRetry, authentication, () -> {
                 scheduler.submit(() -> consumePayload(result));
-                doRequest(client, config, uri, method, streamingMode, sendBodyMode, followRedirects,
-                          authentication, responseTimeout, responseValidator, transformationService,
-                          requestCreator, false, muleContext, scheduler, notificationEmitter,
-                          streamingHelper, callback, injectedHeaders, distributedTraceContextManager);
+                try {
+                  doRequest(client, config, uri, method, streamingMode, sendBodyMode, followRedirects,
+                            authentication, responseTimeout, responseValidator, transformationService,
+                            requestCreator, false, muleContext, scheduler, notificationEmitter,
+                            streamingHelper, callback, injectedHeaders, distributedTraceContextManager);
+                } catch (MuleException e) {
+                  throw new RuntimeException(e);
+                }
               }, () -> {
                 if (distributedTraceContextManager != null) {
                   result.getAttributes().ifPresent(attributes -> {
@@ -254,10 +336,14 @@ public class HttpRequester {
             checkIfRemotelyClosed(exception, client.getDefaultUriParameters());
 
             if (shouldRetryRemotelyClosed(exception, retryCount, httpRequest)) {
-              doRequestWithRetry(client, config, uri, method, streamingMode, sendBodyMode, followRedirects, authentication,
-                                 responseTimeout, responseValidator, transformationService, requestCreator, checkRetry,
-                                 muleContext, scheduler, notificationEmitter, streamingHelper, callback, httpRequest,
-                                 retryCount - 1, injectedHeaders, distributedTraceContextManager);
+              try {
+                doRequestWithRetry(client, config, uri, method, streamingMode, sendBodyMode, followRedirects, authentication,
+                                   responseTimeout, responseValidator, transformationService, requestCreator, checkRetry,
+                                   muleContext, scheduler, notificationEmitter, streamingHelper, callback, httpRequest,
+                                   retryCount - 1, injectedHeaders, distributedTraceContextManager);
+              } catch (MuleException e) {
+                throw new RuntimeException(e);
+              }
               return;
             }
 

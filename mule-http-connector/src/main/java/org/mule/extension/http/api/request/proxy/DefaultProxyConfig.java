@@ -6,13 +6,17 @@
  */
 package org.mule.extension.http.api.request.proxy;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.dsl.xml.TypeDsl;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
+import org.mule.runtime.http.api.domain.message.request.HttpRequest;
+import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Basic HTTP Proxy configuration based on host and port, and optionally a username and password for proxy authentication.
@@ -76,6 +80,17 @@ public class DefaultProxyConfig implements HttpProxyConfig {
 
   public String getNonProxyHosts() {
     return nonProxyHosts;
+  }
+
+  @Override
+  public CompletableFuture<HttpResponse> executeRequest(HttpRequest request, int responseTimeout,
+                                                        boolean followRedirects,
+                                                        org.mule.extension.http.api.request.HttpSendBodyMode sendBodyMode)
+      throws MuleException {
+    // Default implementation delegates to the standard HTTP client
+    // This will be handled by the HTTP connector's standard proxy mechanism
+    throw new UnsupportedOperationException("DefaultProxyConfig does not provide custom execution. " +
+        "Use a custom proxy implementation that extends HttpRequestProxyAuthentication.");
   }
 
   @Override

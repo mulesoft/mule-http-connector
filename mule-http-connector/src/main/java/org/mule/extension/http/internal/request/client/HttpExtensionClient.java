@@ -33,12 +33,23 @@ public class HttpExtensionClient implements Startable, Stoppable {
   private final HttpRequestAuthentication authentication;
   private final ShareableHttpClient httpClient;
   private final UriParameters uriParameters;
+  private final org.mule.runtime.http.api.client.proxy.ProxyConfig proxyConfig;
 
   public HttpExtensionClient(ShareableHttpClient httpClient, UriParameters uriParameters,
                              HttpRequestAuthentication authentication) {
     this.httpClient = httpClient;
     this.uriParameters = uriParameters;
     this.authentication = authentication;
+    this.proxyConfig = null;
+  }
+
+  public HttpExtensionClient(ShareableHttpClient httpClient, UriParameters uriParameters,
+                             HttpRequestAuthentication authentication,
+                             org.mule.runtime.http.api.client.proxy.ProxyConfig proxyConfig) {
+    this.httpClient = httpClient;
+    this.uriParameters = uriParameters;
+    this.authentication = authentication;
+    this.proxyConfig = proxyConfig;
   }
 
   /**
@@ -50,6 +61,13 @@ public class HttpExtensionClient implements Startable, Stoppable {
 
   public HttpRequestAuthentication getDefaultAuthentication() {
     return authentication;
+  }
+
+  /**
+   * Returns the proxy configuration from the underlying HTTP client.
+   */
+  public org.mule.runtime.http.api.client.proxy.ProxyConfig getProxyConfig() {
+    return proxyConfig;
   }
 
   @Override
